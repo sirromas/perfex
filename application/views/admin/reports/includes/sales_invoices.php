@@ -1,6 +1,6 @@
     <div id="invoices-report" class="hide">
       <div class="row">
-         <div class="col-md-4">
+         <div class="col-md-3">
             <div class="form-group">
                <label for="invoice_status"><?php echo _l('report_invoice_status'); ?></label>
                <select name="invoice_status" class="selectpicker" multiple data-width="100%">
@@ -11,8 +11,9 @@
                </select>
             </div>
          </div>
+         
          <?php if(count($invoices_sale_agents) > 0 ) { ?>
-         <div class="col-md-4">
+         <div class="col-md-3">
             <div class="form-group">
                <label for="sale_agent_invoices"><?php echo _l('sale_agent_string'); ?></label>
                <select name="sale_agent_invoices" class="selectpicker" multiple data-width="100%">
@@ -24,6 +25,39 @@
             </div>
          </div>
          <?php } ?>
+          
+         <?php 
+         
+         if(count($regions) > 0 ) { ?>
+         <div class="col-md-3">
+            <div class="form-group">
+               <label for="regions"><?php echo _l('regions'); ?></label>
+               <select name="regions" class="selectpicker" multiple data-width="100%">
+                  <option value="" selected><?php echo _l('regions_all'); ?></option>
+                  <?php foreach($regions as $r){ ?>
+                  <option value="<?php echo $r; ?>"><?php echo $r; ?></option>
+                  <?php } ?>
+               </select>
+            </div>
+         </div>
+         <?php } ?> 
+     
+          
+         <?php 
+           if(count($employees) > 0 ) { ?>
+         <div class="col-md-3">
+            <div class="form-group">
+               <label for="employees"><?php echo _l('employee_string'); ?></label>
+               <select name="employees" class="selectpicker" multiple data-width="100%">
+                  <option value="" selected><?php echo _l('employee_all'); ?></option>
+                  <?php foreach($employees as $e){ ?>
+                  <option value="<?php echo $e; ?>"><?php echo get_staff_full_name($e); ?></option>
+                  <?php } ?>
+               </select>
+            </div>
+         </div>
+         <?php } ?>  
+          
          <div class="clearfix"></div>
       </div>
          <table class="table table-striped table-invoices-report scroll-responsive">
@@ -31,6 +65,8 @@
                <tr>
                   <th><?php echo _l('report_invoice_number'); ?></th>
                   <th><?php echo _l('report_invoice_customer'); ?></th>
+                  <th><?php echo _l('region'); ?></th>
+                  <th><?php echo _l('employee_string'); ?></th>
                   <th><?php echo _l('invoice_estimate_year'); ?></th>
                   <th><?php echo _l('report_invoice_date'); ?></th>
                   <th><?php echo _l('report_invoice_duedate'); ?></th>
@@ -49,6 +85,8 @@
             <tbody></tbody>
             <tfoot>
                <tr>
+                  <td></td>
+                  <td></td>
                   <td></td>
                   <td></td>
                   <td></td>

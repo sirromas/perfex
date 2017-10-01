@@ -48,7 +48,8 @@ $lang['invoice_payments_table_number_heading'] = 'Payment #';
 $lang['invoice_payments_table_mode_heading']   = 'Payment Mode';
 $lang['invoice_payments_table_date_heading']   = 'Date';
 $lang['invoice_payments_table_amount_heading'] = 'Amount';
-
+$lang['region']='Region';
+$lang['manager']='Manager';
 
 # Announcements
 $lang['announcement']                 = 'Announcement';
@@ -1472,7 +1473,12 @@ $lang['settings_custom_pdf_logo_image_url_tooltip']   = 'Probably you will have 
 
 # General
 $lang['sale_agent_string']               = 'Sale Agent';
+$lang['employee_string']                 = 'Employee';
+$lang['employee_all']                    = 'All';
+$lang['regions']                         = 'Regions';
+$lang['regions_all']                     = 'All';
 $lang['amount_display_in_base_currency'] = 'Amount is displayed in your base currency - Only use this report if you are using 1 currency for payments and expenses.';
+
 # Leads
 $lang['leads_summary']                                         = 'Leads Summary';
 

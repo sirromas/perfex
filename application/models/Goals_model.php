@@ -82,7 +82,7 @@ class Goals_model extends CRM_Model
             logActivity('Goal Updated [ID:' . $id . ']');
 
             return true;
-            ;
+            
         }
 
         return false;
