@@ -13,17 +13,26 @@ class Invoices_model extends CRM_Model
         parent::__construct();
     }
 
+    /**
+     * @return array
+     */
     public function get_statuses()
     {
         return $this->statuses;
     }
 
+    /**
+     * @return mixed
+     */
     public function get_sale_agents()
     {
         return $this->db->query("SELECT DISTINCT(sale_agent) as sale_agent "
             . "FROM tblinvoices WHERE sale_agent != 0")->result_array();
     }
 
+    /**
+     * @return array
+     */
     public function get_employees()
     {
         $result = $this->db->query("SELECT DISTINCT(staffid) as employee "
@@ -34,6 +43,44 @@ class Invoices_model extends CRM_Model
         return $employee;
     }
 
+    /**
+     * @param $relid
+     * @return mixed
+     */
+    public function get_region_name_by_rel($relid)
+    {
+        $query = "select * from blcustomfieldsvalues where fieldid=1 
+                and relid=$relid";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $value = $row->value;
+        }
+        return $value;
+    }
+
+    /**
+     * @param $clientid
+     * @return string
+     */
+    public function get_staff_name_by_id($addedfrom)
+    {
+        if ($addedfrom > 0) {
+            $query = "select * from tblstaff where staffid=$addedfrom";
+            $result = $this->db->query($query);
+            foreach ($result->result() as $row) {
+                $name = $row->firstname . ' ' . $row->lastname;
+            }
+        } // end if
+        else {
+            $name = 'N/A';
+        }
+        return $name;
+    }
+
+    /**
+     * @param $region_name
+     * @return mixed
+     */
     public function is_region_has_invoices($region_name)
     {
         $cleardata = trim($region_name);
@@ -43,6 +90,9 @@ class Invoices_model extends CRM_Model
         return $num;
     }
 
+    /**
+     * @return array
+     */
     public function get_regions()
     {
         $regionsArr = array();
@@ -57,16 +107,35 @@ class Invoices_model extends CRM_Model
             if ($status > 0) {
                 $regionsArr[] = $region_name;
             } // end if
-        } // end foeach
+        } // end foreach
         return $regionsArr;
     }
 
+    /**
+     * @param $regionname
+     * @return array
+     */
     public function get_clientid_by_region($regionname)
     {
         $query = "select * from tblcustomfieldsvalues where value='$regionname'";
         $result = $this->db->query($query);
         foreach ($result->result() as $row) {
             $clientids[] = $row->relid;
+        }
+        return $clientids;
+    }
+
+
+    /**
+     * @param $staff_id
+     * @return array
+     */
+    public function get_clientid_by_admin($staff_id)
+    {
+        $query = "select * from tblcustomeradmins where staff_id=$staff_id";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $clientids[] = $row->customer_id;
         }
         return $clientids;
     }
@@ -138,6 +207,10 @@ class Invoices_model extends CRM_Model
         return $items;
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function get_invoice_item($id)
     {
         $this->db->where('id', $id);
@@ -145,6 +218,10 @@ class Invoices_model extends CRM_Model
         return $this->db->get('tblitems_in')->row();
     }
 
+    /**
+     * @param $id
+     * @return bool
+     */
     public function mark_as_cancelled($id)
     {
         $this->db->where('id', $id);
@@ -161,6 +238,10 @@ class Invoices_model extends CRM_Model
         return false;
     }
 
+    /**
+     * @param $id
+     * @return bool
+     */
     public function unmark_as_cancelled($id)
     {
         $this->db->where('id', $id);
@@ -643,6 +724,9 @@ class Invoices_model extends CRM_Model
         return false;
     }
 
+    /**
+     * @param $id
+     */
     public function update_total_tax($id)
     {
         $total_tax = 0;
@@ -685,6 +769,10 @@ class Invoices_model extends CRM_Model
         ));
     }
 
+    /**
+     * @param $clientid
+     * @return mixed
+     */
     public function get_expenses_to_bill($clientid)
     {
         $this->load->model('expenses_model');
@@ -696,6 +784,11 @@ class Invoices_model extends CRM_Model
         return $this->expenses_model->get('', $where);
     }
 
+    /**
+     * @param $client_id
+     * @param $current_invoice
+     * @return array
+     */
     public function check_for_merge_invoice($client_id, $current_invoice)
     {
         if ($current_invoice != 'undefined') {
@@ -1347,6 +1440,11 @@ class Invoices_model extends CRM_Model
         return false;
     }
 
+    /**
+     * @param $invoiceid
+     * @param string $id
+     * @return mixed
+     */
     public function get_attachments($invoiceid, $id = '')
     {
         // If is passed id get return only 1 attachment
@@ -1780,6 +1878,9 @@ class Invoices_model extends CRM_Model
         ));
     }
 
+    /**
+     * @return mixed
+     */
     public function get_invoices_years()
     {
         return $this->db->query('SELECT DISTINCT(YEAR(date)) as year FROM tblinvoices ORDER BY year DESC')->result_array();

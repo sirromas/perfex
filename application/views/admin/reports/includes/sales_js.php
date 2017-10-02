@@ -24,13 +24,15 @@
         "sale_agent_invoices": '[name="sale_agent_invoices"]',
         "sale_agent_items": '[name="sale_agent_items"]',
         "sale_agent_estimates": '[name="sale_agent_estimates"]',
-        "regions":'[name="regions"]',
-        "employees":'[name="employees"]',
+        "regions": '[name="regions"]',
+        "employees": '[name="employees"]',
+        "c_regions": '[name="c_regions"]',
+        "c_employees": '[name="c_employees"]',
         "proposals_sale_agents": '[name="proposals_sale_agents"]',
         "proposal_status": '[name="proposal_status"]',
     }
     $(function () {
-        $('select[name="currency"], select[name="regions"], select[name="employees"], select[name="invoice_status"],select[name="estimate_status"],select[name="sale_agent_invoices"],select[name="sale_agent_items"],select[name="sale_agent_estimates"],select[name="payments_years"],select[name="proposals_sale_agents"],select[name="proposal_status"]').on('change', function () {
+        $('select[name="currency"], select[name="regions"], select[name="employees"], select[name="c_regions"], select[name="c_employees"], select[name="invoice_status"],select[name="estimate_status"],select[name="sale_agent_invoices"],select[name="sale_agent_items"],select[name="sale_agent_estimates"],select[name="payments_years"],select[name="proposals_sale_agents"],select[name="proposal_status"]').on('change', function () {
             gen_reports();
         });
 
@@ -99,9 +101,9 @@
             $(this).find('tfoot td.total_tax').html(sums.total_tax);
             $(this).find('tfoot td.discount').html(sums.discount);
             $(this).find('tfoot td.adjustment').html(sums.adjustment);
-<?php foreach ($proposal_taxes as $key => $tax) { ?>
-                $(this).find('tfoot td.total_tax_single_<?php echo $key; ?>').html(sums['total_tax_single_<?php echo $key; ?>']);
-<?php } ?>
+            <?php foreach ($proposal_taxes as $key => $tax) { ?>
+            $(this).find('tfoot td.total_tax_single_<?php echo $key; ?>').html(sums['total_tax_single_<?php echo $key; ?>']);
+            <?php } ?>
         });
 
         $('.table-invoices-report').on('draw.dt', function () {
@@ -115,9 +117,9 @@
             $(this).find('tfoot td.discount_total').html(sums.discount_total);
             $(this).find('tfoot td.adjustment').html(sums.adjustment);
             $(this).find('tfoot td.amount_open').html(sums.amount_open);
-<?php foreach ($invoice_taxes as $key => $tax) { ?>
-                $(this).find('tfoot td.total_tax_single_<?php echo $key; ?>').html(sums['total_tax_single_<?php echo $key; ?>']);
-<?php } ?>
+            <?php foreach ($invoice_taxes as $key => $tax) { ?>
+            $(this).find('tfoot td.total_tax_single_<?php echo $key; ?>').html(sums['total_tax_single_<?php echo $key; ?>']);
+            <?php } ?>
         });
 
         $('.table-estimates-report').on('draw.dt', function () {
@@ -130,9 +132,9 @@
             $(this).find('tfoot td.total_tax').html(sums.total_tax);
             $(this).find('tfoot td.discount_total').html(sums.discount_total);
             $(this).find('tfoot td.adjustment').html(sums.adjustment);
-<?php foreach ($estimate_taxes as $key => $tax) { ?>
-                $(this).find('tfoot td.total_tax_single_<?php echo $key; ?>').html(sums['total_tax_single_<?php echo $key; ?>']);
-<?php } ?>
+            <?php foreach ($estimate_taxes as $key => $tax) { ?>
+            $(this).find('tfoot td.total_tax_single_<?php echo $key; ?>').html(sums['total_tax_single_<?php echo $key; ?>']);
+            <?php } ?>
         });
 
         $('.table-items-report').on('draw.dt', function () {
@@ -230,10 +232,10 @@
                     },
                     scales: {
                         yAxes: [{
-                                ticks: {
-                                    beginAtZero: true,
-                                }
-                            }]
+                            ticks: {
+                                beginAtZero: true,
+                            }
+                        }]
                     },
                 }
             })
@@ -260,20 +262,22 @@
                     maintainAspectRatio: false,
                     scales: {
                         yAxes: [{
-                                ticks: {
-                                    beginAtZero: true,
-                                }
-                            }]
+                            ticks: {
+                                beginAtZero: true,
+                            }
+                        }]
                     },
                 }
             })
         });
     }
+
     // Generate customers report
     function customers_report() {
         if ($.fn.DataTable.isDataTable('.table-customers-report')) {
             $('.table-customers-report').DataTable().destroy();
         }
+        $('#customer_report_controls').show();
         initDataTable('.table-customers-report', admin_url + 'reports/customers_report', false, false, fnServerParams, [0, 'ASC']);
     }
 
@@ -302,22 +306,25 @@
                     },
                     scales: {
                         yAxes: [{
-                                ticks: {
-                                    beginAtZero: true,
-                                }
-                            }]
-                    }}
+                            ticks: {
+                                beginAtZero: true,
+                            }
+                        }]
+                    }
+                }
             });
         });
     }
+
     function invoices_report() {
         if ($.fn.DataTable.isDataTable('.table-invoices-report')) {
             $('.table-invoices-report').DataTable().destroy();
         }
+        $('#customer_report_controls').hide();
         _table_api = initDataTable('.table-invoices-report', admin_url + 'reports/invoices_report', false, false, fnServerParams, [
-         [2, 'ASC'],
-         [0, 'DESC']
-         ]);
+            [2, 'ASC'],
+            [0, 'DESC']
+        ]);
     }
 
     function estimates_report() {
