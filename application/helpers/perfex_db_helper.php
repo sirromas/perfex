@@ -785,6 +785,8 @@ function total_rows($table, $where = array())
         $CI->db->where($where);
     }
 
+    //print_r($where);
+
     return $CI->db->count_all_results($table);
 }
 /**

@@ -19,6 +19,9 @@ class Reports extends Admin_controller
 
     /* No access on this url */
 
+    /**
+     *
+     */
     public function index()
     {
         redirect(admin_url());
@@ -26,6 +29,9 @@ class Reports extends Admin_controller
 
     /* See knowledge base article reports */
 
+    /**
+     *
+     */
     public function knowledge_base_articles()
     {
         $this->load->model('knowledge_base_model');
@@ -34,18 +40,15 @@ class Reports extends Admin_controller
         $this->load->view('admin/reports/knowledge_base_articles', $data);
     }
 
-    /*
-      public function tax_summary(){
-      $this->load->model('taxes_model');
-      $this->load->model('payments_model');
-      $this->load->model('invoices_model');
-      $data['taxes'] = $this->db->query("SELECT DISTINCT taxname,taxrate FROM tblitemstax WHERE rel_type='invoice'")->result_array();
-      $this->load->view('admin/reports/tax_summary',$data);
-      } */
-    /* Repoert leads conversions */
 
+    /* Report leads conversions */
+    /**
+     *
+     */
     public function leads()
     {
+        $data['regions'] = $this->reports_model->get_leads_regions();
+        $data['staff'] = $this->reports_model->get_leads_staff();
         $type = 'leads';
         if ($this->input->get('type')) {
             $type = $type . '_' . $this->input->get('type');
@@ -58,8 +61,26 @@ class Reports extends Admin_controller
         $this->load->view('admin/reports/' . $type, $data);
     }
 
-    /* Sales reportts */
+    /**
+     *
+     */
+    public function get_leads_data_ajax()
+    {
+        $item = $_POST['item'];
+        $data = $this->reports_model->get_leads_conversion_report_data(json_decode($item));
+        /*
+        echo "<pre>";
+        print_r($data);
+        echo "</pre>";
+        */
+        echo $data;
 
+    }
+
+    /* Sales reports */
+    /**
+     *
+     */
     public function sales()
     {
 
@@ -96,6 +117,9 @@ class Reports extends Admin_controller
 
     /* Customer report */
 
+    /**
+     *
+     */
     public function customers_report()
     {
         if ($this->input->is_ajax_request()) {
@@ -239,6 +263,9 @@ class Reports extends Admin_controller
     }
 
 
+    /**
+     *
+     */
     public function payments_received()
     {
         if ($this->input->is_ajax_request()) {
@@ -340,6 +367,9 @@ class Reports extends Admin_controller
         }
     }
 
+    /**
+     *
+     */
     public function proposals_report()
     {
         if ($this->input->is_ajax_request()) {
@@ -506,6 +536,9 @@ class Reports extends Admin_controller
         }
     }
 
+    /**
+     *
+     */
     public function estimates_report()
     {
         if ($this->input->is_ajax_request()) {
@@ -677,6 +710,10 @@ class Reports extends Admin_controller
         }
     }
 
+    /**
+     * @param string $field
+     * @return string
+     */
     private function get_where_report_period($field = 'date')
     {
         $months_report = $this->input->post('report_months');
@@ -720,6 +757,9 @@ class Reports extends Admin_controller
         return $custom_date_select;
     }
 
+    /**
+     *
+     */
     public function items()
     {
         if ($this->input->is_ajax_request()) {
@@ -808,6 +848,9 @@ class Reports extends Admin_controller
         }
     }
 
+    /**
+     *
+     */
     public function invoices_report()
     {
         if ($this->input->is_ajax_request()) {
@@ -1042,6 +1085,9 @@ class Reports extends Admin_controller
         }
     }
 
+    /**
+     * @param string $type
+     */
     public function expenses($type = 'simple_report')
     {
         $this->load->model('currencies_model');
@@ -1236,6 +1282,9 @@ class Reports extends Admin_controller
         }
     }
 
+    /**
+     * @param string $year
+     */
     public function expenses_vs_income($year = '')
     {
         $_expenses_years = array();
@@ -1258,16 +1307,25 @@ class Reports extends Admin_controller
 
     /* Total income report / ajax chart */
 
+    /**
+     *
+     */
     public function total_income_report()
     {
         echo json_encode($this->reports_model->total_income_report());
     }
 
+    /**
+     *
+     */
     public function report_by_payment_modes()
     {
         echo json_encode($this->reports_model->report_by_payment_modes());
     }
 
+    /**
+     *
+     */
     public function report_by_customer_groups()
     {
         echo json_encode($this->reports_model->report_by_customer_groups());
@@ -1275,11 +1333,18 @@ class Reports extends Admin_controller
 
     /* Leads conversion monthly report / ajax chart */
 
+    /**
+     * @param $month
+     */
     public function leads_monthly_report($month)
     {
         echo json_encode($this->reports_model->leads_monthly_report($month));
     }
 
+    /**
+     * @param $rel_type
+     * @return mixed
+     */
     private function distinct_taxes($rel_type)
     {
         return $this->db->query("SELECT DISTINCT taxname,taxrate FROM tblitemstax WHERE rel_type='" . $rel_type . "' ORDER BY taxname ASC")->result_array();

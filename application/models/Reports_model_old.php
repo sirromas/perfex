@@ -1,6 +1,5 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
-
 class Reports_model extends CRM_Model
 {
     public function __construct()
@@ -10,19 +9,19 @@ class Reports_model extends CRM_Model
 
     /**
      *  Leads conversions monthly report
-     * @param   mixed $month which month / chart
+     * @param   mixed $month  which month / chart
      * @return  array          chart data
      */
     public function leads_monthly_report($month)
     {
-        $result = $this->db->query('select last_status_change from tblleads where MONTH(last_status_change) = ' . $month . ' AND status = 1 and lost = 0')->result_array();
+        $result      = $this->db->query('select last_status_change from tblleads where MONTH(last_status_change) = ' . $month . ' AND status = 1 and lost = 0')->result_array();
         $month_dates = array();
-        $data = array();
+        $data        = array();
         for ($d = 1; $d <= 31; $d++) {
             $time = mktime(12, 0, 0, $month, $d, date('Y'));
             if (date('m', $time) == $month) {
                 $month_dates[] = _d(date('Y-m-d', $time));
-                $data[] = 0;
+                $data[]        = 0;
             }
         }
         $chart = array(
@@ -51,13 +50,6 @@ class Reports_model extends CRM_Model
         return $chart;
     }
 
-    /**
-     * @param $label
-     * @param $where
-     * @param $dataset_options
-     * @param $year
-     * @return array
-     */
     public function get_stats_chart_data($label, $where, $dataset_options, $year)
     {
         $chart = array(
@@ -78,7 +70,7 @@ class Reports_model extends CRM_Model
         $this->load->model('expenses_model');
         $categories = $this->expenses_model->get_category();
         foreach ($categories as $category) {
-            $_where['category'] = $category['id'];
+            $_where['category']   = $category['id'];
             $_where['YEAR(date)'] = $year;
             if (count($where) > 0) {
                 foreach ($where as $key => $val) {
@@ -92,18 +84,14 @@ class Reports_model extends CRM_Model
         return $chart;
     }
 
-    /**
-     * @param string $year
-     * @return array
-     */
     public function get_expenses_vs_income_report($year = '')
     {
         $this->load->model('expenses_model');
 
-        $months_labels = array();
+        $months_labels  = array();
         $total_expenses = array();
-        $total_income = array();
-        $i = 0;
+        $total_income   = array();
+        $i              = 0;
         if (!is_numeric($year)) {
             $year = date('Y');
         }
@@ -185,7 +173,7 @@ class Reports_model extends CRM_Model
         $this->db->where('CAST(last_status_change as DATE) >= "' . date('Y-m-d', strtotime('monday this week')) . '" AND CAST(last_status_change as DATE) <= "' . date('Y-m-d', strtotime('sunday this week')) . '" AND status = 1 and lost = 0');
         $weekly = $this->db->get('tblleads')->result_array();
         $colors = get_system_favourite_colors();
-        $chart = array(
+        $chart  = array(
             'labels' => array(
                 _l('wd_monday'),
                 _l('wd_tuesday'),
@@ -229,7 +217,7 @@ class Reports_model extends CRM_Model
         );
         foreach ($weekly as $weekly) {
             $lead_status_day = _l(mb_strtolower('wd_' . date('l', strtotime($weekly['last_status_change']))));
-            $i = 0;
+            $i               = 0;
             foreach ($chart['labels'] as $dat) {
                 if ($lead_status_day == $dat) {
                     $chart['datasets'][0]['data'][$i]++;
@@ -241,48 +229,14 @@ class Reports_model extends CRM_Model
         return $chart;
     }
 
-
-    /**
-     * @return array
-     */
-    public function get_leads_regions()
-    {
-        $query = "select * from tblcustomfields where name='regions'";
-        $result = $this->db->query($query);
-        foreach ($result->result() as $row) {
-            $options = explode(',', $row->options);
-        }
-        return $options;
-    }
-
-    /**
-     * @return array
-     */
-    public function get_leads_staff()
-    {
-        $query = "select * from tblstaff";
-        $result = $this->db->query($query);
-        foreach ($result->result() as $row) {
-            $staff[] = $row->staffid;
-        }
-        return $staff;
-    }
-
-
-    /**
-     * @return array
-     */
     public function leads_staff_report()
     {
         $this->load->model('staff_model');
         $staff = $this->staff_model->get();
         if ($this->input->post()) {
             $from_date = to_sql_date($this->input->post('staff_report_from_date'));
-            $to_date = to_sql_date($this->input->post('staff_report_to_date'));
-            $region = $this->input->post('l_regions');
-            $staffid = $this->input->post('l_staff');
+            $to_date   = to_sql_date($this->input->post('staff_report_to_date'));
         }
-
         $chart = array(
             'labels' => array(),
             'datasets' => array(
@@ -312,337 +266,52 @@ class Reports_model extends CRM_Model
                 )
             )
         );
-
         foreach ($staff as $member) {
             array_push($chart['labels'], $member['firstname'] . ' ' . $member['lastname']);
-            // Case when no employee selected
             if (!isset($to_date) && !isset($from_date)) {
-                // Converted
-                $sql = "";
-                $sql .= "SELECT COUNT(tblleads.id) as total FROM tblleads WHERE  status = 1 AND assigned=" . $member['staffid'] . "";
-                if ($region != '') {
-                    $sql .= " AND region='$region'";
-                }
-                $total_rows_converted = $this->db->query($sql)->row()->total;
-
-                // Created
-                $sql = "";
-                $sql .= "SELECT COUNT(tblleads.id) as total FROM tblleads WHERE addedfrom=" . $member['staffid'] . "";
-                if ($region != '') {
-                    $sql .= " AND region='$region'";
-                }
-                $total_rows_created = $this->db->query($sql)->row()->total;
-
-                // Lost
-                $sql = "";
-                $sql .= "SELECT COUNT(tblleads.id) as total FROM tblleads WHERE lost = 1 AND assigned=" . $member['staffid'] . "";
-                if ($region != '') {
-                    $sql .= " AND region='$region'";
-                }
-                $total_rows_lost = $this->db->query($sql)->row()->total;
+                $total_rows_converted = total_rows('tblleads', array(
+                    'assigned' => $member['staffid'],
+                    'status' => 1
+                ));
+                $total_rows_created   = total_rows('tblleads', array(
+                    'addedfrom' => $member['staffid']
+                ));
+                $total_rows_lost      = total_rows('tblleads', array(
+                    'assigned' => $member['staffid'],
+                    'lost' => 1
+                ));
             } // end if !isset($to_date) && !isset($from_date)
             else {
-                // Converted
-                $sql = "SELECT COUNT(tblleads.id) as total FROM tblleads WHERE DATE(last_status_change) BETWEEN '" . $from_date . "' AND '" . $to_date . "' AND status = 1 AND assigned=" . $member['staffid'] . "";
+                $sql                  = "SELECT COUNT(tblleads.id) as total FROM tblleads WHERE DATE(last_status_change) BETWEEN '" . $from_date . "' AND '" . $to_date . "' AND status = 1 AND assigned=" . $member['staffid'] . "";
                 $total_rows_converted = $this->db->query($sql)->row()->total;
-                // Created
-                $sql = "SELECT COUNT(tblleads.id) as total FROM tblleads WHERE DATE(dateadded) BETWEEN '" . $from_date . "' AND '" . $to_date . "' AND addedfrom=" . $member['staffid'] . "";
+
+                $sql                = "SELECT COUNT(tblleads.id) as total FROM tblleads WHERE DATE(dateadded) BETWEEN '" . $from_date . "' AND '" . $to_date . "' AND addedfrom=" . $member['staffid'] . "";
                 $total_rows_created = $this->db->query($sql)->row()->total;
-                // Lost
+
                 $sql = "SELECT COUNT(tblleads.id) as total FROM tblleads WHERE DATE(last_status_change) BETWEEN '" . $from_date . "' AND '" . $to_date . "' AND lost = 1 AND assigned=" . $member['staffid'] . "";
+
                 $total_rows_lost = $this->db->query($sql)->row()->total;
-            }
+            } // end else when date is selected
 
             array_push($chart['datasets'][0]['data'], $total_rows_created);
             array_push($chart['datasets'][1]['data'], $total_rows_lost);
             array_push($chart['datasets'][2]['data'], $total_rows_converted);
-
-        } // end foreach
+        }
 
         return $chart;
-
-    }
-
-    /**
-     * @param $item
-     * @return string
-     */
-    public function get_leads_conversion_report_data($item)
-    {
-        $this->load->model('staff_model');
-        $staff = $this->staff_model->get();
-        $from_date = to_sql_date($item->date1);
-        $to_date = to_sql_date($item->date2);
-        $region = trim($item->region);
-        $staffid = $item->staffid;
-
-        $chart = array(
-            'labels' => array(),
-            'datasets' => array(
-                array(
-                    'label' => _l('leads_staff_report_created'),
-                    'backgroundColor' => 'rgba(3,169,244,0.2)',
-                    'borderColor' => "#03a9f4",
-                    'borderWidth' => 1,
-                    'tension' => false,
-                    'data' => array()
-                ),
-                array(
-                    'label' => _l('leads_staff_report_lost'),
-                    'backgroundColor' => 'rgba(252,45,66,0.4)',
-                    'borderColor' => "#fc2d42",
-                    'borderWidth' => 1,
-                    'tension' => false,
-                    'data' => array()
-                ),
-                array(
-                    'label' => _l('leads_staff_report_converted'),
-                    'backgroundColor' => 'rgba(37,155,35,0.2)',
-                    'borderColor' => "#84c529",
-                    'borderWidth' => 1,
-                    'tension' => false,
-                    'data' => array()
-                )
-            )
-        );
-
-        if ($staffid == '') {
-            foreach ($staff as $member) {
-                array_push($chart['labels'], $member['firstname'] . ' ' . $member['lastname']);
-                if (!isset($to_date) && !isset($from_date)) {
-                    $total_rows_created = $this->get_created_leads($member['staffid'], null, null, $region);
-                    $total_rows_lost = $this->get_lost_leads($member['staffid'], null, null, $region);
-                    $total_rows_converted = $this->get_converted_leads($member['staffid'], null, null, $region);
-                } // end if !isset($to_date) && !isset($from_date)
-                else {
-                    $total_rows_created = $this->get_created_leads($member['staffid'], $from_date, $to_date, $region);
-                    $total_rows_lost = $this->get_lost_leads($member['staffid'], $from_date, $to_date, $region);
-                    $total_rows_converted = $this->get_converted_leads($member['staffid'], $from_date, $to_date, $region);
-                } // end else
-
-                array_push($chart['datasets'][0]['data'], $total_rows_created);
-                array_push($chart['datasets'][1]['data'], $total_rows_lost);
-                array_push($chart['datasets'][2]['data'], $total_rows_converted);
-
-            } // end foreach
-        } // end if $staffid==''
-        else {
-            $member = $this->get_employee_data($staffid);
-            array_push($chart['labels'], $member['firstname'] . ' ' . $member['lastname']);
-            if (!isset($to_date) && !isset($from_date)) {
-                $total_rows_created = $this->get_created_leads($staffid, null, null, $region);
-                $total_rows_lost = $this->get_lost_leads($staffid, null, null, $region);
-                $total_rows_converted = $this->get_converted_leads($staffid, null, null, $region);
-            } // end if !isset($to_date) && !isset($from_date)
-            else {
-                $total_rows_created = $this->get_created_leads($staffid, $from_date, $to_date, $region);
-                $total_rows_lost = $this->get_lost_leads($staffid, $from_date, $to_date, $region);
-                $total_rows_converted = $this->get_converted_leads($staffid, $from_date, $to_date, $region);
-            } // end else
-
-            array_push($chart['datasets'][0]['data'], $total_rows_created);
-            array_push($chart['datasets'][1]['data'], $total_rows_lost);
-            array_push($chart['datasets'][2]['data'], $total_rows_converted);
-
-        } // end else
-
-
-        return json_encode($chart);
-
-    }
-
-    /**
-     * @param $region_name
-     * @return array
-     */
-    public function get_leads_by_region($region_name)
-    {
-        $leads = array();
-        $query = "select * from tblcustomfieldsvalues where fieldid=3 
-                  and value='$region_name'";
-        $result = $this->db->query($query);
-        foreach ($result->result() as $row) {
-            $leads[] = $row->relid;
-        }
-        return $leads;
     }
 
 
-    /**
-     * @param $staffid
-     * @param null $from_date
-     * @param null $to_date
-     * @param string $region
-     * @return mixed
-     */
-    public function get_converted_leads($staffid, $from_date = null, $to_date = null, $region = '')
-    {
-        $sql = "";
-        if (!isset($to_date) && !isset($from_date)) {
-            $sql .= "SELECT COUNT(tblleads.id) as total FROM tblleads 
-                     WHERE  status = 1 AND assigned=" . $staffid . "";
-            if ($region != '') {
-                $region_leads = $this->get_leads_by_region($region);
-                if (is_array($region_leads) && count($region_leads) > 0) {
-                    $leads_str = implode(',', $region_leads);
-                    $sql .= " AND id in ($leads_str)";
-                } // end if
-                else {
-                    $sql .= " AND id=0";
-                }
-            }
-            //echo "Converted no dates SQL: ".$sql."<br>";
-            $total_rows_converted = $this->db->query($sql)->row()->total;
-        } // end if !isset($to_date) && !isset($from_date)
-        else {
-            $sql .= "SELECT COUNT(tblleads.id) as total FROM tblleads 
-                     WHERE DATE(dateadded) BETWEEN '" . $from_date . "' AND '" . $to_date . "' 
-                     AND status = 1 AND assigned=$staffid";
-            if ($region != '') {
-                $region_leads = $this->get_leads_by_region($region);
-                if (is_array($region_leads) && count($region_leads) > 0) {
-                    $leads_str = implode(',', $region_leads);
-                    $sql .= " AND id in ($leads_str)";
-                } // end if
-                else {
-                    $sql .= " AND id=0";
-                }
-            }
-            //echo "Converted with dates SQL: ".$sql."<br>";
-            $total_rows_converted = $this->db->query($sql)->row()->total;
-        } // end else
-        return $total_rows_converted;
-    }
-
-    /**
-     * @param $staffid
-     * @param null $from_date
-     * @param null $to_date
-     * @param string $region
-     * @return mixed
-     */
-    public function get_created_leads($staffid, $from_date = null, $to_date = null, $region = '')
-    {
-        $sql = "";
-        if (!isset($to_date) && !isset($from_date)) {
-            $sql .= "SELECT COUNT(tblleads.id) as total FROM tblleads 
-                     WHERE addedfrom=" . $staffid . "";
-            if ($region != '') {
-                $region_leads = $this->get_leads_by_region($region);
-                if (is_array($region_leads) && count($region_leads) > 0) {
-                    $leads_str = implode(',', $region_leads);
-                    $sql .= " AND id in ($leads_str)";
-                } // end if
-                else {
-                    $sql .= " AND id=0";
-                }
-            }
-            //echo "Created no dates SQL: ".$sql."<br>";
-            $total_rows_created = $this->db->query($sql)->row()->total;
-        } // end if !isset($to_date) && !isset($from_date)
-        else {
-            $sql .= "SELECT COUNT(tblleads.id) as total FROM tblleads 
-                     WHERE DATE(dateadded) BETWEEN '" . $from_date . "' AND '" . $to_date . "' 
-                     AND addedfrom=$staffid";
-            if ($region != '') {
-                $region_leads = $this->get_leads_by_region($region);
-                if (is_array($region_leads) && count($region_leads) > 0) {
-                    $leads_str = implode(',', $region_leads);
-                    $sql .= " AND id in ($leads_str)";
-                } // end if
-                else {
-                    $sql .= " AND id=0";
-                }
-            }
-            //echo "Created with dates SQL: ".$sql."<br>";
-            $total_rows_created = $this->db->query($sql)->row()->total;
-        } // end else
-        return $total_rows_created;
-    }
-
-    /**
-     * @param $staffid
-     * @param null $from_date
-     * @param null $to_date
-     * @param string $region
-     * @return mixed
-     */
-    public function get_lost_leads($staffid, $from_date = null, $to_date = null, $region = '')
-    {
-        $sql = "";
-        if (!isset($to_date) && !isset($from_date)) {
-            $sql .= "SELECT COUNT(tblleads.id) as total FROM tblleads 
-                     WHERE lost = 1 AND assigned=" . $staffid . "";
-            if ($region != '') {
-                $region_leads = $this->get_leads_by_region($region);
-                if (is_array($region_leads) && count($region_leads) > 0) {
-                    $leads_str = implode(',', $region_leads);
-                    $sql .= " AND id in ($leads_str)";
-                } // end if
-                else {
-                    $sql .= " AND id=0";
-                }
-            }
-            //echo "Lost no dates SQL: ".$sql."<br>";
-            $total_rows_lost = $this->db->query($sql)->row()->total;
-        }  // end if !isset($to_date) && !isset($from_date)
-        else {
-            $sql = "SELECT COUNT(tblleads.id) as total FROM tblleads 
-                    WHERE DATE(dateadded) BETWEEN '" . $from_date . "' AND '" . $to_date . "' 
-                    AND lost = 1 AND assigned=$staffid";
-            if ($region != '') {
-                $region_leads = $this->get_leads_by_region($region);
-                if (is_array($region_leads) && count($region_leads) > 0) {
-                    $leads_str = implode(',', $region_leads);
-                    $sql .= " AND id in ($leads_str)";
-                } // end if
-                else {
-                    $sql .= " AND id=0";
-                }
-            }
-            //echo "Lost with dates SQL: ".$sql."<br>";
-            $total_rows_lost = $this->db->query($sql)->row()->total;
-        } // end else
-        return $total_rows_lost;
-    }
-
-    /**
-     * @param null $from_date
-     * @param null $to_date
-     */
-    public function get_total_list($from_date = null, $to_date = null)
-    {
-
-    }
-
-
-    /**
-     * @param $staffid
-     * @return array
-     */
-    public
-    function get_employee_data($staffid)
-    {
-        $data = array();
-        $query = "select * from tblstaff where staffid=$staffid";
-        $result = $this->db->query($query);
-        foreach ($result->result() as $row) {
-            $data['firstname'] = $row->firstname;
-            $data['lastname'] = $row->lastname;
-        }
-        return $data;
-    }
 
     /**
      * Lead conversion by sources report / chart
      * @return arrray chart data
      */
-    public
-    function leads_sources_report()
+    public function leads_sources_report()
     {
         $this->load->model('leads_model');
         $sources = $this->leads_model->get_source();
-        $chart = array(
+        $chart   = array(
             'labels' => array(),
             'datasets' => array(
                 array(
@@ -665,44 +334,40 @@ class Reports_model extends CRM_Model
         return $chart;
     }
 
-    /**
-     * @return array
-     */
-    public
-    function report_by_customer_groups()
+    public function report_by_customer_groups()
     {
         $months_report = $this->input->post('months_report');
-        $groups = $this->clients_model->get_groups();
+        $groups        = $this->clients_model->get_groups();
         if ($months_report != '') {
             $custom_date_select = '';
             if (is_numeric($months_report)) {
-                // Last month
-                if ($months_report == '1') {
-                    $beginMonth = date('Y-m-01', strtotime("-$months_report MONTH"));
-                    $endMonth = date('Y-m-t', strtotime('-1 MONTH'));
-                } else {
-                    $months_report = (int)$months_report;
-                    $months_report--;
-                    $beginMonth = date('Y-m-01', strtotime("-$months_report MONTH"));
-                    $endMonth = date('Y-m-t');
-                }
+               // Last month
+               if($months_report == '1'){
+                   $beginMonth = date('Y-m-01', strtotime("-$months_report MONTH"));
+                   $endMonth   = date('Y-m-t', strtotime('-1 MONTH'));
+               } else {
+                   $months_report = (int) $months_report;
+                   $months_report--;
+                   $beginMonth = date('Y-m-01', strtotime("-$months_report MONTH"));
+                   $endMonth   = date('Y-m-t');
+               }
 
                 $custom_date_select = '(tblinvoicepaymentrecords.date BETWEEN "' . $beginMonth . '" AND "' . $endMonth . '")';
-            } elseif ($months_report == 'this_month') {
+            } elseif($months_report == 'this_month'){
                 $custom_date_select = '(tblinvoicepaymentrecords.date BETWEEN "' . date('Y-m-01') . '" AND "' . date('Y-m-t') . '")';
-            } elseif ($months_report == 'this_year') {
+            } elseif($months_report == 'this_year'){
                 $custom_date_select = '(tblinvoicepaymentrecords.date BETWEEN "' .
-                    date('Y-m-d', strtotime(date('Y-01-01'))) .
-                    '" AND "' .
-                    date('Y-m-d', strtotime(date('Y-12-' . date('d', strtotime('last day of this year'))))) . '")';
-            } elseif ($months_report == 'last_year') {
-                $custom_date_select = '(tblinvoicepaymentrecords.date BETWEEN "' .
-                    date('Y-m-d', strtotime(date(date('Y', strtotime('last year')) . '-01-01'))) .
-                    '" AND "' .
-                    date('Y-m-d', strtotime(date(date('Y', strtotime('last year')) . '-12-' . date('d', strtotime('last day of last year'))))) . '")';
+                date('Y-m-d',strtotime(date('Y-01-01'))) .
+                '" AND "' .
+                date('Y-m-d',strtotime(date('Y-12-'.date('d',strtotime('last day of this year'))))) . '")';
+            } elseif($months_report == 'last_year'){
+             $custom_date_select = '(tblinvoicepaymentrecords.date BETWEEN "' .
+                date('Y-m-d',strtotime(date(date('Y',strtotime('last year')).'-01-01'))) .
+                '" AND "' .
+                date('Y-m-d',strtotime(date(date('Y',strtotime('last year')). '-12-'.date('d',strtotime('last day of last year'))))) . '")';
             } elseif ($months_report == 'custom') {
                 $from_date = to_sql_date($this->input->post('report_from'));
-                $to_date = to_sql_date($this->input->post('report_to'));
+                $to_date   = to_sql_date($this->input->post('report_to'));
                 if ($from_date == $to_date) {
                     $custom_date_select = 'tblinvoicepaymentrecords.date ="' . $from_date . '"';
                 } else {
@@ -720,10 +385,10 @@ class Reports_model extends CRM_Model
         if ($by_currency) {
             $this->db->where('currency', $by_currency);
         }
-        $payments = $this->db->get()->result_array();
-        $data = array();
-        $data['temp'] = array();
-        $data['total'] = array();
+        $payments       = $this->db->get()->result_array();
+        $data           = array();
+        $data['temp']   = array();
+        $data['total']  = array();
         $data['labels'] = array();
         foreach ($groups as $group) {
             if (!isset($data['groups'][$group['name']])) {
@@ -764,15 +429,11 @@ class Reports_model extends CRM_Model
         return $chart;
     }
 
-    /**
-     * @return array
-     */
-    public
-    function report_by_payment_modes()
+    public function report_by_payment_modes()
     {
         $this->load->model('payment_modes_model');
-        $modes = $this->payment_modes_model->get('', array(), true, true);
-        $year = $this->input->post('year');
+        $modes  = $this->payment_modes_model->get('', array(), true, true);
+        $year   = $this->input->post('year');
         $colors = get_system_favourite_colors();
         $this->db->select('amount,tblinvoicepaymentrecords.date');
         $this->db->from('tblinvoicepaymentrecords');
@@ -782,17 +443,17 @@ class Reports_model extends CRM_Model
         if ($by_currency) {
             $this->db->where('currency', $by_currency);
         }
-        $all_payments = $this->db->get()->result_array();
-        $chart = array(
+        $all_payments   = $this->db->get()->result_array();
+        $chart          = array(
             'labels' => array(),
             'datasets' => array()
         );
-        $data = array();
+        $data           = array();
         $data['months'] = array();
         foreach ($all_payments as $payment) {
-            $month = date('m', strtotime($payment['date']));
+            $month   = date('m', strtotime($payment['date']));
             $dateObj = DateTime::createFromFormat('!m', $month);
-            $month = $dateObj->format('F');
+            $month   = $dateObj->format('F');
             if (!isset($data['months'][$month])) {
                 $data['months'][$month] = $month;
             }
@@ -810,8 +471,8 @@ class Reports_model extends CRM_Model
         $i = 0;
         foreach ($modes as $mode) {
             if (total_rows('tblinvoicepaymentrecords', array(
-                    'paymentmode' => $mode['id']
-                )) == 0) {
+                'paymentmode' => $mode['id']
+            )) == 0) {
                 continue;
             }
             $color = '#4B5158';
@@ -829,7 +490,7 @@ class Reports_model extends CRM_Model
             }
             $payments = $this->db->get()->result_array();
 
-            $datasets_data = array();
+            $datasets_data          = array();
             $datasets_data['total'] = array();
             foreach ($data['months'] as $month) {
                 $total_payments = array();
@@ -837,9 +498,9 @@ class Reports_model extends CRM_Model
                     $datasets_data['temp'][$month] = array();
                 }
                 foreach ($payments as $payment) {
-                    $_month = date('m', strtotime($payment['date']));
+                    $_month  = date('m', strtotime($payment['date']));
                     $dateObj = DateTime::createFromFormat('!m', $_month);
-                    $_month = $dateObj->format('F');
+                    $_month  = $dateObj->format('F');
                     if ($month == $_month) {
                         $total_payments[] = $payment['amount'];
                     }
@@ -864,8 +525,7 @@ class Reports_model extends CRM_Model
      * Total income report / chart
      * @return array chart data
      */
-    public
-    function total_income_report()
+    public function total_income_report()
     {
         $year = $this->input->post('year');
         $this->db->select('amount,tblinvoicepaymentrecords.date');
@@ -876,16 +536,16 @@ class Reports_model extends CRM_Model
         if ($by_currency) {
             $this->db->where('currency', $by_currency);
         }
-        $payments = $this->db->get()->result_array();
-        $data = array();
+        $payments       = $this->db->get()->result_array();
+        $data           = array();
         $data['months'] = array();
-        $data['temp'] = array();
-        $data['total'] = array();
+        $data['temp']   = array();
+        $data['total']  = array();
         $data['labels'] = array();
         foreach ($payments as $payment) {
-            $month = date('m', strtotime($payment['date']));
+            $month   = date('m', strtotime($payment['date']));
             $dateObj = DateTime::createFromFormat('!m', $month);
-            $month = $dateObj->format('F');
+            $month   = $dateObj->format('F');
             if (!isset($data['months'][$month])) {
                 $data['months'][$month] = $month;
             }
@@ -898,9 +558,9 @@ class Reports_model extends CRM_Model
         });
         foreach ($data['months'] as $month) {
             foreach ($payments as $payment) {
-                $_month = date('m', strtotime($payment['date']));
+                $_month  = date('m', strtotime($payment['date']));
                 $dateObj = DateTime::createFromFormat('!m', $_month);
-                $_month = $dateObj->format('F');
+                $_month  = $dateObj->format('F');
                 if ($month == $_month) {
                     $data['temp'][$month][] = $payment['amount'];
                 }
@@ -925,20 +585,12 @@ class Reports_model extends CRM_Model
         return $chart;
     }
 
-    /**
-     * @return mixed
-     */
-    public
-    function get_distinct_payments_years()
+    public function get_distinct_payments_years()
     {
         return $this->db->query('SELECT DISTINCT(YEAR(date)) as year FROM tblinvoicepaymentrecords')->result_array();
     }
 
-    /**
-     * @return mixed
-     */
-    public
-    function get_distinct_customer_invoices_years()
+    public function get_distinct_customer_invoices_years()
     {
         return $this->db->query('SELECT DISTINCT(YEAR(date)) as year FROM tblinvoices WHERE clientid=' . get_client_user_id())->result_array();
     }

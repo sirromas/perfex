@@ -213,6 +213,7 @@
         if (typeof (salesChart) !== 'undefined') {
             salesChart.destroy();
         }
+        $('#customer_report_controls').hide();
         var data = {};
         data.year = $('select[name="payments_years"]').val();
         var currency = $('#currency');
@@ -246,6 +247,7 @@
         if (typeof (paymentMethodsChart) !== 'undefined') {
             paymentMethodsChart.destroy();
         }
+        $('#customer_report_controls').hide();
         var data = {};
         data.year = $('select[name="payments_years"]').val();
         var currency = $('#currency');
@@ -285,6 +287,7 @@
         if (typeof (groupsChart) !== 'undefined') {
             groupsChart.destroy();
         }
+        $('#customer_report_controls').hide();
         var data = {};
         data.months_report = $('select[name="months-report"]').val();
         data.report_from = report_from.val();
@@ -331,6 +334,7 @@
         if ($.fn.DataTable.isDataTable('.table-estimates-report')) {
             $('.table-estimates-report').DataTable().destroy();
         }
+        $('#customer_report_controls').hide();
         _table_api = initDataTable('.table-estimates-report', admin_url + 'reports/estimates_report', false, false, fnServerParams, [
             [3, 'DESC'],
             [0, 'DESC']
@@ -342,6 +346,7 @@
         if ($.fn.DataTable.isDataTable('.table-payments-received-report')) {
             $('.table-payments-received-report').DataTable().destroy();
         }
+        $('#customer_report_controls').hide();
         initDataTable('.table-payments-received-report', admin_url + 'reports/payments_received', false, false, fnServerParams, [1, 'DESC']);
     }
 
@@ -349,7 +354,7 @@
         if ($.fn.DataTable.isDataTable('.table-proposals-report')) {
             $('.table-proposals-report').DataTable().destroy();
         }
-
+        $('#customer_report_controls').hide();
         initDataTable('.table-proposals-report', admin_url + 'reports/proposals_report', false, false, fnServerParams, [0, 'DESC']);
     }
 
@@ -357,6 +362,7 @@
         if ($.fn.DataTable.isDataTable('.table-items-report')) {
             $('.table-items-report').DataTable().destroy();
         }
+        $('#customer_report_controls').hide();
         initDataTable('.table-items-report', admin_url + 'reports/items', false, false, fnServerParams, [0, 'ASC']);
     }
 
