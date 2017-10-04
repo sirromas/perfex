@@ -86,10 +86,9 @@
 <script type="text/javascript">
     $(document).ready(function () {
         console.log("ready!");
-        var i=1; // global variable
         var myChart; // global variable
 
-        myChart=new Chart($('#leads-staff-report'), {
+        myChart = new Chart($('#leads-staff-report'), {
             data:<?php echo $leads_staff_report; ?>,
             type: 'bar',
             options: {responsive: true, maintainAspectRatio: false}
@@ -110,17 +109,13 @@
 
             var url = '/admin/reports/get_leads_data_ajax';
             $.post(url, {item: JSON.stringify(item)}).done(function (data) {
-                console.log('Server response: ' + data);
-                var canvasid='#leads-staff-report'+i;
-                myChart=new Chart($('#leads-staff-report'), {
+                myChart = new Chart($('#leads-staff-report'), {
                     data: JSON.parse(data),
                     type: 'bar',
                     options: {responsive: true, maintainAspectRatio: false}
                 }); // end of chart
             }); // end of post
         }); // end of click function
-
-
     }); // end of document ready
 
 
