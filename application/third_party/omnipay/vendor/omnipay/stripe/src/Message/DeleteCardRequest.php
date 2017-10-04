@@ -26,17 +26,18 @@ namespace Omnipay\Stripe\Message;
  * all CreateCard requests added a new customer and the customer ID
  * was used as the card ID, if a cardReference is passed in but no
  * customerReference then we assume that the cardReference is in fact
- * a customerReference and delete the customer.  This might be
+ * a customerReference and delete the customer. This might be
  * dangerous but it's the best way to ensure backwards compatibility.
  *
  * @link https://stripe.com/docs/api#delete_card
  */
 class DeleteCardRequest extends AbstractRequest
 {
+
     public function getData()
     {
         $this->validate('cardReference');
-
+        
         return;
     }
 
@@ -49,11 +50,9 @@ class DeleteCardRequest extends AbstractRequest
     {
         if ($this->getCustomerReference()) {
             // Delete a card from a customer
-            return $this->endpoint.'/customers/'.
-                $this->getCustomerReference().'/cards/'.
-                $this->getCardReference();
+            return $this->endpoint . '/customers/' . $this->getCustomerReference() . '/cards/' . $this->getCardReference();
         }
-        // Delete the customer.  Oops?
-        return $this->endpoint.'/customers/'.$this->getCardReference();
+        // Delete the customer. Oops?
+        return $this->endpoint . '/customers/' . $this->getCardReference();
     }
 }

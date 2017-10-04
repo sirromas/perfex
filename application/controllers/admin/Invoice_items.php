@@ -1,48 +1,50 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
 class Invoice_items extends Admin_controller
 {
+
     public function __construct()
     {
         parent::__construct();
         $this->load->model('invoice_items_model');
     }
-
+    
     /* List all available items */
     public function index()
     {
-        if (!has_permission('items', '', 'view')) {
+        if (! has_permission('items', '', 'view')) {
             access_denied('Invoice Items');
         }
         if ($this->input->is_ajax_request()) {
             $this->perfex_base->get_table_data('invoice_items');
         }
         $this->load->model('taxes_model');
-        $data['taxes']        = $this->taxes_model->get();
+        $data['taxes'] = $this->taxes_model->get();
         $data['items_groups'] = $this->invoice_items_model->get_groups();
-
+        
         $this->load->model('currencies_model');
         $data['currencies'] = $this->currencies_model->get();
-
+        
         $data['base_currency'] = $this->currencies_model->get_base_currency();
-
+        
         $data['title'] = _l('invoice_items');
         $this->load->view('admin/invoice_items/manage', $data);
     }
-
-    /* Edit or update items / ajax request /*/
+    
+    /* Edit or update items / ajax request / */
     public function manage()
     {
         if (has_permission('items', '', 'view')) {
             if ($this->input->post()) {
                 $data = $this->input->post();
                 if ($data['itemid'] == '') {
-                    if (!has_permission('items', '', 'create')) {
+                    if (! has_permission('items', '', 'create')) {
                         header('HTTP/1.0 400 Bad error');
                         echo _l('access_denied');
-                        die;
+                        die();
                     }
-                    $id      = $this->invoice_items_model->add($data);
+                    $id = $this->invoice_items_model->add($data);
                     $success = false;
                     $message = '';
                     if ($id) {
@@ -55,10 +57,10 @@ class Invoice_items extends Admin_controller
                         'item' => $this->invoice_items_model->get($id)
                     ));
                 } else {
-                    if (!has_permission('items', '', 'edit')) {
+                    if (! has_permission('items', '', 'edit')) {
                         header('HTTP/1.0 400 Bad error');
                         echo _l('access_denied');
-                        die;
+                        die();
                     }
                     $success = $this->invoice_items_model->edit($data);
                     $message = '';
@@ -99,18 +101,18 @@ class Invoice_items extends Admin_controller
         }
         redirect(admin_url('invoice_items?groups_modal=true'));
     }
-
-    /* Delete item*/
+    
+    /* Delete item */
     public function delete($id)
     {
-        if (!has_permission('items', '', 'delete')) {
+        if (! has_permission('items', '', 'delete')) {
             access_denied('Invoice Items');
         }
-
-        if (!$id) {
+        
+        if (! $id) {
             redirect(admin_url('invoice_items'));
         }
-
+        
         $response = $this->invoice_items_model->delete($id);
         if (is_array($response) && isset($response['referenced'])) {
             set_alert('warning', _l('is_referenced', _l('invoice_item_lowercase')));
@@ -122,17 +124,18 @@ class Invoice_items extends Admin_controller
         redirect(admin_url('invoice_items'));
     }
 
-    public function search(){
-        if($this->input->post() && $this->input->is_ajax_request()){
+    public function search()
+    {
+        if ($this->input->post() && $this->input->is_ajax_request()) {
             echo json_encode($this->invoice_items_model->search($this->input->post('q')));
         }
     }
-
+    
     /* Get item by id / ajax */
     public function get_item_by_id($id)
     {
         if ($this->input->is_ajax_request()) {
-            $item                   = $this->invoice_items_model->get($id);
+            $item = $this->invoice_items_model->get($id);
             $item->long_description = nl2br($item->long_description);
             echo json_encode($item);
         }

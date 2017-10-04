@@ -1,35 +1,37 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
 class Goals extends Admin_controller
 {
+
     public function __construct()
     {
         parent::__construct();
         $this->load->model('goals_model');
     }
-
+    
     /* List all announcements */
     public function index()
     {
-        if (!has_permission('goals', '', 'view')) {
+        if (! has_permission('goals', '', 'view')) {
             access_denied('goals');
         }
         if ($this->input->is_ajax_request()) {
             $this->perfex_base->get_table_data('goals');
         }
         $data['circle_progress_asset'] = true;
-        $data['title']                 = _l('goals_tracking');
+        $data['title'] = _l('goals_tracking');
         $this->load->view('admin/goals/manage', $data);
     }
 
     public function goal($id = '')
     {
-        if (!has_permission('goals', '', 'view')) {
+        if (! has_permission('goals', '', 'view')) {
             access_denied('goals');
         }
         if ($this->input->post()) {
             if ($id == '') {
-                if (!has_permission('goals', '', 'create')) {
+                if (! has_permission('goals', '', 'create')) {
                     access_denied('goals');
                 }
                 $id = $this->goals_model->add($this->input->post());
@@ -38,7 +40,7 @@ class Goals extends Admin_controller
                     redirect(admin_url('goals/goal/' . $id));
                 }
             } else {
-                if (!has_permission('goals', '', 'edit')) {
+                if (! has_permission('goals', '', 'edit')) {
                     access_denied('goals');
                 }
                 $success = $this->goals_model->update($this->input->post(), $id);
@@ -51,25 +53,25 @@ class Goals extends Admin_controller
         if ($id == '') {
             $title = _l('add_new', _l('goal_lowercase'));
         } else {
-            $data['goal']        = $this->goals_model->get($id);
+            $data['goal'] = $this->goals_model->get($id);
             $data['achievement'] = $this->goals_model->calculate_goal_achievement($id);
-
-            $title               = _l('edit', _l('goal_lowercase'));
+            
+            $title = _l('edit', _l('goal_lowercase'));
         }
         $this->load->model('contracts_model');
-        $data['contract_types']        = $this->contracts_model->get_contract_types();
-        $data['title']                 = $title;
+        $data['contract_types'] = $this->contracts_model->get_contract_types();
+        $data['title'] = $title;
         $data['circle_progress_asset'] = true;
         $this->load->view('admin/goals/goal', $data);
     }
-
+    
     /* Delete announcement from database */
     public function delete($id)
     {
-        if (!has_permission('goals', '', 'delete')) {
+        if (! has_permission('goals', '', 'delete')) {
             access_denied('goals');
         }
-        if (!$id) {
+        if (! $id) {
             redirect(admin_url('goals'));
         }
         $response = $this->goals_model->delete($id);
@@ -83,10 +85,10 @@ class Goals extends Admin_controller
 
     public function notify($id, $notify_type)
     {
-        if (!has_permission('goals', '', 'edit') && !has_permission('goals', '', 'create')) {
+        if (! has_permission('goals', '', 'edit') && ! has_permission('goals', '', 'create')) {
             access_denied('goals');
         }
-        if (!$id) {
+        if (! $id) {
             redirect(admin_url('goals'));
         }
         $success = $this->goals_model->notify_staff_members($id, $notify_type);

@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Plugin\Cache;
 
 use Guzzle\Http\Message\Request;
@@ -11,6 +10,7 @@ use Guzzle\Plugin\Cache\SkipRevalidation;
  */
 class SkipRevalidationTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testSkipsRequestRevalidation()
     {
         $skip = new SkipRevalidation();

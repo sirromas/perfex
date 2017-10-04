@@ -22,17 +22,17 @@ namespace Omnipay\Stripe\Message;
  *
  * <code>
  * $response = $gateway->createCustomer(array(
- *     'description'       => 'Test Customer',
- *     'email'             => 'test123@example.com',
+ * 'description' => 'Test Customer',
+ * 'email' => 'test123@example.com',
  * ))->send();
  * if ($response->isSuccessful()) {
- *     echo "Gateway createCustomer was successful.\n";
- *     // Find the card ID
- *     $customer_id = $response->getCustomerReference();
- *     echo "Customer ID = " . $customer_id . "\n";
+ * echo "Gateway createCustomer was successful.\n";
+ * // Find the card ID
+ * $customer_id = $response->getCustomerReference();
+ * echo "Customer ID = " . $customer_id . "\n";
  * } else {
- *     echo "Gateway createCustomer failed.\n";
- *     echo "Error message == " . $response->getMessage() . "\n";
+ * echo "Gateway createCustomer failed.\n";
+ * echo "Error message == " . $response->getMessage() . "\n";
  * }
  * </code>
  *
@@ -50,32 +50,32 @@ namespace Omnipay\Stripe\Message;
  * // This card can be used for testing.
  * // The CreditCard object is also used for creating customers.
  * $card = new CreditCard(array(
- *             'firstName'    => 'Example',
- *             'lastName'     => 'Customer',
- *             'number'       => '4242424242424242',
- *             'expiryMonth'  => '01',
- *             'expiryYear'   => '2020',
- *             'cvv'          => '123',
- *             'email'                 => 'customer@example.com',
- *             'billingAddress1'       => '1 Scrubby Creek Road',
- *             'billingCountry'        => 'AU',
- *             'billingCity'           => 'Scrubby Creek',
- *             'billingPostcode'       => '4999',
- *             'billingState'          => 'QLD',
+ * 'firstName' => 'Example',
+ * 'lastName' => 'Customer',
+ * 'number' => '4242424242424242',
+ * 'expiryMonth' => '01',
+ * 'expiryYear' => '2020',
+ * 'cvv' => '123',
+ * 'email' => 'customer@example.com',
+ * 'billingAddress1' => '1 Scrubby Creek Road',
+ * 'billingCountry' => 'AU',
+ * 'billingCity' => 'Scrubby Creek',
+ * 'billingPostcode' => '4999',
+ * 'billingState' => 'QLD',
  * ));
  *
  * // Do a create customer transaction on the gateway
  * $response = $gateway->createCustomer(array(
- *     'card'                     => $card,
+ * 'card' => $card,
  * ))->send();
  * if ($response->isSuccessful()) {
- *     echo "Gateway createCustomer was successful.\n";
- *     // Find the customer ID
- *     $customer_id = $response->getCustomerReference();
- *     echo "Customer ID = " . $customer_id . "\n";
- *     // Find the card ID
- *     $card_id = $response->getCardReference();
- *     echo "Card ID = " . $card_id . "\n";
+ * echo "Gateway createCustomer was successful.\n";
+ * // Find the customer ID
+ * $customer_id = $response->getCustomerReference();
+ * echo "Customer ID = " . $customer_id . "\n";
+ * // Find the card ID
+ * $card_id = $response->getCardReference();
+ * echo "Card ID = " . $card_id . "\n";
  * }
  * </code>
  *
@@ -83,6 +83,7 @@ namespace Omnipay\Stripe\Message;
  */
 class CreateCustomerRequest extends AbstractRequest
 {
+
     /**
      * Get the customer's email address.
      *
@@ -96,7 +97,7 @@ class CreateCustomerRequest extends AbstractRequest
     /**
      * Sets the customer's email address.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreateCustomerRequest provides a fluent interface.
      */
     public function setEmail($value)
@@ -118,10 +119,10 @@ class CreateCustomerRequest extends AbstractRequest
     {
         $data = array();
         $data['description'] = $this->getDescription();
-
+        
         if ($this->getToken()) {
             $data['card'] = $this->getToken();
-
+            
             if ($this->getEmail()) {
                 $data['email'] = $this->getEmail();
             }
@@ -131,20 +132,20 @@ class CreateCustomerRequest extends AbstractRequest
         } elseif ($this->getEmail()) {
             $data['email'] = $this->getEmail();
         }
-
+        
         if ($this->getMetadata()) {
             $data['metadata'] = $this->getMetadata();
         }
-
+        
         if ($this->getSource()) {
             $data['source'] = $this->getSource();
         }
-
+        
         return $data;
     }
 
     public function getEndpoint()
     {
-        return $this->endpoint.'/customers';
+        return $this->endpoint . '/customers';
     }
 }

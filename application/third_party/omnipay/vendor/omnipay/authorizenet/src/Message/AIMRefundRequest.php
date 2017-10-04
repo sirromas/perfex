@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\AuthorizeNet\Message;
 
 /**
@@ -7,11 +6,12 @@ namespace Omnipay\AuthorizeNet\Message;
  */
 class AIMRefundRequest extends AIMAbstractRequest
 {
+
     protected $action = 'refundTransaction';
 
     public function shouldVoidIfRefundFails()
     {
-        return !!$this->getParameter('voidIfRefundFails');
+        return ! ! $this->getParameter('voidIfRefundFails');
     }
 
     public function setVoidIfRefundFails($value)
@@ -22,10 +22,10 @@ class AIMRefundRequest extends AIMAbstractRequest
     public function getData()
     {
         $this->validate('transactionReference', 'amount');
-
+        
         $data = $this->getBaseData();
         $data->transactionRequest->amount = $this->getParameter('amount');
-
+        
         $transactionRef = $this->getTransactionReference();
         if ($card = $transactionRef->getCard()) {
             $data->transactionRequest->payment->creditCard->cardNumber = $card->number;
@@ -43,26 +43,26 @@ class AIMRefundRequest extends AIMAbstractRequest
             }
         }
         $data->transactionRequest->refTransId = $transactionRef->getTransId();
-
+        
         $this->addTransactionSettings($data);
-
+        
         return $data;
     }
 
     public function send()
     {
-        /** @var AIMResponse $response */
+        /**
+         * @var AIMResponse $response
+         */
         $response = parent::send();
-
-        if (!$response->isSuccessful() && $this->shouldVoidIfRefundFails() &&
-            $response->getReasonCode() == AIMResponse::ERROR_RESPONSE_CODE_CANNOT_ISSUE_CREDIT
-        ) {
+        
+        if (! $response->isSuccessful() && $this->shouldVoidIfRefundFails() && $response->getReasonCode() == AIMResponse::ERROR_RESPONSE_CODE_CANNOT_ISSUE_CREDIT) {
             // This transaction has not yet been settled, hence cannot be refunded. But a void is possible.
             $voidRequest = new CIMVoidRequest($this->httpClient, $this->httpRequest);
             $voidRequest->initialize($this->getParameters());
             $response = $voidRequest->send();
         }
-
+        
         return $response;
     }
 }

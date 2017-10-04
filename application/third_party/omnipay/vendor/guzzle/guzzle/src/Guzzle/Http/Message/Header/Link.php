@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Http\Message\Header;
 
 use Guzzle\Http\Message\Header;
@@ -9,31 +8,39 @@ use Guzzle\Http\Message\Header;
  */
 class Link extends Header
 {
+
     /**
      * Add a link to the header
      *
-     * @param string $url    Link URL
-     * @param string $rel    Link rel
-     * @param array  $params Other link parameters
-     *
+     * @param string $url
+     *            Link URL
+     * @param string $rel
+     *            Link rel
+     * @param array $params
+     *            Other link parameters
+     *            
      * @return self
      */
     public function addLink($url, $rel, array $params = array())
     {
-        $values = array("<{$url}>", "rel=\"{$rel}\"");
-
+        $values = array(
+            "<{$url}>",
+            "rel=\"{$rel}\""
+        );
+        
         foreach ($params as $k => $v) {
             $values[] = "{$k}=\"{$v}\"";
         }
-
+        
         return $this->add(implode('; ', $values));
     }
 
     /**
      * Check if a specific link exists for a given rel attribute
      *
-     * @param string $rel rel value
-     *
+     * @param string $rel
+     *            rel value
+     *            
      * @return bool
      */
     public function hasLink($rel)
@@ -44,8 +51,9 @@ class Link extends Header
     /**
      * Get a specific link for a given rel attribute
      *
-     * @param string $rel Rel value
-     *
+     * @param string $rel
+     *            Rel value
+     *            
      * @return array|null
      */
     public function getLink($rel)
@@ -55,7 +63,7 @@ class Link extends Header
                 return $link;
             }
         }
-
+        
         return null;
     }
 
@@ -68,11 +76,11 @@ class Link extends Header
      * <code>
      * var_export($response->getLinks());
      * array(
-     *     array(
-     *         'url' => 'http:/.../front.jpeg',
-     *         'rel' => 'back',
-     *         'type' => 'image/jpeg',
-     *     )
+     * array(
+     * 'url' => 'http:/.../front.jpeg',
+     * 'rel' => 'back',
+     * 'type' => 'image/jpeg',
+     * )
      * )
      * </code>
      *
@@ -81,13 +89,13 @@ class Link extends Header
     public function getLinks()
     {
         $links = $this->parseParams();
-
+        
         foreach ($links as &$link) {
             $key = key($link);
             unset($link[$key]);
             $link['url'] = trim($key, '<> ');
         }
-
+        
         return $links;
     }
 }

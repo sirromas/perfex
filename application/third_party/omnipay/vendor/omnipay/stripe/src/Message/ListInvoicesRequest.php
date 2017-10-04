@@ -13,16 +13,17 @@ namespace Omnipay\Stripe\Message;
  */
 class ListInvoicesRequest extends AbstractRequest
 {
+
     public function getData()
     {
         $data = array();
-
+        
         return $data;
     }
 
     public function getEndpoint()
     {
-        return $this->endpoint.'/invoices';
+        return $this->endpoint . '/invoices';
     }
 
     public function getHttpMethod()

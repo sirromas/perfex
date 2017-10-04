@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Http\Message;
 
 use Guzzle\Common\Collection;
@@ -21,10 +20,15 @@ use Guzzle\Http\Exception\BadResponseException;
  */
 class RequestTest extends \Guzzle\Tests\GuzzleTestCase
 {
-    /** @var Request */
+
+    /**
+     * @var Request
+     */
     protected $request;
 
-    /** @var Client */
+    /**
+     * @var Client
+     */
     protected $client;
 
     protected function setUp()
@@ -45,7 +49,7 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
         $request = new Request('GET', 'http://www.guzzle-project.com/', array(
             'foo' => 'bar'
         ));
-
+        
         $this->assertEquals('GET', $request->getMethod());
         $this->assertEquals('http://www.guzzle-project.com/', $request->getUrl());
         $this->assertEquals('bar', $request->getHeader('foo'));
@@ -83,15 +87,12 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
     public function testRequestsCanBeConvertedToRawMessageStrings()
     {
         $auth = base64_encode('michael:123');
-        $message = "PUT /path?q=1&v=2 HTTP/1.1\r\n"
-            . "Host: www.google.com\r\n"
-            . "Authorization: Basic {$auth}\r\n"
-            . "Content-Length: 4\r\n\r\nData";
-
+        $message = "PUT /path?q=1&v=2 HTTP/1.1\r\n" . "Host: www.google.com\r\n" . "Authorization: Basic {$auth}\r\n" . "Content-Length: 4\r\n\r\nData";
+        
         $request = RequestFactory::getInstance()->create('PUT', 'http://www.google.com/path?q=1&v=2', array(
             'Authorization' => 'Basic ' . $auth
         ), 'Data');
-
+        
         $this->assertEquals($message, $request->__toString());
     }
 
@@ -102,11 +103,12 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $auth = base64_encode('michael:123');
         $this->getServer()->enqueue("HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n");
-        $request = RequestFactory::getInstance()->create('PUT', $this->getServer()->getUrl(), null, 'Data')
+        $request = RequestFactory::getInstance()->create('PUT', $this->getServer()
+            ->getUrl(), null, 'Data')
             ->setClient($this->client)
             ->setAuth('michael', '123', CURLAUTH_BASIC);
         $request->send();
-
+        
         $this->assertContains('Authorization: Basic ' . $auth, (string) $request);
     }
 
@@ -142,7 +144,7 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
         ), 'abc');
         $this->request->setResponse($response, true);
         $r = $this->request->send();
-
+        
         $this->assertSame($response, $r);
         $this->assertInstanceOf('Guzzle\\Http\\Message\\Response', $this->request->getResponse());
         $this->assertSame($r, $this->request->getResponse());
@@ -152,21 +154,23 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
     public function testGetResponse()
     {
         $this->assertNull($this->request->getResponse());
-        $response = new Response(200, array('Content-Length' => 3), 'abc');
-
+        $response = new Response(200, array(
+            'Content-Length' => 3
+        ), 'abc');
+        
         $this->request->setResponse($response);
         $this->assertEquals($response, $this->request->getResponse());
-
+        
         $client = new Client('http://www.google.com');
         $request = $client->get('http://www.google.com/');
         $request->setResponse($response, true);
         $request->send();
         $requestResponse = $request->getResponse();
         $this->assertSame($response, $requestResponse);
-
+        
         // Try again, making sure it's still the same response
         $this->assertSame($requestResponse, $request->getResponse());
-
+        
         $response = new Response(204);
         $request = $client->get();
         $request->setResponse($response, true);
@@ -179,7 +183,9 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
     public function testRequestThrowsExceptionOnBadResponse()
     {
         try {
-            $this->request->setResponse(new Response(404, array('Content-Length' => 3), 'abc'), true);
+            $this->request->setResponse(new Response(404, array(
+                'Content-Length' => 3
+            ), 'abc'), true);
             $this->request->send();
             $this->fail('Expected exception not thrown');
         } catch (BadResponseException $e) {
@@ -212,11 +218,11 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $this->assertEquals('127.0.0.1', $this->request->getHost());
         $this->assertEquals('127.0.0.1:8124', (string) $this->request->getHeader('Host'));
-
+        
         $this->assertSame($this->request, $this->request->setHost('www2.google.com'));
         $this->assertEquals('www2.google.com', $this->request->getHost());
         $this->assertEquals('www2.google.com:8124', (string) $this->request->getHeader('Host'));
-
+        
         $this->assertSame($this->request, $this->request->setHost('www.test.com:8081'));
         $this->assertEquals('www.test.com', $this->request->getHost());
         $this->assertEquals(8081, $this->request->getPort());
@@ -246,7 +252,7 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertSame('0', $request->getHost());
         $this->assertSame('/0', $request->getPath());
         $this->assertSame('0', $request->getQuery(true));
-
+        
         $request = new Request('GET', '0');
         $this->assertEquals('/0', $request->getPath());
     }
@@ -255,11 +261,11 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $this->assertEquals(8124, $this->request->getPort());
         $this->assertEquals('127.0.0.1:8124', $this->request->getHeader('Host'));
-
+        
         $this->assertEquals($this->request, $this->request->setPort('8080'));
         $this->assertEquals('8080', $this->request->getPort());
         $this->assertEquals('127.0.0.1:8080', $this->request->getHeader('Host'));
-
+        
         $this->request->setPort(80);
         $this->assertEquals('127.0.0.1', $this->request->getHeader('Host'));
     }
@@ -269,27 +275,29 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
         // Uninitialized auth
         $this->assertEquals(null, $this->request->getUsername());
         $this->assertEquals(null, $this->request->getPassword());
-
+        
         // Set an auth
         $this->assertSame($this->request, $this->request->setAuth('michael', '123'));
         $this->assertEquals('michael', $this->request->getUsername());
         $this->assertEquals('123', $this->request->getPassword());
-
+        
         // Set an auth with blank password
         $this->assertSame($this->request, $this->request->setAuth('michael', ''));
         $this->assertEquals('michael', $this->request->getUsername());
         $this->assertEquals('', $this->request->getPassword());
-
+        
         // Remove the auth
         $this->request->setAuth(false);
         $this->assertEquals(null, $this->request->getUsername());
         $this->assertEquals(null, $this->request->getPassword());
-
+        
         // Make sure that the cURL based auth works too
         $request = new Request('GET', $this->getServer()->getUrl());
         $request->setAuth('michael', 'password', CURLAUTH_DIGEST);
-        $this->assertEquals('michael:password', $request->getCurlOptions()->get(CURLOPT_USERPWD));
-        $this->assertEquals(CURLAUTH_DIGEST, $request->getCurlOptions()->get(CURLOPT_HTTPAUTH));
+        $this->assertEquals('michael:password', $request->getCurlOptions()
+            ->get(CURLOPT_USERPWD));
+        $this->assertEquals(CURLAUTH_DIGEST, $request->getCurlOptions()
+            ->get(CURLOPT_HTTPAUTH));
     }
 
     /**
@@ -315,7 +323,7 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
         $u = Url::factory($url);
         $this->assertSame($this->request, $this->request->setUrl($url));
         $this->assertEquals($url, $this->request->getUrl());
-
+        
         $this->assertSame($this->request, $this->request->setUrl($u));
         $this->assertEquals($url, $this->request->getUrl());
     }
@@ -333,9 +341,9 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
             'Date' => 'Sat, 16 Oct 2010 17:27:14 GMT',
             'Expires' => '-1',
             'Cache-Control' => 'private, max-age=0',
-            'Content-Type' => 'text/html; charset=ISO-8859-1',
+            'Content-Type' => 'text/html; charset=ISO-8859-1'
         ), 'response body');
-
+        
         $this->assertSame($this->request, $this->request->setResponse($response), '-> setResponse() must use a fluent interface');
         $this->assertEquals('complete', $this->request->getState(), '-> setResponse() must change the state of the request to complete');
         $this->assertSame($response, $this->request->getResponse(), '-> setResponse() must set the exact same response that was passed in to it');
@@ -347,60 +355,61 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
         if (file_exists($file)) {
             unlink($file);
         }
-
+        
         $this->getServer()->enqueue("HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\ndata");
-        $request = RequestFactory::getInstance()->create('GET', $this->getServer()->getUrl());
+        $request = RequestFactory::getInstance()->create('GET', $this->getServer()
+            ->getUrl());
         $request->setClient($this->client);
         $entityBody = EntityBody::factory(fopen($file, 'w+'));
         $request->setResponseBody($entityBody);
         $response = $request->send();
         $this->assertSame($entityBody, $response->getBody());
-
+        
         $this->assertTrue(file_exists($file));
         $this->assertEquals('data', file_get_contents($file));
         unlink($file);
-
+        
         $this->assertEquals('data', $response->getBody(true));
     }
 
     public function testHoldsCookies()
     {
         $this->assertNull($this->request->getCookie('test'));
-
+        
         // Set a cookie
         $this->assertSame($this->request, $this->request->addCookie('test', 'abc'));
         $this->assertEquals('abc', $this->request->getCookie('test'));
-
+        
         // Multiple cookies by setting the Cookie header
         $this->request->setHeader('Cookie', '__utma=1.638370270.1344367610.1374365610.1944450276.2; __utmz=1.1346368610.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); hl=de; PHPSESSID=ak93pqashi5uubuoq8fjv60897');
         $this->assertEquals('1.638370270.1344367610.1374365610.1944450276.2', $this->request->getCookie('__utma'));
         $this->assertEquals('1.1346368610.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none)', $this->request->getCookie('__utmz'));
         $this->assertEquals('de', $this->request->getCookie('hl'));
         $this->assertEquals('ak93pqashi5uubuoq8fjv60897', $this->request->getCookie('PHPSESSID'));
-
+        
         // Unset the cookies by setting the Cookie header to null
         $this->request->setHeader('Cookie', null);
         $this->assertNull($this->request->getCookie('test'));
         $this->request->removeHeader('Cookie');
-
+        
         // Set and remove a cookie
         $this->assertSame($this->request, $this->request->addCookie('test', 'abc'));
         $this->assertEquals('abc', $this->request->getCookie('test'));
         $this->assertSame($this->request, $this->request->removeCookie('test'));
         $this->assertNull($this->request->getCookie('test'));
-
+        
         // Remove the cookie header
         $this->assertSame($this->request, $this->request->addCookie('test', 'abc'));
         $this->request->removeHeader('Cookie');
         $this->assertEquals('', (string) $this->request->getHeader('Cookie'));
-
+        
         // Remove a cookie value
         $this->request->addCookie('foo', 'bar')->addCookie('baz', 'boo');
         $this->request->removeCookie('foo');
         $this->assertEquals(array(
             'baz' => 'boo'
         ), $this->request->getCookies());
-
+        
         $this->request->addCookie('foo', 'bar');
         $this->assertEquals('baz=boo; foo=bar', (string) $this->request->getHeader('Cookie'));
     }
@@ -419,7 +428,7 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
         $p = new AsyncPlugin();
         $this->request->getEventDispatcher()->addSubscriber($p);
         $h = $this->request->getHeader('Host');
-
+        
         $r = clone $this->request;
         $this->assertEquals(RequestInterface::STATE_NEW, $r->getState());
         $this->assertNotSame($r->getQuery(), $this->request->getQuery());
@@ -428,7 +437,8 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertEquals($r->getHeaders(), $this->request->getHeaders());
         $this->assertNotSame($h, $r->getHeader('Host'));
         $this->assertNotSame($r->getParams(), $this->request->getParams());
-        $this->assertTrue($this->request->getEventDispatcher()->hasListeners('request.sent'));
+        $this->assertTrue($this->request->getEventDispatcher()
+            ->hasListeners('request.sent'));
     }
 
     public function testRecognizesBasicAuthCredentialsInUrls()
@@ -446,49 +456,50 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
             "HTTP/1.1 200 OK\r\nContent-Length: 4\r\nExpires: Thu, 01 Dec 1994 16:00:00 GMT\r\nConnection: close\r\n\r\ndata",
             "HTTP/1.1 404 Not Found\r\nContent-Encoding: application/xml\r\nContent-Length: 48\r\n\r\n<error><mesage>File not found</message></error>"
         ));
-
-        $request = RequestFactory::getInstance()->create('GET', $this->getServer()->getUrl());
+        
+        $request = RequestFactory::getInstance()->create('GET', $this->getServer()
+            ->getUrl());
         $request->setClient($this->client);
         $response = $request->send();
-
+        
         $this->assertEquals('data', $response->getBody(true));
         $this->assertEquals(200, (int) $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
         $this->assertEquals(4, $response->getContentLength());
         $this->assertEquals('Thu, 01 Dec 1994 16:00:00 GMT', $response->getExpires());
-
+        
         // Test that the same handle can be sent twice without setting state to new
         $response2 = $request->send();
         $this->assertNotSame($response, $response2);
-
+        
         try {
-            $request = RequestFactory::getInstance()->create('GET', $this->getServer()->getUrl() . 'index.html');
+            $request = RequestFactory::getInstance()->create('GET', $this->getServer()
+                ->getUrl() . 'index.html');
             $request->setClient($this->client);
             $response = $request->send();
             $this->fail('Request did not receive a 404 response');
-        } catch (BadResponseException $e) {
-        }
-
+        } catch (BadResponseException $e) {}
+        
         $requests = $this->getServer()->getReceivedRequests(true);
         $messages = $this->getServer()->getReceivedRequests(false);
         $port = $this->getServer()->getPort();
-
+        
         $userAgent = $this->client->getDefaultUserAgent();
-
+        
         $this->assertEquals('127.0.0.1:' . $port, $requests[0]->getHeader('Host'));
         $this->assertEquals('127.0.0.1:' . $port, $requests[1]->getHeader('Host'));
         $this->assertEquals('127.0.0.1:' . $port, $requests[2]->getHeader('Host'));
-
+        
         $this->assertEquals('/', $requests[0]->getPath());
         $this->assertEquals('/', $requests[1]->getPath());
         $this->assertEquals('/index.html', $requests[2]->getPath());
-
+        
         $parts = explode("\r\n", $messages[0]);
         $this->assertEquals('GET / HTTP/1.1', $parts[0]);
-
+        
         $parts = explode("\r\n", $messages[1]);
         $this->assertEquals('GET / HTTP/1.1', $parts[0]);
-
+        
         $parts = explode("\r\n", $messages[2]);
         $this->assertEquals('GET /index.html HTTP/1.1', $parts[0]);
     }
@@ -497,7 +508,7 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $this->getServer()->flush();
         $this->getServer()->enqueue("HTTP/1.1 404 Not found\r\nContent-Length: 0\r\n\r\n");
-
+        
         try {
             $request = $this->client->get('/index.html');
             $response = $request->send();
@@ -516,7 +527,8 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
         $request->setResponse($response, true);
         $out = '';
         $that = $this;
-        $request->getEventDispatcher()->addListener('request.error', function($event) use (&$out, $that) {
+        $request->getEventDispatcher()->addListener('request.error', function ($event) use(&$out, $that)
+        {
             $out .= $event['request'] . "\n" . $event['response'] . "\n";
             $event->stopPropagation();
         });
@@ -530,18 +542,15 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $this->getServer()->flush();
         $this->getServer()->enqueue(array(
-            "HTTP/1.1 404 NOT FOUND\r\n" .
-            "Content-Length: 0\r\n" .
-            "\r\n",
-            "HTTP/1.1 200 OK\r\n" .
-            "Content-Length: 0\r\n" .
-            "\r\n"
+            "HTTP/1.1 404 NOT FOUND\r\n" . "Content-Length: 0\r\n" . "\r\n",
+            "HTTP/1.1 200 OK\r\n" . "Content-Length: 0\r\n" . "\r\n"
         ));
-
+        
         $newResponse = null;
-
+        
         $request = $this->request;
-        $request->getEventDispatcher()->addListener('request.error', function($event) use (&$newResponse) {
+        $request->getEventDispatcher()->addListener('request.error', function ($event) use(&$newResponse)
+        {
             if ($event['response']->getStatusCode() == 404) {
                 $newRequest = clone $event['request'];
                 $newResponse = $newRequest->send();
@@ -551,12 +560,14 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
                 $event->stopPropagation();
             }
         });
-
+        
         $request->send();
-
-        $this->assertEquals(200, $request->getResponse()->getStatusCode());
+        
+        $this->assertEquals(200, $request->getResponse()
+            ->getStatusCode());
         $this->assertSame($newResponse, $request->getResponse());
-        $this->assertEquals(2, count($this->getServer()->getReceivedRequests()));
+        $this->assertEquals(2, count($this->getServer()
+            ->getReceivedRequests()));
     }
 
     public function testCanRetrieveUrlObject()
@@ -575,16 +586,19 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
             "HTTP/1.1 301 Foo\r\nLocation: /foo\r\nContent-Length: 0\r\n\r\n"
         ));
         $request = $this->request;
-        $this->assertEquals(303, $request->send()->getStatusCode());
+        $this->assertEquals(303, $request->send()
+            ->getStatusCode());
         $request->getParams()->set(RedirectPlugin::DISABLE, true);
-        $this->assertEquals(301, $request->send()->getStatusCode());
+        $this->assertEquals(301, $request->send()
+            ->getStatusCode());
     }
 
     public function testCanSendCustomRequests()
     {
         $this->getServer()->flush();
         $this->getServer()->enqueue("HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n");
-        $request = $this->client->createRequest('PROPFIND', $this->getServer()->getUrl(), array(
+        $request = $this->client->createRequest('PROPFIND', $this->getServer()
+            ->getUrl(), array(
             'Content-Type' => 'text/plain'
         ), 'foo');
         $response = $request->send();
@@ -601,7 +615,9 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $this->getServer()->flush();
         $this->getServer()->enqueue("HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\ntest");
-        $this->client->get('/')->setResponseBody('/wefwefefefefwewefwe/wefwefwefefwe/wefwefewfw.txt')->send();
+        $this->client->get('/')
+            ->setResponseBody('/wefwefefefefwewefwe/wefwefwefefwe/wefwefewfw.txt')
+            ->send();
     }
 
     public function testAllowsFilenameForDownloadingContent()
@@ -609,7 +625,9 @@ class RequestTest extends \Guzzle\Tests\GuzzleTestCase
         $this->getServer()->flush();
         $this->getServer()->enqueue("HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\ntest");
         $name = sys_get_temp_dir() . '/foo.txt';
-        $this->client->get('/')->setResponseBody($name)->send();
+        $this->client->get('/')
+            ->setResponseBody($name)
+            ->send();
         $this->assertEquals('test', file_get_contents($name));
         unlink($name);
     }

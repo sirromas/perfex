@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\Braintree\Message;
 
 /**
@@ -7,12 +6,13 @@ namespace Omnipay\Braintree\Message;
  */
 class CustomerResponse extends Response
 {
+
     public function getCustomerData()
     {
         if (isset($this->data->customer)) {
             return $this->data->customer;
         }
-
+        
         return null;
     }
 }

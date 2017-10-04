@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Inflection;
 
 use Guzzle\Inflection\Inflector;
@@ -9,6 +8,7 @@ use Guzzle\Inflection\Inflector;
  */
 class InflectorTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testReturnsDefaultInstance()
     {
         $this->assertSame(Inflector::getDefault(), Inflector::getDefault());

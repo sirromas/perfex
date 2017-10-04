@@ -5,20 +5,24 @@
  * @copyright 2012 Clay Loveless <clay@php.net>
  * @license   http://claylo.mit-license.org/2012/ MIT License
  */
-
 require_once 'phing/Task.php';
 
 class ComposerLintTask extends Task
 {
+
     protected $dir = null;
+
     protected $file = null;
+
     protected $passthru = false;
+
     protected $composer = null;
 
     /**
      * The setter for the dir
      *
-     * @param string $str Directory to crawl recursively for composer files
+     * @param string $str
+     *            Directory to crawl recursively for composer files
      */
     public function setDir($str)
     {
@@ -28,7 +32,8 @@ class ComposerLintTask extends Task
     /**
      * The setter for the file
      *
-     * @param string $str Individual file to validate
+     * @param string $str
+     *            Individual file to validate
      */
     public function setFile($str)
     {
@@ -38,7 +43,8 @@ class ComposerLintTask extends Task
     /**
      * Whether to use PHP's passthru() function instead of exec()
      *
-     * @param boolean $passthru If passthru shall be used
+     * @param boolean $passthru
+     *            If passthru shall be used
      */
     public function setPassthru($passthru)
     {
@@ -46,11 +52,13 @@ class ComposerLintTask extends Task
     }
 
     /**
-     * Composer to execute. If unset, will attempt composer.phar in project
+     * Composer to execute.
+     * If unset, will attempt composer.phar in project
      * basedir, and if that fails, will attempt global composer
      * installation.
      *
-     * @param string $str Individual file to validate
+     * @param string $str
+     *            Individual file to validate
      */
     public function setComposer($str)
     {
@@ -73,24 +81,24 @@ class ComposerLintTask extends Task
         if ($this->composer === null) {
             $this->findComposer();
         }
-
+        
         $files = array();
-        if (!empty($this->file) && file_exists($this->file)) {
+        if (! empty($this->file) && file_exists($this->file)) {
             $files[] = $this->file;
         }
-
-        if (!empty($this->dir)) {
+        
+        if (! empty($this->dir)) {
             $found = $this->findFiles();
             foreach ($found as $file) {
                 $files[] = $this->dir . DIRECTORY_SEPARATOR . $file;
             }
         }
-
+        
         foreach ($files as $file) {
-
+            
             $cmd = $this->composer . ' validate ' . $file;
             $cmd = escapeshellcmd($cmd);
-
+            
             if ($this->passthru) {
                 $retval = null;
                 passthru($cmd, $retval);
@@ -108,9 +116,7 @@ class ComposerLintTask extends Task
                     $this->log($out[0]);
                 }
             }
-
         }
-
     }
 
     /**
@@ -122,29 +128,28 @@ class ComposerLintTask extends Task
     {
         $ds = new DirectoryScanner();
         $ds->setBasedir($this->dir);
-        $ds->setIncludes(array('**/composer.json'));
+        $ds->setIncludes(array(
+            '**/composer.json'
+        ));
         $ds->scan();
         return $ds->getIncludedFiles();
     }
 
     /**
      * Find composer installation
-     *
      */
     protected function findComposer()
     {
         $basedir = $this->project->getBasedir();
         $php = $this->project->getProperty('php.interpreter');
-
+        
         if (file_exists($basedir . '/composer.phar')) {
             $this->composer = "$php $basedir/composer.phar";
         } else {
             $out = array();
             exec('which composer', $out);
             if (empty($out)) {
-                throw new BuildException(
-                    'Could not determine composer location.'
-                );
+                throw new BuildException('Could not determine composer location.');
             }
             $this->composer = $out[0];
         }

@@ -7,8 +7,8 @@ use Braintree\Instance;
  * Status details from a subscription
  * Creates an instance of StatusDetails, as part of a subscription response
  *
- * @package    Braintree
- *
+ * @package Braintree
+ *         
  * @property-read string $price
  * @property-read string $currencyIsoCode
  * @property-read string $planId

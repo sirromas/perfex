@@ -2,7 +2,6 @@
 /**
  * PayPal REST Search Transaction Request
  */
-
 namespace Omnipay\PayPal\Message;
 
 /**
@@ -10,7 +9,7 @@ namespace Omnipay\PayPal\Message;
  *
  * Use this call to search for the transactions within a billing agreement.
  * Note that this is not a generic transaction search function -- for that
- * see RestListPurchaseRequest.  It only searches for transactions within
+ * see RestListPurchaseRequest. It only searches for transactions within
  * a billing agreement.
  *
  * This should be used on a regular basis to determine the success / failure
@@ -19,11 +18,11 @@ namespace Omnipay\PayPal\Message;
  * ### Example
  *
  * <code>
- *   // List the transactions for a billing agreement.
- *   $transaction = $gateway->listPurchase();
- *   $response = $transaction->send();
- *   $data = $response->getData();
- *   echo "Gateway listPurchase response data == " . print_r($data, true) . "\n";
+ * // List the transactions for a billing agreement.
+ * $transaction = $gateway->listPurchase();
+ * $response = $transaction->send();
+ * $data = $response->getData();
+ * echo "Gateway listPurchase response data == " . print_r($data, true) . "\n";
  * </code>
  *
  * ### Request Sample
@@ -32,8 +31,8 @@ namespace Omnipay\PayPal\Message;
  *
  * <code>
  * curl -v GET https://api.sandbox.paypal.com/v1/payments/billing-agreements/I-0LN988D3JACS/transactions \
- *     -H 'Content-Type:application/json' \
- *     -H 'Authorization: Bearer <Access-Token>'
+ * -H 'Content-Type:application/json' \
+ * -H 'Authorization: Bearer <Access-Token>'
  * </code>
  *
  * ### Response Sample
@@ -42,63 +41,63 @@ namespace Omnipay\PayPal\Message;
  *
  * <code>
  * {
- *     "agreement_transaction_list": [
- *         {
- *             "transaction_id": "I-0LN988D3JACS",
- *             "status": "Created",
- *             "transaction_type": "Recurring Payment",
- *             "payer_email": "bbuyer@example.com",
- *             "payer_name": "Betsy Buyer",
- *             "time_stamp": "2014-06-09T09:29:36Z",
- *             "time_zone": "GMT"
- *         },
- *         {
- *             "transaction_id": "928415314Y5640008",
- *             "status": "Completed",
- *             "transaction_type": "Recurring Payment",
- *             "amount": {
- *                 "currency": "USD",
- *                 "value": "1.00"
- *             },
- *             "fee_amount": {
- *                 "currency": "USD",
- *                 "value": "-0.33"
- *             },
- *             "net_amount": {
- *                 "currency": "USD",
- *                 "value": "0.67"
- *             },
- *             "payer_email": "bbuyer@example.com",
- *             "payer_name": "Betsy Buyer",
- *             "time_stamp": "2014-06-09T09:42:47Z",
- *             "time_zone": "GMT"
- *         },
- *         {
- *             "transaction_id": "I-0LN988D3JACS",
- *             "status": "Suspended",
- *             "transaction_type": "Recurring Payment",
- *             "payer_email": "bbuyer@example.com",
- *             "payer_name": "Betsy Buyer",
- *             "time_stamp": "2014-06-09T11:18:34Z",
- *             "time_zone": "GMT"
- *         },
- *         {
- *             "transaction_id": "I-0LN988D3JACS",
- *             "status": "Reactivated",
- *             "transaction_type": "Recurring Payment",
- *             "payer_email": "bbuyer@example.com",
- *             "payer_name": "Betsy Buyer",
- *             "time_stamp": "2014-06-09T11:18:48Z",
- *             "time_zone": "GMT"
- *         }
- *     ]
+ * "agreement_transaction_list": [
+ * {
+ * "transaction_id": "I-0LN988D3JACS",
+ * "status": "Created",
+ * "transaction_type": "Recurring Payment",
+ * "payer_email": "bbuyer@example.com",
+ * "payer_name": "Betsy Buyer",
+ * "time_stamp": "2014-06-09T09:29:36Z",
+ * "time_zone": "GMT"
+ * },
+ * {
+ * "transaction_id": "928415314Y5640008",
+ * "status": "Completed",
+ * "transaction_type": "Recurring Payment",
+ * "amount": {
+ * "currency": "USD",
+ * "value": "1.00"
+ * },
+ * "fee_amount": {
+ * "currency": "USD",
+ * "value": "-0.33"
+ * },
+ * "net_amount": {
+ * "currency": "USD",
+ * "value": "0.67"
+ * },
+ * "payer_email": "bbuyer@example.com",
+ * "payer_name": "Betsy Buyer",
+ * "time_stamp": "2014-06-09T09:42:47Z",
+ * "time_zone": "GMT"
+ * },
+ * {
+ * "transaction_id": "I-0LN988D3JACS",
+ * "status": "Suspended",
+ * "transaction_type": "Recurring Payment",
+ * "payer_email": "bbuyer@example.com",
+ * "payer_name": "Betsy Buyer",
+ * "time_stamp": "2014-06-09T11:18:34Z",
+ * "time_zone": "GMT"
+ * },
+ * {
+ * "transaction_id": "I-0LN988D3JACS",
+ * "status": "Reactivated",
+ * "transaction_type": "Recurring Payment",
+ * "payer_email": "bbuyer@example.com",
+ * "payer_name": "Betsy Buyer",
+ * "time_stamp": "2014-06-09T11:18:48Z",
+ * "time_zone": "GMT"
+ * }
+ * ]
  * }
  * </code>
  *
  * ### Known Issues
  *
  * PayPal subscription payments cannot be refunded. PayPal is working on this functionality
- * for their future API release.  In order to refund a PayPal subscription payment, you will
+ * for their future API release. In order to refund a PayPal subscription payment, you will
  * need to use the PayPal web interface to refund it manually.
  *
  * @see RestCreateSubscriptionRequest
@@ -106,6 +105,7 @@ namespace Omnipay\PayPal\Message;
  */
 class RestSearchTransactionRequest extends AbstractRestRequest
 {
+
     /**
      * Get the agreement ID
      *
@@ -119,7 +119,7 @@ class RestSearchTransactionRequest extends AbstractRestRequest
     /**
      * Set the agreement ID
      *
-     * @param string $value
+     * @param string $value            
      * @return RestSearchTransactionRequest provides a fluent interface.
      */
     public function setAgreementId($value)
@@ -140,7 +140,7 @@ class RestSearchTransactionRequest extends AbstractRestRequest
     /**
      * Set the request startDate
      *
-     * @param string|DateTime $value
+     * @param string|DateTime $value            
      * @return RestSearchTransactionRequest provides a fluent interface.
      */
     public function setStartDate($value)
@@ -161,7 +161,7 @@ class RestSearchTransactionRequest extends AbstractRestRequest
     /**
      * Set the request endDate
      *
-     * @param string|DateTime $value
+     * @param string|DateTime $value            
      * @return RestSearchTransactionRequest provides a fluent interface.
      */
     public function setEndDate($value)
@@ -174,7 +174,7 @@ class RestSearchTransactionRequest extends AbstractRestRequest
         $this->validate('agreementId', 'startDate', 'endDate');
         return array(
             'start_date' => $this->getStartDate()->format('Y-m-d'),
-            'end_date'   => $this->getEndDate()->format('Y-m-d'),
+            'end_date' => $this->getEndDate()->format('Y-m-d')
         );
     }
 
@@ -192,7 +192,6 @@ class RestSearchTransactionRequest extends AbstractRestRequest
 
     public function getEndpoint()
     {
-        return parent::getEndpoint() . '/payments/billing-agreements/' .
-            $this->getAgreementId() . '/transactions';
+        return parent::getEndpoint() . '/payments/billing-agreements/' . $this->getAgreementId() . '/transactions';
     }
 }

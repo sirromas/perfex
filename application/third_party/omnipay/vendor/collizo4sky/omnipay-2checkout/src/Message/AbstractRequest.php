@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\TwoCheckoutPlus\Message;
 
 use Omnipay\Common\Message\AbstractRequest as BaseAbstractRequest;
@@ -9,6 +8,7 @@ use Omnipay\Common\Message\AbstractRequest as BaseAbstractRequest;
  */
 abstract class AbstractRequest extends BaseAbstractRequest
 {
+
     public function getCart()
     {
         return $this->getParameter('cart');
@@ -92,8 +92,9 @@ abstract class AbstractRequest extends BaseAbstractRequest
     /**
      * Setter: sale ID for use by refund.
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return BaseAbstractRequest
      */
     public function setSaleId($value)
@@ -114,8 +115,9 @@ abstract class AbstractRequest extends BaseAbstractRequest
     /**
      * Setter: sale ID for use by refund.
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return BaseAbstractRequest
      */
     public function setInvoiceId($value)
@@ -146,8 +148,9 @@ abstract class AbstractRequest extends BaseAbstractRequest
     /**
      * Setter: admin username for use by refund.
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return BaseAbstractRequest
      */
     public function setAdminUsername($value)
@@ -168,8 +171,9 @@ abstract class AbstractRequest extends BaseAbstractRequest
     /**
      * Setter: admin password for use by refund.
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return BaseAbstractRequest
      */
     public function setAdminPassword($value)
@@ -190,8 +194,9 @@ abstract class AbstractRequest extends BaseAbstractRequest
     /**
      * Setter: category for use by refund.
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return BaseAbstractRequest
      */
     public function setCategory($value)
@@ -212,8 +217,9 @@ abstract class AbstractRequest extends BaseAbstractRequest
     /**
      * Setter: category for use by refund.
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return BaseAbstractRequest
      */
     public function setComment($value)
@@ -224,8 +230,9 @@ abstract class AbstractRequest extends BaseAbstractRequest
     /**
      * Setter: lineitem_id for use by stop recurring.
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return BaseAbstractRequest
      */
     public function setLineItemId($value)

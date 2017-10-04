@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Cache;
 
 use Guzzle\Cache\Zf2CacheAdapter;
@@ -10,7 +9,9 @@ use Zend\Cache\StorageFactory;
  */
 class Zf2CacheAdapterTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     private $cache;
+
     private $adapter;
 
     /**

@@ -2,7 +2,6 @@
 /**
  * PayPal REST Create Card Request
  */
-
 namespace Omnipay\PayPal\Message;
 
 /**
@@ -24,44 +23,44 @@ namespace Omnipay\PayPal\Message;
  * Example:
  *
  * <code>
- *   // Create a gateway for the PayPal RestGateway
- *   // (routes to GatewayFactory::create)
- *   $gateway = Omnipay::create('PayPal_Rest');
+ * // Create a gateway for the PayPal RestGateway
+ * // (routes to GatewayFactory::create)
+ * $gateway = Omnipay::create('PayPal_Rest');
  *
- *   // Initialise the gateway
- *   $gateway->initialize(array(
- *       'clientId' => 'MyPayPalClientId',
- *       'secret'   => 'MyPayPalSecret',
- *       'testMode' => true, // Or false when you are ready for live transactions
- *   ));
+ * // Initialise the gateway
+ * $gateway->initialize(array(
+ * 'clientId' => 'MyPayPalClientId',
+ * 'secret' => 'MyPayPalSecret',
+ * 'testMode' => true, // Or false when you are ready for live transactions
+ * ));
  *
- *   // Create a credit card object
- *   // DO NOT USE THESE CARD VALUES -- substitute your own
- *   // see the documentation in the class header.
- *   $card = new CreditCard(array(
- *               'firstName' => 'Example',
- *               'lastName' => 'User',
- *               'number' => '4111111111111111',
- *               'expiryMonth'           => '01',
- *               'expiryYear'            => '2020',
- *               'cvv'                   => '123',
- *               'billingAddress1'       => '1 Scrubby Creek Road',
- *               'billingCountry'        => 'AU',
- *               'billingCity'           => 'Scrubby Creek',
- *               'billingPostcode'       => '4999',
- *               'billingState'          => 'QLD',
- *   ));
+ * // Create a credit card object
+ * // DO NOT USE THESE CARD VALUES -- substitute your own
+ * // see the documentation in the class header.
+ * $card = new CreditCard(array(
+ * 'firstName' => 'Example',
+ * 'lastName' => 'User',
+ * 'number' => '4111111111111111',
+ * 'expiryMonth' => '01',
+ * 'expiryYear' => '2020',
+ * 'cvv' => '123',
+ * 'billingAddress1' => '1 Scrubby Creek Road',
+ * 'billingCountry' => 'AU',
+ * 'billingCity' => 'Scrubby Creek',
+ * 'billingPostcode' => '4999',
+ * 'billingState' => 'QLD',
+ * ));
  *
- *   // Do a create card transaction on the gateway
- *   $transaction = $gateway->createCard(array(
- *       'card'          => $card,
- *   ));
- *   $response = $transaction->send();
- *   if ($response->isSuccessful()) {
- *       echo "Create card transaction was successful!\n";
- *       // Find the card ID
- *       $card_id = $response->getTransactionReference();
- *   }
+ * // Do a create card transaction on the gateway
+ * $transaction = $gateway->createCard(array(
+ * 'card' => $card,
+ * ));
+ * $response = $transaction->send();
+ * if ($response->isSuccessful()) {
+ * echo "Create card transaction was successful!\n";
+ * // Find the card ID
+ * $card_id = $response->getTransactionReference();
+ * }
  * </code>
  *
  * @link https://developer.paypal.com/docs/api/#vault
@@ -70,11 +69,12 @@ namespace Omnipay\PayPal\Message;
  */
 class RestCreateCardRequest extends AbstractRestRequest
 {
+
     public function getData()
     {
         $this->validate('card');
         $this->getCard()->validate();
-
+        
         $data = array(
             'number' => $this->getCard()->getNumber(),
             'type' => $this->getCard()->getBrand(),
@@ -85,21 +85,22 @@ class RestCreateCardRequest extends AbstractRestRequest
             'last_name' => $this->getCard()->getLastName(),
             'billing_address' => array(
                 'line1' => $this->getCard()->getAddress1(),
-                //'line2' => $this->getCard()->getAddress2(),
+                
+                // 'line2' => $this->getCard()->getAddress2(),
                 'city' => $this->getCard()->getCity(),
                 'state' => $this->getCard()->getState(),
                 'postal_code' => $this->getCard()->getPostcode(),
-                'country_code' => strtoupper($this->getCard()->getCountry()),
+                'country_code' => strtoupper($this->getCard()->getCountry())
             )
         );
-
+        
         // There's currently a quirk with the REST API that requires line2 to be
         // non-empty if it's present. Jul 14, 2014
         $line2 = $this->getCard()->getAddress2();
-        if (!empty($line2)) {
+        if (! empty($line2)) {
             $data['billing_address']['line2'] = $line2;
         }
-
+        
         return $data;
     }
 

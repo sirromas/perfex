@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Service\Command\LocationVisitor\Request;
 
 use Guzzle\Http\EntityBody;
@@ -18,6 +17,7 @@ use Guzzle\Service\Description\Parameter;
  */
 class BodyVisitor extends AbstractRequestVisitor
 {
+
     public function visit(CommandInterface $command, RequestInterface $request, Parameter $param, $value)
     {
         $value = $param->filter($value);
@@ -33,9 +33,12 @@ class BodyVisitor extends AbstractRequestVisitor
     /**
      * Add the appropriate expect header to a request
      *
-     * @param EntityEnclosingRequestInterface $request Request to update
-     * @param EntityBodyInterface             $body    Entity body of the request
-     * @param string|int                      $expect  Expect header setting
+     * @param EntityEnclosingRequestInterface $request
+     *            Request to update
+     * @param EntityBodyInterface $body
+     *            Entity body of the request
+     * @param string|int $expect
+     *            Expect header setting
      */
     protected function addExpectHeader(EntityEnclosingRequestInterface $request, EntityBodyInterface $body, $expect)
     {
@@ -44,7 +47,7 @@ class BodyVisitor extends AbstractRequestVisitor
             $request->removeHeader('Expect');
         } elseif ($expect !== true) {
             // Default to using a MB as the point in which to start using the expect header
-            $expect = $expect ?: 1048576;
+            $expect = $expect ?  : 1048576;
             // If the expect_header value is numeric then only add if the size is greater than the cutoff
             if (is_numeric($expect) && $body->getSize()) {
                 if ($body->getSize() < $expect) {

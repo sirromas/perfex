@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Http\Exception;
 
 use Guzzle\Http\Message\Response;
@@ -9,6 +8,7 @@ use Guzzle\Http\Exception\BadResponseException;
 
 class ExceptionTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     /**
      * @covers Guzzle\Http\Exception\RequestException
      */

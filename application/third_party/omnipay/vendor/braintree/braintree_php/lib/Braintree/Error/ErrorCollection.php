@@ -10,20 +10,20 @@ use Braintree\Util;
  *
  * Contains a read-only property $error which is a ValidationErrorCollection
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Errors
- * @category   Errors
- *
+ * @category Errors
+ *          
  * @property-read object $errors
  */
 class ErrorCollection implements \Countable
 {
+
     private $_errors;
 
     public function __construct($errorData)
     {
-        $this->_errors =
-                new ValidationErrorCollection($errorData);
+        $this->_errors = new ValidationErrorCollection($errorData);
     }
 
     /**
@@ -46,8 +46,9 @@ class ErrorCollection implements \Countable
     }
 
     /**
-     * Returns the total number of validation errors at all levels of nesting. For example,
-     *if creating a customer with a credit card and a billing address, and each of the customer,
+     * Returns the total number of validation errors at all levels of nesting.
+     * For example,
+     * if creating a customer with a credit card and a billing address, and each of the customer,
      * credit card, and billing address has 1 error, this method will return 3.
      *
      * @return int size
@@ -61,7 +62,7 @@ class ErrorCollection implements \Countable
     /**
      * return errors for the passed key name
      *
-     * @param string $key
+     * @param string $key            
      * @return mixed
      */
     public function forKey($key)
@@ -73,16 +74,18 @@ class ErrorCollection implements \Countable
      * return errors for the passed html field.
      * For example, $result->errors->onHtmlField("transaction[customer][last_name]")
      *
-     * @param string $field
+     * @param string $field            
      * @return array
      */
     public function onHtmlField($field)
     {
         $pieces = preg_split("/[\[\]]+/", $field, 0, PREG_SPLIT_NO_EMPTY);
         $errors = $this;
-        foreach(array_slice($pieces, 0, -1) as $key) {
+        foreach (array_slice($pieces, 0, - 1) as $key) {
             $errors = $errors->forKey(Util::delimiterToCamelCase($key));
-            if (!isset($errors)) { return []; }
+            if (! isset($errors)) {
+                return [];
+            }
         }
         $finalKey = Util::delimiterToCamelCase(end($pieces));
         return $errors->onAttribute($finalKey);
@@ -92,8 +95,8 @@ class ErrorCollection implements \Countable
      * Returns the errors at the given nesting level (see forKey) in a single, flat array:
      *
      * <code>
-     *   $result = Customer::create(...);
-     *   $customerErrors = $result->errors->forKey('customer')->shallowAll();
+     * $result = Customer::create(...);
+     * $customerErrors = $result->errors->forKey('customer')->shallowAll();
      * </code>
      */
     public function shallowAll()
@@ -104,8 +107,9 @@ class ErrorCollection implements \Countable
     /**
      *
      * @ignore
+     *
      */
-    public function  __get($name)
+    public function __get($name)
     {
         $varName = "_$name";
         return isset($this->$varName) ? $this->$varName : null;
@@ -114,8 +118,9 @@ class ErrorCollection implements \Countable
     /**
      *
      * @ignore
+     *
      */
-    public function  __toString()
+    public function __toString()
     {
         return sprintf('%s', $this->_errors);
     }

@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Batch;
 
 use Guzzle\Batch\Exception\BatchTransferException;
@@ -14,21 +13,33 @@ use Guzzle\Batch\Exception\BatchTransferException;
  */
 class Batch implements BatchInterface
 {
-    /** @var \SplQueue Queue of items in the queue */
+
+    /**
+     * @var \SplQueue Queue of items in the queue
+     */
     protected $queue;
 
-    /** @var array Divided batches to be transferred */
+    /**
+     * @var array Divided batches to be transferred
+     */
     protected $dividedBatches;
 
-    /** @var BatchTransferInterface */
+    /**
+     * @var BatchTransferInterface
+     */
     protected $transferStrategy;
 
-    /** @var BatchDivisorInterface */
+    /**
+     * @var BatchDivisorInterface
+     */
     protected $divisionStrategy;
 
     /**
-     * @param BatchTransferInterface $transferStrategy Strategy used to transfer items
-     * @param BatchDivisorInterface  $divisionStrategy Divisor used to create batches
+     *
+     * @param BatchTransferInterface $transferStrategy
+     *            Strategy used to transfer items
+     * @param BatchDivisorInterface $divisionStrategy
+     *            Divisor used to create batches
      */
     public function __construct(BatchTransferInterface $transferStrategy, BatchDivisorInterface $divisionStrategy)
     {
@@ -42,14 +53,14 @@ class Batch implements BatchInterface
     public function add($item)
     {
         $this->queue->enqueue($item);
-
+        
         return $this;
     }
 
     public function flush()
     {
         $this->createBatches();
-
+        
         $items = array();
         foreach ($this->dividedBatches as $batchIndex => $dividedBatch) {
             while ($dividedBatch->valid()) {
@@ -65,7 +76,7 @@ class Batch implements BatchInterface
             // Keep the divided batch down to a minimum in case of a later exception
             unset($this->dividedBatches[$batchIndex]);
         }
-
+        
         return $items;
     }
 

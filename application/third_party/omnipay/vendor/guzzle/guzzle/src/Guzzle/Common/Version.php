@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Common;
 
 /**
@@ -7,18 +6,21 @@ namespace Guzzle\Common;
  */
 class Version
 {
+
     const VERSION = '3.9.3';
 
     /**
+     *
      * @var bool Set this value to true to enable warnings for deprecated functionality use. This should be on in your
-     *           unit tests, but probably not in production.
+     *      unit tests, but probably not in production.
      */
     public static $emitWarnings = false;
 
     /**
      * Emit a deprecation warning
      *
-     * @param string $message Warning message
+     * @param string $message
+     *            Warning message
      */
     public static function warn($message)
     {

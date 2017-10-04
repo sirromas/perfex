@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal\Message;
 
 use Omnipay\Tests\TestCase;
@@ -7,7 +6,10 @@ use Omnipay\PayPal\RestGateway;
 
 class RestCompleteSubscriptionRequestTest extends TestCase
 {
-    /** @var \Omnipay\PayPal\Message\RestCompleteSubscriptionRequest */
+
+    /**
+     * @var \Omnipay\PayPal\Message\RestCompleteSubscriptionRequest
+     */
     private $request;
 
     public function setUp()
@@ -15,9 +17,9 @@ class RestCompleteSubscriptionRequestTest extends TestCase
         $client = $this->getHttpClient();
         $request = $this->getHttpRequest();
         $this->request = new RestCompleteSubscriptionRequest($client, $request);
-
+        
         $this->request->initialize(array(
-            'transactionReference'  => 'ABC-123',
+            'transactionReference' => 'ABC-123'
         ));
     }
 

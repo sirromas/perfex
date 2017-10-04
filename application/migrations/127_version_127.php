@@ -1,8 +1,9 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 class Migration_Version_127 extends CI_Migration
 {
+
     function __construct()
     {
         parent::__construct();
@@ -11,21 +12,21 @@ class Migration_Version_127 extends CI_Migration
     public function up()
     {
         $this->db->query("ALTER TABLE  `tblemailtemplates` CHANGE  `plaintext`  `plaintext` INT( 11 ) NOT NULL DEFAULT  '0';");
-
+        
         if ($this->session->has_userdata('update_encryption_key')) {
             $enc = $this->session->userdata('update_encryption_key');
         } else {
             $enc = $this->config->item('encryption_key');
         }
         $base = $this->config->item('base_url');
-
-        $db_name  = $this->db->database;
+        
+        $db_name = $this->db->database;
         $hostname = $this->db->hostname;
         $username = $this->db->username;
         $password = $this->db->password;
         $sess_driver = $this->config->item('sess_driver');
         $sess_save_path = $this->config->item('sess_save_path');
-
+        
         $new_config_file = '<?php defined(\'BASEPATH\') OR exit(\'No direct script access allowed\');
 /*
 |--------------------------------------------------------------------------
@@ -76,12 +77,12 @@ define(\'APP_DB_NAME\',\'' . $db_name . '\');
 
 define(\'SESS_DRIVER\',\'' . $sess_driver . '\');
 define(\'SESS_SAVE_PATH\',\'' . $sess_save_path . '\');';
-
+        
         $fp = fopen(APPPATH . 'config/app-config.php', 'w');
         if ($fp) {
             fwrite($fp, $new_config_file);
             fclose($fp);
-
+            
             $fp = fopen(APPPATH . 'config/config.php', 'w+');
             if ($fp) {
                 $update_old_config = '<?php defined(\'BASEPATH\') OR exit(\'No direct script access allowed\');
@@ -617,11 +618,10 @@ $config[\'proxy_ips\'] = \'\';
 if(defined(\'APP_MEMORY_LIMIT\')){
     @ini_set(\'memory_limit\', APP_MEMORY_LIMIT);
 }';
-
+                
                 fwrite($fp, $update_old_config);
                 fclose($fp);
-
-
+                
                 $fp = fopen(APPPATH . 'config/database.php', 'w+');
                 if ($fp) {
                     $update_old_db_config = '<?php defined(\'BASEPATH\') OR exit(\'No direct script access allowed\');
@@ -727,9 +727,9 @@ $db[\'default\'] = array(
         add_option('default_task_priority', 2);
         add_option('dropbox_app_key', '');
         add_option('auto_assign_customer_admin_after_lead_convert', 1);
-
+        
         $this->db->query("ALTER TABLE  `tblinvoices` ADD  `number_format` INT NOT NULL DEFAULT  '0' AFTER  `prefix`;");
-
+        
         $invoices = $this->db->get('tblinvoices')->result_array();
         foreach ($invoices as $invoice) {
             $this->db->where('id', $invoice['id']);
@@ -737,9 +737,9 @@ $db[\'default\'] = array(
                 'number_format' => get_option('invoice_number_format')
             ));
         }
-
+        
         $this->db->query("ALTER TABLE  `tblestimates` ADD  `number_format` INT NOT NULL DEFAULT  '0' AFTER  `prefix`");
-
+        
         $estimates = $this->db->get('tblestimates')->result_array();
         foreach ($estimates as $estimate) {
             $this->db->where('id', $estimate['id']);
@@ -747,7 +747,7 @@ $db[\'default\'] = array(
                 'number_format' => get_option('estimate_number_format')
             ));
         }
-
+        
         $this->db->query("CREATE TABLE IF NOT EXISTS `tblfiles` (
                   `id` int(11) NOT NULL AUTO_INCREMENT,
                   `rel_id` int(11) NOT NULL,
@@ -767,7 +767,7 @@ $db[\'default\'] = array(
                   KEY `rel_type` (`rel_type`)
                 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;");
         $lead_attachments = $this->db->get('tblleadattachments')->result_array();
-
+        
         foreach ($lead_attachments as $at) {
             $this->db->insert('tblfiles', array(
                 'staffid' => $at['addedfrom'],
@@ -779,12 +779,12 @@ $db[\'default\'] = array(
                 'filetype' => $at['filetype']
             ));
         }
-
+        
         $this->db->query("DROP TABLE tblleadattachments");
-
+        
         $expenses = $this->db->get('tblexpenses')->result_array();
         foreach ($expenses as $expense) {
-            if (!empty($expense['attachment'])) {
+            if (! empty($expense['attachment'])) {
                 $this->db->insert('tblfiles', array(
                     'staffid' => $expense['addedfrom'],
                     'dateadded' => $expense['dateadded'],
@@ -796,10 +796,10 @@ $db[\'default\'] = array(
                 ));
             }
         }
-
+        
         $this->db->query("ALTER TABLE  `tblexpenses` DROP  `attachment` ,
 DROP  `filetype` ;");
-
+        
         $contract_attachments = $this->db->get('tblcontractattachments')->result_array();
         foreach ($contract_attachments as $at) {
             $this->db->insert('tblfiles', array(
@@ -812,9 +812,9 @@ DROP  `filetype` ;");
                 'filetype' => $at['filetype']
             ));
         }
-
+        
         $this->db->query("DROP TABLE tblcontractattachments");
-
+        
         $client_attachments = $this->db->get('tblclientattachments')->result_array();
         foreach ($client_attachments as $at) {
             $this->db->insert('tblfiles', array(
@@ -827,10 +827,9 @@ DROP  `filetype` ;");
                 'filetype' => $at['filetype']
             ));
         }
-
+        
         $this->db->query("DROP TABLE tblclientattachments");
-
-
+        
         $sales_attachments = $this->db->get('tblsalesattachments')->result_array();
         foreach ($sales_attachments as $at) {
             $this->db->insert('tblfiles', array(
@@ -845,9 +844,9 @@ DROP  `filetype` ;");
                 'visible_to_customer' => $at['visible_to_customer']
             ));
         }
-
+        
         $this->db->query("DROP TABLE tblsalesattachments");
-
+        
         $newsfeed_attachments = $this->db->get('tblpostattachments')->result_array();
         foreach ($newsfeed_attachments as $at) {
             $this->db->insert('tblfiles', array(
@@ -860,10 +859,9 @@ DROP  `filetype` ;");
                 'filetype' => $at['filetype']
             ));
         }
-
+        
         $this->db->query("DROP TABLE tblpostattachments");
-
-
+        
         $tasks_attachments = $this->db->get('tblstafftasksattachments')->result_array();
         foreach ($tasks_attachments as $at) {
             $this->db->insert('tblfiles', array(
@@ -877,51 +875,49 @@ DROP  `filetype` ;");
                 'filetype' => $at['filetype']
             ));
         }
-
+        
         $this->db->query("DROP TABLE tblstafftasksattachments");
-
+        
         $this->db->query("ALTER TABLE `tblclients` ADD `active` INT NOT NULL DEFAULT '1' AFTER `datecreated`;");
-
+        
         $this->db->query("INSERT INTO `tblemailtemplates` (`type`, `slug`, `language`, `name`, `subject`, `message`, `fromname`, `fromemail`, `plaintext`, `active`, `order`) VALUES
                 ('staff', 'new-staff-created', 'english', 'New Staff Created (Welcome Email)', 'You are added as staff member', 'Hello&nbsp;{staff_firstname}&nbsp;{staff_lastname}<br /><br />You are added as member on our CRM.<br />You can login at {admin_url}<br /><br />Please use the following&nbsp;logic credentials:<br /><br />Email:&nbsp;{staff_email}<br />Password:&nbsp;{password}<br /><br />Best Regards,<br />{email_signature}', '{companyname} | CRM', '', 0, 1, 0);");
-
-
+        
         $this->db->like('name', 'custom_company_field_', 'after');
         $cfields = $this->db->get('tbloptions')->result_array();
-        $i      = 0;
+        $i = 0;
         foreach ($cfields as $field) {
             $cfields[$i]['label'] = str_replace('custom_company_field_', '', $field['name']);
             $cfields[$i]['label'] = str_replace('_', ' ', $cfields[$i]['label']);
             $cfields[$i]['label'] = $cfields[$i]['label'];
-            $i++;
+            $i ++;
         }
-        foreach($cfields as $f){
-            $this->db->insert('tblcustomfields',array(
-                    'fieldto'=>'company',
-                    'name'=>$f['label'],
-                    'slug' => slug_it('company_' . $f['label'], array(
-                        'delimiter' => '_'
-                    )),
-                    'type'=>'input',
-                    'show_on_pdf'=>1,
-                    'show_on_table'=>1,
-                    'show_on_client_portal'=>1,
-                    'disalow_client_to_edit'=>0,
-                ));
-                $insert_id = $this->db->insert_id();
-                $this->db->insert('tblcustomfieldsvalues',array(
-                    'relid'=>0,
-                    'fieldid'=>$insert_id,
-                    'fieldto'=>'company',
-                    'value'=>$f['value'],
-
-                ));
-
-                $this->db->where('id',$f['id']);
-                $this->db->delete('tbloptions');
+        foreach ($cfields as $f) {
+            $this->db->insert('tblcustomfields', array(
+                'fieldto' => 'company',
+                'name' => $f['label'],
+                'slug' => slug_it('company_' . $f['label'], array(
+                    'delimiter' => '_'
+                )),
+                'type' => 'input',
+                'show_on_pdf' => 1,
+                'show_on_table' => 1,
+                'show_on_client_portal' => 1,
+                'disalow_client_to_edit' => 0
+            ));
+            $insert_id = $this->db->insert_id();
+            $this->db->insert('tblcustomfieldsvalues', array(
+                'relid' => 0,
+                'fieldid' => $insert_id,
+                'fieldto' => 'company',
+                'value' => $f['value']
+            )
+            );
+            
+            $this->db->where('id', $f['id']);
+            $this->db->delete('tbloptions');
         }
-
-
+        
         $this->db->query("CREATE TABLE IF NOT EXISTS `tblitemstax` (
               `id` int(11) NOT NULL AUTO_INCREMENT,
               `itemid` int(11) NOT NULL,
@@ -931,56 +927,55 @@ DROP  `filetype` ;");
               `taxname` varchar(100) NOT NULL,
               PRIMARY KEY (`id`)
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;");
-
+        
         $taxes_invoices = $this->db->get('tblinvoiceitemstaxes')->result_array();
-        foreach($taxes_invoices as $t){
-            $this->db->insert('tblitemstax',array(
-                'rel_id'=>$t['invoice_id'],
-                'rel_type'=>'invoice',
-                'itemid'=>$t['itemid'],
-                'taxrate'=>$t['taxrate'],
-                'taxname'=>$t['taxname'],
-                ));
+        foreach ($taxes_invoices as $t) {
+            $this->db->insert('tblitemstax', array(
+                'rel_id' => $t['invoice_id'],
+                'rel_type' => 'invoice',
+                'itemid' => $t['itemid'],
+                'taxrate' => $t['taxrate'],
+                'taxname' => $t['taxname']
+            ));
         }
-
+        
         $this->db->query("DROP TABLE tblinvoiceitemstaxes");
-
+        
         $taxes_invoices = $this->db->get('tblestimateitemstaxes')->result_array();
-        foreach($taxes_invoices as $t){
-            $this->db->insert('tblitemstax',array(
-                'rel_id'=>$t['estimate_id'],
-                'rel_type'=>'estimate',
-                'itemid'=>$t['itemid'],
-                'taxrate'=>$t['taxrate'],
-                'taxname'=>$t['taxname'],
-                ));
+        foreach ($taxes_invoices as $t) {
+            $this->db->insert('tblitemstax', array(
+                'rel_id' => $t['estimate_id'],
+                'rel_type' => 'estimate',
+                'itemid' => $t['itemid'],
+                'taxrate' => $t['taxrate'],
+                'taxname' => $t['taxname']
+            ));
         }
-
+        
         $this->db->query("DROP TABLE tblestimateitemstaxes");
-
+        
         $this->db->query("ALTER TABLE `tblstaff` ADD `email_signature` TEXT NULL AFTER `is_not_staff`;");
-
-        $this->db->where('name','invoice_year');
+        
+        $this->db->where('name', 'invoice_year');
         $this->db->delete('tbloptions');
-
-        $this->db->where('name','estimate_year');
+        
+        $this->db->where('name', 'estimate_year');
         $this->db->delete('tbloptions');
-
+        
         $this->db->query("ALTER TABLE `tblinvoices` DROP `year`;");
         $this->db->query("ALTER TABLE `tblestimates` DROP `year`;");
-
-
+        
         $this->db->query("INSERT INTO `tblemailtemplates` (`type`, `slug`, `language`, `name`, `subject`, `message`, `fromname`, `fromemail`, `plaintext`, `active`, `order`) VALUES
         ('client', 'contact-forgot-password', 'english', 'Forgot Password', 'Create New Password', '<h2>Create a new password</h2>\r\nForgot your password?<br /> To create a new password, just follow this link:<br /> <br /> <big><strong>{reset_password_url}</strong></big><br /> <br /> You received this email, because it was requested by a {companyname}&nbsp;user. This is part of the procedure to create a new password on the system. If you DID NOT request a new password then please ignore this email and your password will remain the same. <br /><br /> {email_signature}', '{companyname} | CRM', '', 0, 1, 0),
         ('client', 'contact-password-reseted', 'english', 'Password Reset - Confirmation', 'Your password has been changed', '<strong>You have changed your password.<br /></strong><br /> Please, keep it in your records so you don''t forget it.<br /> <br /> Your email address for login is: {contact_email}<br />If this wasnt you, please contact us.<br /><br />{email_signature}', '{companyname} | CRM', '', 0, 1, 0),
         ('client', 'contact-set-password', 'english', 'Set New Password', 'Set new password on {companyname} ', '<h2>Setup your new password on {companyname}</h2>\r\nPlease use the following link to setup your new password.<br /><br />Keep it in your records so you don''t forget it.<br /><br /> Please set your new password in 48 hours. After that you wont be able to set your password. <br /><br />You can login at: {crm_url}<br /> Your email address for login: {contact_email}<br /> <br /><big><strong>{set_password_url}</strong></big><br /> <br />{email_signature}', '{companyname} | CRM', '', 0, 1, 0),
         ('staff', 'staff-forgot-password', 'english', 'Forgot Password', 'Create New Password', '<h2>Create a new password</h2>\r\nForgot your password?<br /> To create a new password, just follow this link:<br /> <br /> <big><strong>{reset_password_url}</strong></big><br /> <br /> You received this email, because it was requested by a {companyname}&nbsp;user. This is part of the procedure to create a new password on the system. If you DID NOT request a new password then please ignore this email and your password will remain the same. <br /><br /> {email_signature}', '{companyname} | CRM', '', 0, 1, 0),
         ('staff', 'staff-password-reseted', 'english', 'Password Reset - Confirmation', 'Your password has been changed', '<strong>You have changed your password.<br /></strong><br /> Please, keep it in your records so you don''t forget it.<br /> <br /> Your email address for login is: {staff_email}<br /> If this wasnt you, please contact us.<br /><br />{email_signature}', '{companyname} | CRM', '', 0, 1, 0);");
-
+        
         $this->db->query("INSERT INTO `tblemailtemplates` (`type`, `slug`, `language`, `name`, `subject`, `message`, `fromname`, `fromemail`, `plaintext`, `active`, `order`) VALUES
 ('project', 'assigned-to-project', 'english', 'New Project Created (Sent to Customer Contacts)', 'New Project Created', '<p>Hello&nbsp;{contact_firstname}</p>\r\n<p>New project is assigned to your company.<br />Project Name:&nbsp;{project_name}</p>\r\n<p>You can view the project on the following link:{project_link}</p>\r\n<p>We are looking forward hearing from you.</p>\r\n<p>{email_signature}</p>', '{companyname} | CRM', NULL, 0, 1, 0);");
-
-          update_option('update_info_message', '<div class="col-md-12">
+        
+        update_option('update_info_message', '<div class="col-md-12">
             <div class="alert alert-success bold">
                 <h4 class="bold">Hi! Thanks for updating Perfex CRM - You are using version 1.2.7</h4>
                 <p>
@@ -994,6 +989,5 @@ DROP  `filetype` ;");
             },10000);
         </script>
         ');
-
     }
 }

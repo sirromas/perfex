@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\TwoCheckoutPlus\Message;
 
 use Omnipay\Common\Message\AbstractResponse;
@@ -10,18 +9,21 @@ use Omnipay\Common\Message\ResponseInterface;
  */
 class StopRecurringResponse extends AbstractResponse implements ResponseInterface
 {
+
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
      *
      * @return bool
      */
     public function isSuccessful()
     {
-        return !isset($this->data['errors']) && $this->data['response_code'] == 'OK';
+        return ! isset($this->data['errors']) && $this->data['response_code'] == 'OK';
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
      *
      * @return bool
      */
@@ -31,7 +33,8 @@ class StopRecurringResponse extends AbstractResponse implements ResponseInterfac
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
      *
      * @return int|null
      */
@@ -46,12 +49,12 @@ class StopRecurringResponse extends AbstractResponse implements ResponseInterfac
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getMessage()
     {
-        return isset($this->data['response_message']) ?
-            $this->data['response_message'] :
-            json_encode($this->data['errors']);
+        return isset($this->data['response_message']) ? $this->data['response_message'] : json_encode($this->data['errors']);
     }
 }

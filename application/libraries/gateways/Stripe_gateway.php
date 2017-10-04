@@ -3,33 +3,34 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 use Omnipay\Omnipay;
 
-require_once(APPPATH . 'third_party/omnipay/vendor/autoload.php');
+require_once (APPPATH . 'third_party/omnipay/vendor/autoload.php');
 
 class Stripe_gateway extends App_gateway
 {
+
     public function __construct()
     {
         /**
-        * Call App_gateway __construct function
-        */
+         * Call App_gateway __construct function
+         */
         parent::__construct();
-
+        
         /**
-        * REQUIRED
-        * Gateway unique id
-        * The ID must be alpha/alphanumeric
-        */
+         * REQUIRED
+         * Gateway unique id
+         * The ID must be alpha/alphanumeric
+         */
         $this->setId('stripe');
-
+        
         /**
          * REQUIRED
          * Gateway name
          */
         $this->setName('Stripe');
-
+        
         /**
          * Add gateway settings
-        */
+         */
         $this->setSettings(array(
             array(
                 'name' => 'api_secret_key',
@@ -43,8 +44,8 @@ class Stripe_gateway extends App_gateway
             array(
                 'name' => 'description_dashboard',
                 'label' => 'settings_paymentmethod_description',
-                'type'=>'textarea',
-                'default_value'=>'Payment for Invoice'
+                'type' => 'textarea',
+                'default_value' => 'Payment for Invoice'
             ),
             array(
                 'name' => 'currencies',
@@ -58,14 +59,15 @@ class Stripe_gateway extends App_gateway
                 'label' => 'settings_paymentmethod_testing_mode'
             )
         ));
-
+        
         /**
          * REQUIRED
          * Hook gateway with other online payment modes
          */
-        add_action('before_add_online_payment_modes', array( $this, 'initMode' ));
-
-
+        add_action('before_add_online_payment_modes', array(
+            $this,
+            'initMode'
+        ));
     }
 
     public function process_payment($data)
@@ -87,7 +89,7 @@ class Stripe_gateway extends App_gateway
             'currency' => $data['currency'],
             'token' => $data['stripeToken']
         ))->send();
-
+        
         return $oResponse;
     }
 }

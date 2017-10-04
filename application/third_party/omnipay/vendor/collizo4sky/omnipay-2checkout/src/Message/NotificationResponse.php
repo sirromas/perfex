@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\TwoCheckoutPlus\Message;
 
 use Omnipay\Common\Message\NotificationInterface;
@@ -7,18 +6,19 @@ use Omnipay\Common\Message\AbstractResponse;
 
 class NotificationResponse extends AbstractResponse implements NotificationInterface
 {
+
     /**
      * Is the notification harsh correct after validation?
      */
     public function isSuccessful()
     {
-        # Validate the Hash
-        $hashSecretWord = $this->data['secretWord']; # Input your secret word
-        $hashSid = $this->data['accountNumber']; #Input your seller ID (2Checkout account number)
+        // Validate the Hash
+        $hashSecretWord = $this->data['secretWord']; // Input your secret word
+        $hashSid = $this->data['accountNumber']; // Input your seller ID (2Checkout account number)
         $hashOrder = $this->data['sale_id'];
         $hashInvoice = $this->data['invoice_id'];
-        $StringToHash = strtoupper(md5($hashOrder.$hashSid.$hashInvoice.$hashSecretWord));
-
+        $StringToHash = strtoupper(md5($hashOrder . $hashSid . $hashInvoice . $hashSecretWord));
+        
         return $StringToHash == $this->data['md5_hash'];
     }
 

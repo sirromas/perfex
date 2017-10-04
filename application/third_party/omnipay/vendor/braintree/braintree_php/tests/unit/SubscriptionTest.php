@@ -8,6 +8,7 @@ use Braintree;
 
 class SubscriptionTest extends Setup
 {
+
     public function testErrorsOnFindWithBlankArgument()
     {
         $this->setExpectedException('InvalidArgumentException');

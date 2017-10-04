@@ -1,13 +1,15 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
 class Announcements extends Admin_controller
 {
+
     public function __construct()
     {
         parent::__construct();
         $this->load->model('announcements_model');
     }
-
+    
     /* List all announcements */
     public function index()
     {
@@ -17,15 +19,15 @@ class Announcements extends Admin_controller
         $data['title'] = _l('announcements');
         $this->load->view('admin/announcements/manage', $data);
     }
-
+    
     /* Edit announcement or add new if passed id */
     public function announcement($id = '')
     {
-        if (!is_admin()) {
+        if (! is_admin()) {
             access_denied('Announcement');
         }
         if ($this->input->post()) {
-            $data            = $this->input->post();
+            $data = $this->input->post();
             $data['message'] = $this->input->post('message', false);
             if ($id == '') {
                 $id = $this->announcements_model->add($data);
@@ -45,7 +47,7 @@ class Announcements extends Admin_controller
             $title = _l('add_new', _l('announcement_lowercase'));
         } else {
             $data['announcement'] = $this->announcements_model->get($id);
-            $title                = _l('edit', _l('announcement_lowercase'));
+            $title = _l('edit', _l('announcement_lowercase'));
         }
         $data['title'] = $title;
         $this->load->view('admin/announcements/announcement', $data);
@@ -55,25 +57,25 @@ class Announcements extends Admin_controller
     {
         if (is_staff_member()) {
             $announcement = $this->announcements_model->get($id);
-            if (!$announcement) {
+            if (! $announcement) {
                 blank_page(_l('announcement_not_found'));
             }
-            $data['announcement']         = $announcement;
+            $data['announcement'] = $announcement;
             $data['recent_announcements'] = $this->announcements_model->get('', array(
                 'announcementid !=' => $id
             ), 4);
-            $data['title']                = $announcement->name;
+            $data['title'] = $announcement->name;
             $this->load->view('admin/announcements/view', $data);
         }
     }
-
+    
     /* Delete announcement from database */
     public function delete($id)
     {
-        if (!$id) {
+        if (! $id) {
             redirect(admin_url('announcements'));
         }
-        if (!is_admin()) {
+        if (! is_admin()) {
             access_denied('Announcement');
         }
         $response = $this->announcements_model->delete($id);

@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Plugin\Backoff;
 
 use Guzzle\Plugin\Backoff\ExponentialBackoffStrategy;
@@ -9,6 +8,7 @@ use Guzzle\Plugin\Backoff\ExponentialBackoffStrategy;
  */
 class ExponentialBackoffStrategyTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testRetriesWithExponentialDelay()
     {
         $strategy = new ExponentialBackoffStrategy();

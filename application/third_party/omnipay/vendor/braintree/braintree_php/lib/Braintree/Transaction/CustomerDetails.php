@@ -7,9 +7,9 @@ use Braintree\Instance;
  * Customer details from a transaction
  * Creates an instance of customer details as returned from a transaction
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Transaction
- *
+ *            
  * @property-read string $company
  * @property-read string $email
  * @property-read string $fax

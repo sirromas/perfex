@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation;
 
 /**
@@ -18,8 +17,11 @@ namespace Symfony\Component\HttpFoundation;
  */
 class ApacheRequest extends Request
 {
+
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     protected function prepareRequestUri()
     {
@@ -27,17 +29,19 @@ class ApacheRequest extends Request
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     protected function prepareBaseUrl()
     {
         $baseUrl = $this->server->get('SCRIPT_NAME');
-
+        
         if (false === strpos($this->server->get('REQUEST_URI'), $baseUrl)) {
             // assume mod_rewrite
             return rtrim(dirname($baseUrl), '/\\');
         }
-
+        
         return $baseUrl;
     }
 }

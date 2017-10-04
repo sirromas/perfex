@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Plugin\Backoff;
 
 use Guzzle\Http\Message\RequestInterface;
@@ -11,6 +10,7 @@ use Guzzle\Http\Exception\HttpException;
  */
 class ReasonPhraseBackoffStrategy extends AbstractErrorCodeBackoffStrategy
 {
+
     public function makesDecision()
     {
         return true;

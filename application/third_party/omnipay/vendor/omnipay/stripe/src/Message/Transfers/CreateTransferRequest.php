@@ -3,7 +3,6 @@
 /**
  * Stripe Transfer Request (Connect only).
  */
-
 namespace Omnipay\Stripe\Message\Transfers;
 
 use Omnipay\Common\Exception\InvalidRequestException;
@@ -19,22 +18,24 @@ use Omnipay\Stripe\Message\AuthorizeRequest;
  * Example -- note this example assumes that the original charge was successful
  *
  * <code>
- *   // Create the transfer object when moving funds between Stripe accounts
- *   $transaction = $gateway->transfer(array(
- *       'amount'        => '10.00',
- *       'currency'      => 'AUD',
- *       'transferGroup' => '{ORDER10}',
- *       'destination'   => '{CONNECTED_STRIPE_ACCOUNT_ID}',
- *   ));
- *   $response = $transaction->send();
+ * // Create the transfer object when moving funds between Stripe accounts
+ * $transaction = $gateway->transfer(array(
+ * 'amount' => '10.00',
+ * 'currency' => 'AUD',
+ * 'transferGroup' => '{ORDER10}',
+ * 'destination' => '{CONNECTED_STRIPE_ACCOUNT_ID}',
+ * ));
+ * $response = $transaction->send();
  * </code>
  *
- * @see  AuthorizeRequest
+ * @see AuthorizeRequest
  * @link https://stripe.com/docs/connect/charges-transfers
  */
 class CreateTransferRequest extends AuthorizeRequest
 {
+
     /**
+     *
      * @return mixed
      */
     public function getSourceTransaction()
@@ -45,14 +46,15 @@ class CreateTransferRequest extends AuthorizeRequest
     /**
      * When creating separate charges and transfers, your platform can
      * inadvertently attempt a transfer without having a sufficient
-     * available balance. Doing so raises an error and the transfer
+     * available balance.
+     * Doing so raises an error and the transfer
      * attempt fails. If you’re commonly experiencing this problem, you
      * can use the `source_transaction` parameter to tie a transfer to an
      * existing charge. By using `source_transaction`, the transfer
      * request succeeds regardless of your available balance and the
      * transfer itself only occurs once the charge’s funds become available.
      *
-     * @param string $value
+     * @param string $value            
      *
      * @return \Omnipay\Common\Message\AbstractRequest
      */
@@ -64,17 +66,17 @@ class CreateTransferRequest extends AuthorizeRequest
     public function getData()
     {
         $this->validate('amount', 'currency', 'destination');
-
+        
         $data = array(
             'amount' => $this->getAmountInteger(),
             'currency' => strtolower($this->getCurrency()),
-            'destination' => $this->getDestination(),
+            'destination' => $this->getDestination()
         );
-
+        
         if ($this->getMetadata()) {
             $data['metadata'] = $this->getMetadata();
         }
-
+        
         if ($this->getTransferGroup()) {
             $data['transfer_group'] = $this->getTransferGroup();
         } elseif ($this->getSourceTransaction()) {
@@ -82,12 +84,12 @@ class CreateTransferRequest extends AuthorizeRequest
         } else {
             throw new InvalidRequestException("The sourceTransaction or transferGroup parameter is required");
         }
-
+        
         return $data;
     }
 
     public function getEndpoint()
     {
-        return $this->endpoint.'/transfers';
+        return $this->endpoint . '/transfers';
     }
 }

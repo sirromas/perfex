@@ -3,7 +3,6 @@
 /**
  * Stripe Create Subscription Request.
  */
-
 namespace Omnipay\Stripe\Message;
 
 /**
@@ -14,6 +13,7 @@ namespace Omnipay\Stripe\Message;
  */
 class CreateSubscriptionRequest extends AbstractRequest
 {
+
     /**
      * Get the plan
      *
@@ -27,7 +27,8 @@ class CreateSubscriptionRequest extends AbstractRequest
     /**
      * Set the plan
      *
-     * @param $value
+     * @param
+     *            $value
      * @return \Omnipay\Common\Message\AbstractRequest|CreateSubscriptionRequest
      */
     public function setPlan($value)
@@ -48,7 +49,8 @@ class CreateSubscriptionRequest extends AbstractRequest
     /**
      * Set the tax percentage
      *
-     * @param $value
+     * @param
+     *            $value
      * @return \Omnipay\Common\Message\AbstractRequest|CreateSubscriptionRequest
      */
     public function setTaxPercent($value)
@@ -59,24 +61,24 @@ class CreateSubscriptionRequest extends AbstractRequest
     public function getData()
     {
         $this->validate('customerReference', 'plan');
-
+        
         $data = array(
             'plan' => $this->getPlan()
         );
-
+        
         if ($this->parameters->has('tax_percent')) {
-            $data['tax_percent'] = (float)$this->getParameter('tax_percent');
+            $data['tax_percent'] = (float) $this->getParameter('tax_percent');
         }
-
+        
         if ($this->getMetadata()) {
             $data['metadata'] = $this->getMetadata();
         }
-
+        
         return $data;
     }
 
     public function getEndpoint()
     {
-        return $this->endpoint.'/customers/'.$this->getCustomerReference().'/subscriptions';
+        return $this->endpoint . '/customers/' . $this->getCustomerReference() . '/subscriptions';
     }
 }

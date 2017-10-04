@@ -3,7 +3,6 @@
 /**
  *  Stripe Update Transfer Reversal Request (Connect only).
  */
-
 namespace Omnipay\Stripe\Message\Transfers;
 
 use Omnipay\Stripe\Message\AbstractRequest;
@@ -17,20 +16,22 @@ use Omnipay\Stripe\Message\AbstractRequest;
  * This request only accepts metadata and description as arguments.
  *
  * <code>
- *   // Once the transaction has been authorized, we can capture it for final payment.
- *   $transaction = $gateway->updateTransfer(array(
- *       'transferReference' => '{TRANSFER_ID}',
- *       'reversalReference' => '{REVERSAL_ID}',
- *       'metadata'          => [],
- *   ));
- *   $response = $transaction->send();
+ * // Once the transaction has been authorized, we can capture it for final payment.
+ * $transaction = $gateway->updateTransfer(array(
+ * 'transferReference' => '{TRANSFER_ID}',
+ * 'reversalReference' => '{REVERSAL_ID}',
+ * 'metadata' => [],
+ * ));
+ * $response = $transaction->send();
  * </code>
  *
  * @link https://stripe.com/docs/api#update_transfer_reversal
  */
 class UpdateTransferReversalRequest extends AbstractRequest
 {
+
     /**
+     *
      * @return mixed
      */
     public function getReversalReference()
@@ -39,7 +40,8 @@ class UpdateTransferReversalRequest extends AbstractRequest
     }
 
     /**
-     * @param string $value
+     *
+     * @param string $value            
      *
      * @return \Omnipay\Common\Message\AbstractRequest
      */
@@ -49,6 +51,7 @@ class UpdateTransferReversalRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return mixed
      */
     public function getTransferReference()
@@ -57,7 +60,8 @@ class UpdateTransferReversalRequest extends AbstractRequest
     }
 
     /**
-     * @param string $value
+     *
+     * @param string $value            
      *
      * @return \Omnipay\Common\Message\AbstractRequest
      */
@@ -67,30 +71,32 @@ class UpdateTransferReversalRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return array
      */
     public function getData()
     {
         $this->validate('reversalReference', 'transferReference');
-
+        
         $data = array();
-
+        
         if ($this->getMetadata()) {
             $data['metadata'] = $this->getMetadata();
         }
-
+        
         if ($this->getDescription()) {
             $data['description'] = $this->getDescription();
         }
-
+        
         return $data;
     }
 
     /**
+     *
      * @return string
      */
     public function getEndpoint()
     {
-        return $this->endpoint.'/transfers/'.$this->getTransferReference().'/reversals/'.$this->getReversalReference();
+        return $this->endpoint . '/transfers/' . $this->getTransferReference() . '/reversals/' . $this->getReversalReference();
     }
 }

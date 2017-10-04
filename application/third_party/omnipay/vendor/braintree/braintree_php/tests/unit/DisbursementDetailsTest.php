@@ -9,12 +9,13 @@ use Braintree;
 
 class DisbursementDetailsTest extends Setup
 {
+
     public function testIsValidReturnsTrue()
     {
         $details = new Braintree\DisbursementDetails([
             "disbursementDate" => new DateTime("2013-04-10")
         ]);
-
+        
         $this->assertTrue($details->isValid());
     }
 
@@ -23,7 +24,7 @@ class DisbursementDetailsTest extends Setup
         $details = new Braintree\DisbursementDetails([
             "disbursementDate" => null
         ]);
-
+        
         $this->assertFalse($details->isValid());
     }
 }

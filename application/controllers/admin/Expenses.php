@@ -1,7 +1,9 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
 class Expenses extends Admin_controller
 {
+
     public function __construct()
     {
         parent::__construct();
@@ -15,7 +17,7 @@ class Expenses extends Admin_controller
 
     public function list_expenses($id = '', $clientid = '')
     {
-        if (!has_permission('expenses', '', 'view') && !has_permission('expenses', '', 'view_own')) {
+        if (! has_permission('expenses', '', 'view') && ! has_permission('expenses', '', 'view_own')) {
             access_denied('expenses');
         }
         if ($this->input->is_ajax_request()) {
@@ -29,9 +31,9 @@ class Expenses extends Admin_controller
             $data['expenseid'] = $id;
         }
         $data['categories'] = $this->expenses_model->get_category();
-        $data['years']      = $this->expenses_model->get_expenses_years();
-        $data['title']      = _l('expenses');
-
+        $data['years'] = $this->expenses_model->get_expenses_years();
+        $data['title'] = _l('expenses');
+        
         $this->load->view('admin/expenses/manage', $data);
     }
 
@@ -39,12 +41,12 @@ class Expenses extends Admin_controller
     {
         if ($this->input->post()) {
             if ($id == '') {
-                if (!has_permission('expenses', '', 'create')) {
+                if (! has_permission('expenses', '', 'create')) {
                     set_alert('danger', _l('access_denied'));
                     echo json_encode(array(
                         'url' => admin_url('expenses/expense')
                     ));
-                    die;
+                    die();
                 }
                 $id = $this->expenses_model->add($this->input->post());
                 if ($id) {
@@ -53,19 +55,19 @@ class Expenses extends Admin_controller
                         'url' => admin_url('expenses/list_expenses/' . $id),
                         'expenseid' => $id
                     ));
-                    die;
+                    die();
                 }
                 echo json_encode(array(
                     'url' => admin_url('expenses/expense')
                 ));
-                die;
+                die();
             } else {
-                if (!has_permission('expenses', '', 'edit')) {
+                if (! has_permission('expenses', '', 'edit')) {
                     set_alert('danger', _l('access_denied'));
                     echo json_encode(array(
                         'url' => admin_url('expenses/expense/' . $id)
                     ));
-                    die;
+                    die();
                 }
                 $success = $this->expenses_model->update($this->input->post(), $id);
                 if ($success) {
@@ -75,36 +77,36 @@ class Expenses extends Admin_controller
                     'url' => admin_url('expenses/list_expenses/' . $id),
                     'expenseid' => $id
                 ));
-                die;
+                die();
             }
         }
         if ($id == '') {
             $title = _l('add_new', _l('expense_lowercase'));
         } else {
             $data['expense'] = $this->expenses_model->get($id);
-
-            if (!$data['expense'] || (!has_permission('expenses', '', 'view') && $data['expense']->addedfrom != get_staff_user_id())) {
+            
+            if (! $data['expense'] || (! has_permission('expenses', '', 'view') && $data['expense']->addedfrom != get_staff_user_id())) {
                 blank_page(_l('expense_not_found'));
             }
-
+            
             $title = _l('edit', _l('expense_lowercase'));
         }
-
+        
         if ($this->input->get('customer_id')) {
-            $data['customer_id']        = $this->input->get('customer_id');
+            $data['customer_id'] = $this->input->get('customer_id');
         }
-
+        
         $this->load->model('taxes_model');
         $this->load->model('payment_modes_model');
         $this->load->model('currencies_model');
-
-        $data['taxes']         = $this->taxes_model->get();
-        $data['categories']    = $this->expenses_model->get_category();
+        
+        $data['taxes'] = $this->taxes_model->get();
+        $data['categories'] = $this->expenses_model->get_category();
         $data['payment_modes'] = $this->payment_modes_model->get('', array(
             'invoices_only !=' => 1
         ));
-        $data['currencies']    = $this->currencies_model->get();
-        $data['title']         = $title;
+        $data['currencies'] = $this->currencies_model->get();
+        $data['title'] = $title;
         $this->load->view('admin/expenses/expense', $data);
     }
 
@@ -116,8 +118,8 @@ class Expenses extends Admin_controller
                 $this->load->model('currencies_model');
                 $data['currencies'] = $this->currencies_model->get();
             }
-
-            $data['expenses_years']      = $this->expenses_model->get_expenses_years();
+            
+            $data['expenses_years'] = $this->expenses_model->get_expenses_years();
             $data['_currency'] = $data['totals']['currencyid'];
             $this->load->view('admin/expenses/expenses_total_template', $data);
         }
@@ -125,10 +127,10 @@ class Expenses extends Admin_controller
 
     public function delete($id)
     {
-        if (!has_permission('expenses', '', 'delete')) {
+        if (! has_permission('expenses', '', 'delete')) {
             access_denied('expenses');
         }
-        if (!$id) {
+        if (! $id) {
             redirect(admin_url('expenses/list_expenses'));
         }
         $response = $this->expenses_model->delete($id);
@@ -146,7 +148,7 @@ class Expenses extends Admin_controller
 
     public function copy($id)
     {
-        if (!has_permission('expenses', '', 'create')) {
+        if (! has_permission('expenses', '', 'create')) {
             access_denied('expenses');
         }
         $new_expense_id = $this->expenses_model->copy($id);
@@ -161,26 +163,26 @@ class Expenses extends Admin_controller
 
     public function convert_to_invoice($id)
     {
-        if (!has_permission('invoices', '', 'create')) {
+        if (! has_permission('invoices', '', 'create')) {
             access_denied('Convert Expense to Invoice');
         }
-        if (!$id) {
+        if (! $id) {
             redirect(admin_url('expenses/list_expenses'));
         }
         $draft_invoice = false;
         if ($this->input->get('save_as_draft')) {
             $draft_invoice = true;
         }
-
+        
         $params = array();
         if ($this->input->get('include_note') == 'true') {
             $params['include_note'] = true;
         }
-
+        
         if ($this->input->get('include_name') == 'true') {
             $params['include_name'] = true;
         }
-
+        
         $invoiceid = $this->expenses_model->convert_to_invoice($id, $draft_invoice, $params);
         if ($invoiceid) {
             set_alert('success', _l('expense_converted_to_invoice'));
@@ -193,17 +195,17 @@ class Expenses extends Admin_controller
 
     public function get_expense_data_ajax($id)
     {
-        if (!has_permission('expenses', '', 'view') && !has_permission('expenses', '', 'view_own')) {
+        if (! has_permission('expenses', '', 'view') && ! has_permission('expenses', '', 'view_own')) {
             echo _l('access_denied');
-            die;
+            die();
         }
         $expense = $this->expenses_model->get($id);
-
-        if (!$expense || (!has_permission('expenses', '', 'view') && $expense->addedfrom != get_staff_user_id())) {
+        
+        if (! $expense || (! has_permission('expenses', '', 'view') && $expense->addedfrom != get_staff_user_id())) {
             echo _l('expense_not_found');
-            die;
+            die();
         }
-
+        
         $data['expense'] = $expense;
         if ($expense->billable == 1) {
             if ($expense->invoiceid !== null) {
@@ -211,7 +213,7 @@ class Expenses extends Admin_controller
                 $data['invoice'] = $this->invoices_model->get($expense->invoiceid);
             }
         }
-
+        
         $data['child_expenses'] = $this->expenses_model->get_child_expenses($id);
         $data['members'] = $this->staff_model->get('', 1);
         $this->load->view('admin/expenses/expense_preview_template', $data);
@@ -227,7 +229,7 @@ class Expenses extends Admin_controller
 
     public function categories()
     {
-        if (!is_admin()) {
+        if (! is_admin()) {
             access_denied('expenses');
         }
         if ($this->input->is_ajax_request()) {
@@ -239,18 +241,18 @@ class Expenses extends Admin_controller
 
     public function category()
     {
-        if (!is_admin()) {
+        if (! is_admin()) {
             access_denied('expenses');
         }
         if ($this->input->post()) {
-            if (!$this->input->post('id')) {
+            if (! $this->input->post('id')) {
                 $id = $this->expenses_model->add_category($this->input->post());
                 if ($id) {
                     set_alert('success', _l('added_successfully', _l('expense_category')));
                 }
             } else {
                 $data = $this->input->post();
-                $id   = $data['id'];
+                $id = $data['id'];
                 unset($data['id']);
                 $success = $this->expenses_model->update_category($data, $id);
                 if ($success) {
@@ -262,10 +264,10 @@ class Expenses extends Admin_controller
 
     public function delete_category($id)
     {
-        if (!is_admin()) {
+        if (! is_admin()) {
             access_denied('expenses');
         }
-        if (!$id) {
+        if (! $id) {
             redirect(admin_url('expenses/categories'));
         }
         $response = $this->expenses_model->delete_category($id);
@@ -292,7 +294,7 @@ class Expenses extends Admin_controller
         $this->db->where('rel_id', $id);
         $this->db->where('rel_type', 'expense');
         $file = $this->db->get('tblfiles')->row();
-
+        
         if ($file->staffid == get_staff_user_id() || is_admin()) {
             $success = $this->expenses_model->delete_expense_attachment($id);
             if ($success) {

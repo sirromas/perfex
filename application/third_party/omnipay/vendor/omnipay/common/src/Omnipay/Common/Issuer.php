@@ -2,7 +2,6 @@
 /**
  * Issuer
  */
-
 namespace Omnipay\Common;
 
 /**
@@ -13,20 +12,21 @@ namespace Omnipay\Common;
  */
 class Issuer
 {
+
     /**
      * The identifier of the issuer.
      *
      * @var string
      */
     protected $id;
-    
+
     /**
      * The full name of the issuer.
      *
      * @var string
      */
     protected $name;
-    
+
     /**
      * The ID of a payment method that the issuer belongs to.
      *
@@ -41,9 +41,12 @@ class Issuer
      *
      * @see PaymentMethod
      *
-     * @param string      $id            The identifier of this issuer
-     * @param string      $name          The name of this issuer
-     * @param string|null $paymentMethod The ID of a payment method this issuer belongs to
+     * @param string $id
+     *            The identifier of this issuer
+     * @param string $name
+     *            The name of this issuer
+     * @param string|null $paymentMethod
+     *            The ID of a payment method this issuer belongs to
      */
     public function __construct($id, $name, $paymentMethod = null)
     {

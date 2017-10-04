@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Service\Command;
 
 use Guzzle\Http\Message\Response;
@@ -9,33 +8,36 @@ use Guzzle\Http\Message\Response;
  */
 class DefaultResponseParser implements ResponseParserInterface
 {
-    /** @var self */
+
+    /**
+     * @var self
+     */
     protected static $instance;
 
     /**
-     * @return self
-     * @codeCoverageIgnore
+     *
+     * @return self @codeCoverageIgnore
      */
     public static function getInstance()
     {
-        if (!self::$instance) {
-            self::$instance = new self;
+        if (! self::$instance) {
+            self::$instance = new self();
         }
-
+        
         return self::$instance;
     }
 
     public function parse(CommandInterface $command)
     {
         $response = $command->getRequest()->getResponse();
-
+        
         // Account for hard coded content-type values specified in service descriptions
         if ($contentType = $command['command.expects']) {
             $response->setHeader('Content-Type', $contentType);
         } else {
             $contentType = (string) $response->getHeader('Content-Type');
         }
-
+        
         return $this->handleParsing($command, $response, $contentType);
     }
 
@@ -49,7 +51,7 @@ class DefaultResponseParser implements ResponseParserInterface
                 $result = $result->xml();
             }
         }
-
+        
         return $result;
     }
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Iterator;
 
 /**
@@ -7,24 +6,32 @@ namespace Guzzle\Iterator;
  */
 class ChunkedIterator extends \IteratorIterator
 {
-    /** @var int Size of each chunk */
+
+    /**
+     * @var int Size of each chunk
+     */
     protected $chunkSize;
 
-    /** @var array Current chunk */
+    /**
+     * @var array Current chunk
+     */
     protected $chunk;
 
     /**
-     * @param \Traversable $iterator  Traversable iterator
-     * @param int          $chunkSize Size to make each chunk
+     *
+     * @param \Traversable $iterator
+     *            Traversable iterator
+     * @param int $chunkSize
+     *            Size to make each chunk
      * @throws \InvalidArgumentException
      */
     public function __construct(\Traversable $iterator, $chunkSize)
     {
         $chunkSize = (int) $chunkSize;
-        if ($chunkSize < 0 ) {
+        if ($chunkSize < 0) {
             throw new \InvalidArgumentException("The chunk size must be equal or greater than zero; $chunkSize given");
         }
-
+        
         parent::__construct($iterator);
         $this->chunkSize = $chunkSize;
     }
@@ -38,7 +45,7 @@ class ChunkedIterator extends \IteratorIterator
     public function next()
     {
         $this->chunk = array();
-        for ($i = 0; $i < $this->chunkSize && parent::valid(); $i++) {
+        for ($i = 0; $i < $this->chunkSize && parent::valid(); $i ++) {
             $this->chunk[] = parent::current();
             parent::next();
         }

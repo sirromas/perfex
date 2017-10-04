@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Cache;
 
 use Guzzle\Cache\DoctrineCacheAdapter;
@@ -11,10 +10,15 @@ use Doctrine\Common\Cache\ArrayCache;
  */
 class CacheAdapterTest extends \Guzzle\Tests\GuzzleTestCase
 {
-    /** @var ArrayCache */
+
+    /**
+     * @var ArrayCache
+     */
     private $cache;
 
-    /** @var DoctrineCacheAdapter */
+    /**
+     * @var DoctrineCacheAdapter
+     */
     private $adapter;
 
     /**

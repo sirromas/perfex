@@ -3,11 +3,12 @@ namespace Braintree;
 
 class WebhookTesting
 {
+
     public static function sampleNotification($kind, $id)
     {
         $payload = base64_encode(self::_sampleXml($kind, $id)) . "\n";
         $signature = Configuration::publicKey() . "|" . Digest::hexDigestSha1(Configuration::privateKey(), $payload);
-
+        
         return [
             'bt_signature' => $signature,
             'bt_payload' => $payload
@@ -410,7 +411,7 @@ class WebhookTesting
         date_default_timezone_set('UTC');
         $timestamp = strftime('%Y-%m-%dT%TZ');
         date_default_timezone_set($originalZone);
-
+        
         return $timestamp;
     }
 }

@@ -8,6 +8,7 @@ use Braintree;
 
 class OAuthTest extends Setup
 {
+
     protected $gateway;
 
     public function setUp()
@@ -24,9 +25,9 @@ class OAuthTest extends Setup
             'code' => '93801',
             'message' => 'Invalid grant: code not found'
         ]);
-
+        
         $this->gateway->oauth()->_mapError($result);
-
+        
         $this->assertEquals($result->error, 'invalid_grant');
         $this->assertEquals($result->errorDescription, 'code not found');
     }
@@ -37,9 +38,9 @@ class OAuthTest extends Setup
             'code' => '93802',
             'message' => 'Invalid credentials: wrong client id or secret'
         ]);
-
+        
         $this->gateway->oauth()->_mapError($result);
-
+        
         $this->assertEquals($result->error, 'invalid_credentials');
         $this->assertEquals($result->errorDescription, 'wrong client id or secret');
     }
@@ -50,9 +51,9 @@ class OAuthTest extends Setup
             'code' => '93803',
             'message' => 'Invalid scope: scope is invalid'
         ]);
-
+        
         $this->gateway->oauth()->_mapError($result);
-
+        
         $this->assertEquals($result->error, 'invalid_scope');
         $this->assertEquals($result->errorDescription, 'scope is invalid');
     }
@@ -63,7 +64,9 @@ class OAuthTest extends Setup
             'errors' => [
                 'errors' => [],
                 'credentials' => [
-                    'errors' => [$error]
+                    'errors' => [
+                        $error
+                    ]
                 ]
             ]
         ]);

@@ -1,22 +1,24 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
 class Todo extends Admin_controller
 {
+
     public function __construct()
     {
         parent::__construct();
         $this->load->model('todo_model');
     }
-
+    
     /* Get all staff todo items */
     public function index()
     {
         if ($this->input->is_ajax_request()) {
             echo json_encode($this->todo_model->get_todo_items($this->input->post('finished'), $this->input->post('todo_page')));
-            exit;
+            exit();
         }
-        $data['bodyclass']              = 'main_todo_page';
-        $data['total_pages_finished']   = ceil(total_rows('tbltodoitems', array(
+        $data['bodyclass'] = 'main_todo_page';
+        $data['total_pages_finished'] = ceil(total_rows('tbltodoitems', array(
             'finished' => 1,
             'staffid' => get_staff_user_id()
         )) / $this->todo_model->getTodosLimit());
@@ -24,10 +26,10 @@ class Todo extends Admin_controller
             'finished' => 0,
             'staffid' => get_staff_user_id()
         )) / $this->todo_model->getTodosLimit());
-        $data['title']                  = _l('my_todos');
+        $data['title'] = _l('my_todos');
         $this->load->view('admin/todos/all', $data);
     }
-
+    
     /* Add new todo item */
     public function todo()
     {
@@ -47,18 +49,18 @@ class Todo extends Admin_controller
                     set_alert('success', _l('updated_successfully', _l('todo')));
                 }
             }
-
+            
             redirect($_SERVER['HTTP_REFERER']);
         }
     }
 
     public function get_by_id($id)
     {
-        $todo              = $this->todo_model->get($id);
+        $todo = $this->todo_model->get($id);
         $todo->description = clear_textarea_breaks($todo->description);
         echo json_encode($todo);
     }
-
+    
     /* Change todo status */
     public function change_todo_status($id, $status)
     {
@@ -68,7 +70,7 @@ class Todo extends Admin_controller
         }
         redirect($_SERVER['HTTP_REFERER']);
     }
-
+    
     /* Update todo order / ajax */
     public function update_todo_items_order()
     {
@@ -76,7 +78,7 @@ class Todo extends Admin_controller
             $this->todo_model->update_todo_items_order($this->input->post());
         }
     }
-
+    
     /* Delete todo item from databse */
     public function delete_todo_item($id)
     {

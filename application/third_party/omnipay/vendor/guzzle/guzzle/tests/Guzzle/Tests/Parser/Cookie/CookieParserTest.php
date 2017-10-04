@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Parser\Cookie;
 
 use Guzzle\Parser\Cookie\CookieParser;
@@ -9,6 +8,7 @@ use Guzzle\Parser\Cookie\CookieParser;
  */
 class CookieParserTest extends CookieParserProvider
 {
+
     protected $cookieParserClass = 'Guzzle\Parser\Cookie\CookieParser';
 
     public function testUrlDecodesCookies()

@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\AuthorizeNet\Message;
 
 /**

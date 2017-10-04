@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal\Message;
 
 use Omnipay\Tests\TestCase;
@@ -7,7 +6,10 @@ use Omnipay\PayPal\RestGateway;
 
 class RestReactivateSubscriptionRequestTest extends TestCase
 {
-    /** @var \Omnipay\PayPal\Message\RestReactivateSubscriptionRequest */
+
+    /**
+     * @var \Omnipay\PayPal\Message\RestReactivateSubscriptionRequest
+     */
     private $request;
 
     public function setUp()
@@ -15,10 +17,10 @@ class RestReactivateSubscriptionRequestTest extends TestCase
         $client = $this->getHttpClient();
         $request = $this->getHttpRequest();
         $this->request = new RestReactivateSubscriptionRequest($client, $request);
-
+        
         $this->request->initialize(array(
-            'transactionReference'  => 'ABC-123',
-            'description'           => 'Reactivate this subscription',
+            'transactionReference' => 'ABC-123',
+            'description' => 'Reactivate this subscription'
         ));
     }
 

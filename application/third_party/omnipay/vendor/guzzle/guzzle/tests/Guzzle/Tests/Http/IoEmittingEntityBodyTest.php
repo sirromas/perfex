@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Http;
 
 use Guzzle\Http\EntityBody;
@@ -10,7 +9,9 @@ use Guzzle\Http\IoEmittingEntityBody;
  */
 class IoEmittingEntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     protected $body;
+
     protected $decorated;
 
     public function setUp()
@@ -22,7 +23,8 @@ class IoEmittingEntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
     public function testEmitsReadEvents()
     {
         $e = null;
-        $this->body->getEventDispatcher()->addListener('body.read', function ($event) use (&$e) {
+        $this->body->getEventDispatcher()->addListener('body.read', function ($event) use(&$e)
+        {
             $e = $event;
         });
         $this->assertEquals('hel', $this->body->read(3));
@@ -34,7 +36,8 @@ class IoEmittingEntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
     public function testEmitsWriteEvents()
     {
         $e = null;
-        $this->body->getEventDispatcher()->addListener('body.write', function ($event) use (&$e) {
+        $this->body->getEventDispatcher()->addListener('body.write', function ($event) use(&$e)
+        {
             $e = $event;
         });
         $this->body->seek(0, SEEK_END);

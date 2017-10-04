@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Service\Resource;
 
 use Guzzle\Common\Exception\InvalidArgumentException;
@@ -10,14 +9,15 @@ use Guzzle\Service\Command\CommandInterface;
  */
 abstract class AbstractResourceIteratorFactory implements ResourceIteratorFactoryInterface
 {
+
     public function build(CommandInterface $command, array $options = array())
     {
-        if (!$this->canBuild($command)) {
+        if (! $this->canBuild($command)) {
             throw new InvalidArgumentException('Iterator was not found for ' . $command->getName());
         }
-
+        
         $className = $this->getClassName($command);
-
+        
         return new $className($command, $options);
     }
 
@@ -29,8 +29,9 @@ abstract class AbstractResourceIteratorFactory implements ResourceIteratorFactor
     /**
      * Get the name of the class to instantiate for the command
      *
-     * @param CommandInterface $command Command that is associated with the iterator
-     *
+     * @param CommandInterface $command
+     *            Command that is associated with the iterator
+     *            
      * @return string
      */
     abstract protected function getClassName(CommandInterface $command);

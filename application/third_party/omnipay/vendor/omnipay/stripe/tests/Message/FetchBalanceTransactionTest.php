@@ -1,11 +1,11 @@
 <?php
-
 namespace Omnipay\Stripe\Message;
 
 use Omnipay\Tests\TestCase;
 
 class FetchBalanceTransactionRequestTest extends TestCase
 {
+
     public function setUp()
     {
         $this->request = new FetchBalanceTransactionRequest($this->getHttpClient(), $this->getHttpRequest());
@@ -21,7 +21,7 @@ class FetchBalanceTransactionRequestTest extends TestCase
     {
         $this->setMockHttpResponse('FetchBalanceTransactionSuccess.txt');
         $response = $this->request->send();
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertSame('txn_1044bu4CmsDZ3Zk6BGg97VUU', $response->getBalanceTransactionReference());
@@ -33,7 +33,7 @@ class FetchBalanceTransactionRequestTest extends TestCase
     {
         $this->setMockHttpResponse('FetchBalanceTransactionFailure.txt');
         $response = $this->request->send();
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getBalanceTransactionReference());

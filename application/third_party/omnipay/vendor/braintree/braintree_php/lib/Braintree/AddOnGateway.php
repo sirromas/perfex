@@ -3,6 +3,7 @@ namespace Braintree;
 
 class AddOnGateway
 {
+
     /**
      *
      * @var Gateway
@@ -23,7 +24,7 @@ class AddOnGateway
 
     /**
      *
-     * @param Gateway $gateway
+     * @param Gateway $gateway            
      */
     public function __construct($gateway)
     {
@@ -41,13 +42,12 @@ class AddOnGateway
     {
         $path = $this->_config->merchantPath() . '/add_ons';
         $response = $this->_http->get($path);
-
-        $addOns = ["addOn" => $response['addOns']];
-
-        return Util::extractAttributeAsArray(
-            $addOns,
-            'addOn'
-        );
+        
+        $addOns = [
+            "addOn" => $response['addOns']
+        ];
+        
+        return Util::extractAttributeAsArray($addOns, 'addOn');
     }
 }
 class_alias('Braintree\AddOnGateway', 'Braintree_AddOnGateway');

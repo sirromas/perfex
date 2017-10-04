@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\AuthorizeNet\Message;
 
 /**
@@ -7,5 +6,4 @@ namespace Omnipay\AuthorizeNet\Message;
  */
 class CIMRefundRequest extends AIMRefundRequest
 {
-
 }

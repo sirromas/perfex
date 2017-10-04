@@ -7,8 +7,8 @@ namespace Braintree;
  *
  * Creates an instance of PartnerMerchants
  *
- * @package    Braintree
- *
+ * @package Braintree
+ *         
  * @property-read string $merchantPublicId
  * @property-read string $publicKey
  * @property-read string $privateKey
@@ -17,21 +17,26 @@ namespace Braintree;
  */
 class PartnerMerchant extends Base
 {
+
     protected $_attributes = [];
 
     /**
+     *
      * @ignore
+     *
      */
     public static function factory($attributes)
     {
         $instance = new self();
         $instance->_initialize($attributes);
-
+        
         return $instance;
     }
 
     /**
+     *
      * @ignore
+     *
      */
     protected function _initialize($attributes)
     {

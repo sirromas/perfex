@@ -1,12 +1,14 @@
 <?php
-
 namespace Omnipay\PayPal\Message;
 
 use Omnipay\Tests\TestCase;
 
 class RestFetchPurchaseRequestTest extends TestCase
 {
-    /** @var \Omnipay\PayPal\Message\RestFetchPurchaseRequest */
+
+    /**
+     * @var \Omnipay\PayPal\Message\RestFetchPurchaseRequest
+     */
     private $request;
 
     public function setUp()

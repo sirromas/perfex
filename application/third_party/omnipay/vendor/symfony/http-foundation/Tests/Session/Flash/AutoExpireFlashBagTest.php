@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\Tests\Session\Flash;
 
 use PHPUnit\Framework\TestCase;
@@ -21,12 +20,15 @@ use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag as FlashBa
  */
 class AutoExpireFlashBagTest extends TestCase
 {
+
     /**
+     *
      * @var \Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag
      */
     private $bag;
 
     /**
+     *
      * @var array
      */
     protected $array = array();
@@ -35,7 +37,13 @@ class AutoExpireFlashBagTest extends TestCase
     {
         parent::setUp();
         $this->bag = new FlashBag();
-        $this->array = array('new' => array('notice' => array('A previous flash message')));
+        $this->array = array(
+            'new' => array(
+                'notice' => array(
+                    'A previous flash message'
+                )
+            )
+        );
         $this->bag->initialize($this->array);
     }
 
@@ -48,16 +56,34 @@ class AutoExpireFlashBagTest extends TestCase
     public function testInitialize()
     {
         $bag = new FlashBag();
-        $array = array('new' => array('notice' => array('A previous flash message')));
+        $array = array(
+            'new' => array(
+                'notice' => array(
+                    'A previous flash message'
+                )
+            )
+        );
         $bag->initialize($array);
-        $this->assertEquals(array('A previous flash message'), $bag->peek('notice'));
-        $array = array('new' => array(
-                'notice' => array('Something else'),
-                'error' => array('a'),
-            ));
+        $this->assertEquals(array(
+            'A previous flash message'
+        ), $bag->peek('notice'));
+        $array = array(
+            'new' => array(
+                'notice' => array(
+                    'Something else'
+                ),
+                'error' => array(
+                    'a'
+                )
+            )
+        );
         $bag->initialize($array);
-        $this->assertEquals(array('Something else'), $bag->peek('notice'));
-        $this->assertEquals(array('a'), $bag->peek('error'));
+        $this->assertEquals(array(
+            'Something else'
+        ), $bag->peek('notice'));
+        $this->assertEquals(array(
+            'a'
+        ), $bag->peek('error'));
     }
 
     public function testGetStorageKey()
@@ -77,15 +103,25 @@ class AutoExpireFlashBagTest extends TestCase
     public function testPeek()
     {
         $this->assertEquals(array(), $this->bag->peek('non_existing'));
-        $this->assertEquals(array('default'), $this->bag->peek('non_existing', array('default')));
-        $this->assertEquals(array('A previous flash message'), $this->bag->peek('notice'));
-        $this->assertEquals(array('A previous flash message'), $this->bag->peek('notice'));
+        $this->assertEquals(array(
+            'default'
+        ), $this->bag->peek('non_existing', array(
+            'default'
+        )));
+        $this->assertEquals(array(
+            'A previous flash message'
+        ), $this->bag->peek('notice'));
+        $this->assertEquals(array(
+            'A previous flash message'
+        ), $this->bag->peek('notice'));
     }
 
     public function testSet()
     {
         $this->bag->set('notice', 'Foo');
-        $this->assertEquals(array('A previous flash message'), $this->bag->peek('notice'));
+        $this->assertEquals(array(
+            'A previous flash message'
+        ), $this->bag->peek('notice'));
     }
 
     public function testHas()
@@ -96,7 +132,9 @@ class AutoExpireFlashBagTest extends TestCase
 
     public function testKeys()
     {
-        $this->assertEquals(array('notice'), $this->bag->keys());
+        $this->assertEquals(array(
+            'notice'
+        ), $this->bag->keys());
     }
 
     public function testPeekAll()
@@ -104,35 +142,42 @@ class AutoExpireFlashBagTest extends TestCase
         $array = array(
             'new' => array(
                 'notice' => 'Foo',
-                'error' => 'Bar',
-            ),
+                'error' => 'Bar'
+            )
         );
-
+        
         $this->bag->initialize($array);
         $this->assertEquals(array(
             'notice' => 'Foo',
-            'error' => 'Bar',
-            ), $this->bag->peekAll()
-        );
-
+            'error' => 'Bar'
+        ), $this->bag->peekAll());
+        
         $this->assertEquals(array(
             'notice' => 'Foo',
-            'error' => 'Bar',
-            ), $this->bag->peekAll()
-        );
+            'error' => 'Bar'
+        ), $this->bag->peekAll());
     }
 
     public function testGet()
     {
         $this->assertEquals(array(), $this->bag->get('non_existing'));
-        $this->assertEquals(array('default'), $this->bag->get('non_existing', array('default')));
-        $this->assertEquals(array('A previous flash message'), $this->bag->get('notice'));
+        $this->assertEquals(array(
+            'default'
+        ), $this->bag->get('non_existing', array(
+            'default'
+        )));
+        $this->assertEquals(array(
+            'A previous flash message'
+        ), $this->bag->get('notice'));
         $this->assertEquals(array(), $this->bag->get('notice'));
     }
 
     public function testSetAll()
     {
-        $this->bag->setAll(array('a' => 'first', 'b' => 'second'));
+        $this->bag->setAll(array(
+            'a' => 'first',
+            'b' => 'second'
+        ));
         $this->assertFalse($this->bag->has('a'));
         $this->assertFalse($this->bag->has('b'));
     }
@@ -142,15 +187,20 @@ class AutoExpireFlashBagTest extends TestCase
         $this->bag->set('notice', 'Foo');
         $this->bag->set('error', 'Bar');
         $this->assertEquals(array(
-            'notice' => array('A previous flash message'),
-            ), $this->bag->all()
-        );
-
+            'notice' => array(
+                'A previous flash message'
+            )
+        ), $this->bag->all());
+        
         $this->assertEquals(array(), $this->bag->all());
     }
 
     public function testClear()
     {
-        $this->assertEquals(array('notice' => array('A previous flash message')), $this->bag->clear());
+        $this->assertEquals(array(
+            'notice' => array(
+                'A previous flash message'
+            )
+        ), $this->bag->clear());
     }
 }

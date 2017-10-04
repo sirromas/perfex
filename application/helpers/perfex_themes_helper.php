@@ -1,77 +1,92 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
+
 /**
  * Get current template assets url
+ * 
  * @return string Assets url
  */
 function template_assets_url()
 {
     return base_url('assets/themes/' . get_option('clients_default_theme')) . '/';
 }
+
 function template_assets_path()
 {
     return 'assets/themes/' . get_option('clients_default_theme');
 }
+
 /**
  * Current theme view part
- * @param  string $name file name
- * @param  array  $data variables passed to view
+ * 
+ * @param string $name
+ *            file name
+ * @param array $data
+ *            variables passed to view
  */
 function get_template_part($name, $data = array(), $return = false)
 {
-    $CI =& get_instance();
+    $CI = & get_instance();
     if ($return == true) {
         return $CI->load->view('themes/' . get_option('clients_default_theme') . '/' . 'template_parts/' . $name, $data, TRUE);
     }
     $CI->load->view('themes/' . get_option('clients_default_theme') . '/' . 'template_parts/' . $name, $data);
 }
+
 /**
  * Get all client themes in themes folder
+ * 
  * @return array
  */
 function get_all_client_themes()
 {
     return list_folders(APPPATH . 'views/themes/');
 }
+
 /**
  * Get active client theme
+ * 
  * @return mixed
  */
 function active_clients_theme()
 {
-    $CI =& get_instance();
-
+    $CI = & get_instance();
+    
     $theme = get_option('clients_default_theme');
     if ($theme == '') {
         show_error('Default theme is not set');
     }
-    if (!is_dir(APPPATH . 'views/themes/' . $theme)) {
+    if (! is_dir(APPPATH . 'views/themes/' . $theme)) {
         show_error('Theme does not exists');
     }
     return $theme;
 }
 
-add_action('app_customers_head','do_theme_required_head');
+add_action('app_customers_head', 'do_theme_required_head');
+
 /**
  * Function used in the customers are in head and hook all the necessary data for full app usage
- * @param  array  $params pass params to use
+ * 
+ * @param array $params
+ *            pass params to use
  * @return void
  */
-function do_theme_required_head($params = array()){
+function do_theme_required_head($params = array())
+{
     ob_start();
     $isRTL = (is_rtl(true) ? 'true' : 'false');
     echo get_custom_fields_hyperlink_js_function();
     $locale = get_locale_key($params['language']);
-
+    
     $date_format = get_option('dateformat');
     $date_format = explode('|', $date_format);
     $date_format = $date_format[0];
-
+    
     ?>
     <?php if(get_option('use_recaptcha_customers_area') == 1 && get_option('recaptcha_secret_key') != '' && get_option('recaptcha_site_key') != ''){ ?>
-    <script src='https://www.google.com/recaptcha/api.js'></script>
-    <?php } ?>
-    <script>
+<script src='https://www.google.com/recaptcha/api.js'></script>
+<?php } ?>
+<script>
         <?php if(is_staff_logged_in()){  ?>
           var admin_url = '<?php echo admin_url(); ?>';
           <?php } ?>
@@ -108,7 +123,7 @@ function do_theme_required_head($params = array()){
             custom_fields_hyperlink();
         });
     </script>
-    <?php
+<?php
     $contents = ob_get_contents();
     ob_end_clean();
     echo $contents;

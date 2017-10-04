@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Service\Command;
 
 use Guzzle\Common\Event;
@@ -9,10 +8,12 @@ use Guzzle\Common\Event;
  */
 class CreateResponseClassEvent extends Event
 {
+
     /**
      * Set the result of the object creation
      *
-     * @param mixed $result Result value to set
+     * @param mixed $result
+     *            Result value to set
      */
     public function setResult($result)
     {

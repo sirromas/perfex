@@ -6,7 +6,7 @@ use Braintree\Instance;
 /**
  * Android Pay card details from a transaction
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Transaction
  */
 
@@ -14,9 +14,9 @@ use Braintree\Instance;
  * creates an instance of AndroidPayCardDetails
  *
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Transaction
- *
+ *            
  * @property-read string $bin
  * @property-read string $default
  * @property-read string $expirationMonth
@@ -32,10 +32,13 @@ use Braintree\Instance;
  */
 class AndroidPayCardDetails extends Instance
 {
+
     protected $_attributes = [];
 
     /**
+     *
      * @ignore
+     *
      */
     public function __construct($attributes)
     {

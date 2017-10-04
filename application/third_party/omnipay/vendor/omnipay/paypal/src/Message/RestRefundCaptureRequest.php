@@ -2,7 +2,6 @@
 /**
  * PayPal REST Refund Captured Payment Request
  */
-
 namespace Omnipay\PayPal\Message;
 
 /**
@@ -16,16 +15,17 @@ namespace Omnipay\PayPal\Message;
  */
 class RestRefundCaptureRequest extends AbstractRestRequest
 {
+
     public function getData()
     {
         $this->validate('transactionReference');
-
+        
         return array(
             'amount' => array(
                 'currency' => $this->getCurrency(),
-                'total' => $this->getAmount(),
+                'total' => $this->getAmount()
             ),
-            'description' => $this->getDescription(),
+            'description' => $this->getDescription()
         );
     }
 

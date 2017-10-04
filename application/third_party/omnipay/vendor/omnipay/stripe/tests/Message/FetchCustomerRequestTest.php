@@ -1,11 +1,11 @@
 <?php
-
 namespace Omnipay\Stripe\Message;
 
 use Omnipay\Tests\TestCase;
 
 class FetchCustomerRequestTest extends TestCase
 {
+
     public function setUp()
     {
         $this->request = new FetchCustomerRequest($this->getHttpClient(), $this->getHttpRequest());

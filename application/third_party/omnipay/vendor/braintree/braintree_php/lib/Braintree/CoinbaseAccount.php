@@ -4,8 +4,8 @@ namespace Braintree;
 /**
  * Braintree CoinbaseAccount module
  *
- * @package    Braintree
- * @category   Resources
+ * @package Braintree
+ * @category Resources
  */
 
 /**
@@ -14,9 +14,9 @@ namespace Braintree;
  * <b>== More information ==</b>
  *
  *
- * @package    Braintree
- * @category   Resources
- *
+ * @package Braintree
+ * @category Resources
+ *          
  * @property-read string $customerId
  * @property-read string $token
  * @property-read string $userId
@@ -25,11 +25,13 @@ namespace Braintree;
  */
 class CoinbaseAccount extends Base
 {
+
     /**
-     *  factory method: returns an instance of CoinbaseAccount
-     *  to the requesting method, with populated properties
+     * factory method: returns an instance of CoinbaseAccount
+     * to the requesting method, with populated properties
      *
      * @ignore
+     *
      * @return CoinbaseAccount
      */
     public static function factory($attributes)
@@ -38,9 +40,9 @@ class CoinbaseAccount extends Base
         $instance->_initialize($attributes);
         return $instance;
     }
-
+    
     /* instance methods */
-
+    
     /**
      * returns false if default is null or false
      *
@@ -55,38 +57,37 @@ class CoinbaseAccount extends Base
      * sets instance properties from an array of values
      *
      * @access protected
-     * @param array $coinbaseAccountAttribs array of coinbaseAccount data
+     * @param array $coinbaseAccountAttribs
+     *            array of coinbaseAccount data
      * @return void
      */
     protected function _initialize($coinbaseAccountAttribs)
     {
         // set the attributes
         $this->_attributes = $coinbaseAccountAttribs;
-
+        
         $subscriptionArray = [];
         if (isset($coinbaseAccountAttribs['subscriptions'])) {
-            foreach ($coinbaseAccountAttribs['subscriptions'] AS $subscription) {
+            foreach ($coinbaseAccountAttribs['subscriptions'] as $subscription) {
                 $subscriptionArray[] = Subscription::factory($subscription);
             }
         }
-
+        
         $this->_set('subscriptions', $subscriptionArray);
     }
 
     /**
      * create a printable representation of the object as:
      * ClassName[property=value, property=value]
+     * 
      * @return string
      */
-    public function  __toString()
+    public function __toString()
     {
-        return __CLASS__ . '[' .
-                Util::attributesToString($this->_attributes) .']';
+        return __CLASS__ . '[' . Util::attributesToString($this->_attributes) . ']';
     }
-
-
+    
     // static methods redirecting to gateway
-
     public static function find($token)
     {
         return Configuration::gateway()->coinbaseAccount()->find($token);

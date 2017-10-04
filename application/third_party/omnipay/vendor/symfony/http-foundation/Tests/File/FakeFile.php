@@ -8,13 +8,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\Tests\File;
 
 use Symfony\Component\HttpFoundation\File\File as OrigFile;
 
 class FakeFile extends OrigFile
 {
+
     private $realpath;
 
     public function __construct($realpath, $path)

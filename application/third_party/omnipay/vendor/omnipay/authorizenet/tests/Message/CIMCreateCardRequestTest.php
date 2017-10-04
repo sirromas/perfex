@@ -1,13 +1,16 @@
 <?php
-
 namespace Omnipay\AuthorizeNet\Message;
 
 use Omnipay\Tests\TestCase;
 
 class CIMCreateCardRequestTest extends TestCase
 {
-    /** @var CIMCreateCardRequest */
+
+    /**
+     * @var CIMCreateCardRequest
+     */
     protected $request;
+
     private $params;
 
     public function setUp()
@@ -41,9 +44,9 @@ class CIMCreateCardRequestTest extends TestCase
             'city' => 'Blacksburg'
         );
         $this->request->initialize($this->params);
-
+        
         $data = $this->request->getData();
-
+        
         $this->assertEquals('12345', $data->profile->paymentProfiles->billTo->zip);
         $this->assertEquals('1234 Test Street', $data->profile->paymentProfiles->billTo->address);
         $this->assertEquals('Blacksburg', $data->profile->paymentProfiles->billTo->city);
@@ -53,9 +56,9 @@ class CIMCreateCardRequestTest extends TestCase
     {
         unset($this->params['card']['cvv']);
         $this->request->initialize($this->params);
-
+        
         $data = $this->request->getData();
-
+        
         $this->assertFalse(isset($data->profile->paymentProfiles->payment->creditCard->cardCode));
         $this->assertEquals(CIMCreatePaymentProfileRequest::VALIDATION_MODE_NONE, $this->request->getValidationMode());
     }

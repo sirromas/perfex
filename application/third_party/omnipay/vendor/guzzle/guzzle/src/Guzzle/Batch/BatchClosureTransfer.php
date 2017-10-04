@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Batch;
 
 use Guzzle\Common\Exception\InvalidArgumentException;
@@ -10,25 +9,33 @@ use Guzzle\Common\Exception\InvalidArgumentException;
  */
 class BatchClosureTransfer implements BatchTransferInterface
 {
-    /** @var callable A closure that performs the transfer */
+
+    /**
+     * @var callable A closure that performs the transfer
+     */
     protected $callable;
 
-    /** @var mixed $context Context passed to the callable */
+    /**
+     * @var mixed $context Context passed to the callable
+     */
     protected $context;
 
     /**
-     * @param mixed $callable Callable that performs the transfer. This function should accept two arguments:
-     *                        (array $batch, mixed $context).
-     * @param mixed $context  Optional context to pass to the batch divisor
      *
+     * @param mixed $callable
+     *            Callable that performs the transfer. This function should accept two arguments:
+     *            (array $batch, mixed $context).
+     * @param mixed $context
+     *            Optional context to pass to the batch divisor
+     *            
      * @throws InvalidArgumentException
      */
     public function __construct($callable, $context = null)
     {
-        if (!is_callable($callable)) {
+        if (! is_callable($callable)) {
             throw new InvalidArgumentException('Argument must be callable');
         }
-
+        
         $this->callable = $callable;
         $this->context = $context;
     }

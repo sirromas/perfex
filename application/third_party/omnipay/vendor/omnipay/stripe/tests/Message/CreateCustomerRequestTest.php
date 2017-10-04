@@ -1,11 +1,11 @@
 <?php
-
 namespace Omnipay\Stripe\Message;
 
 use Omnipay\Tests\TestCase;
 
 class CreateCustomerRequestTest extends TestCase
 {
+
     public function setUp()
     {
         $this->request = new CreateCustomerRequest($this->getHttpClient(), $this->getHttpRequest());
@@ -20,10 +20,12 @@ class CreateCustomerRequestTest extends TestCase
     {
         $this->request->setEmail('customer@business.dom');
         $this->request->setDescription('New customer');
-        $this->request->setMetadata(array('field' => 'value'));
-
+        $this->request->setMetadata(array(
+            'field' => 'value'
+        ));
+        
         $data = $this->request->getData();
-
+        
         $this->assertSame('customer@business.dom', $data['email']);
         $this->assertSame('New customer', $data['description']);
         $this->assertArrayHasKey('field', $data['metadata']);
@@ -34,7 +36,7 @@ class CreateCustomerRequestTest extends TestCase
     {
         $this->request->setToken('xyz');
         $data = $this->request->getData();
-
+        
         $this->assertSame('xyz', $data['card']);
         $this->assertFalse(isset($data['email']));
     }
@@ -44,7 +46,7 @@ class CreateCustomerRequestTest extends TestCase
         $this->request->setToken('xyz');
         $this->request->setEmail('xyz@test.com');
         $data = $this->request->getData();
-
+        
         $this->assertSame('xyz', $data['card']);
         $this->assertSame('xyz@test.com', $data['email']);
     }
@@ -54,7 +56,7 @@ class CreateCustomerRequestTest extends TestCase
         $card = $this->getValidCard();
         $this->request->setCard($card);
         $data = $this->request->getData();
-
+        
         $this->assertSame($card['number'], $data['card']['number']);
     }
 
@@ -62,7 +64,7 @@ class CreateCustomerRequestTest extends TestCase
     {
         $this->setMockHttpResponse('CreateCustomerSuccess.txt');
         $response = $this->request->send();
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());
@@ -75,7 +77,7 @@ class CreateCustomerRequestTest extends TestCase
     {
         $this->setMockHttpResponse('CreateCustomerFailure.txt');
         $response = $this->request->send();
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());

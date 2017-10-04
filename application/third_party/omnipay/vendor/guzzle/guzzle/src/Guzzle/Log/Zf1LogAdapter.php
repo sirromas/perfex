@@ -1,16 +1,16 @@
 <?php
-
 namespace Guzzle\Log;
 
 use Guzzle\Common\Version;
 
 /**
  * Adapts a Zend Framework 1 logger object
- * @deprecated
- * @codeCoverageIgnore
+ * 
+ * @deprecated @codeCoverageIgnore
  */
 class Zf1LogAdapter extends AbstractLogAdapter
 {
+
     public function __construct(\Zend_Log $logObject)
     {
         $this->log = $logObject;

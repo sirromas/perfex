@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Cache;
 
 /**
@@ -7,7 +6,9 @@ namespace Guzzle\Cache;
  */
 class NullCacheAdapter extends AbstractCacheAdapter
 {
-    public function __construct() {}
+
+    public function __construct()
+    {}
 
     public function contains($id, array $options = null)
     {

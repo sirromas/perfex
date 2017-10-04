@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Service;
 
 use Guzzle\Inflection\Inflector;
@@ -19,7 +18,9 @@ use Guzzle\Service\Command\AbstractCommand;
  */
 class ClientTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     protected $service;
+
     protected $serviceTest;
 
     public function setUp()
@@ -39,14 +40,16 @@ class ClientTest extends \Guzzle\Tests\GuzzleTestCase
                 )
             ))
         ));
-
+        
         $this->service = ServiceDescription::factory(__DIR__ . '/../TestData/test_service.json');
     }
 
     public function testAllowsCustomClientParameters()
     {
         $client = new Mock\MockClient(null, array(
-            Client::COMMAND_PARAMS => array(AbstractCommand::RESPONSE_PROCESSING => 'foo')
+            Client::COMMAND_PARAMS => array(
+                AbstractCommand::RESPONSE_PROCESSING => 'foo'
+            )
         ));
         $command = $client->getCommand('mock_command');
         $this->assertEquals('foo', $command->get(AbstractCommand::RESPONSE_PROCESSING));
@@ -58,7 +61,7 @@ class ClientTest extends \Guzzle\Tests\GuzzleTestCase
             'base_url' => 'http://www.test.com/',
             'test' => '123'
         ));
-
+        
         $this->assertEquals('http://www.test.com/', $client->getBaseUrl());
         $this->assertEquals('123', $client->getConfig('test'));
     }
@@ -77,14 +80,15 @@ class ClientTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $this->getServer()->flush();
         $this->getServer()->enqueue("HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n");
-
+        
         $client = new Client($this->getServer()->getUrl());
         $cmd = new MockCommand();
         $client->execute($cmd);
-
+        
         $this->assertInstanceOf('Guzzle\\Http\\Message\\Response', $cmd->getResponse());
         $this->assertInstanceOf('Guzzle\\Http\\Message\\Response', $cmd->getResult());
-        $this->assertEquals(1, count($this->getServer()->getReceivedRequests(false)));
+        $this->assertEquals(1, count($this->getServer()
+            ->getReceivedRequests(false)));
     }
 
     public function testExecutesCommandsWithArray()
@@ -94,11 +98,14 @@ class ClientTest extends \Guzzle\Tests\GuzzleTestCase
             new Response(200),
             new Response(200)
         )));
-
+        
         // Create a command set and a command
-        $set = array(new MockCommand(), new MockCommand());
+        $set = array(
+            new MockCommand(),
+            new MockCommand()
+        );
         $client->execute($set);
-
+        
         // Make sure it sent
         $this->assertTrue($set[0]->isExecuted());
         $this->assertTrue($set[1]->isExecuted());
@@ -119,13 +126,13 @@ class ClientTest extends \Guzzle\Tests\GuzzleTestCase
     public function testThrowsExceptionWhenMissingCommand()
     {
         $client = new Client();
-
+        
         $mock = $this->getMock('Guzzle\\Service\\Command\\Factory\\FactoryInterface');
         $mock->expects($this->any())
-             ->method('factory')
-             ->with($this->equalTo('test'))
-             ->will($this->returnValue(null));
-
+            ->method('factory')
+            ->with($this->equalTo('test'))
+            ->will($this->returnValue(null));
+        
         $client->setCommandFactory($mock);
         $client->getCommand('test');
     }
@@ -133,19 +140,23 @@ class ClientTest extends \Guzzle\Tests\GuzzleTestCase
     public function testCreatesCommandsUsingCommandFactory()
     {
         $mockCommand = new MockCommand();
-
+        
         $client = new Mock\MockClient();
         $mock = $this->getMock('Guzzle\\Service\\Command\\Factory\\FactoryInterface');
         $mock->expects($this->any())
-             ->method('factory')
-             ->with($this->equalTo('foo'))
-             ->will($this->returnValue($mockCommand));
-
+            ->method('factory')
+            ->with($this->equalTo('foo'))
+            ->will($this->returnValue($mockCommand));
+        
         $client->setCommandFactory($mock);
-
-        $command = $client->getCommand('foo', array('acl' => '123'));
+        
+        $command = $client->getCommand('foo', array(
+            'acl' => '123'
+        ));
         $this->assertSame($mockCommand, $command);
-        $command = $client->getCommand('foo', array('acl' => '123'));
+        $command = $client->getCommand('foo', array(
+            'acl' => '123'
+        ));
         $this->assertSame($mockCommand, $command);
         $this->assertSame($client, $command->getClient());
     }
@@ -154,7 +165,7 @@ class ClientTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $client = new Mock\MockClient();
         $this->assertNull($client->getDescription());
-
+        
         $description = $this->getMock('Guzzle\\Service\\Description\\ServiceDescription');
         $this->assertSame($client, $client->setDescription($description));
         $this->assertSame($description, $client->getDescription());
@@ -163,15 +174,15 @@ class ClientTest extends \Guzzle\Tests\GuzzleTestCase
     public function testOwnsResourceIteratorFactory()
     {
         $client = new Mock\MockClient();
-
+        
         $method = new \ReflectionMethod($client, 'getResourceIteratorFactory');
         $method->setAccessible(TRUE);
         $rf1 = $method->invoke($client);
-
+        
         $rf = $this->readAttribute($client, 'resourceIteratorFactory');
         $this->assertInstanceOf('Guzzle\\Service\\Resource\\ResourceIteratorClassFactory', $rf);
         $this->assertSame($rf1, $rf);
-
+        
         $rf = new ResourceIteratorClassFactory('Guzzle\Tests\Service\Mock');
         $client->setResourceIteratorFactory($rf);
         $this->assertNotSame($rf1, $rf);
@@ -184,28 +195,29 @@ class ClientTest extends \Guzzle\Tests\GuzzleTestCase
             "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nHi",
             "HTTP/1.1 200 OK\r\nContent-Length: 1\r\n\r\nI"
         ));
-
+        
         $client = new Mock\MockClient($this->getServer()->getUrl());
-
+        
         $command = $client->getCommand('mock_command');
         $client->execute($command);
         $client->execute($command);
-        $this->assertEquals('I', $command->getResponse()->getBody(true));
+        $this->assertEquals('I', $command->getResponse()
+            ->getBody(true));
     }
 
     public function testClientCreatesIterators()
     {
         $client = new Mock\MockClient();
-
+        
         $iterator = $client->getIterator('mock_command', array(
             'foo' => 'bar'
         ), array(
             'limit' => 10
         ));
-
+        
         $this->assertInstanceOf('Guzzle\Tests\Service\Mock\Model\MockCommandIterator', $iterator);
         $this->assertEquals(10, $this->readAttribute($iterator, 'limit'));
-
+        
         $command = $this->readAttribute($iterator, 'originalCommand');
         $this->assertEquals('bar', $command->get('foo'));
     }
@@ -231,7 +243,7 @@ class ClientTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $client = new Mock\MockClient();
         $this->assertInstanceOf('Guzzle\Inflection\MemoizingInflector', $client->getInflector());
-
+        
         $inflector = new Inflector();
         $client->setInflector($inflector);
         $this->assertSame($inflector, $client->getInflector());
@@ -250,7 +262,9 @@ class ClientTest extends \Guzzle\Tests\GuzzleTestCase
 
     public function testSupportsServiceDescriptionBaseUrls()
     {
-        $description = new ServiceDescription(array('baseUrl' => 'http://foo.com'));
+        $description = new ServiceDescription(array(
+            'baseUrl' => 'http://foo.com'
+        ));
         $client = new Client();
         $client->setDescription($description);
         $this->assertEquals('http://foo.com', $client->getBaseUrl());
@@ -261,10 +275,12 @@ class ClientTest extends \Guzzle\Tests\GuzzleTestCase
         $client = new Mock\MockClient('http://www.foo.com', array(
             Client::COMMAND_PARAMS => array(
                 'mesa' => 'bar',
-                'jar'  => 'jar'
+                'jar' => 'jar'
             )
         ));
-        $command = $client->getCommand('mock_command', array('jar' => 'test'));
+        $command = $client->getCommand('mock_command', array(
+            'jar' => 'test'
+        ));
         $this->assertEquals('bar', $command->get('mesa'));
         $this->assertEquals('test', $command->get('jar'));
     }
@@ -275,7 +291,9 @@ class ClientTest extends \Guzzle\Tests\GuzzleTestCase
     public function testWrapsSingleCommandExceptions()
     {
         $client = new Mock\MockClient('http://foobaz.com');
-        $mock = new MockPlugin(array(new Response(401)));
+        $mock = new MockPlugin(array(
+            new Response(401)
+        ));
         $client->addSubscriber($mock);
         $client->execute(new MockCommand());
     }
@@ -283,10 +301,20 @@ class ClientTest extends \Guzzle\Tests\GuzzleTestCase
     public function testWrapsMultipleCommandExceptions()
     {
         $client = new Mock\MockClient('http://foobaz.com');
-        $mock = new MockPlugin(array(new Response(200), new Response(200), new Response(404), new Response(500)));
+        $mock = new MockPlugin(array(
+            new Response(200),
+            new Response(200),
+            new Response(404),
+            new Response(500)
+        ));
         $client->addSubscriber($mock);
-
-        $cmds = array(new MockCommand(), new MockCommand(), new MockCommand(), new MockCommand());
+        
+        $cmds = array(
+            new MockCommand(),
+            new MockCommand(),
+            new MockCommand(),
+            new MockCommand()
+        );
         try {
             $client->execute($cmds);
         } catch (CommandTransferException $e) {
@@ -294,13 +322,16 @@ class ClientTest extends \Guzzle\Tests\GuzzleTestCase
             $this->assertEquals(2, count($e->getSuccessfulRequests()));
             $this->assertEquals(2, count($e->getFailedCommands()));
             $this->assertEquals(2, count($e->getSuccessfulCommands()));
-
+            
             foreach ($e->getSuccessfulCommands() as $c) {
-                $this->assertTrue($c->getResponse()->isSuccessful());
+                $this->assertTrue($c->getResponse()
+                    ->isSuccessful());
             }
-
+            
             foreach ($e->getFailedCommands() as $c) {
-                $this->assertFalse($c->getRequest()->getResponse()->isSuccessful());
+                $this->assertFalse($c->getRequest()
+                    ->getResponse()
+                    ->isSuccessful());
             }
         }
     }
@@ -309,9 +340,9 @@ class ClientTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $service1 = ServiceDescription::factory(__DIR__ . '/../TestData/test_service.json');
         $service2 = ServiceDescription::factory(__DIR__ . '/../TestData/test_service_3.json');
-
+        
         $client = new Mock\MockClient();
-
+        
         $client->setDescription($service1);
         $client->getCommand('foo_bar');
         $client->setDescription($service2);

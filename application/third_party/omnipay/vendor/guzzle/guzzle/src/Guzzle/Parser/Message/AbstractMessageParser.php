@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Parser\Message;
 
 /**
@@ -7,22 +6,25 @@ namespace Guzzle\Parser\Message;
  */
 abstract class AbstractMessageParser implements MessageParserInterface
 {
+
     /**
      * Create URL parts from HTTP message parts
      *
-     * @param string $requestUrl Associated URL
-     * @param array  $parts      HTTP message parts
-     *
+     * @param string $requestUrl
+     *            Associated URL
+     * @param array $parts
+     *            HTTP message parts
+     *            
      * @return array
      */
     protected function getUrlPartsFromMessage($requestUrl, array $parts)
     {
         // Parse the URL information from the message
         $urlParts = array(
-            'path'   => $requestUrl,
+            'path' => $requestUrl,
             'scheme' => 'http'
         );
-
+        
         // Check for the Host header
         if (isset($parts['headers']['Host'])) {
             $urlParts['host'] = $parts['headers']['Host'];
@@ -31,7 +33,7 @@ abstract class AbstractMessageParser implements MessageParserInterface
         } else {
             $urlParts['host'] = null;
         }
-
+        
         if (false === strpos($urlParts['host'], ':')) {
             $urlParts['port'] = '';
         } else {
@@ -42,7 +44,7 @@ abstract class AbstractMessageParser implements MessageParserInterface
                 $urlParts['scheme'] = 'https';
             }
         }
-
+        
         // Check if a query is present
         $path = $urlParts['path'];
         $qpos = strpos($path, '?');
@@ -52,7 +54,7 @@ abstract class AbstractMessageParser implements MessageParserInterface
         } else {
             $urlParts['query'] = '';
         }
-
+        
         return $urlParts;
     }
 }

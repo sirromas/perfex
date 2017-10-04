@@ -6,13 +6,13 @@
  * @copyright 2012 Clay Loveless <clay@php.net>
  * @license   http://claylo.mit-license.org/2012/ MIT License
  */
-
 require_once 'phing/tasks/ext/git/GitBaseTask.php';
 
 // base - base of tree to split out
 // subIndicatorFile - composer.json, package.xml?
 class GuzzleSubSplitTask extends GitBaseTask
 {
+
     /**
      * What git repository to pull from and publish to
      */
@@ -29,7 +29,8 @@ class GuzzleSubSplitTask extends GitBaseTask
     protected $tags = null;
 
     /**
-     * Base of the tree RELATIVE TO .subsplit working dir
+     * Base of the tree RELATIVE TO .
+     * subsplit working dir
      */
     protected $base = null;
 
@@ -142,7 +143,7 @@ class GuzzleSubSplitTask extends GitBaseTask
     /**
      * GitClient from VersionControl_Git
      */
-    protected $client   = null;
+    protected $client = null;
 
     /**
      * The main entry point
@@ -153,29 +154,29 @@ class GuzzleSubSplitTask extends GitBaseTask
         if (empty($repo)) {
             throw new BuildException('"repository" is a required parameter');
         }
-
+        
         $remote = $this->getRemote();
         if (empty($remote)) {
             throw new BuildException('"remote" is a required parameter');
         }
-
+        
         chdir($repo);
         $this->client = $this->getGitClient(false, $repo);
-
+        
         // initalized yet?
-        if (!is_dir('.subsplit')) {
+        if (! is_dir('.subsplit')) {
             $this->subsplitInit();
         } else {
             // update
             $this->subsplitUpdate();
         }
-
+        
         // find all splits based on heads requested
         $this->findSplits();
-
+        
         // check that GitHub has the repos
         $this->verifyRepos();
-
+        
         // execute the subsplits
         $this->publish();
     }
@@ -185,25 +186,27 @@ class GuzzleSubSplitTask extends GitBaseTask
         $this->log('DRY RUN ONLY FOR NOW');
         $base = $this->getBase();
         $base = rtrim($base, '/') . '/';
-        $org = $this->getOwningTarget()->getProject()->getProperty('github.org');
-
+        $org = $this->getOwningTarget()
+            ->getProject()
+            ->getProperty('github.org');
+        
         $splits = array();
-
+        
         $heads = $this->getHeads();
         foreach ($heads as $head) {
             foreach ($this->splits[$head] as $component => $meta) {
-                $splits[] = $base . $component . ':git@github.com:'. $org.'/'.$meta['repo'];
+                $splits[] = $base . $component . ':git@github.com:' . $org . '/' . $meta['repo'];
             }
-
+            
             $cmd = 'git subsplit publish ';
             $cmd .= escapeshellarg(implode(' ', $splits));
-
+            
             if ($this->getNoHeads()) {
                 $cmd .= ' --no-heads';
             } else {
-                $cmd .= ' --heads='.$head;
+                $cmd .= ' --heads=' . $head;
             }
-
+            
             if ($this->getNoTags()) {
                 $cmd .= ' --no-tags';
             } else {
@@ -211,7 +214,7 @@ class GuzzleSubSplitTask extends GitBaseTask
                     $cmd .= ' --tags=' . escapeshellarg(implode(' ', $this->getTags()));
                 }
             }
-
+            
             passthru($cmd);
         }
     }
@@ -228,7 +231,7 @@ class GuzzleSubSplitTask extends GitBaseTask
         try {
             $cmd->execute();
         } catch (Exception $e) {
-            throw new BuildException('git subsplit update failed'. $e);
+            throw new BuildException('git subsplit update failed' . $e);
         }
         chdir($repo . '/.subsplit');
         passthru('php ../composer.phar update --dev');
@@ -243,16 +246,16 @@ class GuzzleSubSplitTask extends GitBaseTask
         $remote = $this->getRemote();
         $cmd = $this->client->getCommand('subsplit');
         $this->log('running git-subsplit init ' . $remote);
-
+        
         $cmd->setArguments(array(
             'init',
             $remote
         ));
-
+        
         try {
             $output = $cmd->execute();
         } catch (Exception $e) {
-            throw new BuildException('git subsplit init failed'. $e);
+            throw new BuildException('git subsplit init failed' . $e);
         }
         $this->log(trim($output), Project::MSG_INFO);
         $repo = $this->getRepository();
@@ -271,31 +274,33 @@ class GuzzleSubSplitTask extends GitBaseTask
         $this->log("checking heads for subsplits");
         $repo = $this->getRepository();
         $base = $this->getBase();
-
+        
         $splits = array();
         $heads = $this->getHeads();
-
-        if (!empty($base)) {
+        
+        if (! empty($base)) {
             $base = '/' . ltrim($base, '/');
         } else {
             $base = '/';
         }
-
+        
         chdir($repo . '/.subsplit');
         foreach ($heads as $head) {
             $splits[$head] = array();
-
+            
             // check each head requested *BEFORE* the actual subtree split command gets it
             passthru("git checkout '$head'");
             $ds = new DirectoryScanner();
             $ds->setBasedir($repo . '/.subsplit' . $base);
-            $ds->setIncludes(array('**/'.$this->subIndicatorFile));
+            $ds->setIncludes(array(
+                '**/' . $this->subIndicatorFile
+            ));
             $ds->scan();
             $files = $ds->getIncludedFiles();
-
+            
             // Process the files we found
             foreach ($files as $file) {
-                $pkg = file_get_contents($repo . '/.subsplit' . $base .'/'. $file);
+                $pkg = file_get_contents($repo . '/.subsplit' . $base . '/' . $file);
                 $pkg_json = json_decode($pkg, true);
                 $name = $pkg_json['name'];
                 $component = str_replace('/composer.json', '', $file);
@@ -307,7 +312,7 @@ class GuzzleSubSplitTask extends GitBaseTask
                 $splits[$head][$component]['desc'] = "[READ ONLY] Subtree split of $nscomponent: " . $pkg_json['description'];
             }
         }
-
+        
         // go back to how we found it
         passthru("git checkout master");
         chdir($repo);
@@ -317,20 +322,23 @@ class GuzzleSubSplitTask extends GitBaseTask
     /**
      * Based on list of repositories we determined we *should* have, talk
      * to GitHub and make sure they're all there.
-     *
      */
     protected function verifyRepos()
     {
         $this->log('verifying GitHub target repos');
-        $github_org = $this->getOwningTarget()->getProject()->getProperty('github.org');
-        $github_creds = $this->getOwningTarget()->getProject()->getProperty('github.basicauth');
-
+        $github_org = $this->getOwningTarget()
+            ->getProject()
+            ->getProperty('github.org');
+        $github_creds = $this->getOwningTarget()
+            ->getProject()
+            ->getProperty('github.basicauth');
+        
         if ($github_creds == 'username:password') {
             $this->log('Skipping GitHub repo checks. Update github.basicauth in build.properties to verify repos.', 1);
             return;
         }
-
-        $ch = curl_init('https://api.github.com/orgs/'.$github_org.'/repos?type=all');
+        
+        $ch = curl_init('https://api.github.com/orgs/' . $github_org . '/repos?type=all');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_USERPWD, $github_creds);
         // change this when we know we can use our bundled CA bundle!
@@ -339,21 +347,21 @@ class GuzzleSubSplitTask extends GitBaseTask
         curl_close($ch);
         $repos = json_decode($result, true);
         $existing_repos = array();
-
+        
         // parse out the repos we found on GitHub
         foreach ($repos as $repo) {
             $tmpreponame = explode('/', $repo['full_name']);
             $reponame = $tmpreponame[1];
             $existing_repos[$reponame] = $repo['description'];
         }
-
+        
         $heads = $this->getHeads();
         foreach ($heads as $head) {
             foreach ($this->splits[$head] as $component => $meta) {
-
+                
                 $reponame = $meta['repo'];
-
-                if (!isset($existing_repos[$reponame])) {
+                
+                if (! isset($existing_repos[$reponame])) {
                     $this->log("Creating missing repo $reponame");
                     $payload = array(
                         'name' => $reponame,
@@ -365,16 +373,18 @@ class GuzzleSubSplitTask extends GitBaseTask
                         'has_downloads' => true,
                         'auto_init' => false
                     );
-                    $ch = curl_init('https://api.github.com/orgs/'.$github_org.'/repos');
+                    $ch = curl_init('https://api.github.com/orgs/' . $github_org . '/repos');
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
                     curl_setopt($ch, CURLOPT_USERPWD, $github_creds);
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                        'Content-Type: application/json'
+                    ));
                     curl_setopt($ch, CURLOPT_POST, 1);
                     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
                     // change this when we know we can use our bundled CA bundle!
                     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
                     $result = curl_exec($ch);
-                    echo "Response code: ".curl_getinfo($ch, CURLINFO_HTTP_CODE)."\n";
+                    echo "Response code: " . curl_getinfo($ch, CURLINFO_HTTP_CODE) . "\n";
                     curl_close($ch);
                 } else {
                     $this->log("Repo $reponame exists", 2);

@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Cache;
 
 use Zend\Cache\Storage\StorageInterface;
@@ -11,8 +10,11 @@ use Zend\Cache\Storage\StorageInterface;
  */
 class Zf2CacheAdapter extends AbstractCacheAdapter
 {
+
     /**
-     * @param StorageInterface $cache Zend Framework 2 cache adapter
+     *
+     * @param StorageInterface $cache
+     *            Zend Framework 2 cache adapter
      */
     public function __construct(StorageInterface $cache)
     {

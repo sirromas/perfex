@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Http\QueryAggregator;
 
 use Guzzle\Http\QueryString;
@@ -9,13 +8,17 @@ use Guzzle\Http\QueryString;
  */
 interface QueryAggregatorInterface
 {
+
     /**
      * Aggregate multi-valued parameters into a flattened associative array
      *
-     * @param string      $key   The name of the query string parameter
-     * @param array       $value The values of the parameter
-     * @param QueryString $query The query string that is being aggregated
-     *
+     * @param string $key
+     *            The name of the query string parameter
+     * @param array $value
+     *            The values of the parameter
+     * @param QueryString $query
+     *            The query string that is being aggregated
+     *            
      * @return array Returns an array of the combined values
      */
     public function aggregate($key, $value, QueryString $query);

@@ -2,12 +2,13 @@
 /**
  * PlanRequest Class
  */
-
 namespace Omnipay\Braintree\Message;
 
 class PlanRequest extends AbstractRequest
 {
+
     /**
+     *
      * @return null
      */
     public function getData()
@@ -16,7 +17,8 @@ class PlanRequest extends AbstractRequest
     }
 
     /**
-     * @param null $data
+     *
+     * @param null $data            
      * @return PlanResponse
      */
     public function sendData($data = null)

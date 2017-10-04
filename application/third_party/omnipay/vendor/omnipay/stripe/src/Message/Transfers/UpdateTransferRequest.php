@@ -3,7 +3,6 @@
 /**
  * Stripe Update Transfer Request (Connect only).
  */
-
 namespace Omnipay\Stripe\Message\Transfers;
 
 use Omnipay\Stripe\Message\AbstractRequest;
@@ -15,18 +14,19 @@ use Omnipay\Stripe\Message\AbstractRequest;
  * Any parameters not provided will be left unchanged.
  *
  * <code>
- *   // Once the transaction has been authorized, we can capture it for final payment.
- *   $transaction = $gateway->updateTransfer(array(
- *       'transferReference' => '{TRANSFER_ID}',
- *       'metadata'          => [],
- *   ));
- *   $response = $transaction->send();
+ * // Once the transaction has been authorized, we can capture it for final payment.
+ * $transaction = $gateway->updateTransfer(array(
+ * 'transferReference' => '{TRANSFER_ID}',
+ * 'metadata' => [],
+ * ));
+ * $response = $transaction->send();
  * </code>
  *
  * @link https://stripe.com/docs/api#update_transfer
  */
 class UpdateTransferRequest extends AbstractRequest
 {
+
     /**
      * Get the plan ID
      *
@@ -40,7 +40,7 @@ class UpdateTransferRequest extends AbstractRequest
     /**
      * Set the plan ID
      *
-     * @param string $value
+     * @param string $value            
      *
      * @return \Omnipay\Common\Message\AbstractRequest
      */
@@ -50,26 +50,28 @@ class UpdateTransferRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return array
      */
     public function getData()
     {
         $this->validate('transferReference');
-
+        
         $data = array();
-
+        
         if ($this->getMetadata()) {
             $data['metadata'] = $this->getMetadata();
         }
-
+        
         return $data;
     }
 
     /**
+     *
      * @return string
      */
     public function getEndpoint()
     {
-        return $this->endpoint.'/transfers/'.$this->getTransferReference();
+        return $this->endpoint . '/transfers/' . $this->getTransferReference();
     }
 }

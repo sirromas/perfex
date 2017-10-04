@@ -1,96 +1,113 @@
 <?php init_head(); ?>
 <div id="wrapper">
-    <div class="content">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel_s">
-                    <div class="panel-body">
-                     <div class="_buttons">
-                        <a href="#" onclick="new_department(); return false;" class="btn btn-info pull-left display-block">
+	<div class="content">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="panel_s">
+					<div class="panel-body">
+						<div class="_buttons">
+							<a href="#" onclick="new_department(); return false;"
+								class="btn btn-info pull-left display-block">
                             <?php echo _l('new_department'); ?>
                         </a>
-                    </div>
-                    <div class="clearfix"></div>
-                    <hr class="hr-panel-heading" />
-                    <div class="clearfix"></div>
-                    <?php render_datatable(array(
+						</div>
+						<div class="clearfix"></div>
+						<hr class="hr-panel-heading" />
+						<div class="clearfix"></div>
+                    <?php
+                    
+render_datatable(array(
                         _l('department_list_name'),
                         _l('department_email'),
                         _l('department_calendar_id'),
                         _l('options')
-                        ),'departments'); ?>
+                    ), 'departments');
+                    ?>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 <div class="modal fade" id="department" tabindex="-1" role="dialog">
-    <div class="modal-dialog">
+	<div class="modal-dialog">
         <?php echo form_open(admin_url('departments/department')); ?>
         <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">
-                    <span class="edit-title"><?php echo _l('edit_department'); ?></span>
-                    <span class="add-title"><?php echo _l('new_department'); ?></span>
-                </h4>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div id="additional"></div>
-                        <!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
-                        <input  type="text" class="fake-autofill-field" name="fakeusernameremembered" value='' tabindex="-1"/>
-                        <input  type="password" class="fake-autofill-field" name="fakepasswordremembered" value='' tabindex="-1"/>
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">
+					<span class="edit-title"><?php echo _l('edit_department'); ?></span>
+					<span class="add-title"><?php echo _l('new_department'); ?></span>
+				</h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-12">
+						<div id="additional"></div>
+						<!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
+						<input type="text" class="fake-autofill-field"
+							name="fakeusernameremembered" value='' tabindex="-1" /> <input
+							type="password" class="fake-autofill-field"
+							name="fakepasswordremembered" value='' tabindex="-1" />
                         <?php echo render_input('name','department_name'); ?>
                         <?php echo render_input('calendar_id','department_calendar_id'); ?>
                         <div class="checkbox checkbox-primary">
-                            <input type="checkbox" name="hidefromclient" id="hidefromclient">
-                            <label for="hidefromclient"><?php echo _l('department_hide_from_client'); ?></label>
-                        </div>
-                        <hr />
+							<input type="checkbox" name="hidefromclient" id="hidefromclient">
+							<label for="hidefromclient"><?php echo _l('department_hide_from_client'); ?></label>
+						</div>
+						<hr />
                         <?php echo render_input('email','department_email','','email'); ?>
-                        <i class="fa fa-question-circle" data-toggle="tooltip" data-title="<?php echo _l('department_username_help'); ?>"></i>
+                        <i class="fa fa-question-circle"
+							data-toggle="tooltip"
+							data-title="<?php echo _l('department_username_help'); ?>"></i>
                         <?php echo render_input('imap_username','department_username'); ?>
                         <?php echo render_input('host','dept_imap_host'); ?>
                         <?php echo render_input('password','dept_email_password','','password'); ?>
                         <div class="form-group">
-                            <label for="encryption"><?php echo _l('dept_encryption'); ?></label><br />
-                            <div class="radio radio-primary radio-inline">
-                                <input type="radio" name="encryption" value="tls" id="tls">
-                                <label for="tls">TLS</label>
-                            </div>
-                            <div class="radio radio-primary radio-inline">
-                                <input type="radio" name="encryption" value="ssl" id="ssl">
-                                <label for="ssl">SSL</label>
-                            </div>
-                            <div class="radio radio-primary radio-inline">
-                                <input type="radio" name="encryption" value="" id="no_enc" checked>
-                                <label for="no_enc"><?php echo _l('dept_email_no_encryption'); ?></label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="checkbox checkbox-primary">
-                                <input type="checkbox" name="delete_after_import" id="delete_after_import">
-                                <label for="delete_after_import"><?php echo _l('delete_mail_after_import'); ?>
-                                </div>
-                                <hr />
-                                <button onclick="test_dep_imap_connection(); return false;" class="btn btn-default"><?php echo _l('leads_email_integration_test_connection'); ?></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
-                    <button type="submit" class="btn btn-info"><?php echo _l('submit'); ?></button>
-                </div>
-            </div><!-- /.modal-content -->
+							<label for="encryption"><?php echo _l('dept_encryption'); ?></label><br />
+							<div class="radio radio-primary radio-inline">
+								<input type="radio" name="encryption" value="tls" id="tls"> <label
+									for="tls">TLS</label>
+							</div>
+							<div class="radio radio-primary radio-inline">
+								<input type="radio" name="encryption" value="ssl" id="ssl"> <label
+									for="ssl">SSL</label>
+							</div>
+							<div class="radio radio-primary radio-inline">
+								<input type="radio" name="encryption" value="" id="no_enc"
+									checked> <label for="no_enc"><?php echo _l('dept_email_no_encryption'); ?></label>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="checkbox checkbox-primary">
+								<input type="checkbox" name="delete_after_import"
+									id="delete_after_import"> <label for="delete_after_import"><?php echo _l('delete_mail_after_import'); ?>
+                                
+							
+							</div>
+							<hr />
+							<button onclick="test_dep_imap_connection(); return false;"
+								class="btn btn-default"><?php echo _l('leads_email_integration_test_connection'); ?></button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+				<button type="submit" class="btn btn-info"><?php echo _l('submit'); ?></button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
             <?php echo form_close(); ?>
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
-    <?php init_tail(); ?>
-    <script>
+        </div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+<?php init_tail(); ?>
+<script>
         $(function(){
            initDataTable('.table-departments', window.location.href, [3], [3]);
            _validate_form($('form'),{name:'required',email:{

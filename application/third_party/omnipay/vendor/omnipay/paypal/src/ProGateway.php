@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal;
 
 use Omnipay\Common\AbstractGateway;
@@ -9,6 +8,7 @@ use Omnipay\Common\AbstractGateway;
  */
 class ProGateway extends AbstractGateway
 {
+
     public function getName()
     {
         return 'PayPal Pro';
@@ -20,7 +20,7 @@ class ProGateway extends AbstractGateway
             'username' => '',
             'password' => '',
             'signature' => '',
-            'testMode' => false,
+            'testMode' => false
         );
     }
 

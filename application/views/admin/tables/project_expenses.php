@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-$aColumns      = array(
+$aColumns = array(
     'tblexpenses.id',
     'category',
     'amount',
@@ -12,32 +12,32 @@ $aColumns      = array(
     'reference_no',
     'paymentmode'
 );
-$join          = array(
+$join = array(
     'LEFT JOIN tblclients ON tblclients.userid = tblexpenses.clientid',
     'LEFT JOIN tblexpensescategories ON tblexpensescategories.id = tblexpenses.category',
-    'LEFT JOIN tblfiles ON tblfiles.rel_id = tblexpenses.id AND rel_type="expense"',
+    'LEFT JOIN tblfiles ON tblfiles.rel_id = tblexpenses.id AND rel_type="expense"'
 );
 $custom_fields = get_custom_fields('expenses', array(
     'show_on_table' => 1
 ));
-$i             = 0;
+$i = 0;
 foreach ($custom_fields as $field) {
     array_push($aColumns, 'ctable_' . $i . '.value as cvalue_' . $i);
     array_push($join, 'LEFT JOIN tblcustomfieldsvalues as ctable_' . $i . ' ON tblexpenses.id = ctable_' . $i . '.relid AND ctable_' . $i . '.fieldto="' . $field['fieldto'] . '" AND ctable_' . $i . '.fieldid=' . $field['id']);
-    $i++;
+    $i ++;
 }
 $where = array();
 $filter = array();
-include_once(APPPATH.'views/admin/tables/includes/expenses_filter.php');
+include_once (APPPATH . 'views/admin/tables/includes/expenses_filter.php');
 
-array_push($where, 'AND project_id='.$project_id);
+array_push($where, 'AND project_id=' . $project_id);
 
-if (!has_permission('expenses', '', 'view')) {
-    array_push($where, 'AND addedfrom='.get_staff_user_id());
+if (! has_permission('expenses', '', 'view')) {
+    array_push($where, 'AND addedfrom=' . get_staff_user_id());
 }
 $sIndexColumn = "id";
-$sTable       = 'tblexpenses';
-$result       = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, array(
+$sTable = 'tblexpenses';
+$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, array(
     'name',
     'billable',
     'invoiceid',
@@ -45,20 +45,20 @@ $result       = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $wher
     'tax',
     'tax2'
 ));
-$output       = $result['output'];
-$rResult      = $result['rResult'];
+$output = $result['output'];
+$rResult = $result['rResult'];
 $this->_instance->load->model('currencies_model');
 $this->_instance->load->model('payment_modes_model');
 foreach ($rResult as $aRow) {
     $row = array();
-    for ($i = 0; $i < count($aColumns); $i++) {
-        if (strpos($aColumns[$i], 'as') !== false && !isset($aRow[$aColumns[$i]])) {
+    for ($i = 0; $i < count($aColumns); $i ++) {
+        if (strpos($aColumns[$i], 'as') !== false && ! isset($aRow[$aColumns[$i]])) {
             $_data = $aRow[strafter($aColumns[$i], 'as ')];
         } else {
             $_data = $aRow[$aColumns[$i]];
         }
         if ($aColumns[$i] == 'tblexpenses.id') {
-            $_data = '<span class="label label-default inline-block">'.$_data.'</span>';
+            $_data = '<span class="label label-default inline-block">' . $_data . '</span>';
         } elseif ($aColumns[$i] == 'category') {
             $_data = '<a href="' . admin_url('expenses/list_expenses/' . $aRow['tblexpenses.id']) . '" target="_blank">' . $aRow['name'] . '</a>';
             if ($aRow['billable'] == 1) {
@@ -89,18 +89,18 @@ foreach ($rResult as $aRow) {
             $_data = format_money($total, $this->_instance->currencies_model->get($aRow['currency'])->symbol);
         } elseif ($aColumns[$i] == 'paymentmode') {
             $_data = '';
-            if ($aRow['paymentmode'] != '0' && !empty($aRow['paymentmode'])) {
+            if ($aRow['paymentmode'] != '0' && ! empty($aRow['paymentmode'])) {
                 $_data = $this->_instance->payment_modes_model->get($aRow['paymentmode'])->name;
             }
         } elseif ($aColumns[$i] == 'file_name') {
-            if (!empty($_data)) {
-                $_data=  '<a href="'.site_url('download/file/expense/'.$aRow['tblexpenses.id']).'">'.$_data.'</a>';
+            if (! empty($_data)) {
+                $_data = '<a href="' . site_url('download/file/expense/' . $aRow['tblexpenses.id']) . '">' . $_data . '</a>';
             }
         } elseif ($aColumns[$i] == 'date') {
             $_data = _d($_data);
         } elseif ($aColumns[$i] == 'invoiceid') {
             if ($_data) {
-                $_data = '<a href="'.admin_url('invoices/list_invoices/'.$_data).'">'.format_invoice_number($_data).'</a>';
+                $_data = '<a href="' . admin_url('invoices/list_invoices/' . $_data) . '">' . format_invoice_number($_data) . '</a>';
             } else {
                 $_data = '';
             }

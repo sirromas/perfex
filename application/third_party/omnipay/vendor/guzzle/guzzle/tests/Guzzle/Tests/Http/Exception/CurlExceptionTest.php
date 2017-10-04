@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Http\Exception;
 
 use Guzzle\Http\Exception\CurlException;
@@ -10,6 +9,7 @@ use Guzzle\Http\Curl\CurlHandle;
  */
 class CurlExceptionTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testStoresCurlError()
     {
         $e = new CurlException();
@@ -18,7 +18,7 @@ class CurlExceptionTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertSame($e, $e->setError('test', 12));
         $this->assertEquals('test', $e->getError());
         $this->assertEquals(12, $e->getErrorNo());
-
+        
         $handle = new CurlHandle(curl_init(), array());
         $e->setCurlHandle($handle);
         $this->assertSame($handle, $e->getCurlHandle());

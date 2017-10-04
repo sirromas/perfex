@@ -1,16 +1,17 @@
 <?php
-
 namespace Omnipay\Stripe\Message;
 
 use Omnipay\Tests\TestCase;
 
 class RefundRequestTest extends TestCase
 {
+
     public function setUp()
     {
         $this->request = new RefundRequest($this->getHttpClient(), $this->getHttpRequest());
         $this->request->setTransactionReference('ch_12RgN9L7XhO9mI')
-            ->setAmount('10.00')->setRefundApplicationFee(true);
+            ->setAmount('10.00')
+            ->setRefundApplicationFee(true);
     }
 
     public function testEndpoint()
@@ -34,7 +35,7 @@ class RefundRequestTest extends TestCase
     {
         $this->setMockHttpResponse('RefundSuccess.txt');
         $response = $this->request->send();
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertSame('ch_12RgN9L7XhO9mI', $response->getTransactionReference());
@@ -46,7 +47,7 @@ class RefundRequestTest extends TestCase
     {
         $this->setMockHttpResponse('RefundFailure.txt');
         $response = $this->request->send();
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());

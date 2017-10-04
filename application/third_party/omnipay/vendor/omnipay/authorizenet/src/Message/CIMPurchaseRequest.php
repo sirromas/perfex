@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\AuthorizeNet\Message;
 
 /**
@@ -7,5 +6,6 @@ namespace Omnipay\AuthorizeNet\Message;
  */
 class CIMPurchaseRequest extends CIMAuthorizeRequest
 {
+
     protected $action = "authCaptureTransaction";
 }

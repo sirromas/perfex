@@ -9,12 +9,13 @@ use Braintree;
 
 class IdealPaymentTest extends Setup
 {
+
     public function testFindIdealPayment()
     {
         $http = new HttpClientApi(Braintree\Configuration::$global);
         $idealPaymentId = Test\Helper::generateValidIdealPaymentId();
-
-        $foundIdealPayment= Braintree\IdealPayment::find($idealPaymentId);
+        
+        $foundIdealPayment = Braintree\IdealPayment::find($idealPaymentId);
         $this->assertInstanceOf('Braintree\IdealPayment', $foundIdealPayment);
         $this->assertRegExp('/^idealpayment_\w{6,}$/', $foundIdealPayment->id);
         $this->assertRegExp('/^\d{16,}$/', $foundIdealPayment->idealTransactionId);
@@ -41,13 +42,13 @@ class IdealPaymentTest extends Setup
     {
         $http = new HttpClientApi(Braintree\Configuration::$global);
         $idealPaymentId = Test\Helper::generateValidIdealPaymentId();
-
+        
         $result = Braintree\IdealPayment::sale($idealPaymentId, [
             'merchantAccountId' => 'ideal_merchant_account',
             'amount' => '100.00',
             'orderId' => 'ABC123'
         ]);
-
+        
         $this->assertTrue($result->success);
         $transaction = $result->transaction;
         $this->assertEquals(Braintree\Transaction::SETTLED, $transaction->status);
@@ -64,13 +65,13 @@ class IdealPaymentTest extends Setup
     {
         $http = new HttpClientApi(Braintree\Configuration::$global);
         $idealPaymentId = Test\Helper::generateValidIdealPaymentId('3.00');
-
+        
         $result = Braintree\IdealPayment::sale($idealPaymentId, [
             'merchantAccountId' => 'ideal_merchant_account',
             'amount' => '3.00',
             'orderId' => 'ABC123'
         ]);
-
+        
         $this->assertFalse($result->success);
         $baseErrors = $result->errors->forKey('transaction')->onAttribute('paymentMethodNonce');
         $this->assertEquals(Braintree\Error\Codes::TRANSACTION_IDEAL_PAYMENT_NOT_COMPLETE, $baseErrors[0]->code);
@@ -79,13 +80,13 @@ class IdealPaymentTest extends Setup
     public function testSale_createsASaleUsingInvalidId()
     {
         $http = new HttpClientApi(Braintree\Configuration::$global);
-
+        
         $result = Braintree\IdealPayment::sale('invalid_id', [
             'merchantAccountId' => 'ideal_merchant_account',
             'amount' => '100.00',
             'orderId' => 'ABC123'
         ]);
-
+        
         $this->assertFalse($result->success);
         $baseErrors = $result->errors->forKey('transaction')->onAttribute('paymentMethodNonce');
         $this->assertEquals(Braintree\Error\Codes::TRANSACTION_PAYMENT_METHOD_NONCE_UNKNOWN, $baseErrors[0]->code);

@@ -1,8 +1,11 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
 class Proposals_model extends CRM_Model
 {
+
     private $statuses;
+
     private $copy = false;
 
     public function __construct()
@@ -35,32 +38,32 @@ class Proposals_model extends CRM_Model
 
     public function do_kanban_query($status, $search = '', $page = 1, $sort = array(), $count = false)
     {
-        $default_pipeline_order      = get_option('default_proposals_pipeline_sort');
+        $default_pipeline_order = get_option('default_proposals_pipeline_sort');
         $default_pipeline_order_type = get_option('default_proposals_pipeline_sort_type');
-        $limit                       = get_option('proposals_pipeline_limit');
-
+        $limit = get_option('proposals_pipeline_limit');
+        
         $has_permission_view = has_permission('proposals', '', 'view');
         $has_permission_view_own = has_permission('proposals', '', 'view_own');
         $allow_staff_view_proposals_assigned = get_option('allow_staff_view_proposals_assigned');
         $staffId = get_staff_user_id();
-
+        
         $this->db->select('id,invoice_id,estimate_id,subject,rel_type,rel_id,total,date,open_till,currency,proposal_to,status');
         $this->db->from('tblproposals');
         $this->db->where('status', $status);
-        if (!$has_permission_view) {
+        if (! $has_permission_view) {
             if ($has_permission_view_own) {
-                $userWhere = '(addedfrom='.$staffId;
+                $userWhere = '(addedfrom=' . $staffId;
                 if ($allow_staff_view_proposals_assigned == 1) {
-                    $userWhere .= ' OR assigned='.$staffId;
+                    $userWhere .= ' OR assigned=' . $staffId;
                 }
                 $userWhere .= ')';
             } else {
-                $userWhere .= 'assigned='.$staffId;
+                $userWhere .= 'assigned=' . $staffId;
             }
             $this->db->where($userWhere);
         }
         if ($search != '') {
-            if (!_startsWith($search, '#')) {
+            if (! _startsWith($search, '#')) {
                 $this->db->where('(
                 phone LIKE "%' . $search . '%"
                 OR
@@ -89,23 +92,23 @@ class Proposals_model extends CRM_Model
                 ');
             }
         }
-
+        
         if (isset($sort['sort_by']) && $sort['sort_by'] && isset($sort['sort']) && $sort['sort']) {
             $this->db->order_by($sort['sort_by'], $sort['sort']);
         } else {
             $this->db->order_by($default_pipeline_order, $default_pipeline_order_type);
         }
-
-        if($count == false){
+        
+        if ($count == false) {
             if ($page > 1) {
-                $page--;
+                $page --;
                 $position = ($page * $limit);
                 $this->db->limit($limit, $position);
             } else {
                 $this->db->limit($limit);
             }
         }
-
+        
         if ($count == false) {
             return $this->db->get()->result_array();
         } else {
@@ -115,7 +118,9 @@ class Proposals_model extends CRM_Model
 
     /**
      * Inserting new proposal function
-     * @param mixed $data $_POST data
+     * 
+     * @param mixed $data
+     *            $_POST data
      */
     public function add($data)
     {
@@ -124,7 +129,7 @@ class Proposals_model extends CRM_Model
             $saveAndSend = true;
             unset($data['save_and_send']);
         }
-
+        
         $unsetters = array(
             'currency_symbol',
             'price',
@@ -142,7 +147,7 @@ class Proposals_model extends CRM_Model
                 unset($data[$unseter]);
             }
         }
-
+        
         if (isset($data['allow_comments'])) {
             $data['allow_comments'] = 1;
         } else {
@@ -152,21 +157,21 @@ class Proposals_model extends CRM_Model
             $custom_fields = $data['custom_fields'];
             unset($data['custom_fields']);
         }
-
+        
         if (isset($data['country']) && $data['country'] == '') {
             $data['country'] = 0;
         }
-
+        
         $tags = '';
         if (isset($data['tags'])) {
-            $tags  = $data['tags'];
+            $tags = $data['tags'];
             unset($data['tags']);
         }
-
+        
         $data['datecreated'] = date('Y-m-d H:i:s');
-        $data['addedfrom']   = get_staff_user_id();
-        $data['date']        = to_sql_date($data['date']);
-        $data['hash']        = md5(rand() . microtime());
+        $data['addedfrom'] = get_staff_user_id();
+        $data['date'] = to_sql_date($data['date']);
+        $data['hash'] = md5(rand() . microtime());
         // Check if the key exists
         $this->db->where('hash', $data['hash']);
         $exists = $this->db->get('tblproposals')->row();
@@ -182,42 +187,42 @@ class Proposals_model extends CRM_Model
                 unset($data['rel_id']);
             }
         }
-        if (!empty($data['open_till'])) {
+        if (! empty($data['open_till'])) {
             $data['open_till'] = to_sql_date($data['open_till']);
         } else {
             unset($data['open_till']);
         }
-
+        
         $items = array();
-
+        
         if (isset($data['newitems'])) {
             $items = $data['newitems'];
             unset($data['newitems']);
         }
-
+        
         if ($data['discount_total'] == 0) {
             $data['discount_type'] = '';
         }
-
-        if ((isset($data['adjustment']) && !is_numeric($data['adjustment'])) || !isset($data['adjustment'])) {
+        
+        if ((isset($data['adjustment']) && ! is_numeric($data['adjustment'])) || ! isset($data['adjustment'])) {
             $data['adjustment'] = 0;
         } elseif (isset($data['adjustment']) && is_numeric($data['adjustment'])) {
             $data['adjustment'] = number_format($data['adjustment'], get_decimal_places(), '.', '');
         }
-
+        
         if ($this->copy == false) {
             $data['content'] = '{proposal_items}';
         }
-        $data = do_action('before_create_proposal',$data);
+        $data = do_action('before_create_proposal', $data);
         $this->db->insert('tblproposals', $data);
         $insert_id = $this->db->insert_id();
         if ($insert_id) {
             if (isset($custom_fields)) {
                 handle_custom_fields_post($insert_id, $custom_fields);
             }
-
+            
             handle_tags_save($tags, $insert_id, 'proposal');
-
+            
             if (count($items) > 0) {
                 foreach ($items as $key => $item) {
                     $this->db->insert('tblitems_in', array(
@@ -229,18 +234,24 @@ class Proposals_model extends CRM_Model
                         'rel_type' => 'proposal',
                         'item_order' => $item['order'],
                         'unit' => $item['unit']
-
-                    ));
+                    )
+                    );
                     $itemid = $this->db->insert_id();
                     if ($itemid) {
                         if (isset($item['taxname']) && is_array($item['taxname'])) {
                             foreach ($item['taxname'] as $taxname) {
                                 if ($taxname != '') {
-                                    $tax_array    = explode('|', $taxname);
+                                    $tax_array = explode('|', $taxname);
                                     if (isset($tax_array[0]) && isset($tax_array[1])) {
                                         $tax_name = trim($tax_array[0]);
                                         $tax_rate = trim($tax_array[1]);
-                                        if (total_rows('tblitemstax', array('itemid'=>$itemid, 'taxrate'=>$tax_rate, 'taxname'=>$tax_name, 'rel_id'=>$insert_id, 'rel_type'=>'proposal')) == 0) {
+                                        if (total_rows('tblitemstax', array(
+                                            'itemid' => $itemid,
+                                            'taxrate' => $tax_rate,
+                                            'taxname' => $tax_name,
+                                            'rel_id' => $insert_id,
+                                            'rel_type' => 'proposal'
+                                        )) == 0) {
                                             $this->db->insert('tblitemstax', array(
                                                 'itemid' => $itemid,
                                                 'taxrate' => $tax_rate,
@@ -269,7 +280,9 @@ class Proposals_model extends CRM_Model
                         ))
                     ));
                     if ($notified) {
-                        pusher_trigger_notification(array($proposal->assigned));
+                        pusher_trigger_notification(array(
+                            $proposal->assigned
+                        ));
                     }
                 }
             }
@@ -281,22 +294,25 @@ class Proposals_model extends CRM_Model
             }
             $this->update_total_tax($insert_id);
             logActivity('New Proposal Created [ID:' . $insert_id . ']');
-
-            if($saveAndSend === true){
+            
+            if ($saveAndSend === true) {
                 $this->send_proposal_to_email($insert_id, 'proposal-send-to-customer', true);
             }
-
-            do_action('proposal_created',$insert_id);
+            
+            do_action('proposal_created', $insert_id);
             return $insert_id;
         }
-
+        
         return false;
     }
 
     /**
      * Update proposal
-     * @param  mixed $data $_POST data
-     * @param  mixed $id   proposal id
+     * 
+     * @param mixed $data
+     *            $_POST data
+     * @param mixed $id
+     *            proposal id
      * @return boolean
      */
     public function update($data, $id)
@@ -306,7 +322,7 @@ class Proposals_model extends CRM_Model
             $saveAndSend = true;
             unset($data['save_and_send']);
         }
-
+        
         $unsetters = array(
             'currency_symbol',
             'price',
@@ -321,26 +337,25 @@ class Proposals_model extends CRM_Model
             'quantity',
             'item_select'
         );
-
+        
         foreach ($unsetters as $u) {
             if (isset($data[$u])) {
                 unset($data[$u]);
             }
         }
-
+        
         if ($data['country'] == '') {
             $data['country'] = 0;
         }
-
-
-        $affectedRows     = 0;
+        
+        $affectedRows = 0;
         $current_proposal = $this->get($id);
         if (empty($data['rel_type'])) {
-            $data['rel_id']   = null;
+            $data['rel_id'] = null;
             $data['rel_type'] = '';
         } else {
             if (empty($data['rel_id'])) {
-                $data['rel_id']   = null;
+                $data['rel_id'] = null;
                 $data['rel_type'] = '';
             }
         }
@@ -350,7 +365,7 @@ class Proposals_model extends CRM_Model
             $data['allow_comments'] = 0;
         }
         $data['date'] = to_sql_date($this->input->post('date'));
-        if (!empty($data['open_till'])) {
+        if (! empty($data['open_till'])) {
             $data['open_till'] = to_sql_date($data['open_till']);
         } else {
             $data['open_till'] = null;
@@ -358,12 +373,11 @@ class Proposals_model extends CRM_Model
         if (isset($data['custom_fields'])) {
             $custom_fields = $data['custom_fields'];
             if (handle_custom_fields_post($id, $custom_fields)) {
-                $affectedRows++;
+                $affectedRows ++;
             }
             unset($data['custom_fields']);
         }
-
-
+        
         $items = array();
         if (isset($data['items'])) {
             $items = $data['items'];
@@ -374,23 +388,23 @@ class Proposals_model extends CRM_Model
             $newitems = $data['newitems'];
             unset($data['newitems']);
         }
-        if ((isset($data['adjustment']) && !is_numeric($data['adjustment'])) || !isset($data['adjustment'])) {
+        if ((isset($data['adjustment']) && ! is_numeric($data['adjustment'])) || ! isset($data['adjustment'])) {
             $data['adjustment'] = 0;
         } elseif (isset($data['adjustment']) && is_numeric($data['adjustment'])) {
             $data['adjustment'] = number_format($data['adjustment'], get_decimal_places(), '.', '');
         }
-
+        
         if ($data['discount_total'] == 0) {
             $data['discount_type'] = '';
         }
-
+        
         // Delete items checked to be removed from database
         if (isset($data['removed_items'])) {
             foreach ($data['removed_items'] as $remove_item_id) {
                 $this->db->where('id', $remove_item_id);
                 $this->db->delete('tblitems_in');
                 if ($this->db->affected_rows() > 0) {
-                    $affectedRows++;
+                    $affectedRows ++;
                     $this->db->where('itemid', $remove_item_id);
                     $this->db->where('rel_type', 'proposal');
                     $this->db->delete('tblitemstax');
@@ -398,19 +412,18 @@ class Proposals_model extends CRM_Model
             }
             unset($data['removed_items']);
         }
-
-
+        
         if (isset($data['tags'])) {
             if (handle_tags_save($data['tags'], $id, 'proposal')) {
-                $affectedRows++;
+                $affectedRows ++;
             }
             unset($data['tags']);
         }
-
+        
         $this->db->where('id', $id);
         $this->db->update('tblproposals', $data);
         if ($this->db->affected_rows() > 0) {
-            $affectedRows++;
+            $affectedRows ++;
             $proposal_now = $this->get($id);
             if ($current_proposal->assigned != $proposal_now->assigned) {
                 if ($proposal_now->assigned != get_staff_user_id()) {
@@ -424,13 +437,14 @@ class Proposals_model extends CRM_Model
                         ))
                     ));
                     if ($notified) {
-                        pusher_trigger_notification(array($proposal_now->assigned));
+                        pusher_trigger_notification(array(
+                            $proposal_now->assigned
+                        ));
                     }
                 }
             }
         }
-
-
+        
         if (count($items) > 0) {
             foreach ($items as $key => $item) {
                 $estimate_item_id = $item['itemid'];
@@ -444,34 +458,34 @@ class Proposals_model extends CRM_Model
                     'unit' => $item['unit']
                 ));
                 if ($this->db->affected_rows() > 0) {
-                    $affectedRows++;
+                    $affectedRows ++;
                 }
-
-                if (!isset($item['taxname']) || (isset($item['taxname']) && count($item['taxname']) == 0)) {
+                
+                if (! isset($item['taxname']) || (isset($item['taxname']) && count($item['taxname']) == 0)) {
                     $this->db->where('itemid', $estimate_item_id);
                     $this->db->where('rel_type', 'proposal');
                     $this->db->delete('tblitemstax');
                 } else {
-                    $item_taxes        = get_proposal_item_taxes($estimate_item_id);
+                    $item_taxes = get_proposal_item_taxes($estimate_item_id);
                     $_item_taxes_names = array();
                     foreach ($item_taxes as $_item_tax) {
                         array_push($_item_taxes_names, $_item_tax['taxname']);
                     }
                     $i = 0;
                     foreach ($_item_taxes_names as $_item_tax) {
-                        if (!in_array($_item_tax, $item['taxname'])) {
+                        if (! in_array($_item_tax, $item['taxname'])) {
                             $this->db->where('id', $item_taxes[$i]['id']);
                             $this->db->delete('tblitemstax');
                             if ($this->db->affected_rows() > 0) {
-                                $affectedRows++;
+                                $affectedRows ++;
                             }
                         }
-                        $i++;
+                        $i ++;
                     }
                     if (isset($item['taxname']) && is_array($item['taxname'])) {
                         foreach ($item['taxname'] as $taxname) {
                             if ($taxname != '') {
-                                $tax_array    = explode('|', $taxname);
+                                $tax_array = explode('|', $taxname);
                                 $tax_name = trim($tax_array[0]);
                                 $tax_rate = trim($tax_array[1]);
                                 if (total_rows('tblitemstax', array(
@@ -479,17 +493,17 @@ class Proposals_model extends CRM_Model
                                     'itemid' => $estimate_item_id,
                                     'taxrate' => $tax_rate,
                                     'rel_type' => 'proposal',
-                                    'rel_id'=>$id
-                                    )) == 0) {
+                                    'rel_id' => $id
+                                )) == 0) {
                                     $this->db->insert('tblitemstax', array(
                                         'taxrate' => $tax_rate,
                                         'taxname' => $tax_name,
                                         'itemid' => $estimate_item_id,
                                         'rel_id' => $id,
                                         'rel_type' => 'proposal'
-                                        ));
+                                    ));
                                     if ($this->db->affected_rows() > 0) {
-                                        $affectedRows++;
+                                        $affectedRows ++;
                                     }
                                 }
                             }
@@ -498,8 +512,7 @@ class Proposals_model extends CRM_Model
                 }
             }
         }
-
-
+        
         if (count($newitems) > 0) {
             foreach ($newitems as $key => $item) {
                 $this->db->insert('tblitems_in', array(
@@ -517,7 +530,7 @@ class Proposals_model extends CRM_Model
                     if (isset($item['taxname']) && is_array($item['taxname'])) {
                         foreach ($item['taxname'] as $taxname) {
                             if ($taxname != '') {
-                                $tax_array    = explode('|', $taxname);
+                                $tax_array = explode('|', $taxname);
                                 if (isset($tax_array[0]) && isset($tax_array[1])) {
                                     $tax_name = trim($tax_array[0]);
                                     $tax_rate = trim($tax_array[1]);
@@ -526,17 +539,17 @@ class Proposals_model extends CRM_Model
                                         'itemid' => $new_item_added,
                                         'taxrate' => $tax_rate,
                                         'rel_type' => 'proposal',
-                                        'rel_id'=>$id
-                                        )) == 0) {
+                                        'rel_id' => $id
+                                    )) == 0) {
                                         $this->db->insert('tblitemstax', array(
                                             'taxrate' => $tax_rate,
                                             'taxname' => $tax_name,
                                             'itemid' => $new_item_added,
                                             'rel_id' => $id,
                                             'rel_type' => 'proposal'
-                                            ));
-                                        if($this->db->affected_rows() > 0){
-                                            $affectedRows++;
+                                        ));
+                                        if ($this->db->affected_rows() > 0) {
+                                            $affectedRows ++;
                                         }
                                     }
                                 }
@@ -546,46 +559,48 @@ class Proposals_model extends CRM_Model
                 }
             }
         }
-
+        
         if ($affectedRows > 0) {
             $this->update_total_tax($id);
         }
-
-        if($saveAndSend === true){
+        
+        if ($saveAndSend === true) {
             $this->send_proposal_to_email($id, 'proposal-send-to-customer', true);
         }
-
-        if($affectedRows > 0){
+        
+        if ($affectedRows > 0) {
             logActivity('Proposal Updated [ID:' . $id . ']');
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * Get proposals
-     * @param  mixed $id proposal id OPTIONAL
+     * 
+     * @param mixed $id
+     *            proposal id OPTIONAL
      * @return mixed
      */
     public function get($id = '', $where = array(), $for_editor = false)
     {
         $this->db->where($where);
-
+        
         if (is_client_logged_in()) {
             $this->db->where('status !=', 0);
         }
-
+        
         $this->db->select('*,tblcurrencies.id as currencyid, tblproposals.id as id, tblcurrencies.name as currency_name');
         $this->db->from('tblproposals');
         $this->db->join('tblcurrencies', 'tblcurrencies.id = tblproposals.currency', 'left');
-
+        
         if (is_numeric($id)) {
             $this->db->where('tblproposals.id', $id);
             $proposal = $this->db->get()->row();
             if ($proposal) {
-                $proposal->attachments                           = $this->get_attachments($id);
-                $proposal->items                                 = $this->get_proposal_items($id);
+                $proposal->attachments = $this->get_attachments($id);
+                $proposal->items = $this->get_proposal_items($id);
                 $proposal->visible_attachments_to_customer_found = false;
                 foreach ($proposal->attachments as $attachment) {
                     if ($attachment['visible_to_customer'] == 1) {
@@ -606,35 +621,35 @@ class Proposals_model extends CRM_Model
                     }
                 }
             }
-
+            
             return $proposal;
         }
-
+        
         return $this->db->get()->result_array();
     }
 
     public function update_total_tax($id)
     {
-        $total_tax         = 0;
-        $taxes             = array();
+        $total_tax = 0;
+        $taxes = array();
         $_calculated_taxes = array();
-        $proposal          = $this->get($id);
+        $proposal = $this->get($id);
         foreach ($proposal->items as $item) {
             $item_taxes = get_proposal_item_taxes($item['id']);
             if (count($item_taxes) > 0) {
                 foreach ($item_taxes as $tax) {
-                    $calc_tax     = 0;
+                    $calc_tax = 0;
                     $tax_not_calc = false;
-                    if (!in_array($tax['taxname'], $_calculated_taxes)) {
+                    if (! in_array($tax['taxname'], $_calculated_taxes)) {
                         array_push($_calculated_taxes, $tax['taxname']);
                         $tax_not_calc = true;
                     }
                     if ($tax_not_calc == true) {
-                        $taxes[$tax['taxname']]          = array();
+                        $taxes[$tax['taxname']] = array();
                         $taxes[$tax['taxname']]['total'] = array();
                         array_push($taxes[$tax['taxname']]['total'], (($item['qty'] * $item['rate']) / 100 * $tax['taxrate']));
                         $taxes[$tax['taxname']]['tax_name'] = $tax['taxname'];
-                        $taxes[$tax['taxname']]['taxrate']  = $tax['taxrate'];
+                        $taxes[$tax['taxname']]['taxrate'] = $tax['taxrate'];
                     } else {
                         array_push($taxes[$tax['taxname']]['total'], (($item['qty'] * $item['rate']) / 100 * $tax['taxrate']));
                     }
@@ -645,7 +660,7 @@ class Proposals_model extends CRM_Model
             $total = array_sum($tax['total']);
             if ($proposal->discount_percent != 0 && $proposal->discount_type == 'before_tax') {
                 $total_tax_calculated = ($total * $proposal->discount_percent) / 100;
-                $total                = ($total - $total_tax_calculated);
+                $total = ($total - $total_tax_calculated);
             }
             $total_tax += $total;
         }
@@ -657,7 +672,9 @@ class Proposals_model extends CRM_Model
 
     /**
      * Get all estimate items
-     * @param  mixed $id estimateid
+     * 
+     * @param mixed $id
+     *            estimateid
      * @return array
      */
     public function get_proposal_items($id)
@@ -667,7 +684,7 @@ class Proposals_model extends CRM_Model
         $this->db->where('rel_id', $id);
         $this->db->where('rel_type', 'proposal');
         $this->db->order_by('item_order', 'asc');
-
+        
         return $this->db->get()->result_array();
     }
 
@@ -700,14 +717,16 @@ class Proposals_model extends CRM_Model
     }
 
     /**
-     *  Delete proposal attachment
-     * @param   mixed $id  attachmentid
-     * @return  boolean
+     * Delete proposal attachment
+     * 
+     * @param mixed $id
+     *            attachmentid
+     * @return boolean
      */
     public function delete_attachment($id)
     {
         $attachment = $this->get_attachments('', $id);
-        $deleted    = false;
+        $deleted = false;
         if ($attachment) {
             if (empty($attachment->external)) {
                 unlink(get_upload_path_by_type('proposal') . $attachment->rel_id . '/' . $attachment->file_name);
@@ -727,21 +746,24 @@ class Proposals_model extends CRM_Model
                 }
             }
         }
-
+        
         return $deleted;
     }
 
     /**
      * Add proposal comment
-     * @param mixed  $data   $_POST comment data
-     * @param boolean $client is request coming from the client side
+     * 
+     * @param mixed $data
+     *            $_POST comment data
+     * @param boolean $client
+     *            is request coming from the client side
      */
     public function add_comment($data, $client = false)
     {
         if (is_staff_logged_in()) {
             $client = false;
         }
-
+        
         if (isset($data['action'])) {
             unset($data['action']);
         }
@@ -754,15 +776,15 @@ class Proposals_model extends CRM_Model
         $insert_id = $this->db->insert_id();
         if ($insert_id) {
             $proposal = $this->get($data['proposalid']);
-
+            
             $merge_fields = array();
             $merge_fields = array_merge($merge_fields, get_proposal_merge_fields($proposal->id));
-
+            
             $this->load->model('emails_model');
-
+            
             $this->emails_model->set_rel_id($data['proposalid']);
             $this->emails_model->set_rel_type('proposal');
-
+            
             if ($client == true) {
                 // Get creator and assigned;
                 $this->db->where('staffid', $proposal->addedfrom);
@@ -791,10 +813,10 @@ class Proposals_model extends CRM_Model
                 // Send email to client that admin commented
                 $this->emails_model->send_email_template('proposal-comment-to-client', $proposal->email, $merge_fields);
             }
-
+            
             return true;
         }
-
+        
         return false;
     }
 
@@ -807,38 +829,44 @@ class Proposals_model extends CRM_Model
         if ($this->db->affected_rows() > 0) {
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * Get proposal comments
-     * @param  mixed $id proposal id
+     * 
+     * @param mixed $id
+     *            proposal id
      * @return array
      */
     public function get_comments($id)
     {
         $this->db->where('proposalid', $id);
         $this->db->order_by('dateadded', 'ASC');
-
+        
         return $this->db->get('tblproposalcomments')->result_array();
     }
 
     /**
      * Get proposal single comment
-     * @param  mixed $id  comment id
+     * 
+     * @param mixed $id
+     *            comment id
      * @return object
      */
     public function get_comment($id)
     {
         $this->db->where('id', $id);
-
+        
         return $this->db->get('tblproposalcomments')->row();
     }
 
     /**
      * Remove proposal comment
-     * @param  mixed $id comment id
+     * 
+     * @param mixed $id
+     *            comment id
      * @return boolean
      */
     public function remove_comment($id)
@@ -848,22 +876,24 @@ class Proposals_model extends CRM_Model
         $this->db->delete('tblproposalcomments');
         if ($this->db->affected_rows() > 0) {
             logActivity('Proposal Comment Removed [ProposalID:' . $comment->proposalid . ', Comment Content: ' . $comment->content . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * Copy proposal
-     * @param  mixed $id proposal id
+     * 
+     * @param mixed $id
+     *            proposal id
      * @return mixed
      */
     public function copy($id)
     {
         $this->copy = true;
-        $proposal        = $this->get($id, array(), true);
+        $proposal = $this->get($id, array(), true);
         $not_copy_fields = array(
             'addedfrom',
             'id',
@@ -875,51 +905,51 @@ class Proposals_model extends CRM_Model
             'is_expiry_notified',
             'date_converted'
         );
-        $fields          = $this->db->list_fields('tblproposals');
-        $insert_data     = array();
+        $fields = $this->db->list_fields('tblproposals');
+        $insert_data = array();
         foreach ($fields as $field) {
-            if (!in_array($field, $not_copy_fields)) {
+            if (! in_array($field, $not_copy_fields)) {
                 $insert_data[$field] = $proposal->$field;
             }
         }
-
-        $insert_data['addedfrom']   = get_staff_user_id();
+        
+        $insert_data['addedfrom'] = get_staff_user_id();
         $insert_data['datecreated'] = date('Y-m-d H:i:s');
-        $insert_data['date']        = _d(date('Y-m-d'));
-        $insert_data['status']      = 6;
-        $insert_data['hash']        = md5(rand() . microtime());
+        $insert_data['date'] = _d(date('Y-m-d'));
+        $insert_data['status'] = 6;
+        $insert_data['hash'] = md5(rand() . microtime());
         // Check if the key exists
         $this->db->where('hash', $insert_data['hash']);
         $exists = $this->db->get('tblproposals')->row();
         if ($exists) {
             $insert_data['hash'] = md5(rand() . microtime());
         }
-
+        
         // in case open till is expired set new 7 days starting from current date
         if ($insert_data['open_till'] && get_option('proposal_due_after') != 0) {
-            $insert_data['open_till'] = _d(date('Y-m-d', strtotime('+'.get_option('proposal_due_after').' DAY', strtotime(date('Y-m-d')))));
+            $insert_data['open_till'] = _d(date('Y-m-d', strtotime('+' . get_option('proposal_due_after') . ' DAY', strtotime(date('Y-m-d')))));
         }
-
+        
         $insert_data['newitems'] = array();
-        $key                     = 1;
+        $key = 1;
         foreach ($proposal->items as $item) {
-            $insert_data['newitems'][$key]['description']      = $item['description'];
+            $insert_data['newitems'][$key]['description'] = $item['description'];
             $insert_data['newitems'][$key]['long_description'] = clear_textarea_breaks($item['long_description']);
-            $insert_data['newitems'][$key]['qty']              = $item['qty'];
-            $insert_data['newitems'][$key]['unit']             = $item['unit'];
-            $insert_data['newitems'][$key]['taxname']          = array();
-            $taxes                                             = get_proposal_item_taxes($item['id']);
+            $insert_data['newitems'][$key]['qty'] = $item['qty'];
+            $insert_data['newitems'][$key]['unit'] = $item['unit'];
+            $insert_data['newitems'][$key]['taxname'] = array();
+            $taxes = get_proposal_item_taxes($item['id']);
             foreach ($taxes as $tax) {
                 // tax name is in format TAX1|10.00
                 array_push($insert_data['newitems'][$key]['taxname'], $tax['taxname']);
             }
-            $insert_data['newitems'][$key]['rate']  = $item['rate'];
+            $insert_data['newitems'][$key]['rate'] = $item['rate'];
             $insert_data['newitems'][$key]['order'] = $item['item_order'];
-            $key++;
+            $key ++;
         }
-
+        
         $id = $this->add($insert_data);
-
+        
         if ($id) {
             $custom_fields = get_custom_fields('proposal');
             foreach ($custom_fields as $field) {
@@ -934,23 +964,27 @@ class Proposals_model extends CRM_Model
                     'value' => $value
                 ));
             }
-
+            
             $tags = get_tags_in($proposal->id, 'proposal');
             handle_tags_save($tags, $id, 'proposal');
-
+            
             logActivity('Copied Proposal ' . format_proposal_number($proposal->id));
-
+            
             return $id;
         }
-
+        
         return false;
     }
 
     /**
      * Take proposal action (change status) manually
-     * @param  mixed $status status id
-     * @param  mixed  $id     proposal id
-     * @param  boolean $client is request coming from client side or not
+     * 
+     * @param mixed $status
+     *            status id
+     * @param mixed $id
+     *            proposal id
+     * @param boolean $client
+     *            is request coming from client side or not
      * @return boolean
      */
     public function mark_action_status($status, $id, $client = false)
@@ -960,7 +994,7 @@ class Proposals_model extends CRM_Model
         $this->db->update('tblproposals', array(
             'status' => $status
         ));
-
+        
         if ($this->db->affected_rows() > 0) {
             // Client take action
             if ($client == true) {
@@ -980,12 +1014,12 @@ class Proposals_model extends CRM_Model
                     $this->db->update('tblproposals', array(
                         'status' => $original_proposal->status
                     ));
-
+                    
                     return false;
                 } else {
                     $merge_fields = array();
                     $merge_fields = array_merge($merge_fields, get_proposal_merge_fields($original_proposal->id));
-
+                    
                     // Get creator and assigned;
                     $this->db->where('staffid', $original_proposal->addedfrom);
                     $this->db->or_where('staffid', $original_proposal->assigned);
@@ -1002,14 +1036,14 @@ class Proposals_model extends CRM_Model
                             array_push($notifiedUsers, $member['staffid']);
                         }
                     }
-
+                    
                     pusher_trigger_notification($notifiedUsers);
-
+                    
                     $this->load->model('emails_model');
-
+                    
                     $this->emails_model->set_rel_id($id);
                     $this->emails_model->set_rel_type('proposal');
-
+                    
                     // Send thank you to the customer email template
                     if ($status == 3) {
                         foreach ($staff_proposal as $member) {
@@ -1034,16 +1068,18 @@ class Proposals_model extends CRM_Model
                 }
             }
             logActivity('Proposal Status Changes [ProposalID:' . $id . ', Status:' . format_proposal_status($status, '', false) . ',Client Action: ' . (int) $client . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * Delete proposal
-     * @param  mixed $id proposal id
+     * 
+     * @param mixed $id
+     *            proposal id
      * @return boolean
      */
     public function delete($id)
@@ -1056,55 +1092,57 @@ class Proposals_model extends CRM_Model
             // Get related tasks
             $this->db->where('rel_type', 'proposal');
             $this->db->where('rel_id', $id);
-
+            
             $tasks = $this->db->get('tblstafftasks')->result_array();
             foreach ($tasks as $task) {
                 $this->tasks_model->delete_task($task['id']);
             }
-
+            
             $attachments = $this->get_attachments($id);
             foreach ($attachments as $attachment) {
                 $this->delete_attachment($attachment['id']);
             }
-
+            
             $this->db->where('rel_id', $id);
             $this->db->where('rel_type', 'proposal');
             $this->db->delete('tblitems_in');
-
-
+            
             $this->db->where('rel_id', $id);
             $this->db->where('rel_type', 'proposal');
             $this->db->delete('tblitemstax');
-
+            
             $this->db->where('rel_id', $id);
             $this->db->where('rel_type', 'proposal');
             $this->db->delete('tbltags_in');
-
+            
             // Delete the custom field values
             $this->db->where('relid', $id);
             $this->db->where('fieldto', 'proposal');
             $this->db->delete('tblcustomfieldsvalues');
-
+            
             $this->db->where('rel_type', 'proposal');
             $this->db->where('rel_id', $id);
             $this->db->delete('tblreminders');
-
+            
             $this->db->where('rel_type', 'proposal');
             $this->db->where('rel_id', $id);
             $this->db->delete('tblviewstracking');
-
+            
             logActivity('Proposal Deleted [ProposalID:' . $id . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
-     * Get relation proposal data. Ex lead or customer will return the necesary db fields
-     * @param  mixed $rel_id
-     * @param  string $rel_type customer/lead
+     * Get relation proposal data.
+     * Ex lead or customer will return the necesary db fields
+     * 
+     * @param mixed $rel_id            
+     * @param string $rel_type
+     *            customer/lead
      * @return object
      */
     public function get_relation_data_values($rel_id, $rel_type)
@@ -1113,105 +1151,111 @@ class Proposals_model extends CRM_Model
         if ($rel_type == 'customer') {
             $this->db->where('userid', $rel_id);
             $_data = $this->db->get('tblclients')->row();
-
+            
             $primary_contact_id = get_primary_contact_user_id($rel_id);
             if ($primary_contact_id) {
-                $contact     = $this->clients_model->get_contact($primary_contact_id);
+                $contact = $this->clients_model->get_contact($primary_contact_id);
                 $data->email = $contact->email;
             }
-
+            
             $data->phone = $_data->phonenumber;
-            if (!empty($_data->company)) {
+            if (! empty($_data->company)) {
                 $data->to = $_data->company;
             } else {
                 $data->to = $contact->firstname . ' ' . $contact->lastname;
             }
-
+            
             $data->address = $_data->address;
-            $data->zip     = $_data->zip;
+            $data->zip = $_data->zip;
             $data->country = $_data->country;
-            $data->state   = $_data->state;
-            $data->city    = $_data->city;
-
+            $data->state = $_data->state;
+            $data->city = $_data->city;
+            
             $default_currency = $this->clients_model->get_customer_default_currency($rel_id);
             if ($default_currency != 0) {
                 $data->currency = $default_currency;
             }
         } elseif ($rel_type = 'lead') {
             $this->db->where('id', $rel_id);
-            $_data       = $this->db->get('tblleads')->row();
+            $_data = $this->db->get('tblleads')->row();
             $data->phone = $_data->phonenumber;
-
+            
             if (empty($_data->company)) {
                 $data->to = $_data->name;
             } else {
                 $data->to = $_data->company;
             }
-
+            
             $data->address = $_data->address;
-            $data->email   = $_data->email;
-            $data->zip     = $_data->zip;
+            $data->email = $_data->email;
+            $data->zip = $_data->zip;
             $data->country = $_data->country;
-            $data->state   = $_data->state;
-            $data->city    = $_data->city;
+            $data->state = $_data->state;
+            $data->city = $_data->city;
         }
-
+        
         return $data;
     }
 
     /**
      * Sent proposal to email
-     * @param  mixed  $id        proposalid
-     * @param  string  $template  email template to sent
-     * @param  boolean $attachpdf attach proposal pdf or not
+     * 
+     * @param mixed $id
+     *            proposalid
+     * @param string $template
+     *            email template to sent
+     * @param boolean $attachpdf
+     *            attach proposal pdf or not
      * @return boolean
      */
     public function send_expiry_reminder($id)
     {
         $proposal = $this->get($id);
-        $pdf      = proposal_pdf($proposal);
-        $attach   = $pdf->Output(slug_it($proposal->subject) . '.pdf', 'S');
+        $pdf = proposal_pdf($proposal);
+        $attach = $pdf->Output(slug_it($proposal->subject) . '.pdf', 'S');
         $this->load->model('emails_model');
-
+        
         $this->emails_model->set_rel_id($id);
         $this->emails_model->set_rel_type('proposal');
-
+        
         $this->emails_model->add_attachment(array(
             'attachment' => $attach,
             'filename' => slug_it($proposal->subject) . '.pdf',
             'type' => 'application/pdf'
         ));
-
+        
         $merge_fields = array();
         $merge_fields = array_merge($merge_fields, get_proposal_merge_fields($proposal->id));
         $this->emails_model->send_email_template('proposal-expiry-reminder', $proposal->email, $merge_fields);
-
+        
         $this->db->where('id', $id);
         $this->db->update('tblproposals', array(
             'is_expiry_notified' => 1
-            ));
-
+        ));
+        
         return true;
     }
 
     public function send_proposal_to_email($id, $template = '', $attachpdf = true, $cc = '')
     {
         $this->load->model('emails_model');
-
+        
         $this->emails_model->set_rel_id($id);
         $this->emails_model->set_rel_type('proposal');
-
+        
         $proposal = $this->get($id);
-
+        
         // Proposal status is draft update to sent
         if ($proposal->status == 6) {
             $this->db->where('id', $id);
-            $this->db->update('tblproposals', array('status'=>4));
+            $this->db->update('tblproposals', array(
+                'status' => 4
+            ));
             $proposal = $this->get($id);
         }
-
+        
         if ($attachpdf) {
-            $pdf    = proposal_pdf($proposal);
+            $pdf = proposal_pdf($proposal);
             $attach = $pdf->Output(slug_it($proposal->subject) . '.pdf', 'S');
             $this->emails_model->add_attachment(array(
                 'attachment' => $attach,
@@ -1219,7 +1263,7 @@ class Proposals_model extends CRM_Model
                 'type' => 'application/pdf'
             ));
         }
-
+        
         if ($this->input->post('email_attachments')) {
             $_other_attachments = $this->input->post('email_attachments');
             foreach ($_other_attachments as $attachment) {
@@ -1232,20 +1276,20 @@ class Proposals_model extends CRM_Model
                 ));
             }
         }
-
+        
         $merge_fields = array();
         $merge_fields = array_merge($merge_fields, get_proposal_merge_fields($proposal->id));
-        $sent         = $this->emails_model->send_email_template($template, $proposal->email, $merge_fields, '', $cc);
+        $sent = $this->emails_model->send_email_template($template, $proposal->email, $merge_fields, '', $cc);
         if ($sent) {
             // Set to status sent
             $this->db->where('id', $id);
             $this->db->update('tblproposals', array(
                 'status' => 4
             ));
-
+            
             return true;
         }
-
+        
         return false;
     }
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Common\Cache;
 
 use Guzzle\Cache\NullCacheAdapter;
@@ -9,6 +8,7 @@ use Guzzle\Cache\NullCacheAdapter;
  */
 class NullCacheAdapterTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testNullCacheAdapter()
     {
         $c = new NullCacheAdapter();

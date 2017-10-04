@@ -2,7 +2,6 @@
 /**
  * PayPal Pro Class using REST API
  */
-
 namespace Omnipay\PayPal;
 
 use Omnipay\Common\AbstractGateway;
@@ -27,13 +26,13 @@ use Omnipay\PayPal\Message\RefundRequest;
  * ### Test Mode
  *
  * In order to use this for testing in sandbox mode you will need at least two sandbox
- * test accounts.  One will need to be a business account, and one will need to be a
- * personal account with credit card details.  To create these you will need to go to
+ * test accounts. One will need to be a business account, and one will need to be a
+ * personal account with credit card details. To create these you will need to go to
  * the sandbox accounts section of the PayPal developer dashboard, here:
  * https://developer.paypal.com/webapps/developer/applications/accounts
- * On that page click "Create Account" and follow the prompts.  When you are creating the
+ * On that page click "Create Account" and follow the prompts. When you are creating the
  * Personal account, ensure that it is created with a credit card -- either Visa or
- * MasterCard or one of the other types.  When you are testing in the sandbox, use the
+ * MasterCard or one of the other types. When you are testing in the sandbox, use the
  * credit card details you will receive for this Personal account rather than any other
  * commonly used test credit card numbers (e.g. visa card 4111111111111111 or 4444333322221111
  * both of which will result in Error 500 / INTERNAL_SERVICE_ERROR type errors from the
@@ -42,9 +41,9 @@ use Omnipay\PayPal\Message\RefundRequest;
  * With each API call, you’ll need to set request headers, including an OAuth 2.0
  * access token. Get an access token by using the OAuth 2.0 client_credentials token
  * grant type with your clientId:secret as your Basic Auth credentials. For more
- * information, see Make your first call (link).  This class sets all of the headers
+ * information, see Make your first call (link). This class sets all of the headers
  * associated with the API call for you, including making preliminary calls to create
- * or update the OAuth 2.0 access token before each call you make, if required.  All
+ * or update the OAuth 2.0 access token before each call you make, if required. All
  * you need to do is provide the clientId and secret when you initialize the gateway,
  * or use the set*() calls to set them after creating the gateway object.
  *
@@ -54,19 +53,19 @@ use Omnipay\PayPal\Message\RefundRequest;
  *
  * * Log into your PayPal account.
  * * Navigate to your Sandbox accounts at https://developer.paypal.com/webapps/developer/applications/accounts
- *   to ensure that you have a valid sandbox account to use for testing.  If you don't already have a sandbox
- *   account, one can be created on this page.  You will actually need 2 accounts, a personal account and a
- *   business account, the business account is the one you need to use for creating API applications.
+ * to ensure that you have a valid sandbox account to use for testing. If you don't already have a sandbox
+ * account, one can be created on this page. You will actually need 2 accounts, a personal account and a
+ * business account, the business account is the one you need to use for creating API applications.
  * * Check your account status on https://developer.paypal.com/webapps/developer/account/status to ensure
- *   that it is valid for live transactions.
+ * that it is valid for live transactions.
  * * Navigate to the My REST apps page: https://developer.paypal.com/webapps/developer/applications/myapps
  * * Click *Create App*
  * * On the next page, enter an App name and select the sandbox account to use, then click *Create app*.
  * * On the next page the sandbox account, endpoint, Client ID and Secret should be displayed.
- *   Record these.  The Sandbox account should match the one that you selected on the previous
- *   page, and the sandbox endpoint should be ai.sandbox.paypal.com
- * * Adjacent to *Live credentials* click *Show* to display your live credentials.  The endpoint
- *   for these should be api.paypal.com, there should also be a Client ID and Secret.
+ * Record these. The Sandbox account should match the one that you selected on the previous
+ * page, and the sandbox endpoint should be ai.sandbox.paypal.com
+ * * Adjacent to *Live credentials* click *Show* to display your live credentials. The endpoint
+ * for these should be api.paypal.com, there should also be a Client ID and Secret.
  *
  * You can create additional REST APIs apps for other websites -- because the webhooks are
  * stored per app then it pays to have one API app per website that you are using (and an
@@ -77,65 +76,65 @@ use Omnipay\PayPal\Message\RefundRequest;
  * #### Initialize Gateway
  *
  * <code>
- *   // Create a gateway for the PayPal RestGateway
- *   // (routes to GatewayFactory::create)
- *   $gateway = Omnipay::create('PayPal_Rest');
+ * // Create a gateway for the PayPal RestGateway
+ * // (routes to GatewayFactory::create)
+ * $gateway = Omnipay::create('PayPal_Rest');
  *
- *   // Initialise the gateway
- *   $gateway->initialize(array(
- *       'clientId' => 'MyPayPalClientId',
- *       'secret'   => 'MyPayPalSecret',
- *       'testMode' => true, // Or false when you are ready for live transactions
- *   ));
+ * // Initialise the gateway
+ * $gateway->initialize(array(
+ * 'clientId' => 'MyPayPalClientId',
+ * 'secret' => 'MyPayPalSecret',
+ * 'testMode' => true, // Or false when you are ready for live transactions
+ * ));
  * </code>
  *
  * #### Direct Credit Card Payment
  *
  * <code>
- *   // Create a credit card object
- *   // DO NOT USE THESE CARD VALUES -- substitute your own
- *   // see the documentation in the class header.
- *   $card = new CreditCard(array(
- *               'firstName' => 'Example',
- *               'lastName' => 'User',
- *               'number' => '4111111111111111',
- *               'expiryMonth'           => '01',
- *               'expiryYear'            => '2020',
- *               'cvv'                   => '123',
- *               'billingAddress1'       => '1 Scrubby Creek Road',
- *               'billingCountry'        => 'AU',
- *               'billingCity'           => 'Scrubby Creek',
- *               'billingPostcode'       => '4999',
- *               'billingState'          => 'QLD',
- *   ));
+ * // Create a credit card object
+ * // DO NOT USE THESE CARD VALUES -- substitute your own
+ * // see the documentation in the class header.
+ * $card = new CreditCard(array(
+ * 'firstName' => 'Example',
+ * 'lastName' => 'User',
+ * 'number' => '4111111111111111',
+ * 'expiryMonth' => '01',
+ * 'expiryYear' => '2020',
+ * 'cvv' => '123',
+ * 'billingAddress1' => '1 Scrubby Creek Road',
+ * 'billingCountry' => 'AU',
+ * 'billingCity' => 'Scrubby Creek',
+ * 'billingPostcode' => '4999',
+ * 'billingState' => 'QLD',
+ * ));
  *
- *   // Do a purchase transaction on the gateway
- *   try {
- *       $transaction = $gateway->purchase(array(
- *           'amount'        => '10.00',
- *           'currency'      => 'AUD',
- *           'description'   => 'This is a test purchase transaction.',
- *           'card'          => $card,
- *       ));
- *       $response = $transaction->send();
- *       $data = $response->getData();
- *       echo "Gateway purchase response data == " . print_r($data, true) . "\n";
+ * // Do a purchase transaction on the gateway
+ * try {
+ * $transaction = $gateway->purchase(array(
+ * 'amount' => '10.00',
+ * 'currency' => 'AUD',
+ * 'description' => 'This is a test purchase transaction.',
+ * 'card' => $card,
+ * ));
+ * $response = $transaction->send();
+ * $data = $response->getData();
+ * echo "Gateway purchase response data == " . print_r($data, true) . "\n";
  *
- *       if ($response->isSuccessful()) {
- *           echo "Purchase transaction was successful!\n";
- *       }
- *   } catch (\Exception $e) {
- *       echo "Exception caught while attempting authorize.\n";
- *       echo "Exception type == " . get_class($e) . "\n";
- *       echo "Message == " . $e->getMessage() . "\n";
- *   }
+ * if ($response->isSuccessful()) {
+ * echo "Purchase transaction was successful!\n";
+ * }
+ * } catch (\Exception $e) {
+ * echo "Exception caught while attempting authorize.\n";
+ * echo "Exception type == " . get_class($e) . "\n";
+ * echo "Message == " . $e->getMessage() . "\n";
+ * }
  * </code>
  *
  * ### Dashboard
  *
  * Once you have processed some payments you can go to the PayPal sandbox site,
  * at https://www.sandbox.paypal.com/ and log in with the email address and password
- * of your PayPal sandbox business test account.  You will then see the result
+ * of your PayPal sandbox business test account. You will then see the result
  * of those transactions on the "My recent activity" list under the My Account
  * tab.
  *
@@ -151,20 +150,31 @@ use Omnipay\PayPal\Message\RefundRequest;
  */
 class RestGateway extends AbstractGateway
 {
-
+    
     // Constants used in plan creation
-    const BILLING_PLAN_TYPE_FIXED       = 'FIXED';
-    const BILLING_PLAN_TYPE_INFINITE    = 'INFINITE';
-    const BILLING_PLAN_FREQUENCY_DAY    = 'DAY';
-    const BILLING_PLAN_FREQUENCY_WEEK   = 'WEEK';
-    const BILLING_PLAN_FREQUENCY_MONTH  = 'MONTH';
-    const BILLING_PLAN_FREQUENCY_YEAR   = 'YEAR';
-    const BILLING_PLAN_STATE_CREATED    = 'CREATED';
-    const BILLING_PLAN_STATE_ACTIVE     = 'ACTIVE';
-    const BILLING_PLAN_STATE_INACTIVE   = 'INACTIVE';
-    const BILLING_PLAN_STATE_DELETED    = 'DELETED';
-    const PAYMENT_TRIAL                 = 'TRIAL';
-    const PAYMENT_REGULAR               = 'REGULAR';
+    const BILLING_PLAN_TYPE_FIXED = 'FIXED';
+
+    const BILLING_PLAN_TYPE_INFINITE = 'INFINITE';
+
+    const BILLING_PLAN_FREQUENCY_DAY = 'DAY';
+
+    const BILLING_PLAN_FREQUENCY_WEEK = 'WEEK';
+
+    const BILLING_PLAN_FREQUENCY_MONTH = 'MONTH';
+
+    const BILLING_PLAN_FREQUENCY_YEAR = 'YEAR';
+
+    const BILLING_PLAN_STATE_CREATED = 'CREATED';
+
+    const BILLING_PLAN_STATE_ACTIVE = 'ACTIVE';
+
+    const BILLING_PLAN_STATE_INACTIVE = 'INACTIVE';
+
+    const BILLING_PLAN_STATE_DELETED = 'DELETED';
+
+    const PAYMENT_TRIAL = 'TRIAL';
+
+    const PAYMENT_REGULAR = 'REGULAR';
 
     public function getName()
     {
@@ -174,19 +184,19 @@ class RestGateway extends AbstractGateway
     public function getDefaultParameters()
     {
         return array(
-            'clientId'     => '',
-            'secret'       => '',
-            'token'        => '',
-            'testMode'     => false,
+            'clientId' => '',
+            'secret' => '',
+            'token' => '',
+            'testMode' => false
         );
     }
-
+    
     //
     // Tokens -- methods to set up, store and retrieve the OAuth 2.0 access token.
     //
     // @link https://developer.paypal.com/docs/api/#authentication--headers
     //
-
+    
     /**
      * Get OAuth 2.0 client ID for the access token.
      *
@@ -208,7 +218,7 @@ class RestGateway extends AbstractGateway
      * token grant type with your clientId:secret as your Basic Auth
      * credentials.
      *
-     * @param string $value
+     * @param string $value            
      * @return RestGateway provides a fluent interface
      */
     public function setClientId($value)
@@ -237,7 +247,7 @@ class RestGateway extends AbstractGateway
      * token grant type with your clientId:secret as your Basic Auth
      * credentials.
      *
-     * @param string $value
+     * @param string $value            
      * @return RestGateway provides a fluent interface
      */
     public function setSecret($value)
@@ -248,12 +258,13 @@ class RestGateway extends AbstractGateway
     /**
      * Get OAuth 2.0 access token.
      *
-     * @param bool $createIfNeeded [optional] - If there is not an active token present, should we create one?
+     * @param bool $createIfNeeded
+     *            [optional] - If there is not an active token present, should we create one?
      * @return string
      */
     public function getToken($createIfNeeded = true)
     {
-        if ($createIfNeeded && !$this->hasToken()) {
+        if ($createIfNeeded && ! $this->hasToken()) {
             $response = $this->createToken()->send();
             if ($response->isSuccessful()) {
                 $data = $response->getData();
@@ -263,7 +274,7 @@ class RestGateway extends AbstractGateway
                 }
             }
         }
-
+        
         return $this->getParameter('token');
     }
 
@@ -280,7 +291,7 @@ class RestGateway extends AbstractGateway
     /**
      * Set OAuth 2.0 access token.
      *
-     * @param string $value
+     * @param string $value            
      * @return RestGateway provides a fluent interface
      */
     public function setToken($value)
@@ -301,7 +312,7 @@ class RestGateway extends AbstractGateway
     /**
      * Set OAuth 2.0 access token expiry time.
      *
-     * @param integer $value
+     * @param integer $value            
      * @return RestGateway provides a fluent interface
      */
     public function setTokenExpires($value)
@@ -317,13 +328,13 @@ class RestGateway extends AbstractGateway
     public function hasToken()
     {
         $token = $this->getParameter('token');
-
+        
         $expires = $this->getTokenExpires();
-        if (!empty($expires) && !is_numeric($expires)) {
+        if (! empty($expires) && ! is_numeric($expires)) {
             $expires = strtotime($expires);
         }
-
-        return !empty($token) && time() < $expires;
+        
+        return ! empty($token) && time() < $expires;
     }
 
     /**
@@ -331,31 +342,31 @@ class RestGateway extends AbstractGateway
      *
      * This overrides the parent createRequest function ensuring that the OAuth
      * 2.0 access token is passed along with the request data -- unless the
-     * request is a RestTokenRequest in which case no token is needed.  If no
+     * request is a RestTokenRequest in which case no token is needed. If no
      * token is available then a new one is created (e.g. if there has been no
      * token request or the current token has expired).
      *
-     * @param string $class
-     * @param array $parameters
+     * @param string $class            
+     * @param array $parameters            
      * @return \Omnipay\PayPal\Message\AbstractRestRequest
      */
     public function createRequest($class, array $parameters = array())
     {
-        if (!$this->hasToken() && $class != '\Omnipay\PayPal\Message\RestTokenRequest') {
+        if (! $this->hasToken() && $class != '\Omnipay\PayPal\Message\RestTokenRequest') {
             // This will set the internal token parameter which the parent
             // createRequest will find when it calls getParameters().
             $this->getToken(true);
         }
-
+        
         return parent::createRequest($class, $parameters);
     }
-
+    
     //
     // Payments -- Create payments or get details of one or more payments.
     //
     // @link https://developer.paypal.com/docs/api/#payments
     //
-
+    
     /**
      * Create a purchase request.
      *
@@ -365,7 +376,7 @@ class RestGateway extends AbstractGateway
      * to get payment related details.
      *
      * @link https://developer.paypal.com/docs/api/#create-a-payment
-     * @param array $parameters
+     * @param array $parameters            
      * @return \Omnipay\PayPal\Message\RestPurchaseRequest
      */
     public function purchase(array $parameters = array())
@@ -380,7 +391,7 @@ class RestGateway extends AbstractGateway
      * such as payments that are created and approved, or if a payment has failed.
      *
      * @link https://developer.paypal.com/docs/api/#look-up-a-payment-resource
-     * @param array $parameters
+     * @param array $parameters            
      * @return \Omnipay\PayPal\Message\RestFetchPurchaseRequest
      */
     public function fetchPurchase(array $parameters = array())
@@ -396,7 +407,7 @@ class RestGateway extends AbstractGateway
      * making the call.
      *
      * @link https://developer.paypal.com/docs/api/#list-payment-resources
-     * @param array $parameters
+     * @param array $parameters            
      * @return \Omnipay\PayPal\Message\RestListPurchaseRequest
      */
     public function listPurchase(array $parameters = array())
@@ -408,23 +419,23 @@ class RestGateway extends AbstractGateway
      * Completes a purchase request.
      *
      * @link https://developer.paypal.com/docs/api/#execute-an-approved-paypal-payment
-     * @param array $parameters
+     * @param array $parameters            
      * @return Message\AbstractRestRequest
      */
     public function completePurchase(array $parameters = array())
     {
         return $this->createRequest('\Omnipay\PayPal\Message\RestCompletePurchaseRequest', $parameters);
     }
-
+    
     // TODO: Update a payment resource https://developer.paypal.com/docs/api/#update-a-payment-resource
-
+    
     //
     // Authorizations -- Capture, reauthorize, void and look up authorizations.
     //
     // @link https://developer.paypal.com/docs/api/#authorizations
     // @link https://developer.paypal.com/docs/integration/direct/capture-payment/
     //
-
+    
     /**
      * Create an authorization request.
      *
@@ -433,7 +444,7 @@ class RestGateway extends AbstractGateway
      *
      * @link https://developer.paypal.com/docs/integration/direct/capture-payment/#authorize-the-payment
      * @link https://developer.paypal.com/docs/api/#authorizations
-     * @param array $parameters
+     * @param array $parameters            
      * @return \Omnipay\PayPal\Message\RestAuthorizeRequest
      */
     public function authorize(array $parameters = array())
@@ -447,7 +458,7 @@ class RestGateway extends AbstractGateway
      * To to void a previously authorized payment.
      *
      * @link https://developer.paypal.com/docs/api/#void-an-authorization
-     * @param array $parameters
+     * @param array $parameters            
      * @return \Omnipay\PayPal\Message\RestVoidRequest
      */
     public function void(array $parameters = array())
@@ -463,35 +474,35 @@ class RestGateway extends AbstractGateway
      * authorize.
      *
      * @link https://developer.paypal.com/docs/api/#capture-an-authorization
-     * @param array $parameters
+     * @param array $parameters            
      * @return \Omnipay\PayPal\Message\RestCaptureRequest
      */
     public function capture(array $parameters = array())
     {
         return $this->createRequest('\Omnipay\PayPal\Message\RestCaptureRequest', $parameters);
     }
-
+    
     // TODO: Authorizations with payment_method == paypal.
-
+    
     /**
      * Refund a Captured Payment
      *
      * To refund captured payments (authorization transaction) created by a authorize request.
      *
      * @link https://developer.paypal.com/docs/api/#refund-a-captured-payment
-     * @param array $parameters
+     * @param array $parameters            
      * @return \Omnipay\PayPal\Message\RestRefundCaptureRequest
      */
     public function refundCapture(array $parameters = array())
     {
         return $this->createRequest('\Omnipay\PayPal\Message\RestRefundCaptureRequest', $parameters);
     }
-
+    
     //
     // Sale Transactions -- Get and refund completed payments (sale transactions).
     // @link https://developer.paypal.com/docs/api/#sale-transactions
     //
-
+    
     /**
      * Fetch a Sale Transaction
      *
@@ -500,7 +511,7 @@ class RestGateway extends AbstractGateway
      * sub-resources.
      *
      * @link https://developer.paypal.com/docs/api/#sale-transactions
-     * @param array $parameters
+     * @param array $parameters            
      * @return \Omnipay\PayPal\Message\RestFetchTransactionRequest
      */
     public function fetchTransaction(array $parameters = array())
@@ -516,20 +527,20 @@ class RestGateway extends AbstractGateway
      * sub-resources.
      *
      * @link https://developer.paypal.com/docs/api/#sale-transactions
-     * @param array $parameters
+     * @param array $parameters            
      * @return \Omnipay\PayPal\Message\RestRefundRequest
      */
     public function refund(array $parameters = array())
     {
         return $this->createRequest('\Omnipay\PayPal\Message\RestRefundRequest', $parameters);
     }
-
+    
     //
     // Vault: Store customer credit cards securely.
     //
     // @link https://developer.paypal.com/docs/api/#vault
     //
-
+    
     /**
      * Store a credit card in the vault
      *
@@ -539,7 +550,7 @@ class RestGateway extends AbstractGateway
      * related credit card details to complete a payment.
      *
      * @link https://developer.paypal.com/docs/api/#store-a-credit-card
-     * @param array $parameters
+     * @param array $parameters            
      * @return \Omnipay\PayPal\Message\RestCreateCardRequest
      */
     public function createCard(array $parameters = array())
@@ -556,19 +567,19 @@ class RestGateway extends AbstractGateway
      * then re-add it using createCard.
      *
      * @link https://developer.paypal.com/docs/api/#delete-a-stored-credit-card
-     * @param array $parameters
+     * @param array $parameters            
      * @return \Omnipay\PayPal\Message\RestDeleteCardRequest
      */
     public function deleteCard(array $parameters = array())
     {
         return $this->createRequest('\Omnipay\PayPal\Message\RestDeleteCardRequest', $parameters);
     }
-
+    
     //
     // Billing Plans and Agreements -- Set up recurring payments.
     // @link https://developer.paypal.com/docs/api/#billing-plans-and-agreements
     //
-
+    
     /**
      * Create a billing plan.
      *
@@ -579,7 +590,7 @@ class RestGateway extends AbstractGateway
      * unless it has been set to the ACTIVE state.
      *
      * @link https://developer.paypal.com/docs/api/#create-a-plan
-     * @param array $parameters
+     * @param array $parameters            
      * @return \Omnipay\PayPal\Message\RestCreatePlanRequest
      */
     public function createPlan(array $parameters = array())
@@ -594,24 +605,24 @@ class RestGateway extends AbstractGateway
      * must be active before a billing agreement is created.
      *
      * @link https://developer.paypal.com/docs/api/#update-a-plan
-     * @param array $parameters
+     * @param array $parameters            
      * @return \Omnipay\PayPal\Message\RestUpdatePlanRequest
      */
     public function updatePlan(array $parameters = array())
     {
         return $this->createRequest('\Omnipay\PayPal\Message\RestUpdatePlanRequest', $parameters);
     }
-
+    
     // TODO: Retrieve a plan
     // TODO: List plans
-
+    
     /**
      * Create a subscription.
      *
      * Use this call to create a billing agreement for the buyer.
      *
      * @link https://developer.paypal.com/docs/api/#create-an-agreement
-     * @param array $parameters
+     * @param array $parameters            
      * @return \Omnipay\PayPal\Message\RestCreateSubscriptionRequest
      */
     public function createSubscription(array $parameters = array())
@@ -625,7 +636,7 @@ class RestGateway extends AbstractGateway
      * Use this call to execute an agreement after the buyer approves it.
      *
      * @link https://developer.paypal.com/docs/api/#execute-an-agreement
-     * @param array $parameters
+     * @param array $parameters            
      * @return \Omnipay\PayPal\Message\RestCompleteSubscriptionRequest
      */
     public function completeSubscription(array $parameters = array())
@@ -639,7 +650,7 @@ class RestGateway extends AbstractGateway
      * Use this call to cancel an agreement.
      *
      * @link https://developer.paypal.com/docs/api/#cancel-an-agreement
-     * @param array $parameters
+     * @param array $parameters            
      * @return \Omnipay\PayPal\Message\RestCancelSubscriptionRequest
      */
     public function cancelSubscription(array $parameters = array())
@@ -653,7 +664,7 @@ class RestGateway extends AbstractGateway
      * Use this call to suspend an agreement.
      *
      * @link https://developer.paypal.com/docs/api/#suspend-an-agreement
-     * @param array $parameters
+     * @param array $parameters            
      * @return \Omnipay\PayPal\Message\RestSuspendSubscriptionRequest
      */
     public function suspendSubscription(array $parameters = array())
@@ -667,7 +678,7 @@ class RestGateway extends AbstractGateway
      * Use this call to reactivate or un-suspend an agreement.
      *
      * @link https://developer.paypal.com/docs/api/#reactivate-an-agreement
-     * @param array $parameters
+     * @param array $parameters            
      * @return \Omnipay\PayPal\Message\RestReactivateSubscriptionRequest
      */
     public function reactivateSubscription(array $parameters = array())
@@ -680,21 +691,21 @@ class RestGateway extends AbstractGateway
      *
      * Use this call to search for the transactions within a billing agreement.
      * Note that this is not a generic transaction search function -- for that
-     * see RestListPurchaseRequest.  It only searches for transactions within
+     * see RestListPurchaseRequest. It only searches for transactions within
      * a billing agreement.
      *
      * This should be used on a regular basis to determine the success / failure
      * state of transactions on active billing agreements.
      *
      * @link https://developer.paypal.com/docs/api/#search-for-transactions
-     * @param array $parameters
+     * @param array $parameters            
      * @return \Omnipay\PayPal\Message\RestCompleteSubscriptionRequest
      */
     public function searchTransaction(array $parameters = array())
     {
         return $this->createRequest('\Omnipay\PayPal\Message\RestSearchTransactionRequest', $parameters);
     }
-
+    
     // TODO: Update an agreement
     // TODO: Retrieve an agreement
     // TODO: Set outstanding agreement amounts

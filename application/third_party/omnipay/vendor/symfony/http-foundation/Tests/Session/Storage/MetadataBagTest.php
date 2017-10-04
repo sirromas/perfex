@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage;
 
 use PHPUnit\Framework\TestCase;
@@ -21,12 +20,15 @@ use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
  */
 class MetadataBagTest extends TestCase
 {
+
     /**
+     *
      * @var MetadataBag
      */
     protected $bag;
 
     /**
+     *
      * @var array
      */
     protected $array = array();
@@ -35,7 +37,11 @@ class MetadataBagTest extends TestCase
     {
         parent::setUp();
         $this->bag = new MetadataBag();
-        $this->array = array(MetadataBag::CREATED => 1234567, MetadataBag::UPDATED => 12345678, MetadataBag::LIFETIME => 0);
+        $this->array = array(
+            MetadataBag::CREATED => 1234567,
+            MetadataBag::UPDATED => 12345678,
+            MetadataBag::LIFETIME => 0
+        );
         $this->bag->initialize($this->array);
     }
 
@@ -49,19 +55,19 @@ class MetadataBagTest extends TestCase
     public function testInitialize()
     {
         $sessionMetadata = array();
-
+        
         $bag1 = new MetadataBag();
         $bag1->initialize($sessionMetadata);
         $this->assertGreaterThanOrEqual(time(), $bag1->getCreated());
         $this->assertEquals($bag1->getCreated(), $bag1->getLastUsed());
-
+        
         sleep(1);
         $bag2 = new MetadataBag();
         $bag2->initialize($sessionMetadata);
         $this->assertEquals($bag1->getCreated(), $bag2->getCreated());
         $this->assertEquals($bag1->getLastUsed(), $bag2->getLastUsed());
         $this->assertEquals($bag2->getCreated(), $bag2->getLastUsed());
-
+        
         sleep(1);
         $bag3 = new MetadataBag();
         $bag3->initialize($sessionMetadata);
@@ -85,7 +91,11 @@ class MetadataBagTest extends TestCase
     public function testGetLifetime()
     {
         $bag = new MetadataBag();
-        $array = array(MetadataBag::CREATED => 1234567, MetadataBag::UPDATED => 12345678, MetadataBag::LIFETIME => 1000);
+        $array = array(
+            MetadataBag::CREATED => 1234567,
+            MetadataBag::UPDATED => 12345678,
+            MetadataBag::LIFETIME => 1000
+        );
         $bag->initialize($array);
         $this->assertEquals(1000, $bag->getLifetime());
     }
@@ -103,7 +113,7 @@ class MetadataBagTest extends TestCase
     public function testClear()
     {
         $this->bag->clear();
-
+        
         // the clear method has no side effects, we just want to ensure it doesn't trigger any exceptions
         $this->addToAssertionCount(1);
     }
@@ -112,15 +122,15 @@ class MetadataBagTest extends TestCase
     {
         $bag = new MetadataBag('', 30);
         $timeStamp = time();
-
+        
         $created = $timeStamp - 15;
         $sessionMetadata = array(
             MetadataBag::CREATED => $created,
             MetadataBag::UPDATED => $created,
-            MetadataBag::LIFETIME => 1000,
+            MetadataBag::LIFETIME => 1000
         );
         $bag->initialize($sessionMetadata);
-
+        
         $this->assertEquals($created, $sessionMetadata[MetadataBag::UPDATED]);
     }
 
@@ -128,15 +138,15 @@ class MetadataBagTest extends TestCase
     {
         $bag = new MetadataBag('', 30);
         $timeStamp = time();
-
+        
         $created = $timeStamp - 45;
         $sessionMetadata = array(
             MetadataBag::CREATED => $created,
             MetadataBag::UPDATED => $created,
-            MetadataBag::LIFETIME => 1000,
+            MetadataBag::LIFETIME => 1000
         );
         $bag->initialize($sessionMetadata);
-
+        
         $this->assertEquals($timeStamp, $sessionMetadata[MetadataBag::UPDATED]);
     }
 }

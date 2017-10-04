@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation;
 
 /**
@@ -21,12 +20,15 @@ namespace Symfony\Component\HttpFoundation;
  */
 class AcceptHeader
 {
+
     /**
+     *
      * @var AcceptHeaderItem[]
      */
     private $items = array();
 
     /**
+     *
      * @var bool
      */
     private $sorted = true;
@@ -34,7 +36,7 @@ class AcceptHeader
     /**
      * Constructor.
      *
-     * @param AcceptHeaderItem[] $items
+     * @param AcceptHeaderItem[] $items            
      */
     public function __construct(array $items)
     {
@@ -46,18 +48,19 @@ class AcceptHeader
     /**
      * Builds an AcceptHeader instance from a string.
      *
-     * @param string $headerValue
+     * @param string $headerValue            
      *
      * @return self
      */
     public static function fromString($headerValue)
     {
         $index = 0;
-
-        return new self(array_map(function ($itemValue) use (&$index) {
+        
+        return new self(array_map(function ($itemValue) use(&$index)
+        {
             $item = AcceptHeaderItem::fromString($itemValue);
-            $item->setIndex($index++);
-
+            $item->setIndex($index ++);
+            
             return $item;
         }, preg_split('/\s*(?:,*("[^"]+"),*|,*(\'[^\']+\'),*|,+)\s*/', $headerValue, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE)));
     }
@@ -75,7 +78,7 @@ class AcceptHeader
     /**
      * Tests if header has given value.
      *
-     * @param string $value
+     * @param string $value            
      *
      * @return bool
      */
@@ -87,7 +90,7 @@ class AcceptHeader
     /**
      * Returns given value's item, if exists.
      *
-     * @param string $value
+     * @param string $value            
      *
      * @return AcceptHeaderItem|null
      */
@@ -99,7 +102,7 @@ class AcceptHeader
     /**
      * Adds an item.
      *
-     * @param AcceptHeaderItem $item
+     * @param AcceptHeaderItem $item            
      *
      * @return $this
      */
@@ -107,7 +110,7 @@ class AcceptHeader
     {
         $this->items[$item->getValue()] = $item;
         $this->sorted = false;
-
+        
         return $this;
     }
 
@@ -119,20 +122,21 @@ class AcceptHeader
     public function all()
     {
         $this->sort();
-
+        
         return $this->items;
     }
 
     /**
      * Filters items on their value using given regex.
      *
-     * @param string $pattern
+     * @param string $pattern            
      *
      * @return self
      */
     public function filter($pattern)
     {
-        return new self(array_filter($this->items, function (AcceptHeaderItem $item) use ($pattern) {
+        return new self(array_filter($this->items, function (AcceptHeaderItem $item) use($pattern)
+        {
             return preg_match($pattern, $item->getValue());
         }));
     }
@@ -145,8 +149,8 @@ class AcceptHeader
     public function first()
     {
         $this->sort();
-
-        return !empty($this->items) ? reset($this->items) : null;
+        
+        return ! empty($this->items) ? reset($this->items) : null;
     }
 
     /**
@@ -154,18 +158,19 @@ class AcceptHeader
      */
     private function sort()
     {
-        if (!$this->sorted) {
-            uasort($this->items, function ($a, $b) {
+        if (! $this->sorted) {
+            uasort($this->items, function ($a, $b)
+            {
                 $qA = $a->getQuality();
                 $qB = $b->getQuality();
-
+                
                 if ($qA === $qB) {
-                    return $a->getIndex() > $b->getIndex() ? 1 : -1;
+                    return $a->getIndex() > $b->getIndex() ? 1 : - 1;
                 }
-
-                return $qA > $qB ? -1 : 1;
+                
+                return $qA > $qB ? - 1 : 1;
             });
-
+            
             $this->sorted = true;
         }
     }

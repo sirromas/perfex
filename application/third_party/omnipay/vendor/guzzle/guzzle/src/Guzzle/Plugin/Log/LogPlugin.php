@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Plugin\Log;
 
 use Guzzle\Common\Event;
@@ -19,26 +18,34 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class LogPlugin implements EventSubscriberInterface
 {
-    /** @var LogAdapterInterface Adapter responsible for writing log data */
+
+    /**
+     * @var LogAdapterInterface Adapter responsible for writing log data
+     */
     protected $logAdapter;
 
-    /** @var MessageFormatter Formatter used to format messages before logging */
+    /**
+     * @var MessageFormatter Formatter used to format messages before logging
+     */
     protected $formatter;
 
-    /** @var bool Whether or not to wire request and response bodies */
+    /**
+     * @var bool Whether or not to wire request and response bodies
+     */
     protected $wireBodies;
 
     /**
-     * @param LogAdapterInterface     $logAdapter Adapter object used to log message
-     * @param string|MessageFormatter $formatter  Formatter used to format log messages or the formatter template
-     * @param bool                    $wireBodies Set to true to track request and response bodies using a temporary
-     *                                            buffer if the bodies are not repeatable.
+     *
+     * @param LogAdapterInterface $logAdapter
+     *            Adapter object used to log message
+     * @param string|MessageFormatter $formatter
+     *            Formatter used to format log messages or the formatter template
+     * @param bool $wireBodies
+     *            Set to true to track request and response bodies using a temporary
+     *            buffer if the bodies are not repeatable.
      */
-    public function __construct(
-        LogAdapterInterface $logAdapter,
-        $formatter = null,
-        $wireBodies = false
-    ) {
+    public function __construct(LogAdapterInterface $logAdapter, $formatter = null, $wireBodies = false)
+    {
         $this->logAdapter = $logAdapter;
         $this->formatter = $formatter instanceof MessageFormatter ? $formatter : new MessageFormatter($formatter);
         $this->wireBodies = $wireBodies;
@@ -47,9 +54,11 @@ class LogPlugin implements EventSubscriberInterface
     /**
      * Get a log plugin that outputs full request, response, and curl error information to stderr
      *
-     * @param bool     $wireBodies Set to false to disable request/response body output when they use are not repeatable
-     * @param resource $stream     Stream to write to when logging. Defaults to STDERR when it is available
-     *
+     * @param bool $wireBodies
+     *            Set to false to disable request/response body output when they use are not repeatable
+     * @param resource $stream
+     *            Stream to write to when logging. Defaults to STDERR when it is available
+     *            
      * @return self
      */
     public static function getDebugPlugin($wireBodies = true, $stream = null)
@@ -61,8 +70,9 @@ class LogPlugin implements EventSubscriberInterface
                 $stream = fopen('php://output', 'w');
             }
         }
-
-        return new self(new ClosureLogAdapter(function ($m) use ($stream) {
+        
+        return new self(new ClosureLogAdapter(function ($m) use($stream)
+        {
             fwrite($stream, $m . PHP_EOL);
         }), "# Request:\n{request}\n\n# Response:\n{response}\n\n# Errors: {curl_code} {curl_error}", $wireBodies);
     }
@@ -70,17 +80,29 @@ class LogPlugin implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            'curl.callback.write' => array('onCurlWrite', 255),
-            'curl.callback.read'  => array('onCurlRead', 255),
-            'request.before_send' => array('onRequestBeforeSend', 255),
-            'request.sent'        => array('onRequestSent', 255)
+            'curl.callback.write' => array(
+                'onCurlWrite',
+                255
+            ),
+            'curl.callback.read' => array(
+                'onCurlRead',
+                255
+            ),
+            'request.before_send' => array(
+                'onRequestBeforeSend',
+                255
+            ),
+            'request.sent' => array(
+                'onRequestSent',
+                255
+            )
         );
     }
 
     /**
      * Event triggered when curl data is read from a request
      *
-     * @param Event $event
+     * @param Event $event            
      */
     public function onCurlRead(Event $event)
     {
@@ -93,7 +115,7 @@ class LogPlugin implements EventSubscriberInterface
     /**
      * Event triggered when curl data is written to a response
      *
-     * @param Event $event
+     * @param Event $event            
      */
     public function onCurlWrite(Event $event)
     {
@@ -106,7 +128,7 @@ class LogPlugin implements EventSubscriberInterface
     /**
      * Called before a request is sent
      *
-     * @param Event $event
+     * @param Event $event            
      */
     public function onRequestBeforeSend(Event $event)
     {
@@ -115,13 +137,11 @@ class LogPlugin implements EventSubscriberInterface
             // Ensure that curl IO events are emitted
             $request->getCurlOptions()->set('emit_io', true);
             // We need to make special handling for content wiring and non-repeatable streams.
-            if ($request instanceof EntityEnclosingRequestInterface && $request->getBody()
-                && (!$request->getBody()->isSeekable() || !$request->getBody()->isReadable())
-            ) {
+            if ($request instanceof EntityEnclosingRequestInterface && $request->getBody() && (! $request->getBody()->isSeekable() || ! $request->getBody()->isReadable())) {
                 // The body of the request cannot be recalled so logging the body will require us to buffer it
                 $request->getParams()->set('request_wire', EntityBody::factory());
             }
-            if (!$request->getResponseBody()->isRepeatable()) {
+            if (! $request->getResponseBody()->isRepeatable()) {
                 // The body of the response cannot be recalled so logging the body will require us to buffer it
                 $request->getParams()->set('response_wire', EntityBody::factory());
             }
@@ -131,31 +151,31 @@ class LogPlugin implements EventSubscriberInterface
     /**
      * Triggers the actual log write when a request completes
      *
-     * @param Event $event
+     * @param Event $event            
      */
     public function onRequestSent(Event $event)
     {
         $request = $event['request'];
         $response = $event['response'];
         $handle = $event['handle'];
-
+        
         if ($wire = $request->getParams()->get('request_wire')) {
             $request = clone $request;
             $request->setBody($wire);
         }
-
+        
         if ($wire = $request->getParams()->get('response_wire')) {
             $response = clone $response;
             $response->setBody($wire);
         }
-
+        
         // Send the log message to the adapter, adding a category and host
         $priority = $response && $response->isError() ? LOG_ERR : LOG_DEBUG;
         $message = $this->formatter->format($request, $response, $handle);
         $this->logAdapter->log($message, $priority, array(
-            'request'  => $request,
+            'request' => $request,
             'response' => $response,
-            'handle'   => $handle
+            'handle' => $handle
         ));
     }
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Service\Command;
 
 use Guzzle\Http\Message\Response;
@@ -16,31 +15,41 @@ use Guzzle\Service\Resource\Model;
  */
 class OperationResponseParser extends DefaultResponseParser
 {
-    /** @var VisitorFlyweight $factory Visitor factory */
+
+    /**
+     * @var VisitorFlyweight $factory Visitor factory
+     */
     protected $factory;
 
-    /** @var self */
+    /**
+     * @var self
+     */
     protected static $instance;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     private $schemaInModels;
 
     /**
-     * @return self
-     * @codeCoverageIgnore
+     *
+     * @return self @codeCoverageIgnore
      */
     public static function getInstance()
     {
-        if (!static::$instance) {
+        if (! static::$instance) {
             static::$instance = new static(VisitorFlyweight::getInstance());
         }
-
+        
         return static::$instance;
     }
 
     /**
-     * @param VisitorFlyweight $factory        Factory to use when creating visitors
-     * @param bool             $schemaInModels Set to true to inject schemas into models
+     *
+     * @param VisitorFlyweight $factory
+     *            Factory to use when creating visitors
+     * @param bool $schemaInModels
+     *            Set to true to inject schemas into models
      */
     public function __construct(VisitorFlyweight $factory, $schemaInModels = false)
     {
@@ -51,15 +60,17 @@ class OperationResponseParser extends DefaultResponseParser
     /**
      * Add a location visitor to the command
      *
-     * @param string                   $location Location to associate with the visitor
-     * @param ResponseVisitorInterface $visitor  Visitor to attach
-     *
+     * @param string $location
+     *            Location to associate with the visitor
+     * @param ResponseVisitorInterface $visitor
+     *            Visitor to attach
+     *            
      * @return self
      */
     public function addVisitor($location, ResponseVisitorInterface $visitor)
     {
         $this->factory->addResponseVisitor($location, $visitor);
-
+        
         return $this;
     }
 
@@ -68,14 +79,14 @@ class OperationResponseParser extends DefaultResponseParser
         $operation = $command->getOperation();
         $type = $operation->getResponseType();
         $model = null;
-
+        
         if ($type == OperationInterface::TYPE_MODEL) {
             $model = $operation->getServiceDescription()->getModel($operation->getResponseClass());
         } elseif ($type == OperationInterface::TYPE_CLASS) {
             return $this->parseClass($command);
         }
-
-        if (!$model) {
+        
+        if (! $model) {
             // Return basic processing if the responseType is not model or the model cannot be found
             return parent::handleParsing($command, $response, $contentType);
         } elseif ($command[AbstractCommand::RESPONSE_PROCESSING] != AbstractCommand::TYPE_MODEL) {
@@ -90,57 +101,65 @@ class OperationResponseParser extends DefaultResponseParser
     /**
      * Parse a class object
      *
-     * @param CommandInterface $command Command to parse into an object
-     *
+     * @param CommandInterface $command
+     *            Command to parse into an object
+     *            
      * @return mixed
      * @throws ResponseClassException
      */
     protected function parseClass(CommandInterface $command)
     {
         // Emit the operation.parse_class event. If a listener injects a 'result' property, then that will be the result
-        $event = new CreateResponseClassEvent(array('command' => $command));
-        $command->getClient()->getEventDispatcher()->dispatch('command.parse_response', $event);
+        $event = new CreateResponseClassEvent(array(
+            'command' => $command
+        ));
+        $command->getClient()
+            ->getEventDispatcher()
+            ->dispatch('command.parse_response', $event);
         if ($result = $event->getResult()) {
             return $result;
         }
-
+        
         $className = $command->getOperation()->getResponseClass();
-        if (!method_exists($className, 'fromCommand')) {
+        if (! method_exists($className, 'fromCommand')) {
             throw new ResponseClassException("{$className} must exist and implement a static fromCommand() method");
         }
-
+        
         return $className::fromCommand($command);
     }
 
     /**
      * Perform transformations on the result array
      *
-     * @param Parameter        $model    Model that defines the structure
-     * @param CommandInterface $command  Command that performed the operation
-     * @param Response         $response Response received
-     *
+     * @param Parameter $model
+     *            Model that defines the structure
+     * @param CommandInterface $command
+     *            Command that performed the operation
+     * @param Response $response
+     *            Response received
+     *            
      * @return array Returns the array of result data
      */
     protected function visitResult(Parameter $model, CommandInterface $command, Response $response)
     {
         $foundVisitors = $result = $knownProps = array();
         $props = $model->getProperties();
-
+        
         foreach ($props as $schema) {
             if ($location = $schema->getLocation()) {
                 // Trigger the before method on the first found visitor of this type
-                if (!isset($foundVisitors[$location])) {
+                if (! isset($foundVisitors[$location])) {
                     $foundVisitors[$location] = $this->factory->getResponseVisitor($location);
                     $foundVisitors[$location]->before($command, $result);
                 }
             }
         }
-
+        
         // Visit additional properties when it is an actual schema
         if (($additional = $model->getAdditionalProperties()) instanceof Parameter) {
             $this->visitAdditionalProperties($model, $command, $response, $additional, $result, $foundVisitors);
         }
-
+        
         // Apply the parameter value with the location visitor
         foreach ($props as $schema) {
             $knownProps[$schema->getName()] = 1;
@@ -148,31 +167,25 @@ class OperationResponseParser extends DefaultResponseParser
                 $foundVisitors[$location]->visit($command, $response, $schema, $result);
             }
         }
-
+        
         // Remove any unknown and potentially unsafe top-level properties
         if ($additional === false) {
             $result = array_intersect_key($result, $knownProps);
         }
-
+        
         // Call the after() method of each found visitor
         foreach ($foundVisitors as $visitor) {
             $visitor->after($command);
         }
-
+        
         return $result;
     }
 
-    protected function visitAdditionalProperties(
-        Parameter $model,
-        CommandInterface $command,
-        Response $response,
-        Parameter $additional,
-        &$result,
-        array &$foundVisitors
-    ) {
+    protected function visitAdditionalProperties(Parameter $model, CommandInterface $command, Response $response, Parameter $additional, &$result, array &$foundVisitors)
+    {
         // Only visit when a location is specified
         if ($location = $additional->getLocation()) {
-            if (!isset($foundVisitors[$location])) {
+            if (! isset($foundVisitors[$location])) {
                 $foundVisitors[$location] = $this->factory->getResponseVisitor($location);
                 $foundVisitors[$location]->before($command, $result);
             }
@@ -181,7 +194,7 @@ class OperationResponseParser extends DefaultResponseParser
                 // Find each additional property
                 foreach (array_keys($result) as $key) {
                     // Check if the model actually knows this property. If so, then it is not additional
-                    if (!$model->getProperty($key)) {
+                    if (! $model->getProperty($key)) {
                         // Set the name to the key so that we can parse it with each visitor
                         $additional->setName($key);
                         $foundVisitors[$location]->visit($command, $response, $additional, $result);

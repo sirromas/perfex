@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Plugin\Backoff;
 
 use Guzzle\Http\Message\RequestInterface;
@@ -13,11 +12,16 @@ use Guzzle\Http\Exception\HttpException;
  */
 class LinearBackoffStrategy extends AbstractBackoffStrategy
 {
-    /** @var int Amount of time to progress each delay */
+
+    /**
+     * @var int Amount of time to progress each delay
+     */
     protected $step;
 
     /**
-     * @param int $step Amount of time to increase the delay each additional backoff
+     *
+     * @param int $step
+     *            Amount of time to increase the delay each additional backoff
      */
     public function __construct($step = 1)
     {

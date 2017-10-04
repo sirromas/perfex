@@ -3,7 +3,6 @@
 /**
  * Stripe Fetch Transfer Reversal Request (Connect only).
  */
-
 namespace Omnipay\Stripe\Message\Transfers;
 
 use Omnipay\Stripe\Message\AbstractRequest;
@@ -12,12 +11,12 @@ use Omnipay\Stripe\Message\AbstractRequest;
  * Stripe Fetch Transfer Reversal Request.
  *
  * <code>
- *   // Once the transaction has been authorized, we can capture it for final payment.
- *   $transaction = $gateway->fetchTransferReversal([
- *       'transferReference' => '{TRANSFER_ID}',
- *       'reversalReference' => '{REVERSAL_ID}',
- *   ]);
- *   $response = $transaction->send();
+ * // Once the transaction has been authorized, we can capture it for final payment.
+ * $transaction = $gateway->fetchTransferReversal([
+ * 'transferReference' => '{TRANSFER_ID}',
+ * 'reversalReference' => '{REVERSAL_ID}',
+ * ]);
+ * $response = $transaction->send();
  * </code>
  *
  *
@@ -25,7 +24,9 @@ use Omnipay\Stripe\Message\AbstractRequest;
  */
 class FetchTransferReversalRequest extends AbstractRequest
 {
+
     /**
+     *
      * @return mixed
      */
     public function getReversalReference()
@@ -34,7 +35,8 @@ class FetchTransferReversalRequest extends AbstractRequest
     }
 
     /**
-     * @param string $value
+     *
+     * @param string $value            
      *
      * @return \Omnipay\Common\Message\AbstractRequest
      */
@@ -44,6 +46,7 @@ class FetchTransferReversalRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return mixed
      */
     public function getTransferReference()
@@ -52,7 +55,8 @@ class FetchTransferReversalRequest extends AbstractRequest
     }
 
     /**
-     * @param string $value
+     *
+     * @param string $value            
      *
      * @return \Omnipay\Common\Message\AbstractRequest
      */
@@ -68,6 +72,6 @@ class FetchTransferReversalRequest extends AbstractRequest
 
     public function getEndpoint()
     {
-        return $this->endpoint.'/transfers/'.$this->getTransferReference().'/reversals/'.$this->getReversalReference();
+        return $this->endpoint . '/transfers/' . $this->getTransferReference() . '/reversals/' . $this->getReversalReference();
     }
 }

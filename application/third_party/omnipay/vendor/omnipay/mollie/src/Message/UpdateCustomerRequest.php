@@ -9,6 +9,7 @@ namespace Omnipay\Mollie\Message;
 
 class UpdateCustomerRequest extends AbstractRequest
 {
+
     /**
      * Get the customer's reference id.
      *
@@ -20,7 +21,9 @@ class UpdateCustomerRequest extends AbstractRequest
     }
 
     /**
-     * @param $value
+     *
+     * @param
+     *            $value
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setCustomerReference($value)
@@ -39,7 +42,9 @@ class UpdateCustomerRequest extends AbstractRequest
     }
 
     /**
-     * @param $value
+     *
+     * @param
+     *            $value
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setEmail($value)
@@ -62,7 +67,8 @@ class UpdateCustomerRequest extends AbstractRequest
     /**
      * Optional value.
      *
-     * @param $value
+     * @param
+     *            $value
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setLocale($value)
@@ -83,7 +89,8 @@ class UpdateCustomerRequest extends AbstractRequest
     /**
      * Optional value.
      *
-     * @param $value
+     * @param
+     *            $value
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setMetadata($value)
@@ -92,42 +99,45 @@ class UpdateCustomerRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return array
      */
     public function getData()
     {
         $this->validate('apiKey', 'customerReference');
-
-        $data                = array();
-        $data['id']          = $this->getCustomerReference();
-        $data['name']        = $this->getDescription();
-        $data['email']       = $this->getEmail();
-        $data['metadata']    = $this->getMetadata();
-        $data['locale']      = $this->getLocale();
-
+        
+        $data = array();
+        $data['id'] = $this->getCustomerReference();
+        $data['name'] = $this->getDescription();
+        $data['email'] = $this->getEmail();
+        $data['metadata'] = $this->getMetadata();
+        $data['locale'] = $this->getLocale();
+        
         if ($this->getMetadata()) {
             $data['metadata'] = $this->getMetadata();
         }
-
+        
         return $data;
     }
 
     /**
-     * @param mixed $data
+     *
+     * @param mixed $data            
      * @return UpdateCustomerResponse
      */
     public function sendData($data)
     {
-        $httpResponse = $this->sendRequest('POST', '/customers/'.$this->getCustomerReference(), $data);
-
+        $httpResponse = $this->sendRequest('POST', '/customers/' . $this->getCustomerReference(), $data);
+        
         return $this->response = new UpdateCustomerResponse($this, $httpResponse->json());
     }
 
     /**
+     *
      * @return string
      */
     public function getEndpoint()
     {
-        return $this->endpoint.'/customers/'.$this->getCustomerReference();
+        return $this->endpoint . '/customers/' . $this->getCustomerReference();
     }
 }

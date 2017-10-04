@@ -8,6 +8,7 @@ use Braintree;
 
 class HttpTest extends Setup
 {
+
     public function testMalformedNoSsl()
     {
         try {

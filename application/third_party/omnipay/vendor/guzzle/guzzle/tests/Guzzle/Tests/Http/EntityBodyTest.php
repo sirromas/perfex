@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Http;
 
 use Guzzle\Http\EntityBody;
@@ -11,6 +10,7 @@ use Guzzle\Http\QueryString;
  */
 class EntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     /**
      * @expectedException \Guzzle\Common\Exception\InvalidArgumentException
      */
@@ -26,9 +26,9 @@ class EntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertEquals(4, $body->getContentLength());
         $this->assertEquals('PHP', $body->getWrapper());
         $this->assertEquals('TEMP', $body->getStreamType());
-
+        
         $handle = fopen(__DIR__ . '/../../../../phpunit.xml.dist', 'r');
-        if (!$handle) {
+        if (! $handle) {
             $this->fail('Could not open test file');
         }
         $body = EntityBody::factory($handle);
@@ -36,7 +36,7 @@ class EntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertTrue($body->isLocal());
         $this->assertEquals(__DIR__ . '/../../../../phpunit.xml.dist', $body->getUri());
         $this->assertEquals(filesize(__DIR__ . '/../../../../phpunit.xml.dist'), $body->getContentLength());
-
+        
         // make sure that a body will return as the same object
         $this->assertTrue($body === EntityBody::factory($body));
     }
@@ -53,7 +53,9 @@ class EntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
 
     public function testFactoryCanCreateFromObject()
     {
-        $body = EntityBody::factory(new QueryString(array('foo' => 'bar')));
+        $body = EntityBody::factory(new QueryString(array(
+            'foo' => 'bar'
+        )));
         $this->assertEquals('foo=bar', (string) $body);
     }
 
@@ -77,28 +79,28 @@ class EntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertTrue($body->uncompress());
         $this->assertEquals('testing 123...testing 123', (string) $body);
         $this->assertFalse($body->getContentEncoding(), '-> getContentEncoding() must reset to FALSE');
-
+        
         if (in_array('bzip2.*', stream_get_filters())) {
             $this->assertTrue($body->compress('bzip2.compress'));
             $this->assertEquals('compress', $body->getContentEncoding(), '-> compress() must set \'compress\' as the Content-Encoding');
         }
-
+        
         $this->assertFalse($body->compress('non-existent'), '-> compress() must return false when a non-existent stream filter is used');
-
+        
         // Release the body
         unset($body);
-
-        // Use gzip compression on the initial content.  This will include a
+        
+        // Use gzip compression on the initial content. This will include a
         // gzip header which will need to be stripped when deflating the stream
         $body = EntityBody::factory(gzencode('test'));
         $this->assertSame($body, $body->setStreamFilterContentEncoding('zlib.deflate'));
         $this->assertTrue($body->uncompress('zlib.inflate'));
         $this->assertEquals('test', (string) $body);
         unset($body);
-
+        
         // Test using a very long string
         $largeString = '';
-        for ($i = 0; $i < 25000; $i++) {
+        for ($i = 0; $i < 25000; $i ++) {
             $largeString .= chr(rand(33, 126));
         }
         $body = EntityBody::factory($largeString);
@@ -109,11 +111,11 @@ class EntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertTrue($body->uncompress());
         $this->assertEquals($largeString, (string) $body);
         $this->assertEquals($compressed, gzdeflate($largeString));
-
+        
         $body = EntityBody::factory(fopen(__DIR__ . '/../TestData/compress_test', 'w'));
         $this->assertFalse($body->compress());
         unset($body);
-
+        
         unlink(__DIR__ . '/../TestData/compress_test');
     }
 
@@ -122,7 +124,7 @@ class EntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
         // Test using a string/temp stream
         $body = EntityBody::factory('testing 123...testing 123');
         $this->assertNull($body->getContentType());
-
+        
         // Use a local file
         $body = EntityBody::factory(fopen(__FILE__, 'r'));
         $this->assertContains('text/x-', $body->getContentType());
@@ -132,13 +134,9 @@ class EntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $body = EntityBody::factory('testing 123...testing 123');
         $this->assertEquals(md5('testing 123...testing 123'), $body->getContentMd5());
-
-        $server = $this->getServer()->enqueue(
-            "HTTP/1.1 200 OK" . "\r\n" .
-            "Content-Length: 3" . "\r\n\r\n" .
-            "abc"
-        );
-
+        
+        $server = $this->getServer()->enqueue("HTTP/1.1 200 OK" . "\r\n" . "Content-Length: 3" . "\r\n\r\n" . "abc");
+        
         $body = EntityBody::factory(fopen($this->getServer()->getUrl(), 'r'));
         $this->assertFalse($body->getContentMd5());
     }
@@ -154,7 +152,10 @@ class EntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
 
     public function testGetTypeFormBodyFactoring()
     {
-        $body = EntityBody::factory(array('key1' => 'val1', 'key2' => 'val2'));
+        $body = EntityBody::factory(array(
+            'key1' => 'val1',
+            'key2' => 'val2'
+        ));
         $this->assertEquals('key1=val1&key2=val2', (string) $body);
     }
 
@@ -162,7 +163,8 @@ class EntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $body = EntityBody::factory('foo');
         $rewound = false;
-        $body->setRewindFunction(function ($body) use (&$rewound) {
+        $body->setRewindFunction(function ($body) use(&$rewound)
+        {
             $rewound = true;
             return $body->seek(0);
         });

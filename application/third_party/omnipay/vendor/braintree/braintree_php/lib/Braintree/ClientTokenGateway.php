@@ -5,6 +5,7 @@ use InvalidArgumentException;
 
 class ClientTokenGateway
 {
+
     /**
      *
      * @var Gateway
@@ -25,7 +26,7 @@ class ClientTokenGateway
 
     /**
      *
-     * @param Gateway $gateway
+     * @param Gateway $gateway            
      */
     public function __construct($gateway)
     {
@@ -35,15 +36,17 @@ class ClientTokenGateway
         $this->_http = new Http($gateway->config);
     }
 
-    public function generate($params=[])
+    public function generate($params = [])
     {
-        if (!array_key_exists("version", $params)) {
+        if (! array_key_exists("version", $params)) {
             $params["version"] = ClientToken::DEFAULT_VERSION;
         }
-
+        
         $this->conditionallyVerifyKeys($params);
-        $generateParams = ["client_token" => $params];
-
+        $generateParams = [
+            "client_token" => $params
+        ];
+        
         return $this->_doGenerate('/client_token', $generateParams);
     }
 
@@ -51,21 +54,22 @@ class ClientTokenGateway
      * sends the generate request to the gateway
      *
      * @ignore
-     * @param var $url
-     * @param array $params
+     *
+     * @param var $url            
+     * @param array $params            
      * @return string
      */
     public function _doGenerate($subPath, $params)
     {
         $fullPath = $this->_config->merchantPath() . $subPath;
         $response = $this->_http->post($fullPath, $params);
-
+        
         return $this->_verifyGatewayResponse($response);
     }
 
     /**
      *
-     * @param array $params
+     * @param array $params            
      * @throws InvalidArgumentException
      */
     public function conditionallyVerifyKeys($params)
@@ -84,9 +88,20 @@ class ClientTokenGateway
     public function generateWithCustomerIdSignature()
     {
         return [
-            "version", "customerId", "proxyMerchantId",
-            ["options" => ["makeDefault", "verifyCard", "failOnDuplicatePaymentMethod"]],
-            "merchantAccountId", "sepaMandateType", "sepaMandateAcceptanceLocation"];
+            "version",
+            "customerId",
+            "proxyMerchantId",
+            [
+                "options" => [
+                    "makeDefault",
+                    "verifyCard",
+                    "failOnDuplicatePaymentMethod"
+                ]
+            ],
+            "merchantAccountId",
+            "sepaMandateType",
+            "sepaMandateAcceptanceLocation"
+        ];
     }
 
     /**
@@ -95,7 +110,11 @@ class ClientTokenGateway
      */
     public function generateWithoutCustomerIdSignature()
     {
-        return ["version", "proxyMerchantId", "merchantAccountId"];
+        return [
+            "version",
+            "proxyMerchantId",
+            "merchantAccountId"
+        ];
     }
 
     /**
@@ -106,7 +125,9 @@ class ClientTokenGateway
      * response from the Gateway or an HTTP status code exception.
      *
      * @ignore
-     * @param array $response gateway response values
+     *
+     * @param array $response
+     *            gateway response values
      * @return string client token
      * @throws InvalidArgumentException | HTTP status code exception
      */
@@ -115,15 +136,10 @@ class ClientTokenGateway
         if (isset($response['clientToken'])) {
             return $response['clientToken']['value'];
         } elseif (isset($response['apiErrorResponse'])) {
-            throw new InvalidArgumentException(
-                $response['apiErrorResponse']['message']
-            );
+            throw new InvalidArgumentException($response['apiErrorResponse']['message']);
         } else {
-            throw new Exception\Unexpected(
-                "Expected clientToken or apiErrorResponse"
-            );
+            throw new Exception\Unexpected("Expected clientToken or apiErrorResponse");
         }
     }
-
 }
 class_alias('Braintree\ClientTokenGateway', 'Braintree_ClientTokenGateway');

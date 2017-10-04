@@ -1,7 +1,9 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
+
 class Newsfeed extends Admin_controller
 {
+
     function __construct()
     {
         parent::__construct();
@@ -14,14 +16,14 @@ class Newsfeed extends Admin_controller
         if ($this->input->post('postid')) {
             $__post_id = $this->input->post('postid');
         }
-
-        $posts    = $this->newsfeed_model->load_newsfeed($this->input->post('page'), $__post_id);
+        
+        $posts = $this->newsfeed_model->load_newsfeed($this->input->post('page'), $__post_id);
         $response = '';
-
+        
         $this->load->model('departments_model');
         $staff_deparments = $this->departments_model->get_staff_departments(get_staff_user_id(), true);
         // we do not need to add pinned post additionally when refreshing only 1 post
-        if (!$this->input->post('postid') && ($this->input->post('page') == 0)) {
+        if (! $this->input->post('postid') && ($this->input->post('page') == 0)) {
             $pinned_posts = $this->newsfeed_model->get_pinned_posts();
             foreach ($pinned_posts as $pinned_post) {
                 array_unshift($posts, $pinned_post);
@@ -29,13 +31,13 @@ class Newsfeed extends Admin_controller
         }
         foreach ($posts as $post) {
             $visible_departments = '';
-            $not_visible         = false;
-            $visibility          = explode(':', $post['visibility']);
+            $not_visible = false;
+            $visibility = explode(':', $post['visibility']);
             if ($visibility[0] != 'all') {
-                for ($i = 0; $i < count($visibility); $i++) {
-                    if (!in_array($visibility[$i], $staff_deparments)) {
+                for ($i = 0; $i < count($visibility); $i ++) {
+                    if (! in_array($visibility[$i], $staff_deparments)) {
                         // Allow admin to view all posts
-                        if (!is_admin()) {
+                        if (! is_admin()) {
                             if ($post['creator'] != get_staff_user_id()) {
                                 $not_visible = true;
                             }
@@ -47,13 +49,13 @@ class Newsfeed extends Admin_controller
             if ($not_visible == true) {
                 continue;
             }
-
+            
             $pinned_class = '';
-
+            
             if ($post['pinned'] == 1) {
                 $pinned_class = ' pinned';
             }
-
+            
             $response .= '<div class="panel_s newsfeed_post' . $pinned_class . '" data-main-postid="' . $post['postid'] . '">';
             $response .= '<div class="panel-body post-content">';
             $response .= '<div class="media">';
@@ -62,7 +64,7 @@ class Newsfeed extends Admin_controller
                 'staff-profile-image-small',
                 'no-radius'
             )) . '</a>';
-
+            
             $response .= '</div>';
             $response .= '<div class="media-body">';
             $response .= '<p class="media-heading no-mbot"><a href="' . admin_url('profile/' . $post['creator']) . '">' . get_staff_full_name($post['creator']) . '</a></p>';
@@ -84,16 +86,16 @@ class Newsfeed extends Admin_controller
             $response .= '</div>';
             $response .= '</div>'; // media end
             $response .= '<div class="post-content mtop20 display-block">';
-            if (!empty($visible_departments)) {
-                $visible_departments = substr($visible_departments, 0, -2);
+            if (! empty($visible_departments)) {
+                $visible_departments = substr($visible_departments, 0, - 2);
                 $response .= '<i class="fa fa-question-circle" data-toggle="tooltip" data-title="' . _l('newsfeed_newsfeed_post_only_visible_to_departments', $visible_departments) . '"></i> ';
             }
             $response .= check_for_links($post['content']);
             $response .= '<div class="clearfix mbot10"></div>';
-            $image_attachments       = $this->newsfeed_model->get_post_attachments($post['postid'], true);
+            $image_attachments = $this->newsfeed_model->get_post_attachments($post['postid'], true);
             $total_image_attachments = count($image_attachments);
-            $non_image_attachments   = $this->newsfeed_model->get_post_attachments($post['postid']);
-
+            $non_image_attachments = $this->newsfeed_model->get_post_attachments($post['postid']);
+            
             if ($total_image_attachments > 0) {
                 $response .= '<hr />';
                 $response .= '<ul class="list-unstyled">';
@@ -114,10 +116,10 @@ class Newsfeed extends Admin_controller
                             break;
                         }
                     }
-                    $a++;
+                    $a ++;
                 }
                 // Hidden images for +X left lightbox
-                for ($i = $a + 2; $i < $total_image_attachments; $i++) {
+                for ($i = $a + 2; $i < $total_image_attachments; $i ++) {
                     $response .= '<a href="' . base_url('uploads/newsfeed/' . $post['postid'] . '/' . $image_attachments[$i]['file_name']) . '" data-lightbox="post-' . $post['postid'] . '"></a>';
                 }
                 $response .= '</ul>';
@@ -155,7 +157,7 @@ class Newsfeed extends Admin_controller
             $response .= '</div>'; // end user-comment
             $response .= '</div>'; // panel end
         }
-
+        
         echo $response;
     }
     /* Init post likes to post */
@@ -163,7 +165,7 @@ class Newsfeed extends Admin_controller
     {
         $_likes = '';
         $_likes .= '<div class="panel-footer user-post-like">';
-        if (!$this->newsfeed_model->user_liked_post($id)) {
+        if (! $this->newsfeed_model->user_liked_post($id)) {
             $_likes .= '<button type="button" class="btn btn-default btn-icon" onclick="like_post(' . $id . ')"> <i class="fa fa-heart"></i></button>';
         } else {
             $_likes .= '<button type="button" class="btn btn-danger btn-icon" onclick="unlike_post(' . $id . ')"> <i class="fa fa-heart-o"></i></button>';
@@ -182,42 +184,44 @@ class Newsfeed extends Admin_controller
             $this->db->where('userid !=', get_staff_user_id());
             $this->db->where('postid', $id);
             $this->db->order_by('dateliked', 'asc');
-            $likes       = $this->db->get()->result_array();
+            $likes = $this->db->get()->result_array();
             $total_likes = count($likes);
             $total_pages = $total_likes / $this->newsfeed_model->post_likes_limit;
             $likes_modal = '<a href="#" onclick="return false;" data-toggle="modal" data-target="#modal_post_likes" data-postid="' . $id . '" data-total-pages="' . $total_pages . '">';
             if ($this->newsfeed_model->user_liked_post($id) && $total_post_likes == 1) {
                 $_likes .= _l('newsfeed_you_like_this');
-            } else if (($this->newsfeed_model->user_liked_post($id) && $total_post_likes > 1) || ($this->newsfeed_model->user_liked_post($id) && $total_post_likes >= 2)) {
-                if ($total_likes == 1) {
-                    $_likes .= _l('newsfeed_you_and') . ' ' . $likes[0]['firstname'] . ' ' . $likes[0]['lastname'] . ' ' . _l('newsfeed_like_this');
-                } else if ($total_likes == 2) {
-                    $_likes .= _l('newsfeed_you') . ', ' . $likes[0]['firstname'] . ' ' . $likes[0]['lastname'] . ' and ' . $likes[1]['firstname'] . ' ' . $likes[1]['lastname'] . _l('newsfeed_like_this');
-                } else {
-                    $_likes .= 'You, ' . $likes[0]['firstname'] . ' ' . $likes[0]['lastname'] . ', ' . $likes[1]['firstname'] . ' ' . $likes[1]['lastname'] . ' and ' . $likes_modal . ' ' . ($total_likes - 2) . ' ' . _l('newsfeed_one_other') . '</a> ' . _l('newsfeed_like_this');
-                }
-            } else {
-                $i = 1;
-                foreach ($likes as $like) {
-                    if ($i > 3) {
-                        $_total_likes = ($total_likes - 3);
-                        if ($_total_likes != 0) {
-                            $_likes = substr($_likes, 0, -2);
-                            $_likes .= $likes_modal . ' ' . _l('newsfeed_and') . ' ' . $_total_likes . ' </a>' . _l('newsfeed_like_this');
+            } else 
+                if (($this->newsfeed_model->user_liked_post($id) && $total_post_likes > 1) || ($this->newsfeed_model->user_liked_post($id) && $total_post_likes >= 2)) {
+                    if ($total_likes == 1) {
+                        $_likes .= _l('newsfeed_you_and') . ' ' . $likes[0]['firstname'] . ' ' . $likes[0]['lastname'] . ' ' . _l('newsfeed_like_this');
+                    } else 
+                        if ($total_likes == 2) {
+                            $_likes .= _l('newsfeed_you') . ', ' . $likes[0]['firstname'] . ' ' . $likes[0]['lastname'] . ' and ' . $likes[1]['firstname'] . ' ' . $likes[1]['lastname'] . _l('newsfeed_like_this');
                         } else {
-                            $_likes = substr($_likes, 0, -2) . ' ' . _l('newsfeed_like_this');
+                            $_likes .= 'You, ' . $likes[0]['firstname'] . ' ' . $likes[0]['lastname'] . ', ' . $likes[1]['firstname'] . ' ' . $likes[1]['lastname'] . ' and ' . $likes_modal . ' ' . ($total_likes - 2) . ' ' . _l('newsfeed_one_other') . '</a> ' . _l('newsfeed_like_this');
                         }
-                        break;
-                    } else {
-                        $_likes .= $like['firstname'] . ' ' . $like['lastname'] . ', ';
+                } else {
+                    $i = 1;
+                    foreach ($likes as $like) {
+                        if ($i > 3) {
+                            $_total_likes = ($total_likes - 3);
+                            if ($_total_likes != 0) {
+                                $_likes = substr($_likes, 0, - 2);
+                                $_likes .= $likes_modal . ' ' . _l('newsfeed_and') . ' ' . $_total_likes . ' </a>' . _l('newsfeed_like_this');
+                            } else {
+                                $_likes = substr($_likes, 0, - 2) . ' ' . _l('newsfeed_like_this');
+                            }
+                            break;
+                        } else {
+                            $_likes .= $like['firstname'] . ' ' . $like['lastname'] . ', ';
+                        }
+                        $i ++;
                     }
-                    $i++;
+                    if ($i < 4) {
+                        $_likes = substr($_likes, 0, - 2);
+                        $_likes .= ' ' . _l('newsfeed_like_this');
+                    }
                 }
-                if ($i < 4) {
-                    $_likes = substr($_likes, 0, -2);
-                    $_likes .= ' ' . _l('newsfeed_like_this');
-                }
-            }
             $_likes .= '</div>'; // panel footer
         }
         if ($this->input->is_ajax_request() && $this->input->get('refresh_post_likes')) {
@@ -229,25 +233,25 @@ class Newsfeed extends Admin_controller
     /* Init post comments */
     public function init_post_comments($id)
     {
-        $_comments      = '';
+        $_comments = '';
         $total_comments = total_rows('tblpostcomments', array(
             'postid' => $id
         ));
         if ($total_comments > 0) {
             $page = $this->input->post('page');
-            if (!$this->input->post('page')) {
+            if (! $this->input->post('page')) {
                 $_comments .= '<div class="panel-footer post-comment">';
             }
-            $comments            = $this->newsfeed_model->get_post_comments($id, $page);
+            $comments = $this->newsfeed_model->get_post_comments($id, $page);
             // Add +1 becuase the first page is already inited
             $total_comment_pages = ($total_comments / $this->newsfeed_model->post_comments_limit) + 1;
             foreach ($comments as $comment) {
                 $_comments .= $this->comment_single($comment);
             }
-            if ($total_comments > $this->newsfeed_model->post_comments_limit && !$this->input->post('page')) {
+            if ($total_comments > $this->newsfeed_model->post_comments_limit && ! $this->input->post('page')) {
                 $_comments .= '<a href="#" onclick="load_more_comments(this); return false" class="mtop10 load-more-comments display-block" data-postid="' . $id . '" data-total-pages="' . $total_comment_pages . '"><input type="hidden" name="page" value="1">' . _l('newsfeed_show_more_comments') . '</a>';
             }
-            if (!$this->input->post('page')) {
+            if (! $this->input->post('page')) {
                 $_comments .= '</div>'; // end comments footer
             }
         }
@@ -257,6 +261,7 @@ class Newsfeed extends Admin_controller
             return $_comments;
         }
     }
+
     public function comment_single($comment)
     {
         $_comments = '';
@@ -276,15 +281,15 @@ class Newsfeed extends Admin_controller
             'commentid' => $comment['id'],
             'postid' => $comment['postid']
         ));
-        $total_pages         = $total_comment_likes / $this->newsfeed_model->post_comments_limit;
-        $likes_modal         = '<a href="#" onclick="return false;" data-toggle="modal" data-target="#modal_post_comment_likes" data-commentid="' . $comment['id'] . '" data-total-pages="' . $total_pages . '">';
-        $_comment_likes      = '';
+        $total_pages = $total_comment_likes / $this->newsfeed_model->post_comments_limit;
+        $likes_modal = '<a href="#" onclick="return false;" data-toggle="modal" data-target="#modal_post_comment_likes" data-commentid="' . $comment['id'] . '" data-total-pages="' . $total_pages . '">';
+        $_comment_likes = '';
         if ($total_comment_likes > 0) {
             $_comment_likes = ' - ' . $likes_modal . $total_comment_likes . ' <i class="fa fa-thumbs-o-up"></i></a>';
         } else {
             $_comment_likes .= '</a>';
         }
-        if (!$this->newsfeed_model->user_liked_comment($comment['id'])) {
+        if (! $this->newsfeed_model->user_liked_comment($comment['id'])) {
             $_comments .= '<p class="no-margin"><a href="#" onclick="like_comment(' . $comment['id'] . ',' . $comment['postid'] . '); return false;"><small>' . _l('newsfeed_like_this_saying') . ' ' . $_comment_likes . ' - ' . _dt($comment['dateadded']) . '</small></p>';
         } else {
             $_comments .= '<p class="no-margin"><a href="#" onclick="unlike_comment(' . $comment['id'] . ',' . $comment['postid'] . '); return false;"><small>' . _l('newsfeed_unlike_this_saying') . ' ' . $_comment_likes . ' - ' . _dt($comment['dateadded']) . '</small></p>';
@@ -292,9 +297,10 @@ class Newsfeed extends Admin_controller
         $_comments .= '</div>';
         $_comments .= '</div>';
         $_comments .= '<div class="clearfix"></div>';
-
+        
         return $_comments;
     }
+
     public function get_data()
     {
         $this->load->model('departments_model');
@@ -305,7 +311,7 @@ class Newsfeed extends Admin_controller
     public function load_likes_modal()
     {
         if ($this->input->post()) {
-            $likes  = $this->newsfeed_model->load_likes_modal($this->input->post('page'), $this->input->post('postid'));
+            $likes = $this->newsfeed_model->load_likes_modal($this->input->post('page'), $this->input->post('postid'));
             $_likes = '';
             foreach ($likes as $like) {
                 $_likes .= '<div class="pull-left modal_like_area"><a href="' . admin_url('profile/' . $like['userid']) . '" target="_blank">' . staff_profile_image($like['userid'], array(
@@ -325,7 +331,7 @@ class Newsfeed extends Admin_controller
     public function load_comment_likes_model()
     {
         if ($this->input->post()) {
-            $likes     = $this->newsfeed_model->load_comment_likes_model($this->input->post('page'), $this->input->post('commentid'));
+            $likes = $this->newsfeed_model->load_comment_likes_model($this->input->post('page'), $this->input->post('commentid'));
             $_comments = '';
             foreach ($likes as $like) {
                 $_comments .= '<div class="pull-left modal_like_area"><a href="' . admin_url('profile/' . $like['userid']) . '" target="_blank">' . staff_profile_image($like['userid'], array(
@@ -376,7 +382,7 @@ class Newsfeed extends Admin_controller
         $this->load->helper('perfex_upload');
         handle_newsfeed_post_attachments($id);
     }
-    /* Staff click like button*/
+    /* Staff click like button */
     public function like_post($id)
     {
         echo json_encode(array(
@@ -394,8 +400,8 @@ class Newsfeed extends Admin_controller
     public function add_comment()
     {
         $comment_id = $this->newsfeed_model->add_comment($this->input->post());
-        $success    = ($comment_id !== FALSE ? TRUE : FALSE);
-        $comment    = '';
+        $success = ($comment_id !== FALSE ? TRUE : FALSE);
+        $comment = '';
         if ($comment_id) {
             $comment = $this->comment_single($this->newsfeed_model->get_comment($comment_id, true));
         }

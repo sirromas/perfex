@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
@@ -21,11 +20,13 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandle
  */
 class PhpBridgeSessionStorage extends NativeSessionStorage
 {
+
     /**
      * Constructor.
      *
-     * @param AbstractProxy|NativeSessionHandler|\SessionHandlerInterface|null $handler
-     * @param MetadataBag                                                      $metaBag MetadataBag
+     * @param AbstractProxy|NativeSessionHandler|\SessionHandlerInterface|null $handler            
+     * @param MetadataBag $metaBag
+     *            MetadataBag
      */
     public function __construct($handler = null, MetadataBag $metaBag = null)
     {
@@ -34,21 +35,25 @@ class PhpBridgeSessionStorage extends NativeSessionStorage
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function start()
     {
         if ($this->started) {
             return true;
         }
-
+        
         $this->loadSession();
-
+        
         return true;
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function clear()
     {
@@ -57,7 +62,7 @@ class PhpBridgeSessionStorage extends NativeSessionStorage
         foreach ($this->bags as $bag) {
             $bag->clear();
         }
-
+        
         // reconnect the bags to the session
         $this->loadSession();
     }

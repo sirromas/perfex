@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Http\Curl;
 
 use Guzzle\Common\Event;
@@ -19,7 +18,10 @@ use Guzzle\Tests\Mock\MockMulti;
  */
 class CurlMultiTest extends \Guzzle\Tests\GuzzleTestCase
 {
-    /** @var \Guzzle\Http\Curl\CurlMulti */
+
+    /**
+     * @var \Guzzle\Http\Curl\CurlMulti
+     */
     private $multi;
 
     /**
@@ -54,10 +56,15 @@ class CurlMultiTest extends \Guzzle\Tests\GuzzleTestCase
         $multi = new CurlMulti();
         $request1 = new Request('GET', 'http://www.google.com/');
         $multi->add($request1);
-        $this->assertEquals(array($request1), $multi->all());
+        $this->assertEquals(array(
+            $request1
+        ), $multi->all());
         $request2 = new Request('POST', 'http://www.google.com/');
         $multi->add($request2);
-        $this->assertEquals(array($request1, $request2), $multi->all());
+        $this->assertEquals(array(
+            $request1,
+            $request2
+        ), $multi->all());
         $this->assertEquals(2, count($multi));
     }
 
@@ -67,10 +74,15 @@ class CurlMultiTest extends \Guzzle\Tests\GuzzleTestCase
         $this->multi->add($request1);
         $request2 = new Request('PUT', 'http://www.google.com/');
         $this->multi->add($request2);
-        $this->assertEquals(array($request1, $request2), $this->multi->all());
+        $this->assertEquals(array(
+            $request1,
+            $request2
+        ), $this->multi->all());
         $this->assertTrue($this->multi->remove($request1));
         $this->assertFalse($this->multi->remove($request1));
-        $this->assertEquals(array($request2), $this->multi->all());
+        $this->assertEquals(array(
+            $request2
+        ), $this->multi->all());
     }
 
     public function testsResetRemovesRequestsAndResetsState()
@@ -83,27 +95,21 @@ class CurlMultiTest extends \Guzzle\Tests\GuzzleTestCase
     public function testSendsRequestsThroughCurl()
     {
         $this->getServer()->enqueue(array(
-            "HTTP/1.1 204 No content\r\n" .
-            "Content-Length: 0\r\n" .
-            "Server: Jetty(6.1.3)\r\n\r\n",
-            "HTTP/1.1 200 OK\r\n" .
-            "Content-Type: text/html; charset=utf-8\r\n" .
-            "Content-Length: 4\r\n" .
-            "Server: Jetty(6.1.3)\r\n\r\n" .
-            "data"
+            "HTTP/1.1 204 No content\r\n" . "Content-Length: 0\r\n" . "Server: Jetty(6.1.3)\r\n\r\n",
+            "HTTP/1.1 200 OK\r\n" . "Content-Type: text/html; charset=utf-8\r\n" . "Content-Length: 4\r\n" . "Server: Jetty(6.1.3)\r\n\r\n" . "data"
         ));
-
+        
         $request1 = new Request('GET', $this->getServer()->getUrl());
         $request2 = new Request('GET', $this->getServer()->getUrl());
         $this->multi->add($request1);
         $this->multi->add($request2);
         $this->multi->send();
-
+        
         $response1 = $request1->getResponse();
         $response2 = $request2->getResponse();
         $this->assertInstanceOf('Guzzle\\Http\\Message\\Response', $response1);
         $this->assertInstanceOf('Guzzle\\Http\\Message\\Response', $response2);
-
+        
         $this->assertTrue($response1->getBody(true) == 'data' || $response2->getBody(true) == 'data');
         $this->assertTrue($response1->getBody(true) == '' || $response2->getBody(true) == '');
         $this->assertTrue($response1->getStatusCode() == '204' || $response2->getStatusCode() == '204');
@@ -113,59 +119,49 @@ class CurlMultiTest extends \Guzzle\Tests\GuzzleTestCase
     public function testSendsThroughCurlAndAggregatesRequestExceptions()
     {
         $this->getServer()->enqueue(array(
-            "HTTP/1.1 200 OK\r\n" .
-            "Content-Type: text/html; charset=utf-8\r\n" .
-            "Content-Length: 4\r\n" .
-            "Server: Jetty(6.1.3)\r\n" .
-            "\r\n" .
-            "data",
-            "HTTP/1.1 204 No content\r\n" .
-            "Content-Length: 0\r\n" .
-            "Server: Jetty(6.1.3)\r\n" .
-            "\r\n",
-            "HTTP/1.1 404 Not Found\r\n" .
-            "Content-Length: 0\r\n" .
-            "\r\n"
+            "HTTP/1.1 200 OK\r\n" . "Content-Type: text/html; charset=utf-8\r\n" . "Content-Length: 4\r\n" . "Server: Jetty(6.1.3)\r\n" . "\r\n" . "data",
+            "HTTP/1.1 204 No content\r\n" . "Content-Length: 0\r\n" . "Server: Jetty(6.1.3)\r\n" . "\r\n",
+            "HTTP/1.1 404 Not Found\r\n" . "Content-Length: 0\r\n" . "\r\n"
         ));
-
+        
         $request1 = new Request('GET', $this->getServer()->getUrl());
         $request2 = new Request('HEAD', $this->getServer()->getUrl());
         $request3 = new Request('GET', $this->getServer()->getUrl());
         $this->multi->add($request1);
         $this->multi->add($request2);
         $this->multi->add($request3);
-
+        
         try {
             $this->multi->send();
             $this->fail('MultiTransferException not thrown when aggregating request exceptions');
         } catch (MultiTransferException $e) {
-
+            
             $this->assertTrue($e->containsRequest($request1));
             $this->assertTrue($e->containsRequest($request2));
             $this->assertTrue($e->containsRequest($request3));
             $this->assertInstanceOf('ArrayIterator', $e->getIterator());
             $this->assertEquals(1, count($e));
             $exceptions = $e->getIterator();
-
+            
             $response1 = $request1->getResponse();
             $response2 = $request2->getResponse();
             $response3 = $request3->getResponse();
-
+            
             $this->assertNotEquals((string) $response1, (string) $response2);
             $this->assertNotEquals((string) $response3, (string) $response1);
             $this->assertInstanceOf('Guzzle\\Http\\Message\\Response', $response1);
             $this->assertInstanceOf('Guzzle\\Http\\Message\\Response', $response2);
             $this->assertInstanceOf('Guzzle\\Http\\Message\\Response', $response3);
-
+            
             $failed = $exceptions[0]->getResponse();
             $this->assertEquals(404, $failed->getStatusCode());
             $this->assertEquals(1, count($e));
-
+            
             // Test the IteratorAggregate functionality
             foreach ($e as $except) {
                 $this->assertEquals($failed, $except->getResponse());
             }
-
+            
             $this->assertEquals(1, count($e->getFailedRequests()));
             $this->assertEquals(2, count($e->getSuccessfulRequests()));
             $this->assertEquals(3, count($e->getAllRequests()));
@@ -205,16 +201,21 @@ class CurlMultiTest extends \Guzzle\Tests\GuzzleTestCase
     public function testRemovesQueuedRequestsAddedInTransit()
     {
         $this->getServer()->flush();
-        $this->getServer()->enqueue(array("HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n"));
+        $this->getServer()->enqueue(array(
+            "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n"
+        ));
         $client = new Client($this->getServer()->getUrl());
         $r = $client->get();
-        $r->getEventDispatcher()->addListener('request.receive.status_line', function (Event $event) use ($client) {
+        $r->getEventDispatcher()->addListener('request.receive.status_line', function (Event $event) use($client)
+        {
             // Create a request using a queued response
-            $request = $client->get()->setResponse(new Response(200), true);
+            $request = $client->get()
+                ->setResponse(new Response(200), true);
             $request->send();
         });
         $r->send();
-        $this->assertEquals(1, count($this->getServer()->getReceivedRequests(false)));
+        $this->assertEquals(1, count($this->getServer()
+            ->getReceivedRequests(false)));
     }
 
     public function testCatchesExceptionsBeforeSendingSingleRequest()
@@ -223,7 +224,8 @@ class CurlMultiTest extends \Guzzle\Tests\GuzzleTestCase
         $multi = new CurlMulti();
         $client->setCurlMulti($multi);
         $request = $client->get();
-        $request->getEventDispatcher()->addListener('request.before_send', function() {
+        $request->getEventDispatcher()->addListener('request.before_send', function ()
+        {
             throw new \RuntimeException('Testing!');
         });
         try {
@@ -243,10 +245,13 @@ class CurlMultiTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $client = new Client($this->getServer()->getUrl());
         $request = $client->get();
-        $request->getEventDispatcher()->addListener('request.before_send', function() {
+        $request->getEventDispatcher()->addListener('request.before_send', function ()
+        {
             throw new \RuntimeException('Thrown before sending!');
         });
-        $client->send(array($request));
+        $client->send(array(
+            $request
+        ));
     }
 
     public function testCatchesExceptionsWhenRemovingQueuedRequests()
@@ -254,9 +259,12 @@ class CurlMultiTest extends \Guzzle\Tests\GuzzleTestCase
         $this->getServer()->enqueue("HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n");
         $client = new Client($this->getServer()->getUrl());
         $r = $client->get();
-        $r->getEventDispatcher()->addListener('request.sent', function() use ($client) {
+        $r->getEventDispatcher()->addListener('request.sent', function () use($client)
+        {
             // Create a request using a queued response
-            $client->get()->setResponse(new Response(404), true)->send();
+            $client->get()
+                ->setResponse(new Response(404), true)
+                ->send();
         });
         try {
             $r->send();
@@ -271,9 +279,12 @@ class CurlMultiTest extends \Guzzle\Tests\GuzzleTestCase
         $this->getServer()->enqueue("HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n");
         $client = new Client($this->getServer()->getUrl());
         $r = $client->get();
-        $r->getEventDispatcher()->addListener('request.before_send', function() use ($client) {
+        $r->getEventDispatcher()->addListener('request.before_send', function () use($client)
+        {
             // Create a request using a queued response
-            $client->get()->setResponse(new Response(404), true)->send();
+            $client->get()
+                ->setResponse(new Response(404), true)
+                ->send();
         });
         try {
             $r->send();
@@ -290,7 +301,9 @@ class CurlMultiTest extends \Guzzle\Tests\GuzzleTestCase
     public function testDoesNotCatchRandomExceptionsThrownDuringPerform()
     {
         $client = new Client($this->getServer()->getUrl());
-        $multi = $this->getMock('Guzzle\\Http\\Curl\\CurlMulti', array('perform'));
+        $multi = $this->getMock('Guzzle\\Http\\Curl\\CurlMulti', array(
+            'perform'
+        ));
         $multi->expects($this->once())
             ->method('perform')
             ->will($this->throwException(new \RuntimeException('test')));
@@ -300,40 +313,44 @@ class CurlMultiTest extends \Guzzle\Tests\GuzzleTestCase
 
     public function testDoesNotSendRequestsDecliningToBeSent()
     {
-        if (!defined('CURLOPT_TIMEOUT_MS')) {
+        if (! defined('CURLOPT_TIMEOUT_MS')) {
             $this->markTestSkipped('Update curl');
         }
-
+        
         // Create a client that is bound to fail connecting
         $client = new Client('http://127.0.0.1:123', array(
-            'curl.CURLOPT_PORT'              => 123,
-            'curl.CURLOPT_CONNECTTIMEOUT_MS' => 1,
+            'curl.CURLOPT_PORT' => 123,
+            'curl.CURLOPT_CONNECTTIMEOUT_MS' => 1
         ));
-
+        
         $request = $client->get();
         $multi = new CurlMulti();
         $multi->add($request);
-
+        
         // Listen for request exceptions, and when they occur, first change the
         // state of the request back to transferring, and then just allow it to
         // exception out
-        $request->getEventDispatcher()->addListener('request.exception', function(Event $event) use ($multi) {
-            $retries = $event['request']->getParams()->get('retries');
+        $request->getEventDispatcher()->addListener('request.exception', function (Event $event) use($multi)
+        {
+            $retries = $event['request']->getParams()
+                ->get('retries');
             // Allow the first failure to retry
             if ($retries == 0) {
                 $event['request']->setState('transfer');
-                $event['request']->getParams()->set('retries', 1);
+                $event['request']->getParams()
+                    ->set('retries', 1);
                 // Remove the request to try again
                 $multi->remove($event['request']);
                 $multi->add($event['request']);
             }
         });
-
+        
         try {
             $multi->send();
             $this->fail('Did not throw an exception at all!?!');
         } catch (\Exception $e) {
-            $this->assertEquals(1, $request->getParams()->get('retries'));
+            $this->assertEquals(1, $request->getParams()
+                ->get('retries'));
         }
     }
 
@@ -342,14 +359,16 @@ class CurlMultiTest extends \Guzzle\Tests\GuzzleTestCase
         $this->getServer()->flush();
         $client = new Client($this->getServer()->getUrl());
         $request = $client->get();
-        $request->getEventDispatcher()->addListener('request.before_send', function(Event $event) {
+        $request->getEventDispatcher()->addListener('request.before_send', function (Event $event)
+        {
             $event['request']->setResponse(new Response(200));
         });
-
+        
         $multi = new CurlMulti();
         $multi->add($request);
         $multi->send();
-        $this->assertEquals(0, count($this->getServer()->getReceivedRequests(false)));
+        $this->assertEquals(0, count($this->getServer()
+            ->getReceivedRequests(false)));
     }
 
     public function testDoesNotThrowExceptionsWhenRequestsRecoverWithSuccess()
@@ -358,18 +377,22 @@ class CurlMultiTest extends \Guzzle\Tests\GuzzleTestCase
         $client = new Client('http://127.0.0.1:123');
         $request = $client->get();
         // Ensure it times out quickly if needed
-        $request->getCurlOptions()->set(CURLOPT_TIMEOUT_MS, 1)->set(CURLOPT_CONNECTTIMEOUT_MS, 1);
-
-        $request->getEventDispatcher()->addListener('request.exception', function(Event $event) use (&$count) {
+        $request->getCurlOptions()
+            ->set(CURLOPT_TIMEOUT_MS, 1)
+            ->set(CURLOPT_CONNECTTIMEOUT_MS, 1);
+        
+        $request->getEventDispatcher()->addListener('request.exception', function (Event $event) use(&$count)
+        {
             $event['request']->setResponse(new Response(200));
         });
-
+        
         $multi = new CurlMulti();
         $multi->add($request);
         $multi->send();
-
+        
         // Ensure that the exception was caught, and the response was set manually
-        $this->assertEquals(200, $request->getResponse()->getStatusCode());
+        $this->assertEquals(200, $request->getResponse()
+            ->getStatusCode());
     }
 
     public function testHardResetReopensMultiHandle()
@@ -378,11 +401,13 @@ class CurlMultiTest extends \Guzzle\Tests\GuzzleTestCase
             "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n",
             "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n"
         ));
-
+        
         $stream = fopen('php://temp', 'w+');
         $client = new Client($this->getServer()->getUrl());
-        $client->getConfig()->set('curl.CURLOPT_VERBOSE', true)->set('curl.CURLOPT_STDERR', $stream);
-
+        $client->getConfig()
+            ->set('curl.CURLOPT_VERBOSE', true)
+            ->set('curl.CURLOPT_STDERR', $stream);
+        
         $request = $client->get();
         $multi = new CurlMulti();
         $multi->add($request);
@@ -390,7 +415,7 @@ class CurlMultiTest extends \Guzzle\Tests\GuzzleTestCase
         $multi->reset(true);
         $multi->add($request);
         $multi->send();
-
+        
         rewind($stream);
         $this->assertNotContains('Re-using existing connection', stream_get_contents($stream));
     }
@@ -398,14 +423,14 @@ class CurlMultiTest extends \Guzzle\Tests\GuzzleTestCase
     public function testThrowsMeaningfulExceptionsForCurlMultiErrors()
     {
         $multi = new CurlMulti();
-
+        
         // Set the state of the multi object to sending to trigger the exception
         $reflector = new \ReflectionMethod('Guzzle\Http\Curl\CurlMulti', 'checkCurlResult');
         $reflector->setAccessible(true);
-
+        
         // Successful
         $reflector->invoke($multi, 0);
-
+        
         // Known error
         try {
             $reflector->invoke($multi, CURLM_BAD_HANDLE);
@@ -415,7 +440,7 @@ class CurlMultiTest extends \Guzzle\Tests\GuzzleTestCase
             $this->assertContains('CURLM_BAD_HANDLE', $e->getMessage());
             $this->assertContains(strval(CURLM_BAD_HANDLE), $e->getMessage());
         }
-
+        
         // Unknown error
         try {
             $reflector->invoke($multi, 255);
@@ -430,7 +455,8 @@ class CurlMultiTest extends \Guzzle\Tests\GuzzleTestCase
         $this->getServer()->enqueue("HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n");
         $request = new Request('PUT', $this->getServer()->getUrl());
         $that = $this;
-        $request->getEventDispatcher()->addListener('request.before_send', function ($event) use ($that) {
+        $request->getEventDispatcher()->addListener('request.before_send', function ($event) use($that)
+        {
             $that->assertEquals(0, $event['request']->getHeader('Content-Length'));
         });
         $this->multi->add($request);
@@ -445,7 +471,8 @@ class CurlMultiTest extends \Guzzle\Tests\GuzzleTestCase
             "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n"
         ));
         $client = new Client($this->getServer()->getUrl());
-        $request = $client->put('/', null, fopen($this->getServer()->getUrl(), 'r'));
+        $request = $client->put('/', null, fopen($this->getServer()
+            ->getUrl(), 'r'));
         $request->setHeader('Content-Length', 4);
         $request->send();
         $received = $this->getServer()->getReceivedRequests(true);

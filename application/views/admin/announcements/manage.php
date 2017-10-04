@@ -7,7 +7,8 @@
 					<div class="panel-body">
 						<div class="_buttons">
 							<?php if(is_admin()) { ?>
-							<a href="<?php echo admin_url('announcements/announcement'); ?>" class="btn btn-info pull-left display-block"><?php echo _l('new_announcement'); ?></a>
+							<a href="<?php echo admin_url('announcements/announcement'); ?>"
+								class="btn btn-info pull-left display-block"><?php echo _l('new_announcement'); ?></a>
 							<div class="clearfix"></div>
 							<hr class="hr-panel-heading" />
 							<?php } else { echo '<h4 class="no-margin bold">'._l('announcements').'</h4>';} ?>

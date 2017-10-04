@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Plugin\Backoff;
 
 use Guzzle\Http\Message\RequestInterface;
@@ -13,6 +12,7 @@ use Guzzle\Http\Exception\HttpException;
  */
 class ExponentialBackoffStrategy extends AbstractBackoffStrategy
 {
+
     public function makesDecision()
     {
         return false;

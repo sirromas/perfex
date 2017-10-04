@@ -2,7 +2,6 @@
 /**
  * PayPal REST Update Plan Request
  */
-
 namespace Omnipay\PayPal\Message;
 
 /**
@@ -22,26 +21,26 @@ namespace Omnipay\PayPal\Message;
  * To create the billing plan, see the code example in RestCreatePlanRequest.
  *
  * <code>
- *   // Create a gateway for the PayPal REST Gateway
- *   // (routes to GatewayFactory::create)
- *   $gateway = Omnipay::create('Paypal_Rest');
+ * // Create a gateway for the PayPal REST Gateway
+ * // (routes to GatewayFactory::create)
+ * $gateway = Omnipay::create('Paypal_Rest');
  *
- *   // Initialise the gateway
- *   $gateway->initialize(array(
- *       'clientId' => 'MyPayPalClientId',
- *       'secret'   => 'MyPayPalSecret',
- *       'testMode' => true, // Or false when you are ready for live transactions
- *   ));
+ * // Initialise the gateway
+ * $gateway->initialize(array(
+ * 'clientId' => 'MyPayPalClientId',
+ * 'secret' => 'MyPayPalSecret',
+ * 'testMode' => true, // Or false when you are ready for live transactions
+ * ));
  *
- *   // Update the billing plan
- *   $transaction = $gateway->updatePlan(array(
- *       'transactionReference'     => $plan_id,
- *       'state'                    => $gateway::BILLING_PLAN_STATE_ACTIVE,
- *   ));
- *   $response = $transaction->send();
- *   if ($response->isSuccessful()) {
- *       echo "Update Plan transaction was successful!\n";
- *   }
+ * // Update the billing plan
+ * $transaction = $gateway->updatePlan(array(
+ * 'transactionReference' => $plan_id,
+ * 'state' => $gateway::BILLING_PLAN_STATE_ACTIVE,
+ * ));
+ * $response = $transaction->send();
+ * if ($response->isSuccessful()) {
+ * echo "Update Plan transaction was successful!\n";
+ * }
  * </code>
  *
  * ### Request Sample
@@ -50,17 +49,17 @@ namespace Omnipay\PayPal\Message;
  *
  * <code>
  * curl -v -k -X PATCH 'https://api.sandbox.paypal.com/v1/payments/billing-plans/P-94458432VR012762KRWBZEUA' \
- *    -H "Content-Type: application/json" \
- *    -H "Authorization: Bearer <Access-Token>" \
- *    -d '[
- *        {
- *            "path": "/",
- *            "value": {
- *                "state": "ACTIVE"
- *            },
- *            "op": "replace"
- *        }
- *    ]'
+ * -H "Content-Type: application/json" \
+ * -H "Authorization: Bearer <Access-Token>" \
+ * -d '[
+ * {
+ * "path": "/",
+ * "value": {
+ * "state": "ACTIVE"
+ * },
+ * "op": "replace"
+ * }
+ * ]'
  * </code>
  *
  * ### Response
@@ -73,6 +72,7 @@ namespace Omnipay\PayPal\Message;
  */
 class RestUpdatePlanRequest extends AbstractRestRequest
 {
+
     /**
      * Get the plan state
      *
@@ -86,7 +86,7 @@ class RestUpdatePlanRequest extends AbstractRestRequest
     /**
      * Set the plan state
      *
-     * @param string $value
+     * @param string $value            
      * @return RestUpdatePlanRequest provides a fluent interface.
      */
     public function setState($value)
@@ -97,14 +97,16 @@ class RestUpdatePlanRequest extends AbstractRestRequest
     public function getData()
     {
         $this->validate('transactionReference', 'state');
-        $data = array(array(
-            'path'      => '/',
-            'value'     => array(
-                'state'     => $this->getState(),
-            ),
-            'op'        => 'replace'
-        ));
-
+        $data = array(
+            array(
+                'path' => '/',
+                'value' => array(
+                    'state' => $this->getState()
+                ),
+                'op' => 'replace'
+            )
+        );
+        
         return $data;
     }
 

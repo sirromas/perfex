@@ -1,17 +1,19 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
 class Roles extends Admin_controller
 {
+
     public function __construct()
     {
         parent::__construct();
         // Model is autoloaded
     }
-
+    
     /* List all staff roles */
     public function index()
     {
-        if (!has_permission('roles', '', 'view')) {
+        if (! has_permission('roles', '', 'view')) {
             access_denied('roles');
         }
         if ($this->input->is_ajax_request()) {
@@ -20,16 +22,16 @@ class Roles extends Admin_controller
         $data['title'] = _l('all_roles');
         $this->load->view('admin/roles/manage', $data);
     }
-
+    
     /* Add new role or edit existing one */
     public function role($id = '')
     {
-        if (!has_permission('roles', '', 'view')) {
+        if (! has_permission('roles', '', 'view')) {
             access_denied('roles');
         }
         if ($this->input->post()) {
             if ($id == '') {
-                if (!has_permission('roles', '', 'create')) {
+                if (! has_permission('roles', '', 'create')) {
                     access_denied('roles');
                 }
                 $id = $this->roles_model->add($this->input->post());
@@ -38,7 +40,7 @@ class Roles extends Admin_controller
                     redirect(admin_url('roles/role/' . $id));
                 }
             } else {
-                if (!has_permission('roles', '', 'edit')) {
+                if (! has_permission('roles', '', 'edit')) {
                     access_denied('roles');
                 }
                 $success = $this->roles_model->update($this->input->post(), $id);
@@ -52,22 +54,22 @@ class Roles extends Admin_controller
             $title = _l('add_new', _l('role_lowercase'));
         } else {
             $data['role_permissions'] = $this->roles_model->get_role_permissions($id);
-            $role                     = $this->roles_model->get($id);
-            $data['role']             = $role;
-            $title                    = _l('edit', _l('role_lowercase')) . ' ' . $role->name;
+            $role = $this->roles_model->get($id);
+            $data['role'] = $role;
+            $title = _l('edit', _l('role_lowercase')) . ' ' . $role->name;
         }
         $data['permissions'] = $this->roles_model->get_permissions();
-        $data['title']       = $title;
+        $data['title'] = $title;
         $this->load->view('admin/roles/role', $data);
     }
-
+    
     /* Delete staff role from database */
     public function delete($id)
     {
-        if (!has_permission('roles', '', 'delete')) {
+        if (! has_permission('roles', '', 'delete')) {
             access_denied('roles');
         }
-        if (!$id) {
+        if (! $id) {
             redirect(admin_url('roles'));
         }
         $response = $this->roles_model->delete($id);

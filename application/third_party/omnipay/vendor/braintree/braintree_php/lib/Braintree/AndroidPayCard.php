@@ -9,9 +9,9 @@ namespace Braintree;
  *
  * See {@link https://developers.braintreepayments.com/javascript+php}<br />
  *
- * @package    Braintree
- * @category   Resources
- *
+ * @package Braintree
+ * @category Resources
+ *          
  * @property-read string $bin
  * @property-read string $cardType
  * @property-read string $createdAt
@@ -44,21 +44,22 @@ class AndroidPayCard extends Base
     }
 
     /**
-     *  factory method: returns an instance of AndroidPayCard
-     *  to the requesting method, with populated properties
+     * factory method: returns an instance of AndroidPayCard
+     * to the requesting method, with populated properties
      *
      * @ignore
+     *
      * @return AndroidPayCard
      */
     public static function factory($attributes)
     {
         $defaultAttributes = [
-            'expirationMonth'    => '',
-            'expirationYear'    => '',
-            'last4'  => $attributes['virtualCardLast4'],
-            'cardType'  => $attributes['virtualCardType'],
+            'expirationMonth' => '',
+            'expirationYear' => '',
+            'last4' => $attributes['virtualCardLast4'],
+            'cardType' => $attributes['virtualCardType']
         ];
-
+        
         $instance = new self();
         $instance->_initialize(array_merge($defaultAttributes, $attributes));
         return $instance;
@@ -68,21 +69,22 @@ class AndroidPayCard extends Base
      * sets instance properties from an array of values
      *
      * @access protected
-     * @param array $androidPayCardAttribs array of Android Pay card properties
+     * @param array $androidPayCardAttribs
+     *            array of Android Pay card properties
      * @return void
      */
     protected function _initialize($androidPayCardAttribs)
     {
         // set the attributes
         $this->_attributes = $androidPayCardAttribs;
-
+        
         $subscriptionArray = [];
         if (isset($androidPayCardAttribs['subscriptions'])) {
-            foreach ($androidPayCardAttribs['subscriptions'] AS $subscription) {
+            foreach ($androidPayCardAttribs['subscriptions'] as $subscription) {
                 $subscriptionArray[] = Subscription::factory($subscription);
             }
         }
-
+        
         $this->_set('subscriptions', $subscriptionArray);
     }
 }

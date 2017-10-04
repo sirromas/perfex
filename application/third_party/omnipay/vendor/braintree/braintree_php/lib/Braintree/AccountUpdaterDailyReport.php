@@ -5,14 +5,15 @@ namespace Braintree;
  * Creates an instance of AccountUpdaterDailyReport
  *
  *
- * @package    Braintree
- *
+ * @package Braintree
+ *         
  * @property-read string $reportUrl
- * @property-read date   $reportDate
- * @property-read date   $receivedDate
+ * @property-read date $reportDate
+ * @property-read date $receivedDate
  */
 class AccountUpdaterDailyReport extends Base
 {
+
     protected $_attributes = [];
 
     protected function _initialize($disputeAttribs)
@@ -27,18 +28,18 @@ class AccountUpdaterDailyReport extends Base
         return $instance;
     }
 
-    public function  __toString()
+    public function __toString()
     {
         $display = [
-            'reportDate', 'reportUrl'
-            ];
-
+            'reportDate',
+            'reportUrl'
+        ];
+        
         $displayAttributes = [];
-        foreach ($display AS $attrib) {
+        foreach ($display as $attrib) {
             $displayAttributes[$attrib] = $this->$attrib;
         }
-        return __CLASS__ . '[' .
-                Util::attributesToString($displayAttributes) .']';
+        return __CLASS__ . '[' . Util::attributesToString($displayAttributes) . ']';
     }
 }
 class_alias('Braintree\AccountUpdaterDailyReport', 'Braintree_AccountUpdaterDailyReport');

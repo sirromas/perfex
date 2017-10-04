@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\AuthorizeNet\Message;
 
 use Omnipay\AuthorizeNet\Model\CardReference;
@@ -13,7 +12,9 @@ use Omnipay\Common\Message\AbstractRequest;
  */
 abstract class AIMAbstractRequest extends AbstractRequest
 {
+
     protected $requestType = 'createTransactionRequest';
+
     protected $action = null;
 
     public function getApiLoginId()
@@ -60,6 +61,7 @@ abstract class AIMAbstractRequest extends AbstractRequest
     {
         return $this->getParameter('hashSecret');
     }
+
     public function setHashSecret($value)
     {
         return $this->setParameter('hashSecret', $value);
@@ -101,6 +103,7 @@ abstract class AIMAbstractRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return TransactionReference
      */
     public function getTransactionReference()
@@ -118,35 +121,38 @@ abstract class AIMAbstractRequest extends AbstractRequest
             $transactionRef = new TransactionReference();
             $transactionRef->setTransId($value);
         }
-
+        
         return $this->setParameter('transactionReference', $transactionRef);
     }
 
     /**
-     * @param string|CardReference $value
+     *
+     * @param string|CardReference $value            
      * @return AbstractRequest
      */
     public function setCardReference($value)
     {
-        if (!($value instanceof CardReference)) {
+        if (! ($value instanceof CardReference)) {
             $value = new CardReference($value);
         }
-
+        
         return parent::setCardReference($value);
     }
 
     /**
-     * @param bool $serialize Determines whether the return value will be a string or object
+     *
+     * @param bool $serialize
+     *            Determines whether the return value will be a string or object
      * @return string|CardReference
      */
     public function getCardReference($serialize = true)
     {
         $value = parent::getCardReference();
-
+        
         if ($serialize) {
-            $value = (string)$value;
+            $value = (string) $value;
         }
-
+        
         return $value;
     }
 
@@ -161,6 +167,7 @@ abstract class AIMAbstractRequest extends AbstractRequest
     }
 
     /**
+     *
      * @link http://developer.authorize.net/api/reference/features/acceptjs.html Documentation on opaque data
      * @return string
      */
@@ -170,6 +177,7 @@ abstract class AIMAbstractRequest extends AbstractRequest
     }
 
     /**
+     *
      * @link http://developer.authorize.net/api/reference/features/acceptjs.html Documentation on opaque data
      * @return string
      */
@@ -179,8 +187,10 @@ abstract class AIMAbstractRequest extends AbstractRequest
     }
 
     /**
+     *
      * @link http://developer.authorize.net/api/reference/features/acceptjs.html Documentation on opaque data
-     * @param string
+     * @param
+     *            string
      * @return string
      */
     public function setOpaqueDataDescriptor($value)
@@ -189,8 +199,10 @@ abstract class AIMAbstractRequest extends AbstractRequest
     }
 
     /**
+     *
      * @link http://developer.authorize.net/api/reference/features/acceptjs.html Documentation on opaque data
-     * @param string
+     * @param
+     *            string
      * @return string
      */
     public function setOpaqueDataValue($value)
@@ -200,27 +212,31 @@ abstract class AIMAbstractRequest extends AbstractRequest
 
     public function sendData($data)
     {
-        $headers = array('Content-Type' => 'text/xml; charset=utf-8');
-
+        $headers = array(
+            'Content-Type' => 'text/xml; charset=utf-8'
+        );
+        
         $data = $data->saveXml();
-        $httpResponse = $this->httpClient->post($this->getEndpoint(), $headers, $data)->send();
-
+        $httpResponse = $this->httpClient->post($this->getEndpoint(), $headers, $data)
+            ->send();
+        
         return $this->response = new AIMResponse($this, $httpResponse->getBody());
     }
 
     /**
+     *
      * @return mixed|\SimpleXMLElement
      * @throws \Omnipay\Common\Exception\InvalidRequestException
      */
     public function getBaseData()
     {
         $data = new \SimpleXMLElement('<' . $this->requestType . '/>');
-
+        
         $data->addAttribute('xmlns', 'AnetApi/xml/v1/schema/AnetApiSchema.xsd');
         $this->addAuthentication($data);
         $this->addReferenceId($data);
         $this->addTransactionType($data);
-
+        
         return $data;
     }
 
@@ -233,51 +249,55 @@ abstract class AIMAbstractRequest extends AbstractRequest
     protected function addReferenceId(\SimpleXMLElement $data)
     {
         $txnId = $this->getTransactionId();
-
-        if (!empty($txnId)) {
+        
+        if (! empty($txnId)) {
             $data->refId = $this->getTransactionId();
         }
     }
 
     protected function addTransactionType(\SimpleXMLElement $data)
     {
-        if (!$this->action) {
+        if (! $this->action) {
             // The extending class probably hasn't specified an "action"
             throw new InvalidRequestException();
         }
-
+        
         $data->transactionRequest->transactionType = $this->action;
     }
 
     /**
      * Adds billing data to a partially filled request data object.
      *
-     * @param \SimpleXMLElement $data
+     * @param \SimpleXMLElement $data            
      *
      * @return \SimpleXMLElement
      */
     protected function addBillingData(\SimpleXMLElement $data)
     {
-        /** @var mixed $req */
+        /**
+         * @var mixed $req
+         */
         $req = $data->transactionRequest;
-
+        
         // The order must come before the customer ID.
         $req->order->invoiceNumber = $this->getInvoiceNumber();
         $req->order->description = $this->getDescription();
-
+        
         // Merchant assigned customer ID
         $customer = $this->getCustomerId();
-        if (!empty($customer)) {
+        if (! empty($customer)) {
             $req->customer->id = $customer;
         }
-
-        //$req->order->description = $this->getDescription();
-
-        /** @var CreditCard $card */
+        
+        // $req->order->description = $this->getDescription();
+        
+        /**
+         * @var CreditCard $card
+         */
         if ($card = $this->getCard()) {
             // A card is present, so include billing and shipping details
             $req->customer->email = $card->getEmail();
-
+            
             $req->billTo->firstName = $card->getBillingFirstName();
             $req->billTo->lastName = $card->getBillingLastName();
             $req->billTo->company = $card->getBillingCompany();
@@ -287,7 +307,7 @@ abstract class AIMAbstractRequest extends AbstractRequest
             $req->billTo->zip = $card->getBillingPostcode();
             $req->billTo->country = $card->getBillingCountry();
             $req->billTo->phoneNumber = $card->getBillingPhone();
-
+            
             $req->shipTo->firstName = $card->getShippingFirstName();
             $req->shipTo->lastName = $card->getShippingLastName();
             $req->shipTo->company = $card->getShippingCompany();
@@ -297,27 +317,25 @@ abstract class AIMAbstractRequest extends AbstractRequest
             $req->shipTo->zip = $card->getShippingPostcode();
             $req->shipTo->country = $card->getShippingCountry();
         }
-
+        
         return $data;
     }
 
     protected function addTransactionSettings(\SimpleXMLElement $data)
     {
         $i = 0;
-
+        
         // The test mode setting indicates whether or not this is a live request or a test request
         $data->transactionRequest->transactionSettings->setting[$i]->settingName = 'testRequest';
-        $data->transactionRequest->transactionSettings->setting[$i]->settingValue = $this->getTestMode()
-            ? 'true'
-            : 'false';
-
+        $data->transactionRequest->transactionSettings->setting[$i]->settingValue = $this->getTestMode() ? 'true' : 'false';
+        
         // The duplicate window setting specifies the threshold for AuthorizeNet's duplicate transaction detection logic
-        if (!is_null($this->getDuplicateWindow())) {
-            $i++;
+        if (! is_null($this->getDuplicateWindow())) {
+            $i ++;
             $data->transactionRequest->transactionSettings->setting[$i]->settingName = 'duplicateWindow';
             $data->transactionRequest->transactionSettings->setting[$i]->settingValue = $this->getDuplicateWindow();
         }
-
+        
         return $data;
     }
 }

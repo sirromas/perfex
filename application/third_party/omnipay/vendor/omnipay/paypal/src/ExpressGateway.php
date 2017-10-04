@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal;
 
 /**
@@ -7,6 +6,7 @@ namespace Omnipay\PayPal;
  */
 class ExpressGateway extends ProGateway
 {
+
     public function getName()
     {
         return 'PayPal Express';
@@ -15,13 +15,19 @@ class ExpressGateway extends ProGateway
     public function getDefaultParameters()
     {
         $settings = parent::getDefaultParameters();
-        $settings['solutionType'] = array('Sole', 'Mark');
-        $settings['landingPage'] = array('Billing', 'Login');
+        $settings['solutionType'] = array(
+            'Sole',
+            'Mark'
+        );
+        $settings['landingPage'] = array(
+            'Billing',
+            'Login'
+        );
         $settings['brandName'] = '';
         $settings['headerImageUrl'] = '';
         $settings['logoImageUrl'] = '';
         $settings['borderColor'] = '';
-
+        
         return $settings;
     }
 
@@ -149,6 +155,7 @@ class ExpressGateway extends ProGateway
     }
 
     /**
+     *
      * @return Message\ExpressTransactionSearchRequest
      */
     public function transactionSearch(array $parameters = array())

@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Service\Command;
 
 use Guzzle\Service\Description\ServiceDescription;
@@ -11,12 +10,22 @@ use Guzzle\Inflection\Inflector;
  */
 class ServiceDescriptionFactoryTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testProvider()
     {
         return array(
-            array('foo', null),
-            array('jar_jar', 'Guzzle\Tests\Service\Mock\Command\MockCommand'),
-            array('binks', 'Guzzle\Tests\Service\Mock\Command\OtherCommand')
+            array(
+                'foo',
+                null
+            ),
+            array(
+                'jar_jar',
+                'Guzzle\Tests\Service\Mock\Command\MockCommand'
+            ),
+            array(
+                'binks',
+                'Guzzle\Tests\Service\Mock\Command\OtherCommand'
+            )
         );
     }
 
@@ -26,10 +35,10 @@ class ServiceDescriptionFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     public function testCreatesCommandsUsingServiceDescriptions($key, $result)
     {
         $d = $this->getDescription();
-
+        
         $factory = new ServiceDescriptionFactory($d);
         $this->assertSame($d, $factory->getServiceDescription());
-
+        
         if (is_null($result)) {
             $this->assertNull($factory->factory($key));
         } else {
@@ -59,9 +68,15 @@ class ServiceDescriptionFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     {
         return ServiceDescription::factory(array(
             'operations' => array(
-                'jar_jar' => array('class' => 'Guzzle\Tests\Service\Mock\Command\MockCommand'),
-                'binks' => array('class' => 'Guzzle\Tests\Service\Mock\Command\OtherCommand'),
-                'Test' => array('class' => 'Guzzle\Tests\Service\Mock\Command\OtherCommand')
+                'jar_jar' => array(
+                    'class' => 'Guzzle\Tests\Service\Mock\Command\MockCommand'
+                ),
+                'binks' => array(
+                    'class' => 'Guzzle\Tests\Service\Mock\Command\OtherCommand'
+                ),
+                'Test' => array(
+                    'class' => 'Guzzle\Tests\Service\Mock\Command\OtherCommand'
+                )
             )
         ));
     }

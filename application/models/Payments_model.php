@@ -1,7 +1,9 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
 class Payments_model extends CRM_Model
 {
+
     public function __construct()
     {
         parent::__construct();
@@ -10,7 +12,9 @@ class Payments_model extends CRM_Model
 
     /**
      * Get payment by ID
-     * @param  mixed $id payment id
+     * 
+     * @param mixed $id
+     *            payment id
      * @return object
      */
     public function get($id)
@@ -20,7 +24,7 @@ class Payments_model extends CRM_Model
         $this->db->order_by('tblinvoicepaymentrecords.id', 'asc');
         $this->db->where('tblinvoicepaymentrecords.id', $id);
         $payment = $this->db->get('tblinvoicepaymentrecords')->row();
-        if (!$payment) {
+        if (! $payment) {
             return false;
         }
         // Since version 1.0.1
@@ -33,13 +37,15 @@ class Payments_model extends CRM_Model
                 }
             }
         }
-
+        
         return $payment;
     }
 
     /**
      * Get all invoice payments
-     * @param  mixed $invoiceid invoiceid
+     * 
+     * @param mixed $invoiceid
+     *            invoiceid
      * @return array
      */
     public function get_invoice_payments($invoiceid)
@@ -52,26 +58,28 @@ class Payments_model extends CRM_Model
         // Since version 1.0.1
         $this->load->model('payment_modes_model');
         $online_modes = $this->payment_modes_model->get_online_payment_modes(true);
-        $i            = 0;
+        $i = 0;
         foreach ($payments as $payment) {
             if (is_null($payment['id'])) {
                 foreach ($online_modes as $online_mode) {
                     if ($payment['paymentmode'] == $online_mode['id']) {
-                        $payments[$i]['id']   = $online_mode['id'];
+                        $payments[$i]['id'] = $online_mode['id'];
                         $payments[$i]['name'] = $online_mode['name'];
                     }
                 }
             }
-            $i++;
+            $i ++;
         }
-
+        
         return $payments;
     }
 
     /**
      * Process invoice payment offline or online
-     * @since  Version 1.0.1
-     * @param  array $data $_POST data
+     * 
+     * @since Version 1.0.1
+     * @param array $data
+     *            $_POST data
      * @return boolean
      */
     public function process_payment($data, $invoiceid = '')
@@ -80,37 +88,37 @@ class Payments_model extends CRM_Model
         if (is_numeric($data['paymentmode'])) {
             if (is_staff_logged_in()) {
                 $id = $this->add($data);
-
+                
                 return $id;
             } else {
                 return false;
             }
             // Is online payment mode request by client or staff
-        } elseif (!is_numeric($data['paymentmode']) && !empty($data['paymentmode'])) {
+        } elseif (! is_numeric($data['paymentmode']) && ! empty($data['paymentmode'])) {
             // This request will come from admin area only
             // If admin clicked the button that dont want to pay the invoice from the getaways only want
             if (is_staff_logged_in() && has_permission('payments', '', 'create')) {
                 if (isset($data['do_not_redirect'])) {
                     $id = $this->add($data);
-
+                    
                     return $id;
                 }
             }
-            if (!is_numeric($invoiceid)) {
-                if (!isset($data['invoiceid'])) {
+            if (! is_numeric($invoiceid)) {
+                if (! isset($data['invoiceid'])) {
                     die('No invoice specified');
                 } else {
                     $invoiceid = $data['invoiceid'];
                 }
             }
-
+            
             if (isset($data['do_not_send_email_template'])) {
                 unset($data['do_not_send_email_template']);
                 $this->session->set_userdata(array(
                     'do_not_send_email_template' => true
                 ));
             }
-
+            
             $invoice = $this->invoices_model->get($invoiceid);
             // Check if request coming from admin area and the user added note so we can insert the note also when the payment is recorded
             if (isset($data['note']) && $data['note'] != '') {
@@ -118,25 +126,27 @@ class Payments_model extends CRM_Model
                     'payment_admin_note' => $data['note']
                 ));
             }
-
+            
             if (get_option('allow_payment_amount_to_be_modified') == 0) {
                 $data['amount'] = get_invoice_total_left_to_pay($invoiceid, $invoice->total);
             }
-
+            
             $data['invoiceid'] = $invoiceid;
-            $data['invoice']   = $invoice;
-            $data              = do_action('before_process_gateway_func', $data);
-
+            $data['invoice'] = $invoice;
+            $data = do_action('before_process_gateway_func', $data);
+            
             $cf = $data['paymentmode'] . '_gateway';
             $this->$cf->process_payment($data);
         }
-
+        
         return false;
     }
 
     /**
      * Record new payment
-     * @param array $data payment data
+     * 
+     * @param array $data
+     *            payment data
      * @return boolean
      */
     public function add($data)
@@ -145,7 +155,7 @@ class Payments_model extends CRM_Model
         if (isset($data['do_not_redirect'])) {
             unset($data['do_not_redirect']);
         }
-
+        
         if (isset($data['do_not_send_email_template'])) {
             unset($data['do_not_send_email_template']);
             $do_not_send_email_template = true;
@@ -153,7 +163,7 @@ class Payments_model extends CRM_Model
             $do_not_send_email_template = true;
             $this->session->unset_userdata('do_not_send_email_template');
         }
-
+        
         if (is_staff_logged_in()) {
             if (isset($data['date'])) {
                 $data['date'] = to_sql_date($data['date']);
@@ -169,9 +179,9 @@ class Payments_model extends CRM_Model
         } else {
             $data['date'] = date('Y-m-d H:i:s');
         }
-
+        
         $data['daterecorded'] = date('Y-m-d H:i:s');
-        $data                 = do_action('before_payment_recorded', $data);
+        $data = do_action('before_payment_recorded', $data);
         $this->db->insert('tblinvoicepaymentrecords', $data);
         $insert_id = $this->db->insert_id();
         if ($insert_id) {
@@ -192,16 +202,16 @@ class Payments_model extends CRM_Model
                     '<a href="' . admin_url('payments/payment/' . $insert_id) . '" target="_blank">#' . $insert_id . '</a>'
                 )));
             }
-
+            
             logActivity('Payment Recorded [ID:' . $insert_id . ', Invoice Number: ' . format_invoice_number($invoice->id) . ', Total: ' . format_money($data['amount'], $invoice->symbol) . ']');
             // Send email to the client that the payment is recorded
-            $payment               = $this->get($insert_id);
+            $payment = $this->get($insert_id);
             $payment->invoice_data = $this->invoices_model->get($payment->invoiceid);
-            $paymentpdf            = payment_pdf($payment);
-            $attach                = $paymentpdf->Output(_l('payment') . '-' . $payment->paymentid . '.pdf', 'S');
-
+            $paymentpdf = payment_pdf($payment);
+            $attach = $paymentpdf->Output(_l('payment') . '-' . $payment->paymentid . '.pdf', 'S');
+            
             $this->load->model('emails_model');
-            if (!isset($do_not_send_email_template)) {
+            if (! isset($do_not_send_email_template)) {
                 $contacts = $this->clients_model->get_contacts($invoice->clientid);
                 foreach ($contacts as $contact) {
                     if (has_contact_permission('invoices', $contact['id'])) {
@@ -217,32 +227,32 @@ class Payments_model extends CRM_Model
                     }
                 }
             }
-
+            
             $this->db->where('staffid', $invoice->addedfrom);
             $this->db->or_where('staffid', $invoice->sale_agent);
             $staff_invoice = $this->db->get('tblstaff')->result_array();
-
+            
             $merge_fields = array();
-            if (!is_client_logged_in()) {
+            if (! is_client_logged_in()) {
                 $merge_fields = array_merge($merge_fields, get_client_contact_merge_fields($invoice->clientid));
             } else {
                 $merge_fields = array_merge($merge_fields, get_client_contact_merge_fields($invoice->clientid, get_contact_user_id()));
             }
             $merge_fields = array_merge($merge_fields, get_invoice_merge_fields($invoice->id));
-
+            
             $notifiedUsers = array();
             foreach ($staff_invoice as $member) {
                 if (get_option('notification_when_customer_pay_invoice') == 1) {
                     if (is_staff_logged_in() && $member['staffid'] == get_staff_user_id()) {
                         continue;
                     }
-
+                    
                     $this->emails_model->add_attachment(array(
                         'attachment' => $attach,
                         'filename' => _l('payment') . '-' . $payment->paymentid . '.pdf',
                         'type' => 'application/pdf'
                     ));
-
+                    
                     $notified = add_notification(array(
                         'fromcompany' => true,
                         'touserid' => $member['staffid'],
@@ -252,40 +262,43 @@ class Payments_model extends CRM_Model
                             format_invoice_number($invoice->id)
                         ))
                     ));
-                    if($notified){
-                        array_push($notifiedUsers,$member['staffid']);
+                    if ($notified) {
+                        array_push($notifiedUsers, $member['staffid']);
                     }
                 }
                 $this->emails_model->send_email_template('invoice-payment-recorded-to-staff', $member['email'], $merge_fields);
             }
-
+            
             pusher_trigger_notification($notifiedUsers);
-
+            
             do_action('after_payment_added', $insert_id);
-
+            
             return $insert_id;
         }
-
+        
         return false;
     }
 
     /**
      * Update payment
-     * @param  array $data payment data
-     * @param  mixed $id   paymentid
+     * 
+     * @param array $data
+     *            payment data
+     * @param mixed $id
+     *            paymentid
      * @return boolean
      */
     public function update($data, $id)
     {
         $payment = $this->get($id);
-
+        
         $data['date'] = to_sql_date($data['date']);
         $data['note'] = nl2br($data['note']);
-        $_data        = do_action('before_payment_updated', array(
+        $_data = do_action('before_payment_updated', array(
             'data' => $data,
             'id' => $id
         ));
-        $data         = $_data['data'];
+        $data = $_data['data'];
         $this->db->where('id', $id);
         $this->db->update('tblinvoicepaymentrecords', $data);
         if ($this->db->affected_rows() > 0) {
@@ -293,23 +306,25 @@ class Payments_model extends CRM_Model
                 update_invoice_status($payment->invoiceid);
             }
             logActivity('Payment Updated [Number:' . $id . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * Delete payment from database
-     * @param  mixed $id paymentid
+     * 
+     * @param mixed $id
+     *            paymentid
      * @return boolean
      */
     public function delete($id)
     {
-        $current         = $this->get($id);
+        $current = $this->get($id);
         $current_invoice = $this->invoices_model->get($current->invoiceid);
-        $invoiceid       = $current->invoiceid;
+        $invoiceid = $current->invoiceid;
         do_action('before_payment_deleted', array(
             'paymentid' => $id,
             'invoiceid' => $invoiceid
@@ -323,10 +338,10 @@ class Payments_model extends CRM_Model
                 format_money($current->amount, $current_invoice->symbol)
             )));
             logActivity('Payment Deleted [ID:' . $id . ', Invoice Number: ' . format_invoice_number($current->id) . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
 }

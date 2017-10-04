@@ -3,47 +3,75 @@
 <head>
     <?php $isRTL = (is_rtl() ? 'true' : 'false'); ?>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport"
+	content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1" />
     <?php if(get_option('favicon') != ''){ ?>
-    <link href="<?php echo base_url('uploads/company/'.get_option('favicon')); ?>" rel="shortcut icon">
+    <link
+	href="<?php echo base_url('uploads/company/'.get_option('favicon')); ?>"
+	rel="shortcut icon">
     <?php } ?>
     <title><?php if (isset($title)){ echo $title; } else { echo get_option('companyname'); } ?></title>
     <?php echo app_stylesheet('assets/css','reset.css'); ?>
-    <link href='<?php echo base_url('assets/plugins/roboto/roboto.css'); ?>' rel='stylesheet'>
-    <link href="<?php echo base_url('assets/plugins/bootstrap/css/bootstrap.min.css'); ?>" rel="stylesheet">
+    <link
+	href='<?php echo base_url('assets/plugins/roboto/roboto.css'); ?>'
+	rel='stylesheet'>
+<link
+	href="<?php echo base_url('assets/plugins/bootstrap/css/bootstrap.min.css'); ?>"
+	rel="stylesheet">
     <?php if($isRTL === 'true'){ ?>
-    <link href="<?php echo base_url('assets/plugins/bootstrap-arabic/css/bootstrap-arabic.min.css'); ?>" rel="stylesheet">
+    <link
+	href="<?php echo base_url('assets/plugins/bootstrap-arabic/css/bootstrap-arabic.min.css'); ?>"
+	rel="stylesheet">
     <?php } ?>
-    <link href="<?php echo base_url('assets/plugins/jquery-ui/jquery-ui.min.css'); ?>" rel="stylesheet">
-    <link href="<?php echo base_url('assets/plugins/font-awesome/css/font-awesome.min.css'); ?>" rel="stylesheet">
-    <link href="<?php echo base_url('assets/plugins/app-build/vendor.css?v='.get_app_version()); ?>" rel="stylesheet">
+    <link
+	href="<?php echo base_url('assets/plugins/jquery-ui/jquery-ui.min.css'); ?>"
+	rel="stylesheet">
+<link
+	href="<?php echo base_url('assets/plugins/font-awesome/css/font-awesome.min.css'); ?>"
+	rel="stylesheet">
+<link
+	href="<?php echo base_url('assets/plugins/app-build/vendor.css?v='.get_app_version()); ?>"
+	rel="stylesheet">
     <?php if(isset($calendar_assets)){ ?>
-    <link href='<?php echo base_url('assets/plugins/fullcalendar/fullcalendar.min.css?v='.get_app_version()); ?>' rel='stylesheet' />
+    <link
+	href='<?php echo base_url('assets/plugins/fullcalendar/fullcalendar.min.css?v='.get_app_version()); ?>'
+	rel='stylesheet' />
     <?php } ?>
     <?php if(isset($lightbox_assets)){ ?>
-    <link id="lightbox-css" href='<?php echo base_url('assets/plugins/lightbox/css/lightbox.min.css'); ?>' rel='stylesheet' />
+    <link id="lightbox-css"
+	href='<?php echo base_url('assets/plugins/lightbox/css/lightbox.min.css'); ?>'
+	rel='stylesheet' />
     <?php } ?>
     <?php if(isset($form_builder_assets)){ ?>
-    <link href='<?php echo base_url('assets/plugins/form-builder/form-builder.min.css'); ?>' rel='stylesheet' />
+    <link
+	href='<?php echo base_url('assets/plugins/form-builder/form-builder.min.css'); ?>'
+	rel='stylesheet' />
     <?php } ?>
     <?php if(isset($projects_assets)){ ?>
-    <link href='<?php echo base_url('assets/plugins/jquery-comments/css/jquery-comments.css'); ?>' rel='stylesheet' />
-    <link href='<?php echo base_url('assets/plugins/gantt/css/style.css'); ?>' rel='stylesheet' />
+    <link
+	href='<?php echo base_url('assets/plugins/jquery-comments/css/jquery-comments.css'); ?>'
+	rel='stylesheet' />
+<link
+	href='<?php echo base_url('assets/plugins/gantt/css/style.css'); ?>'
+	rel='stylesheet' />
     <?php } ?>
      <?php if(isset($media_assets)){ ?>
-    <link rel="stylesheet" type="text/css" media="screen" href="<?php echo base_url('assets/plugins/elFinder/css/elfinder.min.css'); ?>">
-    <link rel="stylesheet" type="text/css" media="screen" href="<?php echo base_url('assets/plugins/elFinder/themes/windows-10/css/theme.css'); ?>">
+    <link rel="stylesheet" type="text/css" media="screen"
+	href="<?php echo base_url('assets/plugins/elFinder/css/elfinder.min.css'); ?>">
+<link rel="stylesheet" type="text/css" media="screen"
+	href="<?php echo base_url('assets/plugins/elFinder/themes/windows-10/css/theme.css'); ?>">
     <?php } ?>
     <?php echo app_stylesheet('assets/css','style.css'); ?>
     <?php if(file_exists(FCPATH.'assets/css/custom.css')){ ?>
-    <link href="<?php echo base_url('assets/css/custom.css'); ?>" rel="stylesheet">
+    <link href="<?php echo base_url('assets/css/custom.css'); ?>"
+	rel="stylesheet">
     <?php } ?>
 
     <?php render_custom_styles(array('general','tabs','buttons','admin','modals','tags')); ?>
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-        <!--[if lt IE 9]>
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
         <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
         <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
         <![endif]-->
@@ -64,5 +92,6 @@
         </script>
         <?php do_action('app_admin_head'); ?>
     </head>
-    <body <?php if($isRTL === 'true'){ echo 'dir="rtl"';} ?> class="<?php echo 'page'.($this->uri->segment(2) ? '-'.$this->uri->segment(2) : '') . '-'.$this->uri->segment(1); ?> admin <?php if(isset($bodyclass)){echo $bodyclass . ' '; } ?><?php if($this->session->has_userdata('is_mobile') && $this->session->userdata('is_mobile') == true){echo 'hide-sidebar ';} ?><?php if($isRTL === 'true'){echo 'rtl';} ?>">
+<body <?php if($isRTL === 'true'){ echo 'dir="rtl"';} ?>
+	class="<?php echo 'page'.($this->uri->segment(2) ? '-'.$this->uri->segment(2) : '') . '-'.$this->uri->segment(1); ?> admin <?php if(isset($bodyclass)){echo $bodyclass . ' '; } ?><?php if($this->session->has_userdata('is_mobile') && $this->session->userdata('is_mobile') == true){echo 'hide-sidebar ';} ?><?php if($isRTL === 'true'){echo 'rtl';} ?>">
         <?php do_action('after_body_start'); ?>

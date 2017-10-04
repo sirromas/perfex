@@ -3,7 +3,6 @@
 /**
  * Stripe Reverse Transfer Request (Connect only).
  */
-
 namespace Omnipay\Stripe\Message\Transfers;
 
 use Omnipay\Stripe\Message\RefundRequest;
@@ -22,19 +21,21 @@ use Omnipay\Stripe\Message\RefundRequest;
  * to reverse more money than is left on a transfer.
  *
  * <code>
- *   // Once the transaction has been authorized, we can capture it for final payment.
- *   $transaction = $gateway->reverseTransfer(array(
- *       'transferReference' => '{TRANSFER_ID}',
- *       'description'       => 'Had to reverse this transfer because of things'
- *   ));
- *   $response = $transaction->send();
+ * // Once the transaction has been authorized, we can capture it for final payment.
+ * $transaction = $gateway->reverseTransfer(array(
+ * 'transferReference' => '{TRANSFER_ID}',
+ * 'description' => 'Had to reverse this transfer because of things'
+ * ));
+ * $response = $transaction->send();
  * </code>
  *
  * @link https://stripe.com/docs/api#create_transfer_reversal
  */
 class CreateTransferReversalRequest extends RefundRequest
 {
+
     /**
+     *
      * @return mixed
      */
     public function getTransferReference()
@@ -43,7 +44,8 @@ class CreateTransferReversalRequest extends RefundRequest
     }
 
     /**
-     * @param string $value
+     *
+     * @param string $value            
      *
      * @return \Omnipay\Common\Message\AbstractRequest
      */
@@ -53,39 +55,43 @@ class CreateTransferReversalRequest extends RefundRequest
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getData()
     {
         $this->validate('transferReference');
-
+        
         $data = array();
-
+        
         // If no amount is passed, then the entire transfer is reversed
         if ($this->getAmountInteger()) {
             $data['amount'] = $this->getAmountInteger();
         }
-
+        
         if ($this->getMetadata()) {
             $data['metadata'] = $this->getMetadata();
         }
-
+        
         if ($this->getDescription()) {
             $data['description'] = $this->getDescription();
         }
-
+        
         if ($this->getRefundApplicationFee()) {
             $data['refund_application_fee'] = 'true';
         }
-
+        
         return $data;
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getEndpoint()
     {
-        return $this->endpoint.'/transfers/'.$this->getTransferReference().'/reversals';
+        return $this->endpoint . '/transfers/' . $this->getTransferReference() . '/reversals';
     }
 }

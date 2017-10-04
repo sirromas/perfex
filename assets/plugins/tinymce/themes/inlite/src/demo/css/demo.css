@@ -1,5 +1,5 @@
 blockquote {
-	border-left: 3px solid rgba(0,0,0,.8);
+	border-left: 3px solid rgba(0, 0, 0, .8);
 	padding-left: 20px;
 	margin: 0;
 }
@@ -15,7 +15,7 @@ blockquote {
 	border: 1px solid gray;
 }
 
-table, td {
+table,td {
 	border: 1px dashed gray;
 }
 

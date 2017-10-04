@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Plugin\Cache;
 
 use Guzzle\Http\Message\Request;
@@ -11,6 +10,7 @@ use Guzzle\Plugin\Cache\DenyRevalidation;
  */
 class DenyRevalidationTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testDeniesRequestRevalidation()
     {
         $deny = new DenyRevalidation();

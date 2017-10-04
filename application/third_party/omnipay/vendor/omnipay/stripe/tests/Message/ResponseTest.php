@@ -1,16 +1,16 @@
 <?php
-
 namespace Omnipay\Stripe\Message;
 
 use Omnipay\Tests\TestCase;
 
 class ResponseTest extends TestCase
 {
+
     public function testPurchaseSuccess()
     {
         $httpResponse = $this->getMockHttpResponse('PurchaseSuccess.txt');
         $response = new Response($this->getMockRequest(), $httpResponse->json());
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertSame('ch_1IU9gcUiNASROd', $response->getTransactionReference());
@@ -23,7 +23,7 @@ class ResponseTest extends TestCase
     {
         $httpResponse = $this->getMockHttpResponse('PurchaseWithSourceSuccess.txt');
         $response = new Response($this->getMockRequest(), $httpResponse->json());
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertSame('ch_1IU9gcUiNASROd', $response->getTransactionReference());
@@ -35,7 +35,7 @@ class ResponseTest extends TestCase
     {
         $httpResponse = $this->getMockHttpResponse('PurchaseFailure.txt');
         $response = new Response($this->getMockRequest(), $httpResponse->json());
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertSame('ch_1IUAZQWFYrPooM', $response->getTransactionReference());
@@ -48,7 +48,7 @@ class ResponseTest extends TestCase
     {
         $httpResponse = $this->getMockHttpResponse('PurchaseFailureWithoutMessage.txt');
         $response = new Response($this->getMockRequest(), $httpResponse->json());
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertSame('ch_1JEJGNWFYxAwgF', $response->getTransactionReference());
@@ -61,7 +61,7 @@ class ResponseTest extends TestCase
     {
         $httpResponse = $this->getMockHttpResponse('PurchaseFailureWithoutCode.txt');
         $response = new Response($this->getMockRequest(), $httpResponse->json());
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertSame('ch_1KGNWMAOUdAbbC', $response->getTransactionReference());
@@ -74,7 +74,7 @@ class ResponseTest extends TestCase
     {
         $httpResponse = $this->getMockHttpResponse('CreateCustomerSuccess.txt');
         $response = new Response($this->getMockRequest(), $httpResponse->json());
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());
@@ -86,7 +86,7 @@ class ResponseTest extends TestCase
     {
         $httpResponse = $this->getMockHttpResponse('CreateCustomerFailure.txt');
         $response = new Response($this->getMockRequest(), $httpResponse->json());
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());
@@ -98,7 +98,7 @@ class ResponseTest extends TestCase
     {
         $httpResponse = $this->getMockHttpResponse('UpdateCustomerSuccess.txt');
         $response = new Response($this->getMockRequest(), $httpResponse->json());
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());
@@ -110,7 +110,7 @@ class ResponseTest extends TestCase
     {
         $httpResponse = $this->getMockHttpResponse('UpdateCustomerFailure.txt');
         $response = new Response($this->getMockRequest(), $httpResponse->json());
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());
@@ -122,7 +122,7 @@ class ResponseTest extends TestCase
     {
         $httpResponse = $this->getMockHttpResponse('DeleteCustomerSuccess.txt');
         $response = new Response($this->getMockRequest(), $httpResponse->json());
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());
@@ -134,7 +134,7 @@ class ResponseTest extends TestCase
     {
         $httpResponse = $this->getMockHttpResponse('DeleteCustomerFailure.txt');
         $response = new Response($this->getMockRequest(), $httpResponse->json());
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());
@@ -146,7 +146,7 @@ class ResponseTest extends TestCase
     {
         $httpResponse = $this->getMockHttpResponse('CreateCardSuccess.txt');
         $response = new Response($this->getMockRequest(), $httpResponse->json());
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());
@@ -158,7 +158,7 @@ class ResponseTest extends TestCase
     {
         $httpResponse = $this->getMockHttpResponse('CreateCardFailure.txt');
         $response = new Response($this->getMockRequest(), $httpResponse->json());
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());
@@ -170,7 +170,7 @@ class ResponseTest extends TestCase
     {
         $httpResponse = $this->getMockHttpResponse('UpdateCardSuccess.txt');
         $response = new Response($this->getMockRequest(), $httpResponse->json());
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());
@@ -182,7 +182,7 @@ class ResponseTest extends TestCase
     {
         $httpResponse = $this->getMockHttpResponse('UpdateCardFailure.txt');
         $response = new Response($this->getMockRequest(), $httpResponse->json());
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());
@@ -194,7 +194,7 @@ class ResponseTest extends TestCase
     {
         $httpResponse = $this->getMockHttpResponse('DeleteCardSuccess.txt');
         $response = new Response($this->getMockRequest(), $httpResponse->json());
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());
@@ -206,7 +206,7 @@ class ResponseTest extends TestCase
     {
         $httpResponse = $this->getMockHttpResponse('DeleteCardFailure.txt');
         $response = new Response($this->getMockRequest(), $httpResponse->json());
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());

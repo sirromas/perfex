@@ -22,11 +22,12 @@ namespace Omnipay\Stripe\Message;
  */
 class UpdateCardRequest extends AbstractRequest
 {
+
     public function getData()
     {
         $this->validate('cardReference');
         $this->validate('customerReference');
-
+        
         if ($this->getCard()) {
             return $this->getCardData();
         } else {
@@ -36,8 +37,7 @@ class UpdateCardRequest extends AbstractRequest
 
     public function getEndpoint()
     {
-        return $this->endpoint.'/customers/'.$this->getCustomerReference().
-            '/cards/'.$this->getCardReference();
+        return $this->endpoint . '/customers/' . $this->getCustomerReference() . '/cards/' . $this->getCardReference();
     }
 
     /**
@@ -53,7 +53,7 @@ class UpdateCardRequest extends AbstractRequest
     {
         $data = array();
         $card = $this->getCard();
-        if (!empty($card)) {
+        if (! empty($card)) {
             if ($card->getExpiryMonth()) {
                 $data['exp_month'] = $card->getExpiryMonth();
             }
@@ -85,7 +85,7 @@ class UpdateCardRequest extends AbstractRequest
                 $data['address_country'] = $card->getCountry();
             }
         }
-
+        
         return $data;
     }
 }

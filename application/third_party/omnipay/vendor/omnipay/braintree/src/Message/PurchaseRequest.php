@@ -8,12 +8,13 @@ namespace Omnipay\Braintree\Message;
  */
 class PurchaseRequest extends AuthorizeRequest
 {
+
     public function getData()
     {
         $data = parent::getData();
-
+        
         $data['options']['submitForSettlement'] = true;
-
+        
         return $data;
     }
 }

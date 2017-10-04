@@ -2,7 +2,6 @@
 /**
  * PayPal REST Authorize Response
  */
-
 namespace Omnipay\PayPal\Message;
 
 use Omnipay\Common\Message\RedirectResponseInterface;
@@ -12,6 +11,7 @@ use Omnipay\Common\Message\RedirectResponseInterface;
  */
 class RestAuthorizeResponse extends RestResponse implements RedirectResponseInterface
 {
+
     public function isSuccessful()
     {
         return empty($this->data['error']) && $this->getCode() == 201;
@@ -31,7 +31,7 @@ class RestAuthorizeResponse extends RestResponse implements RedirectResponseInte
                 }
             }
         }
-
+        
         return null;
     }
 
@@ -52,7 +52,7 @@ class RestAuthorizeResponse extends RestResponse implements RedirectResponseInte
                 }
             }
         }
-
+        
         return null;
     }
 
@@ -65,15 +65,18 @@ class RestAuthorizeResponse extends RestResponse implements RedirectResponseInte
         if (empty($completeUrl)) {
             return parent::getTransactionReference();
         }
-
+        
         $urlParts = explode('/', $completeUrl);
-
+        
         // The last element of the URL should be "execute"
         $execute = end($urlParts);
-        if (!in_array($execute, array('execute', 'agreement-execute'))) {
+        if (! in_array($execute, array(
+            'execute',
+            'agreement-execute'
+        ))) {
             return parent::getTransactionReference();
         }
-
+        
         // The penultimate element should be the transaction reference
         return prev($urlParts);
     }

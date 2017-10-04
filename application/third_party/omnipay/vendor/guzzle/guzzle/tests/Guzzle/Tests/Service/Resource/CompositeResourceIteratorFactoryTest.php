@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Service\Resource;
 
 use Guzzle\Service\Resource\CompositeResourceIteratorFactory;
@@ -11,6 +10,7 @@ use Guzzle\Tests\Service\Mock\Command\MockCommand;
  */
 class CompositeResourceIteratorFactoryTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Iterator was not found for mock_command
@@ -18,7 +18,10 @@ class CompositeResourceIteratorFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     public function testEnsuresIteratorClassExists()
     {
         $factory = new CompositeResourceIteratorFactory(array(
-            new ResourceIteratorClassFactory(array('Foo', 'Bar'))
+            new ResourceIteratorClassFactory(array(
+                'Foo',
+                'Bar'
+            ))
         ));
         $cmd = new MockCommand();
         $this->assertFalse($factory->canBuild($cmd));
@@ -31,7 +34,9 @@ class CompositeResourceIteratorFactoryTest extends \Guzzle\Tests\GuzzleTestCase
         $factory = new CompositeResourceIteratorFactory(array());
         $factory->addFactory($f1);
         $command = new MockCommand();
-        $iterator = $factory->build($command, array('client.namespace' => 'Guzzle\Tests\Service\Mock'));
+        $iterator = $factory->build($command, array(
+            'client.namespace' => 'Guzzle\Tests\Service\Mock'
+        ));
         $this->assertInstanceOf('Guzzle\Tests\Service\Mock\Model\MockCommandIterator', $iterator);
     }
 }

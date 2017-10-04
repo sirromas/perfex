@@ -1,12 +1,13 @@
 <?php
-
 namespace Omnipay\Stripe\Message;
 
 use Omnipay\Tests\TestCase;
 
 class FetchTokenRequestTest extends TestCase
 {
+
     /**
+     *
      * @var FetchTokenRequest
      */
     private $request;
@@ -26,7 +27,7 @@ class FetchTokenRequestTest extends TestCase
     {
         $this->setMockHttpResponse('FetchTokenSuccess.txt');
         $response = $this->request->send();
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertSame('tok_15Kuns2eZvKYlo2CDt9wRdzS', $response->getToken());
@@ -38,7 +39,7 @@ class FetchTokenRequestTest extends TestCase
     {
         $this->setMockHttpResponse('FetchTokenFailure.txt');
         $response = $this->request->send();
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getToken());

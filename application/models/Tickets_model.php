@@ -1,7 +1,9 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
 class Tickets_model extends CRM_Model
 {
+
     private $piping = false;
 
     public function __construct()
@@ -17,50 +19,50 @@ class Tickets_model extends CRM_Model
         $text = str_replace("Ý", "İ", $text);
         $text = str_replace("Ð", "Ğ", $text);
         $text = str_replace("Þ", "Ş", $text);
-
+        
         return $text;
     }
 
     public function insert_piped_ticket($data)
     {
-        $data = do_action('piped_ticket_data',$data);
-
+        $data = do_action('piped_ticket_data', $data);
+        
         $this->piping = true;
-        $attachments  = $data['attachments'];
-        $subject      = $this->_maybe_fix_pipe_encoding_chars($data['subject']);
+        $attachments = $data['attachments'];
+        $subject = $this->_maybe_fix_pipe_encoding_chars($data['subject']);
         // Prevent insert ticket to database if mail delivery error happen
         // This will stop createing a thousand tickets
         $system_blocked_subjects = array(
             'Mail delivery failed',
             'failure notice',
             'Returned mail: see transcript for details',
-            'Undelivered Mail Returned to Sender',
-            );
-
+            'Undelivered Mail Returned to Sender'
+        );
+        
         $subject_blocked = false;
-
+        
         foreach ($system_blocked_subjects as $sb) {
-            if (strpos('x'.$subject, $sb) !== false) {
+            if (strpos('x' . $subject, $sb) !== false) {
                 $subject_blocked = true;
                 break;
             }
         }
-
+        
         if ($subject_blocked == true) {
             return;
         }
-
-        $message      = $this->_maybe_fix_pipe_encoding_chars($data['body']);
-        $name         = $this->_maybe_fix_pipe_encoding_chars($data['fromname']);
-
-        $email        = $data['email'];
-        $to           = $data['to'];
-        $subject      = $subject;
-        $message      = $message;
-        $mailstatus   = false;
+        
+        $message = $this->_maybe_fix_pipe_encoding_chars($data['body']);
+        $name = $this->_maybe_fix_pipe_encoding_chars($data['fromname']);
+        
+        $email = $data['email'];
+        $to = $data['to'];
+        $subject = $subject;
+        $message = $message;
+        $mailstatus = false;
         $spam_filters = $this->db->get('tblticketsspamcontrol')->result_array();
         foreach ($spam_filters as $filter) {
-            $type  = $filter['type'];
+            $type = $filter['type'];
             $value = $filter['value'];
             if ($type == "sender") {
                 if (strtolower($value) == strtolower($email)) {
@@ -79,31 +81,30 @@ class Tickets_model extends CRM_Model
             }
         }
         // No spam found
-        if (!$mailstatus) {
+        if (! $mailstatus) {
             $pos = strpos($subject, "[Ticket ID: ");
-            if ($pos === false) {
-            } else {
+            if ($pos === false) {} else {
                 $tid = substr($subject, $pos + 12);
                 $tid = substr($tid, 0, strpos($tid, "]"));
                 $this->db->where('ticketid', $tid);
                 $data = $this->db->get('tbltickets')->row();
-                $tid  = $data->ticketid;
+                $tid = $data->ticketid;
             }
-            $to            = trim($to);
-            $toemails      = explode(",", $to);
+            $to = trim($to);
+            $toemails = explode(",", $to);
             $department_id = false;
-            $userid        = false;
+            $userid = false;
             foreach ($toemails as $toemail) {
-                if (!$department_id) {
+                if (! $department_id) {
                     $this->db->where('email', $toemail);
                     $data = $this->db->get('tbldepartments')->row();
                     if ($data) {
                         $department_id = $data->departmentid;
-                        $to            = $data->email;
+                        $to = $data->email;
                     }
                 }
             }
-            if (!$department_id) {
+            if (! $department_id) {
                 $mailstatus = "Department Not Found";
             } else {
                 if ($to == $email) {
@@ -115,11 +116,11 @@ class Tickets_model extends CRM_Model
                     $result = $this->db->get('tblstaff')->row();
                     if ($result) {
                         if ($tid) {
-                            $data            = array();
+                            $data = array();
                             $data['message'] = $message;
-                            $data['status']  = 1;
+                            $data['status'] = 1;
                             if ($userid == false) {
-                                $data['name']  = $name;
+                                $data['name'] = $name;
                                 $data['email'] = $email;
                             }
                             $reply_id = $this->add_reply($data, $tid, $result->staffid, $attachments);
@@ -133,14 +134,14 @@ class Tickets_model extends CRM_Model
                         $this->db->where('email', $email);
                         $result = $this->db->get('tblcontacts')->row();
                         if ($result) {
-                            $userid    = $result->userid;
+                            $userid = $result->userid;
                             $contactid = $result->id;
                         }
                         if ($userid == false && get_option('email_piping_only_registered') == '1') {
                             $mailstatus = "Unregistered Email Address";
                         } else {
                             $filterdate = date("YmdHis", mktime(date("H"), date("i") - 15, date("s"), date("m"), date("d"), date("Y")));
-                            $query      = 'SELECT count(*) as total FROM tbltickets WHERE date > "' . $filterdate . '" AND (email="' . $this->db->escape($email) . '"';
+                            $query = 'SELECT count(*) as total FROM tbltickets WHERE date > "' . $filterdate . '" AND (email="' . $this->db->escape($email) . '"';
                             if ($userid) {
                                 $query .= " OR userid=" . (int) $userid;
                             }
@@ -150,24 +151,24 @@ class Tickets_model extends CRM_Model
                                 $mailstatus = "Exceeded Limit of 10 Tickets within 15 Minutes";
                             } else {
                                 if (isset($tid)) {
-                                    $data            = array();
+                                    $data = array();
                                     $data['message'] = $message;
-                                    $data['status']  = 1;
+                                    $data['status'] = 1;
                                     if ($userid == false) {
-                                        $data['name']  = $name;
+                                        $data['name'] = $name;
                                         $data['email'] = $email;
                                     } else {
-                                        $data['userid']    = $userid;
+                                        $data['userid'] = $userid;
                                         $data['contactid'] = $contactid;
-
+                                        
                                         $this->db->where('userid', $userid);
                                         $this->db->where('ticketid', $tid);
                                         $t = $this->db->get('tbltickets')->row();
-                                        if (!$t) {
+                                        if (! $t) {
                                             $abuse = true;
                                         }
                                     }
-                                    if (!isset($abuse)) {
+                                    if (! isset($abuse)) {
                                         $reply_id = $this->add_reply($data, $tid, null, $attachments);
                                         if ($reply_id) {
                                             // Dont change this line
@@ -177,25 +178,25 @@ class Tickets_model extends CRM_Model
                                         $mailstatus = 'Ticket ID Not Found For User';
                                     }
                                 } else {
-                                    if (get_option('email_piping_only_registered') == 1 && !$userid) {
+                                    if (get_option('email_piping_only_registered') == 1 && ! $userid) {
                                         $mailstatus = "Blocked Ticket Opening from Unregistered User";
                                     } else {
                                         if (get_option('email_piping_only_replies') == '1') {
                                             $mailstatus = "Only Replies Allowed by Email";
                                         } else {
-                                            $data               = array();
+                                            $data = array();
                                             $data['department'] = $department_id;
-                                            $data['subject']    = $subject;
-                                            $data['message']    = $message;
-                                            $data['contactid']  = $contactid;
-                                            $data['priority']   = get_option('email_piping_default_priority');
+                                            $data['subject'] = $subject;
+                                            $data['message'] = $message;
+                                            $data['contactid'] = $contactid;
+                                            $data['priority'] = get_option('email_piping_default_priority');
                                             if ($userid == false) {
-                                                $data['name']  = $name;
+                                                $data['name'] = $name;
                                                 $data['email'] = $email;
                                             } else {
                                                 $data['userid'] = $userid;
                                             }
-                                            $tid        = $this->add($data, null, $attachments);
+                                            $tid = $this->add($data, null, $attachments);
                                             // Dont change this line
                                             $mailstatus = "Ticket Imported Successfully";
                                         }
@@ -219,36 +220,36 @@ class Tickets_model extends CRM_Model
             'message' => $message,
             'status' => $mailstatus
         ));
-
+        
         return $mailstatus;
     }
 
     private function process_pipe_attachments($attachments, $ticket_id, $reply_id = '')
     {
-        if (!empty($attachments)) {
+        if (! empty($attachments)) {
             $ticket_attachments = array();
             $allowed_extensions = explode(',', get_option('ticket_attachments_file_extensions'));
-
-            $path = FCPATH .'uploads/ticket_attachments' . '/' . $ticket_id . '/';
-
+            
+            $path = FCPATH . 'uploads/ticket_attachments' . '/' . $ticket_id . '/';
+            
             foreach ($attachments as $attachment) {
-                $filename      = $attachment["filename"];
+                $filename = $attachment["filename"];
                 $filenameparts = explode(".", $filename);
-                $extension     = end($filenameparts);
-                $extension     = strtolower($extension);
+                $extension = end($filenameparts);
+                $extension = strtolower($extension);
                 if (in_array('.' . $extension, $allowed_extensions)) {
                     $filename = implode(array_slice($filenameparts, 0, 0 - 1));
                     $filename = trim(preg_replace("/[^a-zA-Z0-9-_ ]/", "", $filename));
-                    if (!$filename) {
+                    if (! $filename) {
                         $filename = "attachment";
                     }
-                    if (!file_exists($path)) {
+                    if (! file_exists($path)) {
                         mkdir($path);
                         $fp = fopen($path . 'index.html', 'w');
                         fclose($fp);
                     }
                     $filename = unique_filename($path, $filename . "." . $extension);
-                    $fp       = fopen($path . $filename, "w");
+                    $fp = fopen($path . $filename, "w");
                     fwrite($fp, $attachment["data"]);
                     fclose($fp);
                     array_push($ticket_attachments, array(
@@ -274,18 +275,21 @@ class Tickets_model extends CRM_Model
         $this->db->where($where);
         if (is_numeric($id)) {
             $this->db->where('tbltickets.ticketid', $id);
-
+            
             return $this->db->get('tbltickets')->row();
         }
         $this->db->order_by('lastreply', 'asc');
-
+        
         return $this->db->get('tbltickets')->result_array();
     }
 
     /**
      * Get ticket by id and all data
-     * @param  mixed  $id     ticket id
-     * @param  mixed $userid Optional - Tickets from USER ID
+     * 
+     * @param mixed $id
+     *            ticket id
+     * @param mixed $userid
+     *            Optional - Tickets from USER ID
      * @return object
      */
     public function get_ticket_by_id($id, $userid = '')
@@ -319,24 +323,26 @@ class Tickets_model extends CRM_Model
                 }
                 $ticket->opened_by = $ticket->staff_firstname . ' ' . $ticket->staff_lastname;
             }
-
+            
             $ticket->attachments = $this->get_ticket_attachments($id);
         }
-
-
+        
         return $ticket;
     }
 
     /**
      * Insert ticket attachments to database
-     * @param  array  $attachments array of attachment
-     * @param  mixed  $ticketid
-     * @param  boolean $replyid If is from reply
+     * 
+     * @param array $attachments
+     *            array of attachment
+     * @param mixed $ticketid            
+     * @param boolean $replyid
+     *            If is from reply
      */
     public function insert_ticket_attachments_to_database($attachments, $ticketid, $replyid = false)
     {
         foreach ($attachments as $attachment) {
-            $attachment['ticketid']  = $ticketid;
+            $attachment['ticketid'] = $ticketid;
             $attachment['dateadded'] = date('Y-m-d H:i:s');
             if ($replyid !== false && is_int($replyid)) {
                 $attachment['replyid'] = $replyid;
@@ -347,8 +353,11 @@ class Tickets_model extends CRM_Model
 
     /**
      * Get ticket attachments from database
-     * @param  mixed $id      ticket id
-     * @param  mixed $replyid Optional - reply id if is from from reply
+     * 
+     * @param mixed $id
+     *            ticket id
+     * @param mixed $replyid
+     *            Optional - reply id if is from from reply
      * @return array
      */
     public function get_ticket_attachments($id, $replyid = '')
@@ -360,15 +369,19 @@ class Tickets_model extends CRM_Model
             $this->db->where('replyid', null);
         }
         $this->db->where('ticketid', $id);
-
+        
         return $this->db->get('tblticketattachments')->result_array();
     }
 
     /**
      * Add new reply to ticket
-     * @param mixed $data  reply $_POST data
-     * @param mixed $id    ticket id
-     * @param boolean $admin staff id if is staff making reply
+     * 
+     * @param mixed $data
+     *            reply $_POST data
+     * @param mixed $id
+     *            ticket id
+     * @param boolean $admin
+     *            staff id if is staff making reply
      */
     public function add_reply($data, $id, $admin = null, $pipe_attachments = false)
     {
@@ -397,35 +410,35 @@ class Tickets_model extends CRM_Model
         }
         if ($admin !== null) {
             $data['admin'] = $admin;
-            $status        = $data['status'];
+            $status = $data['status'];
         } else {
             $status = 1;
         }
         if (isset($data['status'])) {
             unset($data['status']);
         }
-
+        
         $cc = '';
         if (isset($data['cc'])) {
             $cc = $data['cc'];
             unset($data['cc']);
         }
-
+        
         $data['ticketid'] = $id;
-        $data['date']     = date('Y-m-d H:i:s');
-        $data['ip']       = $this->input->ip_address();
-        $data['message']  = trim($data['message']);
-
+        $data['date'] = date('Y-m-d H:i:s');
+        $data['ip'] = $this->input->ip_address();
+        $data['message'] = trim($data['message']);
+        
         if ($this->piping == true) {
             $data['message'] = preg_replace('/\v+/u', '<br>', $data['message']);
         }
-
+        
         // adminn can have html
         if ($admin == null) {
             $data['message'] = _strip_tags($data['message']);
             $data['message'] = nl2br_save_html($data['message']);
         }
-        if (!isset($data['userid'])) {
+        if (! isset($data['userid'])) {
             $data['userid'] = 0;
         }
         if (is_client_logged_in()) {
@@ -436,7 +449,7 @@ class Tickets_model extends CRM_Model
             'id' => $id,
             'admin' => $admin
         ));
-        $data  = $_data['data'];
+        $data = $_data['data'];
         $this->db->insert('tblticketreplies', $data);
         $insert_id = $this->db->insert_id();
         if ($insert_id) {
@@ -454,15 +467,15 @@ class Tickets_model extends CRM_Model
                     $this->tickets_model->insert_ticket_attachments_to_database($attachments, $id, $insert_id);
                 }
             }
-
+            
             $_attachments = $this->get_ticket_attachments($id, $insert_id);
-
+            
             logActivity('New Ticket Reply [ReplyID: ' . $insert_id . ']');
-
+            
             $this->db->select('status');
             $this->db->where('ticketid', $id);
             $old_ticket_status = $this->db->get('tbltickets')->row()->status;
-
+            
             $this->db->where('ticketid', $id);
             $this->db->update('tbltickets', array(
                 'lastreply' => date('Y-m-d H:i:s'),
@@ -470,14 +483,14 @@ class Tickets_model extends CRM_Model
                 'adminread' => 0,
                 'clientread' => 0
             ));
-
+            
             if ($old_ticket_status != $status) {
                 do_action('after_ticket_status_changed', array(
                     'id' => $id,
                     'status' => $status
                 ));
             }
-
+            
             $this->load->model('emails_model');
             $ticket = $this->get_ticket_by_id($id);
             $userid = $ticket->userid;
@@ -491,11 +504,10 @@ class Tickets_model extends CRM_Model
                 $this->load->model('staff_model');
                 $staff = $this->staff_model->get('', 1);
                 foreach ($staff as $member) {
-                    if (get_option('access_tickets_to_none_staff_members') == 0 && !is_staff_member($member['staffid'])) {
+                    if (get_option('access_tickets_to_none_staff_members') == 0 && ! is_staff_member($member['staffid'])) {
                         continue;
                     }
-
-
+                    
                     $staff_departments = $this->departments_model->get_staff_departments($member['staffid'], true);
                     if (in_array($ticket->department, $staff_departments)) {
                         foreach ($_attachments as $at) {
@@ -506,7 +518,7 @@ class Tickets_model extends CRM_Model
                                 'read' => true
                             ));
                         }
-
+                        
                         $merge_fields = array();
                         $merge_fields = array_merge($merge_fields, get_client_contact_merge_fields($ticket->userid, $ticket->contactid));
                         $merge_fields = array_merge($merge_fields, get_ticket_merge_fields('ticket-reply-to-admin', $id));
@@ -517,7 +529,7 @@ class Tickets_model extends CRM_Model
                 $merge_fields = array();
                 $merge_fields = array_merge($merge_fields, get_client_contact_merge_fields($ticket->userid, $ticket->contactid));
                 $merge_fields = array_merge($merge_fields, get_ticket_merge_fields('ticket-reply', $id));
-
+                
                 foreach ($_attachments as $at) {
                     $this->emails_model->add_attachment(array(
                         'attachment' => get_upload_path_by_type('ticket') . $id . '/' . $at['file_name'],
@@ -526,7 +538,7 @@ class Tickets_model extends CRM_Model
                         'read' => true
                     ));
                 }
-
+                
                 $this->emails_model->send_email_template('ticket-reply', $email, $merge_fields, $id, $cc);
             }
             do_action('after_ticket_reply_added', array(
@@ -535,18 +547,21 @@ class Tickets_model extends CRM_Model
                 'admin' => $admin,
                 'replyid' => $insert_id
             ));
-
+            
             return $insert_id;
         }
-
+        
         return false;
     }
 
     /**
-     *  Delete ticket reply
-     * @param   mixed $ticket_id    ticket id
-     * @param   mixed $reply_id     reply id
-     * @return  boolean
+     * Delete ticket reply
+     * 
+     * @param mixed $ticket_id
+     *            ticket id
+     * @param mixed $reply_id
+     *            reply id
+     * @return boolean
      */
     public function delete_ticket_reply($ticket_id, $reply_id)
     {
@@ -568,17 +583,20 @@ class Tickets_model extends CRM_Model
                     delete_dir(get_upload_path_by_type('ticket') . $ticket_id);
                 }
             }
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * This functions is used when staff open client ticket
-     * @param  mixed $userid client id
-     * @param  mixed $id     ticketid
+     * 
+     * @param mixed $userid
+     *            client id
+     * @param mixed $id
+     *            ticketid
      * @return array
      */
     public function get_user_other_tickets($userid, $id)
@@ -593,27 +611,30 @@ class Tickets_model extends CRM_Model
         $this->db->where('tbltickets.userid', $userid);
         $this->db->where('tbltickets.ticketid !=', $id);
         $tickets = $this->db->get()->result_array();
-        $i       = 0;
+        $i = 0;
         foreach ($tickets as $ticket) {
             $tickets[$i]['submitter'] = $ticket['firstname'] . ' ' . $ticket['lastname'];
             unset($ticket['firstname']);
             unset($ticket['lastname']);
-            $i++;
+            $i ++;
         }
-
+        
         return $tickets;
     }
 
     /**
      * Get all ticket replies
-     * @param  mixed  $id     ticketid
-     * @param  mixed $userid specific client id
+     * 
+     * @param mixed $id
+     *            ticketid
+     * @param mixed $userid
+     *            specific client id
      * @return array
      */
     public function get_ticket_replies($id)
     {
         $ticket_replies_order = do_action('ticket_replies_order', 'ASC');
-
+        
         $this->db->select('tblticketreplies.id,tblticketreplies.ip,tblticketreplies.name as from_name,tblticketreplies.email as reply_email, tblticketreplies.admin, tblticketreplies.userid,tblstaff.firstname as staff_firstname,.tblstaff.lastname as staff_lastname,tblcontacts.firstname as user_firstname,.tblcontacts.lastname as user_lastname,message,date,contactid');
         $this->db->from('tblticketreplies');
         $this->db->join('tblclients', 'tblclients.userid = tblticketreplies.userid', 'left');
@@ -622,7 +643,7 @@ class Tickets_model extends CRM_Model
         $this->db->where('ticketid', $id);
         $this->db->order_by('date', $ticket_replies_order);
         $replies = $this->db->get()->result_array();
-        $i       = 0;
+        $i = 0;
         foreach ($replies as $reply) {
             if ($reply['admin'] !== null || $reply['admin'] != 0) {
                 // staff reply
@@ -639,16 +660,19 @@ class Tickets_model extends CRM_Model
             unset($replies[$i]['user_firstname']);
             unset($replies[$i]['user_lastname']);
             $replies[$i]['attachments'] = $this->get_ticket_attachments($id, $reply['id']);
-            $i++;
+            $i ++;
         }
-
+        
         return $replies;
     }
 
     /**
      * Add new ticket to database
-     * @param mixed $data  ticket $_POST data
-     * @param mixed $admin If admin adding the ticket passed staff id
+     * 
+     * @param mixed $data
+     *            ticket $_POST data
+     * @param mixed $admin
+     *            If admin adding the ticket passed staff id
      */
     public function add($data, $admin = null, $pipe_attachments = false)
     {
@@ -659,42 +683,41 @@ class Tickets_model extends CRM_Model
         if (isset($data['assigned']) && $data['assigned'] == '') {
             $data['assigned'] = 0;
         }
-
+        
         if (isset($data['project_id']) && $data['project_id'] == '') {
             $data['project_id'] = 0;
         }
         if ($admin == null) {
             if (isset($data['email'])) {
-                $data['userid']    = 0;
+                $data['userid'] = 0;
                 $data['contactid'] = 0;
             } else {
                 // Opened from customer portal otherwise is passed from pipe or admin area
-                if (!isset($data['userid']) && !isset($data['contactid'])) {
-                    $data['userid']    = get_client_user_id();
+                if (! isset($data['userid']) && ! isset($data['contactid'])) {
+                    $data['userid'] = get_client_user_id();
                     $data['contactid'] = get_contact_user_id();
                 }
             }
             $data['status'] = 1;
         }
-
-
+        
         if (isset($data['custom_fields'])) {
             $custom_fields = $data['custom_fields'];
             unset($data['custom_fields']);
         }
-
+        
         // CC is only from admin area
         $cc = '';
         if (isset($data['cc'])) {
             $cc = $data['cc'];
             unset($data['cc']);
         }
-
-        $data['date']      = date('Y-m-d H:i:s');
+        
+        $data['date'] = date('Y-m-d H:i:s');
         $data['ticketkey'] = md5(uniqid(time(), true));
-        $data['status']    = 1;
-        $data['message']   = trim($data['message']);
-        $data['subject']   = trim($data['subject']);
+        $data['status'] = 1;
+        $data['message'] = trim($data['message']);
+        $data['subject'] = trim($data['subject']);
         if ($this->piping == true) {
             $data['message'] = preg_replace('/\v+/u', '<br>', $data['message']);
         }
@@ -704,26 +727,25 @@ class Tickets_model extends CRM_Model
             $data['subject'] = _strip_tags($data['subject']);
             $data['message'] = nl2br_save_html($data['message']);
         }
-        if (!isset($data['userid'])) {
+        if (! isset($data['userid'])) {
             $data['userid'] = 0;
         }
-        if (isset($data['priority']) && $data['priority'] == '' || !isset($data['priority'])) {
+        if (isset($data['priority']) && $data['priority'] == '' || ! isset($data['priority'])) {
             $data['priority'] = 0;
         }
-
-
+        
         $tags = '';
         if (isset($data['tags'])) {
-            $tags  = $data['tags'];
+            $tags = $data['tags'];
             unset($data['tags']);
         }
-
+        
         $data['ip'] = $this->input->ip_address();
-        $_data      = do_action('before_ticket_created', array(
+        $_data = do_action('before_ticket_created', array(
             'data' => $data,
             'admin' => $admin
         ));
-        $data       = $_data['data'];
+        $data = $_data['data'];
         $this->db->insert('tbltickets', $data);
         $ticketid = $this->db->insert_id();
         if ($ticketid) {
@@ -731,7 +753,7 @@ class Tickets_model extends CRM_Model
             if (isset($custom_fields)) {
                 handle_custom_fields_post($ticketid, $custom_fields);
             }
-
+            
             $this->load->model('emails_model');
             if (isset($data['assigned']) && $data['assigned'] != 0) {
                 if ($data['assigned'] != get_staff_user_id()) {
@@ -745,17 +767,19 @@ class Tickets_model extends CRM_Model
                             $data['subject']
                         ))
                     ));
-
+                    
                     $merge_fields = array();
                     $merge_fields = array_merge($merge_fields, get_client_contact_merge_fields($data['userid'], $data['contactid']));
                     $merge_fields = array_merge($merge_fields, get_ticket_merge_fields('ticket-assigned-to-admin', $ticketid));
-
+                    
                     $this->db->where('staffid', $data['assigned']);
                     $assignedEmail = $this->db->get('tblstaff')->row()->email;
                     $this->emails_model->send_email_template('ticket-assigned-to-admin', $assignedEmail, $merge_fields, $ticketid);
-
+                    
                     if ($notified) {
-                        pusher_trigger_notification(array($data['assigned']));
+                        pusher_trigger_notification(array(
+                            $data['assigned']
+                        ));
                     }
                 }
             }
@@ -767,31 +791,30 @@ class Tickets_model extends CRM_Model
                     $this->insert_ticket_attachments_to_database($attachments, $ticketid);
                 }
             }
-
+            
             $_attachments = $this->get_ticket_attachments($ticketid);
-
-
+            
             if (isset($data['userid']) && $data['userid'] != false) {
                 $email = $this->clients_model->get_contact($data['contactid'])->email;
             } else {
                 $email = $data['email'];
             }
-
+            
             $template = 'new-ticket-opened-admin';
             if ($admin == null) {
                 $template = 'ticket-autoresponse';
-
+                
                 $this->load->model('departments_model');
                 $this->load->model('staff_model');
                 $staff = $this->staff_model->get('', 1);
-
+                
                 $notifiedUsers = array();
                 $merge_fields = array();
                 $merge_fields = array_merge($merge_fields, get_client_contact_merge_fields($data['userid'], $data['contactid']));
                 $merge_fields = array_merge($merge_fields, get_ticket_merge_fields('new-ticket-created-staff', $ticketid));
-
+                
                 foreach ($staff as $member) {
-                    if (get_option('access_tickets_to_none_staff_members') == 0 && !is_staff_member($member['staffid'])) {
+                    if (get_option('access_tickets_to_none_staff_members') == 0 && ! is_staff_member($member['staffid'])) {
                         continue;
                     }
                     $staff_departments = $this->departments_model->get_staff_departments($member['staffid'], true);
@@ -804,20 +827,20 @@ class Tickets_model extends CRM_Model
                                 'read' => true
                             ));
                         }
-
+                        
                         $this->emails_model->send_email_template('new-ticket-created-staff', $member['email'], $merge_fields, $ticketid);
-
+                        
                         if (get_option('receive_notification_on_new_ticket') == 1) {
                             $notified = add_notification(array(
-                                    'description' => 'not_new_ticket_created',
-                                    'touserid' => $member['staffid'],
-                                    'fromcompany' => 1,
-                                    'fromuserid' => null,
-                                    'link' => 'tickets/ticket/' . $ticketid,
-                                    'additional_data' => serialize(array(
-                                        $data['subject']
-                                    ))
-                                ));
+                                'description' => 'not_new_ticket_created',
+                                'touserid' => $member['staffid'],
+                                'fromcompany' => 1,
+                                'fromuserid' => null,
+                                'link' => 'tickets/ticket/' . $ticketid,
+                                'additional_data' => serialize(array(
+                                    $data['subject']
+                                ))
+                            ));
                             if ($notified) {
                                 array_push($notifiedUsers, $member['staffid']);
                             }
@@ -826,7 +849,7 @@ class Tickets_model extends CRM_Model
                 }
                 pusher_trigger_notification($notifiedUsers);
             }
-
+            
             if ($admin != null) {
                 // Admin opened ticket from admin area add the attachments to the email
                 foreach ($_attachments as $at) {
@@ -838,26 +861,29 @@ class Tickets_model extends CRM_Model
                     ));
                 }
             }
-
+            
             $merge_fields = array();
             $merge_fields = array_merge($merge_fields, get_client_contact_merge_fields($data['userid'], $data['contactid']));
             $merge_fields = array_merge($merge_fields, get_ticket_merge_fields($template, $ticketid));
-
+            
             $this->emails_model->send_email_template($template, $email, $merge_fields, $ticketid, $cc);
-
+            
             do_action('after_ticket_added', $ticketid);
             logActivity('New Ticket Created [ID: ' . $ticketid . ']');
-
+            
             return $ticketid;
         }
-
+        
         return false;
     }
 
     /**
      * Get latest 5 client tickets
-     * @param  integer $limit  Optional limit tickets
-     * @param  mixed $userid client id
+     * 
+     * @param integer $limit
+     *            Optional limit tickets
+     * @param mixed $userid
+     *            client id
      * @return array
      */
     public function get_client_latests_ticket($limit = 5, $userid = '')
@@ -871,13 +897,15 @@ class Tickets_model extends CRM_Model
             $this->db->where('tbltickets.userid', get_client_user_id());
         }
         $this->db->limit($limit);
-
+        
         return $this->db->get()->result_array();
     }
 
     /**
      * Delete ticket from database and all connections
-     * @param  mixed $ticketid ticketid
+     * 
+     * @param mixed $ticketid
+     *            ticketid
      * @return boolean
      */
     public function delete($ticketid)
@@ -888,10 +916,10 @@ class Tickets_model extends CRM_Model
         $this->db->where('ticketid', $ticketid);
         $this->db->delete('tbltickets');
         if ($this->db->affected_rows() > 0) {
-            $affectedRows++;
+            $affectedRows ++;
         }
         if ($this->db->affected_rows() > 0) {
-            $affectedRows++;
+            $affectedRows ++;
             $this->db->where('ticketid', $ticketid);
             $attachments = $this->db->get('tblticketattachments')->result_array();
             if (count($attachments) > 0) {
@@ -901,29 +929,29 @@ class Tickets_model extends CRM_Model
                             $this->db->where('id', $attachment['id']);
                             $this->db->delete('tblticketattachments');
                             if ($this->db->affected_rows() > 0) {
-                                $affectedRows++;
+                                $affectedRows ++;
                             }
                         }
                     }
                 }
             }
-
+            
             $this->db->where('relid', $ticketid);
             $this->db->where('fieldto', 'tickets');
             $this->db->delete('tblcustomfieldsvalues');
-
+            
             // Delete replies
             $this->db->where('ticketid', $ticketid);
             $this->db->delete('tblticketreplies');
-
+            
             $this->db->where('rel_id', $ticketid);
             $this->db->where('rel_type', 'ticket');
             $this->db->delete('tblnotes');
-
+            
             $this->db->where('rel_id', $ticketid);
             $this->db->where('rel_type', 'ticket');
             $this->db->delete('tbltags_in');
-
+            
             // Get related tasks
             $this->db->where('rel_type', 'ticket');
             $this->db->where('rel_id', $ticketid);
@@ -934,68 +962,69 @@ class Tickets_model extends CRM_Model
         }
         if ($affectedRows > 0) {
             logActivity('Ticket Deleted [ID: ' . $ticketid . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * Update ticket data / admin use
-     * @param  mixed $data ticket $_POST data
+     * 
+     * @param mixed $data
+     *            ticket $_POST data
      * @return boolean
      */
     public function update_single_ticket_settings($data)
     {
         $affectedRows = 0;
-        $data         = do_action('before_ticket_settings_updated', $data);
-
+        $data = do_action('before_ticket_settings_updated', $data);
+        
         $ticketBeforeUpdate = $this->get_ticket_by_id($data['ticketid']);
-
+        
         if (isset($data['custom_fields']) && count($data['custom_fields']) > 0) {
             if (handle_custom_fields_post($data['ticketid'], $data['custom_fields'])) {
-                $affectedRows++;
+                $affectedRows ++;
             }
             unset($data['custom_fields']);
         }
-
+        
         $tags = '';
         if (isset($data['tags'])) {
             $tags = $data['tags'];
             unset($data['tags']);
         }
-
+        
         if (handle_tags_save($tags, $data['ticketid'], 'ticket')) {
-            $affectedRows++;
+            $affectedRows ++;
         }
-
-        if (isset($data['priority']) && $data['priority'] == '' || !isset($data['priority'])) {
+        
+        if (isset($data['priority']) && $data['priority'] == '' || ! isset($data['priority'])) {
             $data['priority'] = 0;
         }
-
+        
         if ($data['assigned'] == '') {
             $data['assigned'] = 0;
         }
-
+        
         if (isset($data['project_id']) && $data['project_id'] == '') {
             $data['project_id'] = 0;
         }
-
+        
         $this->db->where('ticketid', $data['ticketid']);
         $this->db->update('tbltickets', $data);
         if ($this->db->affected_rows() > 0) {
-            do_action('ticket_settings_updated',
-            array(
-                'ticket_id'=>$data['ticketid'],
-                'original_ticket'=>$ticketBeforeUpdate,
-                'data'=>$data)
-            );
-            $affectedRows++;
+            do_action('ticket_settings_updated', array(
+                'ticket_id' => $data['ticketid'],
+                'original_ticket' => $ticketBeforeUpdate,
+                'data' => $data
+            ));
+            $affectedRows ++;
         }
-
+        
         $sendAssignedEmail = false;
-
+        
         $current_assigned = $ticketBeforeUpdate->assigned;
         if ($current_assigned != 0) {
             if ($current_assigned != $data['assigned']) {
@@ -1012,7 +1041,9 @@ class Tickets_model extends CRM_Model
                         ))
                     ));
                     if ($notified) {
-                        pusher_trigger_notification(array($data['assigned']));
+                        pusher_trigger_notification(array(
+                            $data['assigned']
+                        ));
                     }
                 }
             }
@@ -1029,36 +1060,41 @@ class Tickets_model extends CRM_Model
                         $data['subject']
                     ))
                 ));
-
+                
                 if ($notified) {
-                    pusher_trigger_notification(array($data['assigned']));
+                    pusher_trigger_notification(array(
+                        $data['assigned']
+                    ));
                 }
             }
         }
         if ($sendAssignedEmail === true) {
             $this->load->model('emails_model');
             $merge_fields = array();
-
+            
             $merge_fields = array_merge($merge_fields, get_client_contact_merge_fields($data['userid'], $data['contactid']));
             $merge_fields = array_merge($merge_fields, get_ticket_merge_fields('ticket-assigned-to-admin', $data['ticketid']));
-
+            
             $this->db->where('staffid', $data['assigned']);
             $assignedEmail = $this->db->get('tblstaff')->row()->email;
             $this->emails_model->send_email_template('ticket-assigned-to-admin', $assignedEmail, $merge_fields, $data['ticketid']);
         }
         if ($affectedRows > 0) {
             logActivity('Ticket Updated [ID: ' . $data['ticketid'] . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * C<ha></ha>nge ticket status
-     * @param  mixed $id     ticketid
-     * @param  mixed $status status id
+     * 
+     * @param mixed $id
+     *            ticketid
+     * @param mixed $status
+     *            status id
      * @return array
      */
     public function change_ticket_status($id, $status)
@@ -1067,44 +1103,48 @@ class Tickets_model extends CRM_Model
         $this->db->update('tbltickets', array(
             'status' => $status
         ));
-        $alert   = 'warning';
+        $alert = 'warning';
         $message = _l('ticket_status_changed_fail');
         if ($this->db->affected_rows() > 0) {
-            $alert   = 'success';
+            $alert = 'success';
             $message = _l('ticket_status_changed_successfully');
             do_action('after_ticket_status_changed', array(
                 'id' => $id,
                 'status' => $status
             ));
         }
-
+        
         return array(
             'alert' => $alert,
             'message' => $message
         );
     }
-
+    
     // Priorities
-
+    
     /**
      * Get ticket priority by id
-     * @param  mixed $id priority id
-     * @return mixed     if id passed return object else array
+     * 
+     * @param mixed $id
+     *            priority id
+     * @return mixed if id passed return object else array
      */
     public function get_priority($id = '')
     {
         if (is_numeric($id)) {
             $this->db->where('priorityid', $id);
-
+            
             return $this->db->get('tblpriorities')->row();
         }
-
+        
         return $this->db->get('tblpriorities')->result_array();
     }
 
     /**
      * Add new ticket priority
-     * @param array $data ticket priority data
+     * 
+     * @param array $data
+     *            ticket priority data
      */
     public function add_priority($data)
     {
@@ -1113,14 +1153,17 @@ class Tickets_model extends CRM_Model
         if ($insert_id) {
             logActivity('New Ticket Priority Added [ID: ' . $insert_id . ', Name: ' . $data['name'] . ']');
         }
-
+        
         return $insert_id;
     }
 
     /**
      * Update ticket priority
-     * @param  array $data ticket priority $_POST data
-     * @param  mixed $id   ticket priority id
+     * 
+     * @param array $data
+     *            ticket priority $_POST data
+     * @param mixed $id
+     *            ticket priority id
      * @return boolean
      */
     public function update_priority($data, $id)
@@ -1129,16 +1172,18 @@ class Tickets_model extends CRM_Model
         $this->db->update('tblpriorities', $data);
         if ($this->db->affected_rows() > 0) {
             logActivity('Ticket Priority Updated [ID: ' . $id . ' Name: ' . $data['name'] . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * Delete ticket priorit
-     * @param  mixed $id ticket priority id
+     * 
+     * @param mixed $id
+     *            ticket priority id
      * @return mixed
      */
     public function delete_priority($id)
@@ -1157,48 +1202,55 @@ class Tickets_model extends CRM_Model
                 update_option('email_piping_default_priority', '');
             }
             logActivity('Ticket Priority Deleted [ID: ' . $id . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
-
+    
     // Predefined replies
-
+    
     /**
-     * Get predefined reply  by id
-     * @param  mixed $id predefined reply id
+     * Get predefined reply by id
+     * 
+     * @param mixed $id
+     *            predefined reply id
      * @return mixed if id passed return object else array
      */
     public function get_predefined_reply($id = '')
     {
         if (is_numeric($id)) {
             $this->db->where('id', $id);
-
+            
             return $this->db->get('tblpredefinedreplies')->row();
         }
-
+        
         return $this->db->get('tblpredefinedreplies')->result_array();
     }
 
     /**
      * Add new predefined reply
-     * @param array $data predefined reply $_POST data
+     * 
+     * @param array $data
+     *            predefined reply $_POST data
      */
     public function add_predefined_reply($data)
     {
         $this->db->insert('tblpredefinedreplies', $data);
         $insertid = $this->db->insert_id();
         logActivity('New Predefined Reply Added [ID: ' . $insertid . ', ' . $data['name'] . ']');
-
+        
         return $insertid;
     }
 
     /**
      * Update predefined reply
-     * @param  array $data predefined $_POST data
-     * @param  mixed $id   predefined reply id
+     * 
+     * @param array $data
+     *            predefined $_POST data
+     * @param mixed $id
+     *            predefined reply id
      * @return boolean
      */
     public function update_predefined_reply($data, $id)
@@ -1207,16 +1259,18 @@ class Tickets_model extends CRM_Model
         $this->db->update('tblpredefinedreplies', $data);
         if ($this->db->affected_rows() > 0) {
             logActivity('Predefined Reply Updated [ID: ' . $id . ', ' . $data['name'] . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * Delete predefined reply
-     * @param  mixed $id predefined reply id
+     * 
+     * @param mixed $id
+     *            predefined reply id
      * @return boolean
      */
     public function delete_predefined_reply($id)
@@ -1225,35 +1279,39 @@ class Tickets_model extends CRM_Model
         $this->db->delete('tblpredefinedreplies');
         if ($this->db->affected_rows() > 0) {
             logActivity('Predefined Reply Deleted [' . $id . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
-
+    
     // Ticket statuses
-
+    
     /**
      * Get ticket status by id
-     * @param  mixed $id status id
-     * @return mixed     if id passed return object else array
+     * 
+     * @param mixed $id
+     *            status id
+     * @return mixed if id passed return object else array
      */
     public function get_ticket_status($id = '')
     {
         if (is_numeric($id)) {
             $this->db->where('ticketstatusid', $id);
-
+            
             return $this->db->get('tblticketstatus')->row();
         }
         $this->db->order_by('statusorder', 'asc');
-
+        
         return $this->db->get('tblticketstatus')->result_array();
     }
 
     /**
      * Add new ticket status
-     * @param array ticket status $_POST data
+     * 
+     * @param
+     *            array ticket status $_POST data
      * @return mixed
      */
     public function add_ticket_status($data)
@@ -1262,17 +1320,20 @@ class Tickets_model extends CRM_Model
         $insert_id = $this->db->insert_id();
         if ($insert_id) {
             logActivity('New Ticket Status Added [ID: ' . $insert_id . ', ' . $data['name'] . ']');
-
+            
             return $insert_id;
         }
-
+        
         return false;
     }
 
     /**
      * Update ticket status
-     * @param  array $data ticket status $_POST data
-     * @param  mixed $id   ticket status id
+     * 
+     * @param array $data
+     *            ticket status $_POST data
+     * @param mixed $id
+     *            ticket status id
      * @return boolean
      */
     public function update_ticket_status($data, $id)
@@ -1281,16 +1342,18 @@ class Tickets_model extends CRM_Model
         $this->db->update('tblticketstatus', $data);
         if ($this->db->affected_rows() > 0) {
             logActivity('Ticket Status Updated [ID: ' . $id . ' Name: ' . $data['name'] . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * Delete ticket status
-     * @param  mixed $id ticket status id
+     * 
+     * @param mixed $id
+     *            ticket status id
      * @return mixed
      */
     public function delete_ticket_status($id)
@@ -1311,23 +1374,23 @@ class Tickets_model extends CRM_Model
         $this->db->delete('tblticketstatus');
         if ($this->db->affected_rows() > 0) {
             logActivity('Ticket Status Deleted [ID: ' . $id . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
-
+    
     // Ticket services
     public function get_service($id = '')
     {
         if (is_numeric($id)) {
             $this->db->where('serviceid', $id);
-
+            
             return $this->db->get('tblservices')->row();
         }
         $this->db->order_by('serviceid', 'asc');
-
+        
         return $this->db->get('tblservices')->result_array();
     }
 
@@ -1338,7 +1401,7 @@ class Tickets_model extends CRM_Model
         if ($insert_id) {
             logActivity('New Ticket Service Added [ID: ' . $insert_id . '.' . $data['name'] . ']');
         }
-
+        
         return $insert_id;
     }
 
@@ -1348,10 +1411,10 @@ class Tickets_model extends CRM_Model
         $this->db->update('tblservices', $data);
         if ($this->db->affected_rows() > 0) {
             logActivity('Ticket Service Updated [ID: ' . $id . ' Name: ' . $data['name'] . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
 
@@ -1366,22 +1429,22 @@ class Tickets_model extends CRM_Model
         $this->db->delete('tblservices');
         if ($this->db->affected_rows() > 0) {
             logActivity('Ticket Service Deleted [ID: ' . $id . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
-     * @return array
-     * Used in home dashboard page
-     * Displays weekly ticket openings statistics (chart)
+     *
+     * @return array Used in home dashboard page
+     *         Displays weekly ticket openings statistics (chart)
      */
     public function get_weekly_tickets_opening_statistics()
     {
         $departments_ids = array();
-        if (!is_admin()) {
+        if (! is_admin()) {
             if (get_option('staff_access_only_assigned_departments') == 1) {
                 $this->load->model('departments_model');
                 $staff_deparments_ids = $this->departments_model->get_staff_departments(get_staff_user_id(), true);
@@ -1396,10 +1459,8 @@ class Tickets_model extends CRM_Model
                 }
             }
         }
-
-
-
-        $chart   = array(
+        
+        $chart = array(
             'labels' => get_weekdays(),
             'datasets' => array(
                 array(
@@ -1420,23 +1481,23 @@ class Tickets_model extends CRM_Model
                 )
             )
         );
-
+        
         $monday = new DateTime(date('Y-m-d', strtotime('monday this week')));
         $sunday = new DateTime(date('Y-m-d', strtotime('sunday this week')));
-
+        
         $thisWeekDays = get_weekdays_between_dates($monday, $sunday);
-
+        
         $byDepartments = count($departments_ids) > 0;
         if (isset($thisWeekDays[1])) {
             $i = 0;
             foreach ($thisWeekDays[1] as $weekDate) {
                 $this->db->like('DATE(date)', $weekDate, 'after');
                 if ($byDepartments) {
-                    $this->db->where('department IN (SELECT departmentid FROM tblstaffdepartments WHERE departmentid IN (' . implode(',', $departments_ids) . ') AND staffid="'.get_staff_user_id().'")');
+                    $this->db->where('department IN (SELECT departmentid FROM tblstaffdepartments WHERE departmentid IN (' . implode(',', $departments_ids) . ') AND staffid="' . get_staff_user_id() . '")');
                 }
                 $chart['datasets'][0]['data'][$i] = $this->db->count_all_results('tbltickets');
-
-                $i++;
+                
+                $i ++;
             }
         }
         return $chart;
@@ -1449,7 +1510,7 @@ class Tickets_model extends CRM_Model
         if ($insert_id) {
             return true;
         }
-
+        
         return false;
     }
 
@@ -1461,7 +1522,7 @@ class Tickets_model extends CRM_Model
         if ($this->db->affected_rows() > 0) {
             return true;
         }
-
+        
         return false;
     }
 
@@ -1471,10 +1532,10 @@ class Tickets_model extends CRM_Model
         $this->db->delete('tblticketsspamcontrol');
         if ($this->db->affected_rows() > 0) {
             logActivity('Tickets Spam Filter Deleted');
-
+            
             return true;
         }
-
+        
         return false;
     }
 

@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal\Message;
 
 /**
@@ -7,10 +6,11 @@ namespace Omnipay\PayPal\Message;
  */
 class RefundRequest extends AbstractRequest
 {
+
     public function getData()
     {
         $this->validate('transactionReference');
-
+        
         $data = $this->getBaseData();
         $data['METHOD'] = 'RefundTransaction';
         $data['TRANSACTIONID'] = $this->getTransactionReference();
@@ -20,7 +20,7 @@ class RefundRequest extends AbstractRequest
             $data['AMT'] = $this->getAmount();
             $data['CURRENCYCODE'] = $this->getCurrency();
         }
-
+        
         return $data;
     }
 }

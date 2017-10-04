@@ -10,9 +10,9 @@ namespace Braintree;
  * For more detailed information on CreditCards, see {@link http://www.braintreepayments.com/gateway/credit-card-api http://www.braintreepaymentsolutions.com/gateway/credit-card-api}<br />
  * For more detailed information on CreditCard verifications, see {@link http://www.braintreepayments.com/gateway/credit-card-verification-api http://www.braintreepaymentsolutions.com/gateway/credit-card-verification-api}
  *
- * @package    Braintree
- * @category   Resources
- *
+ * @package Braintree
+ * @category Resources
+ *          
  * @property-read string $billingAddress
  * @property-read string $bin
  * @property-read string $cardType
@@ -32,52 +32,80 @@ class CreditCard extends Base
 {
     // Card Type
     const AMEX = 'American Express';
-    const CARTE_BLANCHE = 'Carte Blanche';
-    const CHINA_UNION_PAY = 'China UnionPay';
-    const DINERS_CLUB_INTERNATIONAL = 'Diners Club';
-    const DISCOVER = 'Discover';
-    const JCB = 'JCB';
-    const LASER = 'Laser';
-    const MAESTRO = 'Maestro';
-    const UK_MAESTRO = 'UK Maestro';
-    const MASTER_CARD = 'MasterCard';
-    const SOLO = 'Solo';
-    const SWITCH_TYPE = 'Switch';
-    const VISA = 'Visa';
-    const UNKNOWN = 'Unknown';
 
+    const CARTE_BLANCHE = 'Carte Blanche';
+
+    const CHINA_UNION_PAY = 'China UnionPay';
+
+    const DINERS_CLUB_INTERNATIONAL = 'Diners Club';
+
+    const DISCOVER = 'Discover';
+
+    const JCB = 'JCB';
+
+    const LASER = 'Laser';
+
+    const MAESTRO = 'Maestro';
+
+    const UK_MAESTRO = 'UK Maestro';
+
+    const MASTER_CARD = 'MasterCard';
+
+    const SOLO = 'Solo';
+
+    const SWITCH_TYPE = 'Switch';
+
+    const VISA = 'Visa';
+
+    const UNKNOWN = 'Unknown';
+    
     // Credit card origination location
     const INTERNATIONAL = "international";
+
     const US = "us";
 
     const PREPAID_YES = 'Yes';
+
     const PREPAID_NO = 'No';
+
     const PREPAID_UNKNOWN = 'Unknown';
 
     const PAYROLL_YES = 'Yes';
+
     const PAYROLL_NO = 'No';
+
     const PAYROLL_UNKNOWN = 'Unknown';
 
     const HEALTHCARE_YES = 'Yes';
+
     const HEALTHCARE_NO = 'No';
+
     const HEALTHCARE_UNKNOWN = 'Unknown';
 
     const DURBIN_REGULATED_YES = 'Yes';
+
     const DURBIN_REGULATED_NO = 'No';
+
     const DURBIN_REGULATED_UNKNOWN = 'Unknown';
 
     const DEBIT_YES = 'Yes';
+
     const DEBIT_NO = 'No';
+
     const DEBIT_UNKNOWN = 'Unknown';
 
     const COMMERCIAL_YES = 'Yes';
+
     const COMMERCIAL_NO = 'No';
+
     const COMMERCIAL_UNKNOWN = 'Unknown';
 
     const COUNTRY_OF_ISSUANCE_UNKNOWN = "Unknown";
-    const ISSUING_BANK_UNKNOWN = "Unknown";
-    const PRODUCT_ID_UNKNOWN = "Unknown";
 
+    const ISSUING_BANK_UNKNOWN = "Unknown";
+
+    const PRODUCT_ID_UNKNOWN = "Unknown";
+    
     /* instance methods */
     /**
      * returns false if default is null or false
@@ -113,91 +141,93 @@ class CreditCard extends Base
      * sets instance properties from an array of values
      *
      * @access protected
-     * @param array $creditCardAttribs array of creditcard data
+     * @param array $creditCardAttribs
+     *            array of creditcard data
      * @return void
      */
     protected function _initialize($creditCardAttribs)
     {
         // set the attributes
         $this->_attributes = $creditCardAttribs;
-
+        
         // map each address into its own object
-        $billingAddress = isset($creditCardAttribs['billingAddress']) ?
-            Address::factory($creditCardAttribs['billingAddress']) :
-            null;
-
+        $billingAddress = isset($creditCardAttribs['billingAddress']) ? Address::factory($creditCardAttribs['billingAddress']) : null;
+        
         $subscriptionArray = [];
         if (isset($creditCardAttribs['subscriptions'])) {
-            foreach ($creditCardAttribs['subscriptions'] AS $subscription) {
+            foreach ($creditCardAttribs['subscriptions'] as $subscription) {
                 $subscriptionArray[] = Subscription::factory($subscription);
             }
         }
-
+        
         $this->_set('subscriptions', $subscriptionArray);
         $this->_set('billingAddress', $billingAddress);
         $this->_set('expirationDate', $this->expirationMonth . '/' . $this->expirationYear);
         $this->_set('maskedNumber', $this->bin . '******' . $this->last4);
-
-        if(isset($creditCardAttribs['verifications']) && count($creditCardAttribs['verifications']) > 0) {
+        
+        if (isset($creditCardAttribs['verifications']) && count($creditCardAttribs['verifications']) > 0) {
             $verifications = $creditCardAttribs['verifications'];
-            usort($verifications, [$this, '_compareCreatedAtOnVerifications']);
-
+            usort($verifications, [
+                $this,
+                '_compareCreatedAtOnVerifications'
+            ]);
+            
             $this->_set('verification', CreditCardVerification::factory($verifications[0]));
         }
     }
 
     private function _compareCreatedAtOnVerifications($verificationAttrib1, $verificationAttrib2)
     {
-        return ($verificationAttrib2['createdAt'] < $verificationAttrib1['createdAt']) ? -1 : 1;
+        return ($verificationAttrib2['createdAt'] < $verificationAttrib1['createdAt']) ? - 1 : 1;
     }
 
     /**
      * returns false if comparing object is not a CreditCard,
      * or is a CreditCard with a different id
      *
-     * @param object $otherCreditCard customer to compare against
+     * @param object $otherCreditCard
+     *            customer to compare against
      * @return boolean
      */
     public function isEqual($otherCreditCard)
     {
-        return !($otherCreditCard instanceof self) ? false : $this->token === $otherCreditCard->token;
+        return ! ($otherCreditCard instanceof self) ? false : $this->token === $otherCreditCard->token;
     }
 
     /**
      * create a printable representation of the object as:
      * ClassName[property=value, property=value]
+     * 
      * @return string
      */
-    public function  __toString()
+    public function __toString()
     {
-        return __CLASS__ . '[' .
-                Util::attributesToString($this->_attributes) .']';
+        return __CLASS__ . '[' . Util::attributesToString($this->_attributes) . ']';
     }
 
     /**
-     *  factory method: returns an instance of CreditCard
-     *  to the requesting method, with populated properties
+     * factory method: returns an instance of CreditCard
+     * to the requesting method, with populated properties
      *
      * @ignore
+     *
      * @return CreditCard
      */
     public static function factory($attributes)
     {
         $defaultAttributes = [
             'bin' => '',
-            'expirationMonth'    => '',
-            'expirationYear'    => '',
-            'last4'  => '',
+            'expirationMonth' => '',
+            'expirationYear' => '',
+            'last4' => ''
         ];
-
+        
         $instance = new self();
         $instance->_initialize(array_merge($defaultAttributes, $attributes));
         return $instance;
     }
-
-
+    
     // static methods redirecting to gateway
-
     public static function create($attribs)
     {
         return Configuration::gateway()->creditCard()->create($attribs);
@@ -293,7 +323,9 @@ class CreditCard extends Base
         return Configuration::gateway()->creditCard()->delete($token);
     }
 
-    /** @return array */
+    /**
+     * @return array
+     */
     public static function allCardTypes()
     {
         return [

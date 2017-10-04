@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Common;
 
 use Guzzle\Common\Event;
@@ -9,13 +8,15 @@ use Guzzle\Common\Event;
  */
 class EventTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     /**
+     *
      * @return Event
      */
     private function getEvent()
     {
         return new Event(array(
-            'test'  => '123',
+            'test' => '123',
             'other' => '456',
             'event' => 'test.notify'
         ));
@@ -34,13 +35,13 @@ class EventTest extends \Guzzle\Tests\GuzzleTestCase
         $event = $this->getEvent();
         $this->assertEquals('123', $event['test']);
         $this->assertNull($event['foobar']);
-
+        
         $this->assertTrue($event->offsetExists('test'));
         $this->assertFalse($event->offsetExists('foobar'));
-
+        
         unset($event['test']);
         $this->assertFalse($event->offsetExists('test'));
-
+        
         $event['test'] = 'new';
         $this->assertEquals('new', $event['test']);
     }
@@ -54,9 +55,10 @@ class EventTest extends \Guzzle\Tests\GuzzleTestCase
     public function testConvertsToArray()
     {
         $this->assertEquals(array(
-            'test'  => '123',
+            'test' => '123',
             'other' => '456',
             'event' => 'test.notify'
-        ), $this->getEvent()->toArray());
+        ), $this->getEvent()
+            ->toArray());
     }
 }

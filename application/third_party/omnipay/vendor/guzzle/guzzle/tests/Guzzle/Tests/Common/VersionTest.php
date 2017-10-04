@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Common;
 
 use Guzzle\Common\Version;
@@ -9,6 +8,7 @@ use Guzzle\Common\Version;
  */
 class VersionTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     /**
      * @expectedException \PHPUnit_Framework_Error_Deprecated
      */

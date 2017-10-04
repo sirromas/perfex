@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Plugin\Backoff;
 
 use Guzzle\Http\Message\Response;
@@ -12,6 +11,7 @@ use Guzzle\Plugin\Backoff\ConstantBackoffStrategy;
  */
 class TruncatedBackoffStrategyTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testRetriesWhenLessThanMax()
     {
         $strategy = new TruncatedBackoffStrategy(2);
@@ -20,7 +20,7 @@ class TruncatedBackoffStrategyTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertFalse($strategy->getBackoffPeriod(0, $request));
         $this->assertFalse($strategy->getBackoffPeriod(1, $request));
         $this->assertFalse($strategy->getBackoffPeriod(2, $request));
-
+        
         $response = new Response(500);
         $strategy->setNext(new HttpBackoffStrategy(null, new ConstantBackoffStrategy(10)));
         $this->assertEquals(10, $strategy->getBackoffPeriod(0, $request, $response));

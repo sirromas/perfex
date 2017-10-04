@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Http\Message\Header;
 
 use Guzzle\Http\Message\Header\Link;
@@ -7,6 +6,7 @@ use Guzzle\Tests\GuzzleTestCase;
 
 class LinkTest extends GuzzleTestCase
 {
+
     public function testParsesLinks()
     {
         $link = new Link('Link', '<http:/.../front.jpeg>; rel=front; type="image/jpeg", <http://.../back.jpeg>; rel=back; type="image/jpeg", <http://.../side.jpeg?test=1>; rel=side; type="image/jpeg"');
@@ -15,12 +15,12 @@ class LinkTest extends GuzzleTestCase
             array(
                 'rel' => 'front',
                 'type' => 'image/jpeg',
-                'url' => 'http:/.../front.jpeg',
+                'url' => 'http:/.../front.jpeg'
             ),
             array(
                 'rel' => 'back',
                 'type' => 'image/jpeg',
-                'url' => 'http://.../back.jpeg',
+                'url' => 'http://.../back.jpeg'
             ),
             array(
                 'rel' => 'side',
@@ -28,13 +28,13 @@ class LinkTest extends GuzzleTestCase
                 'url' => 'http://.../side.jpeg?test=1'
             )
         ), $links);
-
+        
         $this->assertEquals(array(
             'rel' => 'back',
             'type' => 'image/jpeg',
-            'url' => 'http://.../back.jpeg',
+            'url' => 'http://.../back.jpeg'
         ), $link->getLink('back'));
-
+        
         $this->assertTrue($link->hasLink('front'));
         $this->assertFalse($link->hasLink('foo'));
     }
@@ -42,11 +42,10 @@ class LinkTest extends GuzzleTestCase
     public function testCanAddLink()
     {
         $link = new Link('Link', '<http://foo>; rel=a; type="image/jpeg"');
-        $link->addLink('http://test.com', 'test', array('foo' => 'bar'));
-        $this->assertEquals(
-            '<http://foo>; rel=a; type="image/jpeg", <http://test.com>; rel="test"; foo="bar"',
-            (string) $link
-        );
+        $link->addLink('http://test.com', 'test', array(
+            'foo' => 'bar'
+        ));
+        $this->assertEquals('<http://foo>; rel=a; type="image/jpeg", <http://test.com>; rel="test"; foo="bar"', (string) $link);
     }
 
     public function testCanParseLinksWithCommas()
@@ -56,7 +55,7 @@ class LinkTest extends GuzzleTestCase
             array(
                 'rel' => 'previous',
                 'title' => 'start, index',
-                'url' => 'http://example.com/TheBook/chapter1',
+                'url' => 'http://example.com/TheBook/chapter1'
             )
         ), $link->getLinks());
     }

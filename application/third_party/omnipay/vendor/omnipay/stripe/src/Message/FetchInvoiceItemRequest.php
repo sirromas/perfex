@@ -12,6 +12,7 @@ namespace Omnipay\Stripe\Message;
  */
 class FetchInvoiceItemRequest extends AbstractRequest
 {
+
     /**
      * Get the invoice-item reference.
      *
@@ -36,13 +37,13 @@ class FetchInvoiceItemRequest extends AbstractRequest
     {
         $this->validate('invoiceItemReference');
         $data = array();
-
+        
         return $data;
     }
 
     public function getEndpoint()
     {
-        return $this->endpoint.'/invoiceitems/'.$this->getInvoiceItemReference();
+        return $this->endpoint . '/invoiceitems/' . $this->getInvoiceItemReference();
     }
 
     public function getHttpMethod()

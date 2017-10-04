@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\Session;
 
 /**
@@ -18,6 +17,7 @@ namespace Symfony\Component\HttpFoundation\Session;
  */
 interface SessionBagInterface
 {
+
     /**
      * Gets this bag's name.
      *
@@ -28,7 +28,7 @@ interface SessionBagInterface
     /**
      * Initializes the Bag.
      *
-     * @param array $array
+     * @param array $array            
      */
     public function initialize(array &$array);
 

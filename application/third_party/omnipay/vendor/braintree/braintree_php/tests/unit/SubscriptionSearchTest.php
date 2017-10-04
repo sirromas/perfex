@@ -8,6 +8,7 @@ use Braintree;
 
 class SubscriptionSearchTest extends Setup
 {
+
     public function testSearch_billingCyclesRemaining_isRangeNode()
     {
         $node = Braintree\SubscriptionSearch::billingCyclesRemaining();

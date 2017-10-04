@@ -3,8 +3,11 @@ namespace Braintree;
 
 class MerchantAccountGateway
 {
+
     private $_gateway;
+
     private $_config;
+
     private $_http;
 
     public function __construct($gateway)
@@ -18,7 +21,9 @@ class MerchantAccountGateway
     public function create($attribs)
     {
         Util::verifyKeys(self::detectSignature($attribs), $attribs);
-        return $this->_doCreate('/merchant_accounts/create_via_api', ['merchant_account' => $attribs]);
+        return $this->_doCreate('/merchant_accounts/create_via_api', [
+            'merchant_account' => $attribs
+        ]);
     }
 
     public function find($merchant_account_id)
@@ -35,7 +40,9 @@ class MerchantAccountGateway
     public function update($merchant_account_id, $attributes)
     {
         Util::verifyKeys(self::updateSignature(), $attributes);
-        return $this->_doUpdate('/merchant_accounts/' . $merchant_account_id . '/update_via_api', ['merchant_account' => $attributes]);
+        return $this->_doUpdate('/merchant_accounts/' . $merchant_account_id . '/update_via_api', [
+            'merchant_account' => $attributes
+        ]);
     }
 
     public static function detectSignature($attribs)
@@ -57,7 +64,9 @@ class MerchantAccountGateway
 
     public function createForCurrency($attribs)
     {
-        $response = $this->_http->post($this->_config->merchantPath() . '/merchant_accounts/create_for_currency', ['merchant_account' => $attribs]);
+        $response = $this->_http->post($this->_config->merchantPath() . '/merchant_accounts/create_for_currency', [
+            'merchant_account' => $attribs
+        ]);
         return $this->_verifyGatewayResponse($response);
     }
 
@@ -65,7 +74,7 @@ class MerchantAccountGateway
     {
         $pager = [
             'object' => $this,
-            'method' => 'fetchMerchantAccounts',
+            'method' => 'fetchMerchantAccounts'
         ];
         return new PaginatedCollection($pager);
     }
@@ -82,7 +91,12 @@ class MerchantAccountGateway
 
     public static function createSignature()
     {
-        $addressSignature = ['streetAddress', 'postalCode', 'locality', 'region'];
+        $addressSignature = [
+            'streetAddress',
+            'postalCode',
+            'locality',
+            'region'
+        ];
         $individualSignature = [
             'firstName',
             'lastName',
@@ -90,38 +104,53 @@ class MerchantAccountGateway
             'phone',
             'dateOfBirth',
             'ssn',
-            ['address' => $addressSignature]
+            [
+                'address' => $addressSignature
+            ]
         ];
-
+        
         $businessSignature = [
             'dbaName',
             'legalName',
             'taxId',
-            ['address' => $addressSignature]
+            [
+                'address' => $addressSignature
+            ]
         ];
-
+        
         $fundingSignature = [
             'routingNumber',
             'accountNumber',
             'destination',
             'email',
             'mobilePhone',
-            'descriptor',
+            'descriptor'
         ];
-
+        
         return [
             'id',
             'tosAccepted',
             'masterMerchantAccountId',
-            ['individual' => $individualSignature],
-            ['funding' => $fundingSignature],
-            ['business' => $businessSignature]
+            [
+                'individual' => $individualSignature
+            ],
+            [
+                'funding' => $fundingSignature
+            ],
+            [
+                'business' => $businessSignature
+            ]
         ];
     }
 
     public static function createDeprecatedSignature()
     {
-        $applicantDetailsAddressSignature = ['streetAddress', 'postalCode', 'locality', 'region'];
+        $applicantDetailsAddressSignature = [
+            'streetAddress',
+            'postalCode',
+            'locality',
+            'region'
+        ];
         $applicantDetailsSignature = [
             'companyName',
             'firstName',
@@ -133,11 +162,15 @@ class MerchantAccountGateway
             'taxId',
             'routingNumber',
             'accountNumber',
-            ['address' => $applicantDetailsAddressSignature]
+            [
+                'address' => $applicantDetailsAddressSignature
+            ]
         ];
-
+        
         return [
-            ['applicantDetails' =>  $applicantDetailsSignature],
+            [
+                'applicantDetails' => $applicantDetailsSignature
+            ],
             'id',
             'tosAccepted',
             'masterMerchantAccountId'
@@ -148,7 +181,7 @@ class MerchantAccountGateway
     {
         $fullPath = $this->_config->merchantPath() . $subPath;
         $response = $this->_http->post($fullPath, $params);
-
+        
         return $this->_verifyGatewayResponse($response);
     }
 
@@ -156,7 +189,7 @@ class MerchantAccountGateway
     {
         $fullPath = $this->_config->merchantPath() . $subPath;
         $response = $this->_http->put($fullPath, $params);
-
+        
         return $this->_verifyGatewayResponse($response);
     }
 
@@ -167,16 +200,13 @@ class MerchantAccountGateway
         }
         if (isset($response['merchantAccount'])) {
             // return a populated instance of merchantAccount
-            return new Result\Successful(
-                    MerchantAccount::factory($response['merchantAccount'])
-            );
-        } else if (isset($response['apiErrorResponse'])) {
-            return new Result\Error($response['apiErrorResponse']);
-        } else {
-            throw new Exception\Unexpected(
-            "Expected merchant account or apiErrorResponse"
-            );
-        }
+            return new Result\Successful(MerchantAccount::factory($response['merchantAccount']));
+        } else 
+            if (isset($response['apiErrorResponse'])) {
+                return new Result\Error($response['apiErrorResponse']);
+            } else {
+                throw new Exception\Unexpected("Expected merchant account or apiErrorResponse");
+            }
     }
 }
 class_alias('Braintree\MerchantAccountGateway', 'Braintree_MerchantAccountGateway');

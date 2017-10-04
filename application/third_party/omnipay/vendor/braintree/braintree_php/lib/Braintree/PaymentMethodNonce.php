@@ -4,8 +4,8 @@ namespace Braintree;
 /**
  * Braintree PaymentMethodNonce module
  *
- * @package    Braintree
- * @category   Resources
+ * @package Braintree
+ * @category Resources
  */
 
 /**
@@ -14,13 +14,12 @@ namespace Braintree;
  * <b>== More information ==</b>
  *
  *
- * @package    Braintree
- * @category   Resources
+ * @package Braintree
+ * @category Resources
  */
 class PaymentMethodNonce extends Base
 {
     // static methods redirecting to gateway
-
     public static function create($token)
     {
         return Configuration::gateway()->paymentMethodNonce()->create($token);
@@ -43,8 +42,8 @@ class PaymentMethodNonce extends Base
         $this->_attributes = $nonceAttributes;
         $this->_set('nonce', $nonceAttributes['nonce']);
         $this->_set('type', $nonceAttributes['type']);
-
-        if(isset($nonceAttributes['threeDSecureInfo'])) {
+        
+        if (isset($nonceAttributes['threeDSecureInfo'])) {
             $this->_set('threeDSecureInfo', ThreeDSecureInfo::factory($nonceAttributes['threeDSecureInfo']));
         }
     }

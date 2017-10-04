@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal;
 
 /**
@@ -7,6 +6,7 @@ namespace Omnipay\PayPal;
  */
 class ExpressInContextGateway extends ExpressGateway
 {
+
     public function getName()
     {
         return 'PayPal Express In-Context';

@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\Braintree\Message;
 
 use Omnipay\Common\Message\AbstractResponse;
@@ -10,6 +9,7 @@ use Omnipay\Common\Message\RequestInterface;
  */
 class ClientTokenResponse extends AbstractResponse
 {
+
     public function __construct(RequestInterface $request, $data)
     {
         $this->request = $request;

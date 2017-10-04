@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Batch;
 
 use Guzzle\Common\Exception\InvalidArgumentException;
@@ -9,21 +8,27 @@ use Guzzle\Common\Exception\InvalidArgumentException;
  */
 class NotifyingBatch extends AbstractBatchDecorator
 {
-    /** @var mixed Callable to call */
+
+    /**
+     * @var mixed Callable to call
+     */
     protected $callable;
 
     /**
-     * @param BatchInterface $decoratedBatch Batch object to decorate
-     * @param mixed          $callable       Callable to call
      *
+     * @param BatchInterface $decoratedBatch
+     *            Batch object to decorate
+     * @param mixed $callable
+     *            Callable to call
+     *            
      * @throws InvalidArgumentException
      */
     public function __construct(BatchInterface $decoratedBatch, $callable)
     {
-        if (!is_callable($callable)) {
+        if (! is_callable($callable)) {
             throw new InvalidArgumentException('The passed argument is not callable');
         }
-
+        
         $this->callable = $callable;
         parent::__construct($decoratedBatch);
     }
@@ -32,7 +37,7 @@ class NotifyingBatch extends AbstractBatchDecorator
     {
         $items = $this->decoratedBatch->flush();
         call_user_func($this->callable, $items);
-
+        
         return $items;
     }
 }

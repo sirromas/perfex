@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Http\Message;
 
 use Guzzle\Common\Collection;
@@ -13,16 +12,25 @@ use Guzzle\Parser\ParserRegistry;
  */
 class RequestFactory implements RequestFactoryInterface
 {
-    /** @var RequestFactory Singleton instance of the default request factory */
+
+    /**
+     * @var RequestFactory Singleton instance of the default request factory
+     */
     protected static $instance;
 
-    /** @var array Hash of methods available to the class (provides fast isset() lookups) */
+    /**
+     * @var array Hash of methods available to the class (provides fast isset() lookups)
+     */
     protected $methods;
 
-    /** @var string Class to instantiate for requests with no body */
+    /**
+     * @var string Class to instantiate for requests with no body
+     */
     protected $requestClass = 'Guzzle\\Http\\Message\\Request';
 
-    /** @var string Class to instantiate for requests with a body */
+    /**
+     * @var string Class to instantiate for requests with a body
+     */
     protected $entityEnclosingRequestClass = 'Guzzle\\Http\\Message\\EntityEnclosingRequest';
 
     /**
@@ -33,11 +41,11 @@ class RequestFactory implements RequestFactoryInterface
     public static function getInstance()
     {
         // @codeCoverageIgnoreStart
-        if (!static::$instance) {
+        if (! static::$instance) {
             static::$instance = new static();
         }
         // @codeCoverageIgnoreEnd
-
+        
         return static::$instance;
     }
 
@@ -49,41 +57,32 @@ class RequestFactory implements RequestFactoryInterface
     public function fromMessage($message)
     {
         $parsed = ParserRegistry::getInstance()->getParser('message')->parseRequest($message);
-
-        if (!$parsed) {
+        
+        if (! $parsed) {
             return false;
         }
-
-        $request = $this->fromParts($parsed['method'], $parsed['request_url'],
-            $parsed['headers'], $parsed['body'], $parsed['protocol'],
-            $parsed['version']);
-
+        
+        $request = $this->fromParts($parsed['method'], $parsed['request_url'], $parsed['headers'], $parsed['body'], $parsed['protocol'], $parsed['version']);
+        
         // EntityEnclosingRequest adds an "Expect: 100-Continue" header when using a raw request body for PUT or POST
         // requests. This factory method should accurately reflect the message, so here we are removing the Expect
         // header if one was not supplied in the message.
-        if (!isset($parsed['headers']['Expect']) && !isset($parsed['headers']['expect'])) {
+        if (! isset($parsed['headers']['Expect']) && ! isset($parsed['headers']['expect'])) {
             $request->removeHeader('Expect');
         }
-
+        
         return $request;
     }
 
-    public function fromParts(
-        $method,
-        array $urlParts,
-        $headers = null,
-        $body = null,
-        $protocol = 'HTTP',
-        $protocolVersion = '1.1'
-    ) {
-        return $this->create($method, Url::buildUrl($urlParts), $headers, $body)
-                    ->setProtocolVersion($protocolVersion);
+    public function fromParts($method, array $urlParts, $headers = null, $body = null, $protocol = 'HTTP', $protocolVersion = '1.1')
+    {
+        return $this->create($method, Url::buildUrl($urlParts), $headers, $body)->setProtocolVersion($protocolVersion);
     }
 
     public function create($method, $url, $headers = null, $body = null, array $options = array())
     {
         $method = strtoupper($method);
-
+        
         if ($method == 'GET' || $method == 'HEAD' || $method == 'TRACE') {
             // Handle non-entity-enclosing request methods
             $request = new $this->requestClass($method, $url, $headers);
@@ -118,21 +117,24 @@ class RequestFactory implements RequestFactoryInterface
                 }
             }
         }
-
+        
         if ($options) {
             $this->applyOptions($request, $options);
         }
-
+        
         return $request;
     }
 
     /**
-     * Clone a request while changing the method. Emulates the behavior of
+     * Clone a request while changing the method.
+     * Emulates the behavior of
      * {@see Guzzle\Http\Message\Request::clone}, but can change the HTTP method.
      *
-     * @param RequestInterface $request Request to clone
-     * @param string           $method  Method to set
-     *
+     * @param RequestInterface $request
+     *            Request to clone
+     * @param string $method
+     *            Method to set
+     *            
      * @return RequestInterface
      */
     public function cloneRequestWithMethod(RequestInterface $request, $method)
@@ -143,18 +145,22 @@ class RequestFactory implements RequestFactoryInterface
         } else {
             $cloned = $this->create($method, $request->getUrl(), $request->getHeaders());
         }
-
-        $cloned->getCurlOptions()->replace($request->getCurlOptions()->toArray());
+        
+        $cloned->getCurlOptions()->replace($request->getCurlOptions()
+            ->toArray());
         $cloned->setEventDispatcher(clone $request->getEventDispatcher());
         // Ensure that that the Content-Length header is not copied if changing to GET or HEAD
-        if (!($cloned instanceof EntityEnclosingRequestInterface)) {
+        if (! ($cloned instanceof EntityEnclosingRequestInterface)) {
             $cloned->removeHeader('Content-Length');
         } elseif ($request instanceof EntityEnclosingRequestInterface) {
             $cloned->setBody($request->getBody());
         }
-        $cloned->getParams()->replace($request->getParams()->toArray());
-        $cloned->dispatch('request.clone', array('request' => $cloned));
-
+        $cloned->getParams()->replace($request->getParams()
+            ->toArray());
+        $cloned->dispatch('request.clone', array(
+            'request' => $cloned
+        ));
+        
         return $cloned;
     }
 
@@ -171,14 +177,14 @@ class RequestFactory implements RequestFactoryInterface
 
     protected function visit_headers(RequestInterface $request, $value, $flags)
     {
-        if (!is_array($value)) {
+        if (! is_array($value)) {
             throw new InvalidArgumentException('headers value must be an array');
         }
-
+        
         if ($flags & self::OPTIONS_AS_DEFAULTS) {
             // Merge headers in but do not overwrite existing values
             foreach ($value as $key => $header) {
-                if (!$request->hasHeader($key)) {
+                if (! $request->hasHeader($key)) {
                     $request->setHeader($key, $header);
                 }
             }
@@ -205,19 +211,19 @@ class RequestFactory implements RequestFactoryInterface
 
     protected function visit_auth(RequestInterface $request, $value, $flags)
     {
-        if (!is_array($value)) {
+        if (! is_array($value)) {
             throw new InvalidArgumentException('auth value must be an array');
         }
-
+        
         $request->setAuth($value[0], isset($value[1]) ? $value[1] : null, isset($value[2]) ? $value[2] : 'basic');
     }
 
     protected function visit_query(RequestInterface $request, $value, $flags)
     {
-        if (!is_array($value)) {
+        if (! is_array($value)) {
             throw new InvalidArgumentException('query value must be an array');
         }
-
+        
         if ($flags & self::OPTIONS_AS_DEFAULTS) {
             // Merge query string values in but do not overwrite existing values
             $query = $request->getQuery();
@@ -229,10 +235,10 @@ class RequestFactory implements RequestFactoryInterface
 
     protected function visit_cookies(RequestInterface $request, $value, $flags)
     {
-        if (!is_array($value)) {
+        if (! is_array($value)) {
             throw new InvalidArgumentException('cookies value must be an array');
         }
-
+        
         foreach ($value as $name => $v) {
             $request->addCookie($name, $v);
         }
@@ -240,10 +246,10 @@ class RequestFactory implements RequestFactoryInterface
 
     protected function visit_events(RequestInterface $request, $value, $flags)
     {
-        if (!is_array($value)) {
+        if (! is_array($value)) {
             throw new InvalidArgumentException('events value must be an array');
         }
-
+        
         foreach ($value as $name => $method) {
             if (is_array($method)) {
                 $request->getEventDispatcher()->addListener($name, $method[0], $method[1]);
@@ -255,10 +261,10 @@ class RequestFactory implements RequestFactoryInterface
 
     protected function visit_plugins(RequestInterface $request, $value, $flags)
     {
-        if (!is_array($value)) {
+        if (! is_array($value)) {
             throw new InvalidArgumentException('plugins value must be an array');
         }
-
+        
         foreach ($value as $plugin) {
             $request->addSubscriber($plugin);
         }
@@ -284,10 +290,10 @@ class RequestFactory implements RequestFactoryInterface
 
     protected function visit_params(RequestInterface $request, $value, $flags)
     {
-        if (!is_array($value)) {
+        if (! is_array($value)) {
             throw new InvalidArgumentException('params value must be an array');
         }
-
+        
         $request->getParams()->overwriteWith($value);
     }
 

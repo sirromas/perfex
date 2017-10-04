@@ -3,11 +3,12 @@ namespace Braintree;
 
 class FacilitatorDetails extends Base
 {
+
     public static function factory($attributes)
     {
         $instance = new self();
         $instance->_initialize($attributes);
-
+        
         return $instance;
     }
 
@@ -18,13 +19,12 @@ class FacilitatorDetails extends Base
 
     /**
      * returns a string representation of the three d secure info
+     * 
      * @return string
      */
-    public function  __toString()
+    public function __toString()
     {
-        return __CLASS__ . '[' .
-                Util::attributesToString($this->_attributes) .']';
+        return __CLASS__ . '[' . Util::attributesToString($this->_attributes) . ']';
     }
-
 }
 class_alias('Braintree\FacilitatorDetails', 'Braintree_FacilitatorDetails');

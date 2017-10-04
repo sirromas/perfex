@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Common\Exception;
 
 /**
@@ -7,10 +6,15 @@ namespace Guzzle\Common\Exception;
  */
 class ExceptionCollection extends \Exception implements GuzzleException, \IteratorAggregate, \Countable
 {
-    /** @var array Array of Exceptions */
+
+    /**
+     * @var array Array of Exceptions
+     */
     protected $exceptions = array();
 
-    /** @var string Succinct exception message not including sub-exceptions */
+    /**
+     * @var string Succinct exception message not including sub-exceptions
+     */
     private $shortMessage;
 
     public function __construct($message = '', $code = 0, \Exception $previous = null)
@@ -22,8 +26,9 @@ class ExceptionCollection extends \Exception implements GuzzleException, \Iterat
     /**
      * Set all of the exceptions
      *
-     * @param array $exceptions Array of exceptions
-     *
+     * @param array $exceptions
+     *            Array of exceptions
+     *            
      * @return self
      */
     public function setExceptions(array $exceptions)
@@ -32,15 +37,16 @@ class ExceptionCollection extends \Exception implements GuzzleException, \Iterat
         foreach ($exceptions as $exception) {
             $this->add($exception);
         }
-
+        
         return $this;
     }
 
     /**
      * Add exceptions to the collection
      *
-     * @param ExceptionCollection|\Exception $e Exception to add
-     *
+     * @param ExceptionCollection|\Exception $e
+     *            Exception to add
+     *            
      * @return ExceptionCollection;
      */
     public function add($e)
@@ -49,9 +55,9 @@ class ExceptionCollection extends \Exception implements GuzzleException, \Iterat
         if ($this->message) {
             $this->message .= "\n";
         }
-
+        
         $this->message .= $this->getExceptionMessage($e, 0);
-
+        
         return $this;
     }
 
@@ -90,7 +96,7 @@ class ExceptionCollection extends \Exception implements GuzzleException, \Iterat
         static $sp = '    ';
         $prefix = $depth ? str_repeat($sp, $depth) : '';
         $message = "{$prefix}(" . get_class($e) . ') ' . $e->getFile() . ' line ' . $e->getLine() . "\n";
-
+        
         if ($e instanceof self) {
             if ($e->shortMessage) {
                 $message .= "\n{$prefix}{$sp}" . str_replace("\n", "\n{$prefix}{$sp}", $e->shortMessage) . "\n";
@@ -98,11 +104,11 @@ class ExceptionCollection extends \Exception implements GuzzleException, \Iterat
             foreach ($e as $ee) {
                 $message .= "\n" . $this->getExceptionMessage($ee, $depth + 1);
             }
-        }  else {
+        } else {
             $message .= "\n{$prefix}{$sp}" . str_replace("\n", "\n{$prefix}{$sp}", $e->getMessage()) . "\n";
             $message .= "\n{$prefix}{$sp}" . str_replace("\n", "\n{$prefix}{$sp}", $e->getTraceAsString()) . "\n";
         }
-
+        
         return str_replace(getcwd(), '.', $message);
     }
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\Common;
 
 use Mockery as m;
@@ -7,6 +6,7 @@ use Omnipay\Tests\TestCase;
 
 class HelperTest extends TestCase
 {
+
     public function testCamelCase()
     {
         $result = Helper::camelCase('test_case');
@@ -58,18 +58,30 @@ class HelperTest extends TestCase
     public function testInitializeCallsSetters()
     {
         $target = m::mock('\Omnipay\Common\CreditCard');
-        $target->shouldReceive('setName')->once()->with('adrian');
-        $target->shouldReceive('setNumber')->once()->with('1234');
-
-        Helper::initialize($target, array('name' => 'adrian', 'number' => '1234'));
+        $target->shouldReceive('setName')
+            ->once()
+            ->with('adrian');
+        $target->shouldReceive('setNumber')
+            ->once()
+            ->with('1234');
+        
+        Helper::initialize($target, array(
+            'name' => 'adrian',
+            'number' => '1234'
+        ));
     }
 
     public function testInitializeIgnoresInvalidParameters()
     {
         $target = m::mock('\Omnipay\Common\CreditCard');
-        $target->shouldReceive('setName')->once()->with('adrian');
-
-        Helper::initialize($target, array('name' => 'adrian', 'extra' => 'invalid'));
+        $target->shouldReceive('setName')
+            ->once()
+            ->with('adrian');
+        
+        Helper::initialize($target, array(
+            'name' => 'adrian',
+            'extra' => 'invalid'
+        ));
     }
 
     public function testGetGatewayShortNameSimple()
@@ -183,13 +195,13 @@ class HelperTest extends TestCase
     public function testToFloatFromStringIntNegative()
     {
         $shortName = Helper::toFloat("-199");
-        $this->assertSame(-199.0, $shortName);
+        $this->assertSame(- 199.0, $shortName);
     }
 
     /**
      * Some invalid toFloat() inputs.
      */
-
+    
     /**
      * The number MUST always start with a digit.
      * This is arguably an arbitrary rule that perhaps does not need

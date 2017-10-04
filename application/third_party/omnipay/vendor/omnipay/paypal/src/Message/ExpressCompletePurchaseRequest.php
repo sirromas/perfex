@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal\Message;
 
 /**
@@ -7,11 +6,12 @@ namespace Omnipay\PayPal\Message;
  */
 class ExpressCompletePurchaseRequest extends ExpressCompleteAuthorizeRequest
 {
+
     public function getData()
     {
         $data = parent::getData();
         $data['PAYMENTREQUEST_0_PAYMENTACTION'] = 'Sale';
-
+        
         return $data;
     }
 

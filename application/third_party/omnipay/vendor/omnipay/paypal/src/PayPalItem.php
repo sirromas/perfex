@@ -2,7 +2,6 @@
 /**
  * Paypal Item
  */
-
 namespace Omnipay\PayPal;
 
 use Omnipay\Common\Item;
@@ -14,6 +13,7 @@ use Omnipay\Common\Item;
  */
 class PayPalItem extends Item
 {
+
     /**
      * {@inheritDoc}
      */

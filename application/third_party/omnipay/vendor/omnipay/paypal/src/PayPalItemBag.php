@@ -2,7 +2,6 @@
 /**
  * PayPal Item bag
  */
-
 namespace Omnipay\PayPal;
 
 use Omnipay\Common\ItemBag;
@@ -15,12 +14,14 @@ use Omnipay\Common\ItemInterface;
  */
 class PayPalItemBag extends ItemBag
 {
+
     /**
      * Add an item to the bag
      *
      * @see Item
      *
-     * @param ItemInterface|array $item An existing item, or associative array of item parameters
+     * @param ItemInterface|array $item
+     *            An existing item, or associative array of item parameters
      */
     public function add($item)
     {

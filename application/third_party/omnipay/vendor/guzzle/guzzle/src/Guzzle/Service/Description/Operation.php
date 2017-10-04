@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Service\Description;
 
 use Guzzle\Common\Exception\InvalidArgumentException;
@@ -9,108 +8,159 @@ use Guzzle\Common\Exception\InvalidArgumentException;
  */
 class Operation implements OperationInterface
 {
-    /** @var string Default command class to use when none is specified */
+
+    /**
+     * @var string Default command class to use when none is specified
+     */
     const DEFAULT_COMMAND_CLASS = 'Guzzle\\Service\\Command\\OperationCommand';
 
-    /** @var array Hashmap of properties that can be specified. Represented as a hash to speed up constructor. */
+    /**
+     * @var array Hashmap of properties that can be specified.
+     * Represented as a hash to speed up constructor.
+     */
     protected static $properties = array(
-        'name' => true, 'httpMethod' => true, 'uri' => true, 'class' => true, 'responseClass' => true,
-        'responseType' => true, 'responseNotes' => true, 'notes' => true, 'summary' => true, 'documentationUrl' => true,
-        'deprecated' => true, 'data' => true, 'parameters' => true, 'additionalParameters' => true,
+        'name' => true,
+        'httpMethod' => true,
+        'uri' => true,
+        'class' => true,
+        'responseClass' => true,
+        'responseType' => true,
+        'responseNotes' => true,
+        'notes' => true,
+        'summary' => true,
+        'documentationUrl' => true,
+        'deprecated' => true,
+        'data' => true,
+        'parameters' => true,
+        'additionalParameters' => true,
         'errorResponses' => true
     );
 
-    /** @var array Parameters */
+    /**
+     * @var array Parameters
+     */
     protected $parameters = array();
 
-    /** @var Parameter Additional parameters schema */
+    /**
+     * @var Parameter Additional parameters schema
+     */
     protected $additionalParameters;
 
-    /** @var string Name of the command */
+    /**
+     * @var string Name of the command
+     */
     protected $name;
 
-    /** @var string HTTP method */
+    /**
+     * @var string HTTP method
+     */
     protected $httpMethod;
 
-    /** @var string This is a short summary of what the operation does */
+    /**
+     * @var string This is a short summary of what the operation does
+     */
     protected $summary;
 
-    /** @var string A longer text field to explain the behavior of the operation. */
+    /**
+     * @var string A longer text field to explain the behavior of the operation.
+     */
     protected $notes;
 
-    /** @var string Reference URL providing more information about the operation */
+    /**
+     * @var string Reference URL providing more information about the operation
+     */
     protected $documentationUrl;
 
-    /** @var string HTTP URI of the command */
+    /**
+     * @var string HTTP URI of the command
+     */
     protected $uri;
 
-    /** @var string Class of the command object */
+    /**
+     * @var string Class of the command object
+     */
     protected $class;
 
-    /** @var string This is what is returned from the method */
+    /**
+     * @var string This is what is returned from the method
+     */
     protected $responseClass;
 
-    /** @var string Type information about the response */
+    /**
+     * @var string Type information about the response
+     */
     protected $responseType;
 
-    /** @var string Information about the response returned by the operation */
+    /**
+     * @var string Information about the response returned by the operation
+     */
     protected $responseNotes;
 
-    /** @var bool Whether or not the command is deprecated */
+    /**
+     * @var bool Whether or not the command is deprecated
+     */
     protected $deprecated;
 
-    /** @var array Array of errors that could occur when running the command */
+    /**
+     * @var array Array of errors that could occur when running the command
+     */
     protected $errorResponses;
 
-    /** @var ServiceDescriptionInterface */
+    /**
+     * @var ServiceDescriptionInterface
+     */
     protected $description;
 
-    /** @var array Extra operation information */
+    /**
+     * @var array Extra operation information
+     */
     protected $data;
 
     /**
      * Builds an Operation object using an array of configuration data:
-     * - name:               (string) Name of the command
-     * - httpMethod:         (string) HTTP method of the operation
-     * - uri:                (string) URI template that can create a relative or absolute URL
-     * - class:              (string) Concrete class that implements this command
-     * - parameters:         (array) Associative array of parameters for the command. {@see Parameter} for information.
-     * - summary:            (string) This is a short summary of what the operation does
-     * - notes:              (string) A longer text field to explain the behavior of the operation.
-     * - documentationUrl:   (string) Reference URL providing more information about the operation
-     * - responseClass:      (string) This is what is returned from the method. Can be a primitive, PSR-0 compliant
-     *                       class name, or model.
-     * - responseNotes:      (string) Information about the response returned by the operation
-     * - responseType:       (string) One of 'primitive', 'class', 'model', or 'documentation'. If not specified, this
-     *                       value will be automatically inferred based on whether or not there is a model matching the
-     *                       name, if a matching PSR-0 compliant class name is found, or set to 'primitive' by default.
-     * - deprecated:         (bool) Set to true if this is a deprecated command
-     * - errorResponses:     (array) Errors that could occur when executing the command. Array of hashes, each with a
-     *                       'code' (the HTTP response code), 'reason' (response reason phrase or description of the
-     *                       error), and 'class' (a custom exception class that would be thrown if the error is
-     *                       encountered).
-     * - data:               (array) Any extra data that might be used to help build or serialize the operation
+     * - name: (string) Name of the command
+     * - httpMethod: (string) HTTP method of the operation
+     * - uri: (string) URI template that can create a relative or absolute URL
+     * - class: (string) Concrete class that implements this command
+     * - parameters: (array) Associative array of parameters for the command. {@see Parameter} for information.
+     * - summary: (string) This is a short summary of what the operation does
+     * - notes: (string) A longer text field to explain the behavior of the operation.
+     * - documentationUrl: (string) Reference URL providing more information about the operation
+     * - responseClass: (string) This is what is returned from the method. Can be a primitive, PSR-0 compliant
+     * class name, or model.
+     * - responseNotes: (string) Information about the response returned by the operation
+     * - responseType: (string) One of 'primitive', 'class', 'model', or 'documentation'. If not specified, this
+     * value will be automatically inferred based on whether or not there is a model matching the
+     * name, if a matching PSR-0 compliant class name is found, or set to 'primitive' by default.
+     * - deprecated: (bool) Set to true if this is a deprecated command
+     * - errorResponses: (array) Errors that could occur when executing the command. Array of hashes, each with a
+     * 'code' (the HTTP response code), 'reason' (response reason phrase or description of the
+     * error), and 'class' (a custom exception class that would be thrown if the error is
+     * encountered).
+     * - data: (array) Any extra data that might be used to help build or serialize the operation
      * - additionalParameters: (null|array) Parameter schema to use when an option is passed to the operation that is
-     *                                      not in the schema
+     * not in the schema
      *
-     * @param array                       $config      Array of configuration data
-     * @param ServiceDescriptionInterface $description Service description used to resolve models if $ref tags are found
+     * @param array $config
+     *            Array of configuration data
+     * @param ServiceDescriptionInterface $description
+     *            Service description used to resolve models if $ref tags are found
      */
     public function __construct(array $config = array(), ServiceDescriptionInterface $description = null)
     {
         $this->description = $description;
-
+        
         // Get the intersection of the available properties and properties set on the operation
         foreach (array_intersect_key($config, self::$properties) as $key => $value) {
             $this->{$key} = $value;
         }
-
-        $this->class = $this->class ?: self::DEFAULT_COMMAND_CLASS;
+        
+        $this->class = $this->class ?  : self::DEFAULT_COMMAND_CLASS;
         $this->deprecated = (bool) $this->deprecated;
-        $this->errorResponses = $this->errorResponses ?: array();
-        $this->data = $this->data ?: array();
-
-        if (!$this->responseClass) {
+        $this->errorResponses = $this->errorResponses ?  : array();
+        $this->data = $this->data ?  : array();
+        
+        if (! $this->responseClass) {
             $this->responseClass = 'array';
             $this->responseType = 'primitive';
         } elseif ($this->responseType) {
@@ -120,7 +170,7 @@ class Operation implements OperationInterface
             // A response class was set and no response type was set, so guess what the type is
             $this->inferResponseType();
         }
-
+        
         // Parameters need special handling when adding
         if ($this->parameters) {
             foreach ($this->parameters as $name => $param) {
@@ -132,7 +182,7 @@ class Operation implements OperationInterface
                 }
             }
         }
-
+        
         if ($this->additionalParameters) {
             if ($this->additionalParameters instanceof Parameter) {
                 $this->additionalParameters->setParent($this);
@@ -162,7 +212,7 @@ class Operation implements OperationInterface
         if ($this->additionalParameters instanceof Parameter) {
             $result['additionalParameters'] = $this->additionalParameters->toArray();
         }
-
+        
         return $result;
     }
 
@@ -174,7 +224,7 @@ class Operation implements OperationInterface
     public function setServiceDescription(ServiceDescriptionInterface $description)
     {
         $this->description = $description;
-
+        
         return $this;
     }
 
@@ -201,29 +251,31 @@ class Operation implements OperationInterface
     /**
      * Add a parameter to the command
      *
-     * @param Parameter $param Parameter to add
-     *
+     * @param Parameter $param
+     *            Parameter to add
+     *            
      * @return self
      */
     public function addParam(Parameter $param)
     {
         $this->parameters[$param->getName()] = $param;
         $param->setParent($this);
-
+        
         return $this;
     }
 
     /**
      * Remove a parameter from the command
      *
-     * @param string $name Name of the parameter to remove
-     *
+     * @param string $name
+     *            Name of the parameter to remove
+     *            
      * @return self
      */
     public function removeParam($name)
     {
         unset($this->parameters[$name]);
-
+        
         return $this;
     }
 
@@ -235,14 +287,15 @@ class Operation implements OperationInterface
     /**
      * Set the HTTP method of the command
      *
-     * @param string $httpMethod Method to set
-     *
+     * @param string $httpMethod
+     *            Method to set
+     *            
      * @return self
      */
     public function setHttpMethod($httpMethod)
     {
         $this->httpMethod = $httpMethod;
-
+        
         return $this;
     }
 
@@ -254,14 +307,15 @@ class Operation implements OperationInterface
     /**
      * Set the concrete class of the command
      *
-     * @param string $className Concrete class name
-     *
+     * @param string $className
+     *            Concrete class name
+     *            
      * @return self
      */
     public function setClass($className)
     {
         $this->class = $className;
-
+        
         return $this;
     }
 
@@ -273,14 +327,15 @@ class Operation implements OperationInterface
     /**
      * Set the name of the command
      *
-     * @param string $name Name of the command
-     *
+     * @param string $name
+     *            Name of the command
+     *            
      * @return self
      */
     public function setName($name)
     {
         $this->name = $name;
-
+        
         return $this;
     }
 
@@ -292,14 +347,15 @@ class Operation implements OperationInterface
     /**
      * Set a short summary of what the operation does
      *
-     * @param string $summary Short summary of the operation
-     *
+     * @param string $summary
+     *            Short summary of the operation
+     *            
      * @return self
      */
     public function setSummary($summary)
     {
         $this->summary = $summary;
-
+        
         return $this;
     }
 
@@ -311,14 +367,15 @@ class Operation implements OperationInterface
     /**
      * Set a longer text field to explain the behavior of the operation.
      *
-     * @param string $notes Notes on the operation
-     *
+     * @param string $notes
+     *            Notes on the operation
+     *            
      * @return self
      */
     public function setNotes($notes)
     {
         $this->notes = $notes;
-
+        
         return $this;
     }
 
@@ -330,14 +387,15 @@ class Operation implements OperationInterface
     /**
      * Set the URL pointing to additional documentation on the command
      *
-     * @param string $docUrl Documentation URL
-     *
+     * @param string $docUrl
+     *            Documentation URL
+     *            
      * @return self
      */
     public function setDocumentationUrl($docUrl)
     {
         $this->documentationUrl = $docUrl;
-
+        
         return $this;
     }
 
@@ -347,18 +405,20 @@ class Operation implements OperationInterface
     }
 
     /**
-     * Set what is returned from the method. Can be a primitive, class name, or model. For example: 'array',
+     * Set what is returned from the method.
+     * Can be a primitive, class name, or model. For example: 'array',
      * 'Guzzle\\Foo\\Baz', or 'MyModelName' (to reference a model by ID).
      *
-     * @param string $responseClass Type of response
-     *
+     * @param string $responseClass
+     *            Type of response
+     *            
      * @return self
      */
     public function setResponseClass($responseClass)
     {
         $this->responseClass = $responseClass;
         $this->inferResponseType();
-
+        
         return $this;
     }
 
@@ -368,10 +428,12 @@ class Operation implements OperationInterface
     }
 
     /**
-     * Set qualifying information about the responseClass. One of 'primitive', 'class', 'model', or 'documentation'
+     * Set qualifying information about the responseClass.
+     * One of 'primitive', 'class', 'model', or 'documentation'
      *
-     * @param string $responseType Response type information
-     *
+     * @param string $responseType
+     *            Response type information
+     *            
      * @return self
      * @throws InvalidArgumentException
      */
@@ -383,12 +445,12 @@ class Operation implements OperationInterface
             self::TYPE_MODEL => true,
             self::TYPE_DOCUMENTATION => true
         );
-        if (!isset($types[$responseType])) {
+        if (! isset($types[$responseType])) {
             throw new InvalidArgumentException('responseType must be one of ' . implode(', ', array_keys($types)));
         }
-
+        
         $this->responseType = $responseType;
-
+        
         return $this;
     }
 
@@ -400,14 +462,15 @@ class Operation implements OperationInterface
     /**
      * Set notes about the response of the operation
      *
-     * @param string $notes Response notes
-     *
+     * @param string $notes
+     *            Response notes
+     *            
      * @return self
      */
     public function setResponseNotes($notes)
     {
         $this->responseNotes = $notes;
-
+        
         return $this;
     }
 
@@ -419,14 +482,15 @@ class Operation implements OperationInterface
     /**
      * Set whether or not the command is deprecated
      *
-     * @param bool $isDeprecated Set to true to mark as deprecated
-     *
+     * @param bool $isDeprecated
+     *            Set to true to mark as deprecated
+     *            
      * @return self
      */
     public function setDeprecated($isDeprecated)
     {
         $this->deprecated = $isDeprecated;
-
+        
         return $this;
     }
 
@@ -438,14 +502,15 @@ class Operation implements OperationInterface
     /**
      * Set the URI template of the command
      *
-     * @param string $uri URI template to set
-     *
+     * @param string $uri
+     *            URI template to set
+     *            
      * @return self
      */
     public function setUri($uri)
     {
         $this->uri = $uri;
-
+        
         return $this;
     }
 
@@ -457,30 +522,38 @@ class Operation implements OperationInterface
     /**
      * Add an error to the command
      *
-     * @param string $code   HTTP response code
-     * @param string $reason HTTP response reason phrase or information about the error
-     * @param string $class  Exception class associated with the error
-     *
+     * @param string $code
+     *            HTTP response code
+     * @param string $reason
+     *            HTTP response reason phrase or information about the error
+     * @param string $class
+     *            Exception class associated with the error
+     *            
      * @return self
      */
     public function addErrorResponse($code, $reason, $class)
     {
-        $this->errorResponses[] = array('code' => $code, 'reason' => $reason, 'class' => $class);
-
+        $this->errorResponses[] = array(
+            'code' => $code,
+            'reason' => $reason,
+            'class' => $class
+        );
+        
         return $this;
     }
 
     /**
      * Set all of the error responses of the operation
      *
-     * @param array $errorResponses Hash of error name to a hash containing a code, reason, class
-     *
+     * @param array $errorResponses
+     *            Hash of error name to a hash containing a code, reason, class
+     *            
      * @return self
      */
     public function setErrorResponses(array $errorResponses)
     {
         $this->errorResponses = $errorResponses;
-
+        
         return $this;
     }
 
@@ -492,15 +565,17 @@ class Operation implements OperationInterface
     /**
      * Set a particular data point on the operation
      *
-     * @param string $name  Name of the data value
-     * @param mixed  $value Value to set
-     *
+     * @param string $name
+     *            Name of the data value
+     * @param mixed $value
+     *            Value to set
+     *            
      * @return self
      */
     public function setData($name, $value)
     {
         $this->data[$name] = $value;
-
+        
         return $this;
     }
 
@@ -517,8 +592,9 @@ class Operation implements OperationInterface
     /**
      * Set the additionalParameters of the operation
      *
-     * @param Parameter|null $parameter Parameter to set
-     *
+     * @param Parameter|null $parameter
+     *            Parameter to set
+     *            
      * @return self
      */
     public function setAdditionalParameters($parameter)
@@ -526,7 +602,7 @@ class Operation implements OperationInterface
         if ($this->additionalParameters = $parameter) {
             $this->additionalParameters->setParent($this);
         }
-
+        
         return $this;
     }
 
@@ -535,7 +611,13 @@ class Operation implements OperationInterface
      */
     protected function inferResponseType()
     {
-        static $primitives = array('array' => 1, 'boolean' => 1, 'string' => 1, 'integer' => 1, '' => 1);
+        static $primitives = array(
+            'array' => 1,
+            'boolean' => 1,
+            'string' => 1,
+            'integer' => 1,
+            '' => 1
+        );
         if (isset($primitives[$this->responseClass])) {
             $this->responseType = self::TYPE_PRIMITIVE;
         } elseif ($this->description && $this->description->hasModel($this->responseClass)) {

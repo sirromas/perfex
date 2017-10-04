@@ -1,12 +1,14 @@
 <?php
-
 namespace Omnipay\Stripe\Message;
 
 use Omnipay\Tests\TestCase;
 
 class CreateSubscriptionRequestTest extends TestCase
 {
-    /** @var CreateSubscriptionRequest */
+
+    /**
+     * @var CreateSubscriptionRequest
+     */
     protected $request;
 
     public function setUp()
@@ -19,10 +21,12 @@ class CreateSubscriptionRequestTest extends TestCase
     public function testData()
     {
         $this->request->setTaxPercent(14);
-        $this->request->setMetadata(array('field' => 'value'));
-
+        $this->request->setMetadata(array(
+            'field' => 'value'
+        ));
+        
         $data = $this->request->getData();
-
+        
         $this->assertSame(14.0, $data['tax_percent']);
         $this->assertArrayHasKey('field', $data['metadata']);
         $this->assertSame('value', $data['metadata']['field']);
@@ -31,27 +35,24 @@ class CreateSubscriptionRequestTest extends TestCase
     public function testZeroPercentData()
     {
         $this->request->setTaxPercent(0);
-
+        
         $data = $this->request->getData();
-
+        
         $this->assertSame(0.0, $data['tax_percent']);
     }
 
     public function testZeroPercentStringData()
     {
         $this->request->setTaxPercent('0');
-
+        
         $data = $this->request->getData();
-
+        
         $this->assertSame(0.0, $data['tax_percent']);
     }
 
     public function testEndpoint()
     {
-        $this->assertSame(
-            'https://api.stripe.com/v1/customers/cus_7lqqgOm33t4xSU/subscriptions',
-            $this->request->getEndpoint()
-        );
+        $this->assertSame('https://api.stripe.com/v1/customers/cus_7lqqgOm33t4xSU/subscriptions', $this->request->getEndpoint());
     }
 
     public function testSendSuccess()
@@ -64,7 +65,6 @@ class CreateSubscriptionRequestTest extends TestCase
         $this->assertNotNull($response->getPlan());
         $this->assertNull($response->getMessage());
     }
-
 
     public function testSendError()
     {

@@ -1,12 +1,13 @@
 <?php
-
 namespace Omnipay\Braintree\Message;
 
 use Omnipay\Tests\TestCase;
 
 class AuthorizeRequestTest extends TestCase
 {
+
     /**
+     *
      * @var AuthorizeRequest
      */
     private $request;
@@ -14,27 +15,25 @@ class AuthorizeRequestTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-
+        
         $this->request = new AuthorizeRequest($this->getHttpClient(), $this->getHttpRequest(), \Braintree_Configuration::gateway());
-        $this->request->initialize(
-            array(
-                'amount' => '10.00',
-                'token' => 'abc123',
-                'transactionId' => '684',
-                'testMode' => false,
-                'taxExempt' => false,
-                'card' => array(
-                    'firstName' => 'Kayla',
-                    'shippingCompany' => 'League',
-                )
+        $this->request->initialize(array(
+            'amount' => '10.00',
+            'token' => 'abc123',
+            'transactionId' => '684',
+            'testMode' => false,
+            'taxExempt' => false,
+            'card' => array(
+                'firstName' => 'Kayla',
+                'shippingCompany' => 'League'
             )
-        );
+        ));
     }
 
     public function testGetData()
     {
         $data = $this->request->getData();
-
+        
         $this->assertArrayNotHasKey('paymentMethodToken', $data);
         $this->assertSame('abc123', $data['paymentMethodNonce']);
         $this->assertSame('10.00', $data['amount']);
@@ -43,30 +42,28 @@ class AuthorizeRequestTest extends TestCase
         $this->assertSame('League', $data['shipping']['company']);
         $this->assertFalse($data['options']['submitForSettlement']);
         $this->assertFalse($data['taxExempt']);
-
+        
         // Check empty values are not sent
         $this->assertFalse(isset($data['billingAddressId']));
-
+        
         $this->request->configure();
         $this->assertSame('production', \Braintree_Configuration::environment());
     }
 
     public function testPaymentMethodToken()
     {
-        $this->request->initialize(
-            array(
-                'amount' => '10.00',
-                'transactionId' => '684',
-                'testMode' => false,
-                'taxExempt' => false,
-                'card' => array(
-                    'firstName' => 'Kayla',
-                    'shippingCompany' => 'League',
-                ),
-                'paymentMethodToken' => 'fake-token-123'
-            )
-        );
-
+        $this->request->initialize(array(
+            'amount' => '10.00',
+            'transactionId' => '684',
+            'testMode' => false,
+            'taxExempt' => false,
+            'card' => array(
+                'firstName' => 'Kayla',
+                'shippingCompany' => 'League'
+            ),
+            'paymentMethodToken' => 'fake-token-123'
+        ));
+        
         $data = $this->request->getData();
         $this->assertSame('fake-token-123', $data['paymentMethodToken']);
         $this->assertArrayNotHasKey('paymentMethodNonce', $data);
@@ -74,20 +71,18 @@ class AuthorizeRequestTest extends TestCase
 
     public function testPaymentMethodNonce()
     {
-        $this->request->initialize(
-            array(
-                'amount' => '10.00',
-                'transactionId' => '684',
-                'testMode' => false,
-                'taxExempt' => false,
-                'card' => array(
-                    'firstName' => 'Kayla',
-                    'shippingCompany' => 'League',
-                ),
-                'paymentMethodNonce' => 'abc123'
-            )
-        );
-
+        $this->request->initialize(array(
+            'amount' => '10.00',
+            'transactionId' => '684',
+            'testMode' => false,
+            'taxExempt' => false,
+            'card' => array(
+                'firstName' => 'Kayla',
+                'shippingCompany' => 'League'
+            ),
+            'paymentMethodNonce' => 'abc123'
+        ));
+        
         $data = $this->request->getData();
         $this->assertSame('abc123', $data['paymentMethodNonce']);
         $this->assertArrayNotHasKey('paymentMethodToken', $data);
@@ -95,20 +90,18 @@ class AuthorizeRequestTest extends TestCase
 
     public function testCustomerId()
     {
-        $this->request->initialize(
-            array(
-                'amount' => '10.00',
-                'transactionId' => '684',
-                'testMode' => false,
-                'taxExempt' => false,
-                'card' => array(
-                    'firstName' => 'Kayla',
-                    'shippingCompany' => 'League',
-                ),
-                'customerId' => 'abc123'
-            )
-        );
-
+        $this->request->initialize(array(
+            'amount' => '10.00',
+            'transactionId' => '684',
+            'testMode' => false,
+            'taxExempt' => false,
+            'card' => array(
+                'firstName' => 'Kayla',
+                'shippingCompany' => 'League'
+            ),
+            'customerId' => 'abc123'
+        ));
+        
         $data = $this->request->getData();
         $this->assertSame('abc123', $data['customerId']);
         $this->assertArrayNotHasKey('paymentMethodToken', $data);
@@ -117,16 +110,14 @@ class AuthorizeRequestTest extends TestCase
 
     public function testSubMerchantSale()
     {
-        $this->request->initialize(
-            array(
-                'amount' => '100.00',
-                'holdInEscrow' => true,
-                'merchantAccountId' => 'blue_ladders_store',
-                'paymentMethodToken' => 'fake-token-123',
-                'serviceFeeAmount' => '10.00',
-            )
-        );
-
+        $this->request->initialize(array(
+            'amount' => '100.00',
+            'holdInEscrow' => true,
+            'merchantAccountId' => 'blue_ladders_store',
+            'paymentMethodToken' => 'fake-token-123',
+            'serviceFeeAmount' => '10.00'
+        ));
+        
         $data = $this->request->getData();
         $this->assertTrue($data['options']['holdInEscrow']);
         $this->assertSame('blue_ladders_store', $data['merchantAccountId']);
@@ -136,7 +127,7 @@ class AuthorizeRequestTest extends TestCase
     public function testSandboxEnvironment()
     {
         $this->request->setTestMode(true);
-
+        
         $this->request->configure();
         $this->assertSame('sandbox', \Braintree_Configuration::environment());
     }

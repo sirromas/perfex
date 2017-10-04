@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\Braintree\Message;
 
 use Braintree_MerchantAccount;
@@ -8,7 +7,9 @@ use Omnipay\Tests\TestCase;
 
 class AbstractMerchantAccountRequestTest extends TestCase
 {
+
     /**
+     *
      * @var AbstractRequest
      */
     private $request;
@@ -21,8 +22,9 @@ class AbstractMerchantAccountRequestTest extends TestCase
 
     /**
      * @dataProvider provideKeepsData
-     * @param  string  $field
-     * @param  string  $value
+     * 
+     * @param string $field            
+     * @param string $value            
      */
     public function testKeepsData($field, $value)
     {
@@ -31,32 +33,46 @@ class AbstractMerchantAccountRequestTest extends TestCase
         $this->assertSame($value, $this->request->{"get$field"}());
     }
 
-    public function provideKeepsData(){
+    public function provideKeepsData()
+    {
         return array(
-            array('merchantAccountId', 'blue_ladders_store'),
-            array('masterMerchantAccountId', '14ladders_marketplace'),
-            array('tosAccepted', true),
+            array(
+                'merchantAccountId',
+                'blue_ladders_store'
+            ),
+            array(
+                'masterMerchantAccountId',
+                '14ladders_marketplace'
+            ),
+            array(
+                'tosAccepted',
+                true
+            )
         );
     }
 
     /**
      * @dataProvider provideMakesBool
-     * @param  string  $field
+     * 
+     * @param string $field            
      */
     public function testMakesBool($field)
     {
         $field = ucfirst($field);
-
+        
         $this->assertSame($this->request, $this->request->{"set$field"}(0));
         $this->assertSame(false, $this->request->{"get$field"}());
-
+        
         $this->assertSame($this->request, $this->request->{"set$field"}(1));
         $this->assertSame(true, $this->request->{"get$field"}());
     }
 
-    public function provideMakesBool(){
+    public function provideMakesBool()
+    {
         return array(
-          array('tosAccepted'),
+            array(
+                'tosAccepted'
+            )
         );
     }
 
@@ -69,12 +85,12 @@ class AbstractMerchantAccountRequestTest extends TestCase
             'address1' => '111 Main St',
             'city' => 'Chicago',
             'state' => 'IL',
-            'postCode' => '60622',
+            'postCode' => '60622'
         );
-
+        
         $this->request->setBusiness($business);
         $data = $this->request->getBusinessData();
-
+        
         $this->assertSame($business['legalName'], $data['business']['legalName']);
         $this->assertSame($business['dbaName'], $data['business']['dbaName']);
         $this->assertSame($business['taxId'], $data['business']['taxId']);
@@ -92,12 +108,12 @@ class AbstractMerchantAccountRequestTest extends TestCase
             'email' => 'funding@blueladders.com',
             'mobilePhone' => '5555555555',
             'accountNumber' => '1123581321',
-            'routingNumber' => '071101307',
+            'routingNumber' => '071101307'
         );
-
+        
         $this->request->setFunding($funding);
         $data = $this->request->getFundingData();
-
+        
         $this->assertSame($funding['descriptor'], $data['funding']['descriptor']);
         $this->assertSame($funding['destination'], $data['funding']['destination']);
         $this->assertSame($funding['email'], $data['funding']['email']);
@@ -118,12 +134,12 @@ class AbstractMerchantAccountRequestTest extends TestCase
             'address1' => '111 Main St',
             'city' => 'Chicago',
             'state' => 'IL',
-            'postCode' => '60622',
+            'postCode' => '60622'
         );
-
+        
         $this->request->setIndividual($individual);
         $data = $this->request->getIndividualData();
-
+        
         $this->assertSame($individual['firstName'], $data['individual']['firstName']);
         $this->assertSame($individual['lastName'], $data['individual']['lastName']);
         $this->assertSame($individual['email'], $data['individual']['email']);

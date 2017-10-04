@@ -1,12 +1,13 @@
 <?php
-
 namespace Omnipay\Mollie\Message;
 
 use Omnipay\Tests\TestCase;
 
 class FetchTransactionRequestTest extends TestCase
 {
+
     /**
+     *
      * @var \Omnipay\Mollie\Message\FetchTransactionRequest
      */
     protected $request;
@@ -14,18 +15,16 @@ class FetchTransactionRequestTest extends TestCase
     public function setUp()
     {
         $this->request = new FetchTransactionRequest($this->getHttpClient(), $this->getHttpRequest());
-        $this->request->initialize(
-            array(
-                'apiKey'               => 'mykey',
-                'transactionReference' => 'tr_Qzin4iTWrU',
-            )
-        );
+        $this->request->initialize(array(
+            'apiKey' => 'mykey',
+            'transactionReference' => 'tr_Qzin4iTWrU'
+        ));
     }
 
     public function testGetData()
     {
         $data = $this->request->getData();
-
+        
         $this->assertSame("tr_Qzin4iTWrU", $data['id']);
         $this->assertCount(1, $data);
     }
@@ -34,7 +33,7 @@ class FetchTransactionRequestTest extends TestCase
     {
         $this->setMockHttpResponse('FetchTransactionSuccess.txt');
         $response = $this->request->send();
-
+        
         $this->assertInstanceOf('Omnipay\Mollie\Message\FetchTransactionResponse', $response);
         $this->assertTrue($response->isSuccessful());
         $this->assertTrue($response->isPaid());
@@ -52,7 +51,7 @@ class FetchTransactionRequestTest extends TestCase
     {
         $this->setMockHttpResponse('FetchTransactionExpired.txt');
         $response = $this->request->send();
-
+        
         $this->assertInstanceOf('Omnipay\Mollie\Message\FetchTransactionResponse', $response);
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
@@ -64,7 +63,7 @@ class FetchTransactionRequestTest extends TestCase
     {
         $this->setMockHttpResponse('FetchTransactionFailure.txt');
         $response = $this->request->send();
-
+        
         $this->assertInstanceOf('Omnipay\Mollie\Message\FetchTransactionResponse', $response);
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());

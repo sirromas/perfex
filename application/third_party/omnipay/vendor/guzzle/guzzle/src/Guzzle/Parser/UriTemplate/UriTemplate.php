@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Parser\UriTemplate;
 
 /**
@@ -9,31 +8,83 @@ namespace Guzzle\Parser\UriTemplate;
  */
 class UriTemplate implements UriTemplateInterface
 {
+
     const DEFAULT_PATTERN = '/\{([^\}]+)\}/';
 
-    /** @var string URI template */
+    /**
+     * @var string URI template
+     */
     private $template;
 
-    /** @var array Variables to use in the template expansion */
+    /**
+     * @var array Variables to use in the template expansion
+     */
     private $variables;
 
-    /** @var string Regex used to parse expressions */
+    /**
+     * @var string Regex used to parse expressions
+     */
     private $regex = self::DEFAULT_PATTERN;
 
-    /** @var array Hash for quick operator lookups */
+    /**
+     * @var array Hash for quick operator lookups
+     */
     private static $operatorHash = array(
-        '+' => true, '#' => true, '.' => true, '/' => true, ';' => true, '?' => true, '&' => true
+        '+' => true,
+        '#' => true,
+        '.' => true,
+        '/' => true,
+        ';' => true,
+        '?' => true,
+        '&' => true
     );
 
-    /** @var array Delimiters */
+    /**
+     * @var array Delimiters
+     */
     private static $delims = array(
-        ':', '/', '?', '#', '[', ']', '@', '!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '='
+        ':',
+        '/',
+        '?',
+        '#',
+        '[',
+        ']',
+        '@',
+        '!',
+        '$',
+        '&',
+        '\'',
+        '(',
+        ')',
+        '*',
+        '+',
+        ',',
+        ';',
+        '='
     );
 
-    /** @var array Percent encoded delimiters */
+    /**
+     * @var array Percent encoded delimiters
+     */
     private static $delimsPct = array(
-        '%3A', '%2F', '%3F', '%23', '%5B', '%5D', '%40', '%21', '%24', '%26', '%27', '%28', '%29', '%2A', '%2B', '%2C',
-        '%3B', '%3D'
+        '%3A',
+        '%2F',
+        '%3F',
+        '%23',
+        '%5B',
+        '%5D',
+        '%40',
+        '%21',
+        '%24',
+        '%26',
+        '%27',
+        '%28',
+        '%29',
+        '%2A',
+        '%2B',
+        '%2C',
+        '%3B',
+        '%3D'
     );
 
     public function expand($template, array $variables)
@@ -41,17 +92,20 @@ class UriTemplate implements UriTemplateInterface
         if ($this->regex == self::DEFAULT_PATTERN && false === strpos($template, '{')) {
             return $template;
         }
-
+        
         $this->template = $template;
         $this->variables = $variables;
-
-        return preg_replace_callback($this->regex, array($this, 'expandMatch'), $this->template);
+        
+        return preg_replace_callback($this->regex, array(
+            $this,
+            'expandMatch'
+        ), $this->template);
     }
 
     /**
      * Set the regex patten used to expand URI templates
      *
-     * @param string $regexPattern
+     * @param string $regexPattern            
      */
     public function setRegex($regexPattern)
     {
@@ -61,20 +115,21 @@ class UriTemplate implements UriTemplateInterface
     /**
      * Parse an expression into parts
      *
-     * @param string $expression Expression to parse
-     *
+     * @param string $expression
+     *            Expression to parse
+     *            
      * @return array Returns an associative array of parts
      */
     private function parseExpression($expression)
     {
         // Check for URI operators
         $operator = '';
-
+        
         if (isset(self::$operatorHash[$expression[0]])) {
             $operator = $expression[0];
             $expression = substr($expression, 1);
         }
-
+        
         $values = explode(',', $expression);
         foreach ($values as &$value) {
             $value = trim($value);
@@ -84,39 +139,40 @@ class UriTemplate implements UriTemplateInterface
                 $varspec['value'] = substr($value, 0, $substrPos);
                 $varspec['modifier'] = ':';
                 $varspec['position'] = (int) substr($value, $substrPos + 1);
-            } elseif (substr($value, -1) == '*') {
+            } elseif (substr($value, - 1) == '*') {
                 $varspec['modifier'] = '*';
-                $varspec['value'] = substr($value, 0, -1);
+                $varspec['value'] = substr($value, 0, - 1);
             } else {
                 $varspec['value'] = (string) $value;
                 $varspec['modifier'] = '';
             }
             $value = $varspec;
         }
-
+        
         return array(
             'operator' => $operator,
-            'values'   => $values
+            'values' => $values
         );
     }
 
     /**
      * Process an expansion
      *
-     * @param array $matches Matches met in the preg_replace_callback
-     *
+     * @param array $matches
+     *            Matches met in the preg_replace_callback
+     *            
      * @return string Returns the replacement string
      */
     private function expandMatch(array $matches)
     {
         static $rfc1738to3986 = array(
-            '+'   => '%20',
+            '+' => '%20',
             '%7e' => '~'
         );
-
+        
         $parsed = self::parseExpression($matches[1]);
         $replacements = array();
-
+        
         $prefix = $parsed['operator'];
         $joiner = $parsed['operator'];
         $useQueryString = false;
@@ -133,42 +189,44 @@ class UriTemplate implements UriTemplateInterface
             $joiner = ',';
             $prefix = '';
         }
-
+        
         foreach ($parsed['values'] as $value) {
-
-            if (!array_key_exists($value['value'], $this->variables) || $this->variables[$value['value']] === null) {
+            
+            if (! array_key_exists($value['value'], $this->variables) || $this->variables[$value['value']] === null) {
                 continue;
             }
-
+            
             $variable = $this->variables[$value['value']];
             $actuallyUseQueryString = $useQueryString;
             $expanded = '';
-
+            
             if (is_array($variable)) {
-
+                
                 $isAssoc = $this->isAssoc($variable);
                 $kvp = array();
                 foreach ($variable as $key => $var) {
-
+                    
                     if ($isAssoc) {
                         $key = rawurlencode($key);
                         $isNestedArray = is_array($var);
                     } else {
                         $isNestedArray = false;
                     }
-
-                    if (!$isNestedArray) {
+                    
+                    if (! $isNestedArray) {
                         $var = rawurlencode($var);
                         if ($parsed['operator'] == '+' || $parsed['operator'] == '#') {
                             $var = $this->decodeReserved($var);
                         }
                     }
-
+                    
                     if ($value['modifier'] == '*') {
                         if ($isAssoc) {
                             if ($isNestedArray) {
                                 // Nested arrays must allow for deeply nested structures
-                                $var = strtr(http_build_query(array($key => $var)), $rfc1738to3986);
+                                $var = strtr(http_build_query(array(
+                                    $key => $var
+                                )), $rfc1738to3986);
                             } else {
                                 $var = $key . '=' . $var;
                             }
@@ -176,10 +234,10 @@ class UriTemplate implements UriTemplateInterface
                             $var = $value['value'] . '=' . $var;
                         }
                     }
-
+                    
                     $kvp[$key] = $var;
                 }
-
+                
                 if (empty($variable)) {
                     $actuallyUseQueryString = false;
                 } elseif ($value['modifier'] == '*') {
@@ -198,7 +256,6 @@ class UriTemplate implements UriTemplateInterface
                     }
                     $expanded = implode(',', $kvp);
                 }
-
             } else {
                 if ($value['modifier'] == ':') {
                     $variable = substr($variable, 0, $value['position']);
@@ -208,31 +265,32 @@ class UriTemplate implements UriTemplateInterface
                     $expanded = $this->decodeReserved($expanded);
                 }
             }
-
+            
             if ($actuallyUseQueryString) {
-                if (!$expanded && $joiner != '&') {
+                if (! $expanded && $joiner != '&') {
                     $expanded = $value['value'];
                 } else {
                     $expanded = $value['value'] . '=' . $expanded;
                 }
             }
-
+            
             $replacements[] = $expanded;
         }
-
+        
         $ret = implode($joiner, $replacements);
         if ($ret && $prefix) {
             return $prefix . $ret;
         }
-
+        
         return $ret;
     }
 
     /**
      * Determines if an array is associative
      *
-     * @param array $array Array to check
-     *
+     * @param array $array
+     *            Array to check
+     *            
      * @return bool
      */
     private function isAssoc(array $array)
@@ -243,8 +301,9 @@ class UriTemplate implements UriTemplateInterface
     /**
      * Removes percent encoding on reserved characters (used with + and # modifiers)
      *
-     * @param string $string String to fix
-     *
+     * @param string $string
+     *            String to fix
+     *            
      * @return string
      */
     private function decodeReserved($string)

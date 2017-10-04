@@ -8,9 +8,9 @@ use Braintree\AchMandate;
  * US Bank Account details from a transaction
  * creates an instance of UsbankAccountDetails
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Transaction
- *
+ *            
  * @property-read string $token
  * @property-read string $imageUrl
  * @property-read string $routingNumber
@@ -22,18 +22,19 @@ use Braintree\AchMandate;
  */
 class UsBankAccountDetails extends Instance
 {
+
     protected $_attributes = [];
 
     /**
+     *
      * @ignore
+     *
      */
     public function __construct($attributes)
     {
         parent::__construct($attributes);
-
-        $achMandate = isset($attributes['achMandate']) ?
-            AchMandate::factory($attributes['achMandate']) :
-            null;
+        
+        $achMandate = isset($attributes['achMandate']) ? AchMandate::factory($attributes['achMandate']) : null;
         $this->achMandate = $achMandate;
     }
 }

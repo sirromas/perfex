@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\TwoCheckoutPlus\Message;
 
 use Omnipay\Common\Exception\InvalidResponseException;
@@ -9,8 +8,10 @@ use Omnipay\Common\Exception\InvalidResponseException;
  */
 class CompletePurchaseRequest extends PurchaseRequest
 {
+
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
      *
      * @return mixed
      *
@@ -26,27 +27,28 @@ class CompletePurchaseRequest extends PurchaseRequest
         } else {
             $request_type = 'request';
         }
-
+        
         $orderNo = $this->httpRequest->$request_type->get('order_number');
         $orderAmount = $this->httpRequest->$request_type->get('total');
-
+        
         // strange exception specified by 2Checkout
         if ($this->getDemoMode()) {
             $orderNo = '1';
         }
-
-        $key = md5($this->getSecretWord().$this->getAccountNumber().$orderNo.$orderAmount);
+        
+        $key = md5($this->getSecretWord() . $this->getAccountNumber() . $orderNo . $orderAmount);
         if (strtolower($this->httpRequest->$request_type->get('key')) !== $key) {
             throw new InvalidResponseException('Invalid key');
         }
-
+        
         return $this->httpRequest->$request_type->all();
     }
 
     /**
-     * {@inheritdoc}
      *
-     * @param mixed $data
+     * @ERROR!!!
+     *
+     * @param mixed $data            
      *
      * @return CompletePurchaseResponse
      */

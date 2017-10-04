@@ -8,6 +8,7 @@ use Braintree;
 
 class MerchantAccountTest extends Setup
 {
+
     public function testCreateMerchantAccountWithAllParams()
     {
         $params = [
@@ -28,22 +29,21 @@ class MerchantAccountTest extends Setup
                     "streetAddress" => "123 Fake St",
                     "locality" => "Chicago",
                     "region" => "IL",
-                    "postalCode" => "60622",
+                    "postalCode" => "60622"
                 ]
             ],
             "business" => [
                 "dbaName" => "James's Bloggs",
-                "taxId" => "123456789",
+                "taxId" => "123456789"
             ],
             "funding" => [
                 "accountNumberLast4" => "8798",
                 "routingNumber" => "071000013",
-                "descriptor" => "Joes Bloggs MI",
+                "descriptor" => "Joes Bloggs MI"
             ]
         ];
         $merchantAccount = Braintree\MerchantAccount::factory($params);
-
-
+        
         $this->assertEquals($merchantAccount->status, "active");
         $this->assertEquals($merchantAccount->id, "sub_merchant_account");
         $this->assertEquals($merchantAccount->masterMerchantAccount->id, "master_merchant_account");

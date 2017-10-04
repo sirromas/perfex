@@ -1,10 +1,11 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
  * Defined styling areas for the theme style feature
  * Those string are not translated to keep the language file neat
- * @param  string $type
+ * 
+ * @param string $type            
  * @return array
  */
 function get_styling_areas($type = 'admin')
@@ -89,8 +90,8 @@ function get_styling_areas($type = 'admin')
                 'css' => 'border-right-color',
                 'additional_selectors' => '#top_search_button button|border-right-color+.hide-menu|border-right-color'
             )
-
-        ),
+        )
+        ,
         'customers' => array(
             array(
                 'name' => 'Navigation Background Color',
@@ -288,29 +289,26 @@ function get_styling_areas($type = 'admin')
             )
         )
     );
-
-
-    $CI =& get_instance();
+    
+    $CI = & get_instance();
     $tags = $CI->db->get('tbltags')->result_array();
-
+    
     $areas['tags'] = array();
-
-        foreach ($tags as $tag) {
-            array_push($areas['tags'], array(
-                'name' => $tag['name'],
-                'id' => 'tag-' . $tag['id'],
-                'target' => '.tag-id-' . $tag['id'],
-                'css' => 'color',
-                'additional_selectors' => '.tag-id-' . $tag['id'] . '|border-color+ul.tagit li.tagit-choice-editable.tag-id-' . $tag['id'] . '|border-color+ul.tagit li.tagit-choice.tag-id-' . $tag['id'] . ' .tagit-label:not(a)|color',
-                'example' => '<span class="label label-tag tag-id-' . $tag['id'] . '">' . $tag['name'] . '</span>'
-            ));
-        }
-
+    
+    foreach ($tags as $tag) {
+        array_push($areas['tags'], array(
+            'name' => $tag['name'],
+            'id' => 'tag-' . $tag['id'],
+            'target' => '.tag-id-' . $tag['id'],
+            'css' => 'color',
+            'additional_selectors' => '.tag-id-' . $tag['id'] . '|border-color+ul.tagit li.tagit-choice-editable.tag-id-' . $tag['id'] . '|border-color+ul.tagit li.tagit-choice.tag-id-' . $tag['id'] . ' .tagit-label:not(a)|color',
+            'example' => '<span class="label label-tag tag-id-' . $tag['id'] . '">' . $tag['name'] . '</span>'
+        ));
+    }
+    
     $areas = do_action('get_styling_areas', $areas);
-
-
-
-    if (!is_array($type)) {
+    
+    if (! is_array($type)) {
         return $areas[$type];
     } else {
         $_areas = array();
@@ -320,8 +318,10 @@ function get_styling_areas($type = 'admin')
         return $_areas;
     }
 }
+
 /**
  * Will fetch from database the stored applied styles and return
+ * 
  * @return object
  */
 function get_applied_styling_area()
@@ -333,17 +333,18 @@ function get_applied_styling_area()
     $theme_style = json_decode($theme_style);
     return $theme_style;
 }
+
 /**
  * Function that will parse and render the applied styles
- * @param  string $type
+ * 
+ * @param string $type            
  * @return void
  */
 function render_custom_styles($type)
 {
-    $theme_style   = get_applied_styling_area();
+    $theme_style = get_applied_styling_area();
     $styling_areas = get_styling_areas($type);
-
-
+    
     foreach ($styling_areas as $type => $area) {
         foreach ($area as $_area) {
             foreach ($theme_style as $applied_style) {
@@ -367,7 +368,7 @@ function render_custom_styles($type)
                         .open > .dropdown-toggle' . $_area['target'] . '.focus,
                         ' . $_area['target'] . ':active,
                         ' . $_area['target'] . '.active,
-                        .open > .dropdown-toggle' . $_area['target'] . '{background-color:' . adjust_color_brightness($applied_style->color, -50) . ';color:#fff;}';
+                        .open > .dropdown-toggle' . $_area['target'] . '{background-color:' . adjust_color_brightness($applied_style->color, - 50) . ';color:#fff;}';
                         echo '
                         ' . $_area['target'] . '.disabled,
                         ' . $_area['target'] . '[disabled],
@@ -403,18 +404,19 @@ function render_custom_styles($type)
             }
         }
     }
-
 }
+
 /**
  * Get selected value for some styling area for the Theme style feature
- * @param  string $type
- * @param  string $selector
+ * 
+ * @param string $type            
+ * @param string $selector            
  * @return string
  */
 function get_custom_style_values($type, $selector)
 {
-    $value         = '';
-    $theme_style   = get_applied_styling_area();
+    $value = '';
+    $theme_style = get_applied_styling_area();
     $styling_areas = get_styling_areas($type);
     foreach ($styling_areas as $area) {
         if ($area['id'] == $selector) {

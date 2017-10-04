@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Service\Resource;
 
 use Guzzle\Service\Resource\MapResourceIteratorFactory;
@@ -10,13 +9,17 @@ use Guzzle\Tests\Service\Mock\Command\MockCommand;
  */
 class MapResourceIteratorFactoryTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     /**
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Iterator was not found for mock_command
      */
     public function testEnsuresIteratorClassExists()
     {
-        $factory = new MapResourceIteratorFactory(array('Foo', 'Bar'));
+        $factory = new MapResourceIteratorFactory(array(
+            'Foo',
+            'Bar'
+        ));
         $factory->build(new MockCommand());
     }
 

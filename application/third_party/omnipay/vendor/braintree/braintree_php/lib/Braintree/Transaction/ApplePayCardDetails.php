@@ -6,7 +6,7 @@ use Braintree\Instance;
 /**
  * Apple Pay card details from a transaction
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Transaction
  */
 
@@ -14,9 +14,9 @@ use Braintree\Instance;
  * creates an instance of ApplePayCardDetails
  *
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Transaction
- *
+ *            
  * @property-read string $cardType
  * @property-read string $paymentInstrumentName
  * @property-read string $expirationMonth
@@ -26,10 +26,13 @@ use Braintree\Instance;
  */
 class ApplePayCardDetails extends Instance
 {
+
     protected $_attributes = [];
 
     /**
+     *
      * @ignore
+     *
      */
     public function __construct($attributes)
     {

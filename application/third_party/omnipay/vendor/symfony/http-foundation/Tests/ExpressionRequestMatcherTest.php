@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -18,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ExpressionRequestMatcherTest extends TestCase
 {
+
     /**
      * @expectedException \LogicException
      */
@@ -34,7 +34,7 @@ class ExpressionRequestMatcherTest extends TestCase
     {
         $request = Request::create('/foo');
         $expressionRequestMatcher = new ExpressionRequestMatcher();
-
+        
         $expressionRequestMatcher->setExpression(new ExpressionLanguage(), $expression);
         $this->assertSame($expected, $expressionRequestMatcher->matches($request));
     }
@@ -48,7 +48,7 @@ class ExpressionRequestMatcherTest extends TestCase
         $request->attributes->set('foo', 'foo');
         $expressionRequestMatcher = new ExpressionRequestMatcher();
         $expressionRequestMatcher->matchAttribute('foo', 'bar');
-
+        
         $expressionRequestMatcher->setExpression(new ExpressionLanguage(), $expression);
         $this->assertFalse($expressionRequestMatcher->matches($request));
     }
@@ -56,14 +56,38 @@ class ExpressionRequestMatcherTest extends TestCase
     public function provideExpressions()
     {
         return array(
-            array('request.getMethod() == method', true),
-            array('request.getPathInfo() == path', true),
-            array('request.getHost() == host', true),
-            array('request.getClientIp() == ip', true),
-            array('request.attributes.all() == attributes', true),
-            array('request.getMethod() == method && request.getPathInfo() == path && request.getHost() == host && request.getClientIp() == ip &&  request.attributes.all() == attributes', true),
-            array('request.getMethod() != method', false),
-            array('request.getMethod() != method && request.getPathInfo() == path && request.getHost() == host && request.getClientIp() == ip &&  request.attributes.all() == attributes', false),
+            array(
+                'request.getMethod() == method',
+                true
+            ),
+            array(
+                'request.getPathInfo() == path',
+                true
+            ),
+            array(
+                'request.getHost() == host',
+                true
+            ),
+            array(
+                'request.getClientIp() == ip',
+                true
+            ),
+            array(
+                'request.attributes.all() == attributes',
+                true
+            ),
+            array(
+                'request.getMethod() == method && request.getPathInfo() == path && request.getHost() == host && request.getClientIp() == ip &&  request.attributes.all() == attributes',
+                true
+            ),
+            array(
+                'request.getMethod() != method',
+                false
+            ),
+            array(
+                'request.getMethod() != method && request.getPathInfo() == path && request.getHost() == host && request.getClientIp() == ip &&  request.attributes.all() == attributes',
+                false
+            )
         );
     }
 }

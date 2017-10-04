@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Cache;
 
 use Guzzle\Cache\CacheAdapterFactory;
@@ -12,10 +11,15 @@ use Zend\Cache\StorageFactory;
  */
 class CacheAdapterFactoryTest extends \Guzzle\Tests\GuzzleTestCase
 {
-    /** @var ArrayCache */
+
+    /**
+     * @var ArrayCache
+     */
     private $cache;
 
-    /** @var DoctrineCacheAdapter */
+    /**
+     * @var DoctrineCacheAdapter
+     */
     private $adapter;
 
     /**
@@ -47,9 +51,20 @@ class CacheAdapterFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     public function cacheProvider()
     {
         return array(
-            array(new DoctrineCacheAdapter(new ArrayCache()), 'Guzzle\Cache\DoctrineCacheAdapter'),
-            array(new ArrayCache(), 'Guzzle\Cache\DoctrineCacheAdapter'),
-            array(StorageFactory::factory(array('adapter' => 'memory')), 'Guzzle\Cache\Zf2CacheAdapter'),
+            array(
+                new DoctrineCacheAdapter(new ArrayCache()),
+                'Guzzle\Cache\DoctrineCacheAdapter'
+            ),
+            array(
+                new ArrayCache(),
+                'Guzzle\Cache\DoctrineCacheAdapter'
+            ),
+            array(
+                StorageFactory::factory(array(
+                    'adapter' => 'memory'
+                )),
+                'Guzzle\Cache\Zf2CacheAdapter'
+            )
         );
     }
 

@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Http\Message;
 
 use Guzzle\Common\Version;
@@ -14,19 +13,30 @@ use Guzzle\Http\Message\Header\HeaderInterface;
  */
 abstract class AbstractMessage implements MessageInterface
 {
-    /** @var array HTTP header collection */
+
+    /**
+     * @var array HTTP header collection
+     */
     protected $headers;
 
-    /** @var HeaderFactoryInterface $headerFactory */
+    /**
+     * @var HeaderFactoryInterface $headerFactory
+     */
     protected $headerFactory;
 
-    /** @var Collection Custom message parameters that are extendable by plugins */
+    /**
+     * @var Collection Custom message parameters that are extendable by plugins
+     */
     protected $params;
 
-    /** @var string Message protocol */
+    /**
+     * @var string Message protocol
+     */
     protected $protocol = 'HTTP';
 
-    /** @var string HTTP protocol version of the message */
+    /**
+     * @var string HTTP protocol version of the message
+     */
     protected $protocolVersion = '1.1';
 
     public function __construct()
@@ -39,14 +49,14 @@ abstract class AbstractMessage implements MessageInterface
     /**
      * Set the header factory to use to create headers
      *
-     * @param HeaderFactoryInterface $factory
+     * @param HeaderFactoryInterface $factory            
      *
      * @return self
      */
     public function setHeaderFactory(HeaderFactoryInterface $factory)
     {
         $this->headerFactory = $factory;
-
+        
         return $this;
     }
 
@@ -64,7 +74,7 @@ abstract class AbstractMessage implements MessageInterface
         } else {
             $this->headers[$header] = $this->headerFactory->createHeader($header, $value);
         }
-
+        
         return $this;
     }
 
@@ -73,7 +83,7 @@ abstract class AbstractMessage implements MessageInterface
         foreach ($headers as $key => $value) {
             $this->addHeader($key, $value);
         }
-
+        
         return $this;
     }
 
@@ -93,7 +103,7 @@ abstract class AbstractMessage implements MessageInterface
         foreach ($this->headers as $value) {
             $headers[] = $value->getName() . ': ' . $value;
         }
-
+        
         return $headers;
     }
 
@@ -101,7 +111,7 @@ abstract class AbstractMessage implements MessageInterface
     {
         unset($this->headers[$header]);
         $this->addHeader($header, $value);
-
+        
         return $this;
     }
 
@@ -111,7 +121,7 @@ abstract class AbstractMessage implements MessageInterface
         foreach ($headers as $key => $value) {
             $this->addHeader($key, $value);
         }
-
+        
         return $this;
     }
 
@@ -123,13 +133,14 @@ abstract class AbstractMessage implements MessageInterface
     public function removeHeader($header)
     {
         unset($this->headers[$header]);
-
+        
         return $this;
     }
 
     /**
+     *
      * @deprecated Use $message->getHeader()->parseParams()
-     * @codeCoverageIgnore
+     *             @codeCoverageIgnore
      */
     public function getTokenizedHeader($header, $token = ';')
     {
@@ -150,8 +161,8 @@ abstract class AbstractMessage implements MessageInterface
     }
 
     /**
-     * @deprecated
-     * @codeCoverageIgnore
+     *
+     * @deprecated @codeCoverageIgnore
      */
     public function setTokenizedHeader($header, $data, $token = ';')
     {
@@ -160,22 +171,22 @@ abstract class AbstractMessage implements MessageInterface
     }
 
     /**
-     * @deprecated
-     * @codeCoverageIgnore
+     *
+     * @deprecated @codeCoverageIgnore
      */
     public function getCacheControlDirective($directive)
     {
         Version::warn(__METHOD__ . ' is deprecated. Use $message->getHeader(\'Cache-Control\')->getDirective()');
-        if (!($header = $this->getHeader('Cache-Control'))) {
+        if (! ($header = $this->getHeader('Cache-Control'))) {
             return null;
         }
-
+        
         return $header->getDirective($directive);
     }
 
     /**
-     * @deprecated
-     * @codeCoverageIgnore
+     *
+     * @deprecated @codeCoverageIgnore
      */
     public function hasCacheControlDirective($directive)
     {
@@ -188,25 +199,25 @@ abstract class AbstractMessage implements MessageInterface
     }
 
     /**
-     * @deprecated
-     * @codeCoverageIgnore
+     *
+     * @deprecated @codeCoverageIgnore
      */
     public function addCacheControlDirective($directive, $value = true)
     {
         Version::warn(__METHOD__ . ' is deprecated. Use $message->getHeader(\'Cache-Control\')->addDirective()');
-        if (!($header = $this->getHeader('Cache-Control'))) {
+        if (! ($header = $this->getHeader('Cache-Control'))) {
             $this->addHeader('Cache-Control', '');
             $header = $this->getHeader('Cache-Control');
         }
-
+        
         $header->addDirective($directive, $value);
-
+        
         return $this;
     }
 
     /**
-     * @deprecated
-     * @codeCoverageIgnore
+     *
+     * @deprecated @codeCoverageIgnore
      */
     public function removeCacheControlDirective($directive)
     {
@@ -214,7 +225,7 @@ abstract class AbstractMessage implements MessageInterface
         if ($header = $this->getHeader('Cache-Control')) {
             $header->removeDirective($directive);
         }
-
+        
         return $this;
     }
 }

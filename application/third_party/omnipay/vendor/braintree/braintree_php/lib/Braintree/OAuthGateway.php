@@ -6,12 +6,15 @@ namespace Braintree;
  * PHP Version 5
  * Creates and manages Braintree Addresses
  *
- * @package   Braintree
+ * @package Braintree
  */
 class OAuthGateway
 {
+
     private $_gateway;
+
     private $_config;
+
     private $_http;
 
     public function __construct($gateway)
@@ -20,7 +23,7 @@ class OAuthGateway
         $this->_config = $gateway->config;
         $this->_http = new Http($gateway->config);
         $this->_http->useClientCredentials();
-
+        
         $this->_config->assertHasClientCredentials();
     }
 
@@ -38,14 +41,18 @@ class OAuthGateway
 
     public function revokeAccessToken($accessToken)
     {
-        $params = ['token' => $accessToken];
+        $params = [
+            'token' => $accessToken
+        ];
         $response = $this->_http->post('/oauth/revoke_access_token', $params);
         return $this->_verifyGatewayResponse($response);
     }
 
     private function _createToken($params)
     {
-        $params = ['credentials' => $params];
+        $params = [
+            'credentials' => $params
+        ];
         $response = $this->_http->post('/oauth/access_tokens', $params);
         return $this->_verifyGatewayResponse($response);
     }
@@ -53,36 +60,34 @@ class OAuthGateway
     private function _verifyGatewayResponse($response)
     {
         if (isset($response['credentials'])) {
-            $result =  new Result\Successful(
-                OAuthCredentials::factory($response['credentials'])
-            );
+            $result = new Result\Successful(OAuthCredentials::factory($response['credentials']));
             return $this->_mapSuccess($result);
-        } else if (isset($response['result'])) {
-            $result =  new Result\Successful(
-                OAuthResult::factory($response['result'])
-            );
-            return $this->_mapAccessTokenRevokeSuccess($result);
-        } else if (isset($response['apiErrorResponse'])) {
-            $result = new Result\Error($response['apiErrorResponse']);
-            return $this->_mapError($result);
-        } else {
-            throw new Exception\Unexpected(
-                "Expected credentials or apiErrorResponse"
-            );
-        }
+        } else 
+            if (isset($response['result'])) {
+                $result = new Result\Successful(OAuthResult::factory($response['result']));
+                return $this->_mapAccessTokenRevokeSuccess($result);
+            } else 
+                if (isset($response['apiErrorResponse'])) {
+                    $result = new Result\Error($response['apiErrorResponse']);
+                    return $this->_mapError($result);
+                } else {
+                    throw new Exception\Unexpected("Expected credentials or apiErrorResponse");
+                }
     }
 
     public function _mapError($result)
     {
         $error = $result->errors->deepAll()[0];
-
+        
         if ($error->code == Error\Codes::OAUTH_INVALID_GRANT) {
             $result->error = 'invalid_grant';
-        } else if ($error->code == Error\Codes::OAUTH_INVALID_CREDENTIALS) {
-            $result->error = 'invalid_credentials';
-        } else if ($error->code == Error\Codes::OAUTH_INVALID_SCOPE) {
-            $result->error = 'invalid_scope';
-        }
+        } else 
+            if ($error->code == Error\Codes::OAUTH_INVALID_CREDENTIALS) {
+                $result->error = 'invalid_credentials';
+            } else 
+                if ($error->code == Error\Codes::OAUTH_INVALID_SCOPE) {
+                    $result->error = 'invalid_scope';
+                }
         $result->errorDescription = explode(': ', $error->message)[1];
         return $result;
     }
@@ -109,7 +114,7 @@ class OAuthGateway
         $query['client_id'] = $this->_config->getClientId();
         $queryString = preg_replace('/\%5B\d+\%5D/', '%5B%5D', http_build_query($query));
         $url = $this->_config->baseUrl() . '/oauth/connect?' . $queryString;
-
+        
         return $url . '&signature=' . $this->computeSignature($url) . '&algorithm=SHA256';
     }
 

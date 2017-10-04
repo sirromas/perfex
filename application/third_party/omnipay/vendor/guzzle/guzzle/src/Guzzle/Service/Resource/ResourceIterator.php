@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Service\Resource;
 
 use Guzzle\Common\AbstractHasDispatcher;
@@ -7,61 +6,89 @@ use Guzzle\Service\Command\CommandInterface;
 
 abstract class ResourceIterator extends AbstractHasDispatcher implements ResourceIteratorInterface
 {
-    /** @var CommandInterface Command used to send requests */
+
+    /**
+     * @var CommandInterface Command used to send requests
+     */
     protected $command;
 
-    /** @var CommandInterface First sent command */
+    /**
+     * @var CommandInterface First sent command
+     */
     protected $originalCommand;
 
-    /** @var array Currently loaded resources */
+    /**
+     * @var array Currently loaded resources
+     */
     protected $resources;
 
-    /** @var int Total number of resources that have been retrieved */
+    /**
+     * @var int Total number of resources that have been retrieved
+     */
     protected $retrievedCount = 0;
 
-    /** @var int Total number of resources that have been iterated */
+    /**
+     * @var int Total number of resources that have been iterated
+     */
     protected $iteratedCount = 0;
 
-    /** @var string NextToken/Marker for a subsequent request */
+    /**
+     * @var string NextToken/Marker for a subsequent request
+     */
     protected $nextToken = false;
 
-    /** @var int Maximum number of resources to fetch per request */
+    /**
+     * @var int Maximum number of resources to fetch per request
+     */
     protected $pageSize;
 
-    /** @var int Maximum number of resources to retrieve in total */
+    /**
+     * @var int Maximum number of resources to retrieve in total
+     */
     protected $limit;
 
-    /** @var int Number of requests sent */
+    /**
+     * @var int Number of requests sent
+     */
     protected $requestCount = 0;
 
-    /** @var array Initial data passed to the constructor */
+    /**
+     * @var array Initial data passed to the constructor
+     */
     protected $data = array();
 
-    /** @var bool Whether or not the current value is known to be invalid */
+    /**
+     * @var bool Whether or not the current value is known to be invalid
+     */
     protected $invalid;
 
     public static function getAllEvents()
     {
         return array(
+            
             // About to issue another command to get more results
             'resource_iterator.before_send',
+            
             // Issued another command to get more results
             'resource_iterator.after_send'
         );
     }
 
     /**
-     * @param CommandInterface $command Initial command used for iteration
-     * @param array            $data    Associative array of additional parameters. You may specify any number of custom
-     *     options for an iterator. Among these options, you may also specify the following values:
-     *     - limit: Attempt to limit the maximum number of resources to this amount
-     *     - page_size: Attempt to retrieve this number of resources per request
+     *
+     * @param CommandInterface $command
+     *            Initial command used for iteration
+     * @param array $data
+     *            Associative array of additional parameters. You may specify any number of custom
+     *            options for an iterator. Among these options, you may also specify the following values:
+     *            - limit: Attempt to limit the maximum number of resources to this amount
+     *            - page_size: Attempt to retrieve this number of resources per request
      */
     public function __construct(CommandInterface $command, array $data = array())
     {
         // Clone the command to keep track of the originating command for rewind
         $this->originalCommand = $command;
-
+        
         // Parse options from the array of options
         $this->data = $data;
         $this->limit = array_key_exists('limit', $data) ? $data['limit'] : 0;
@@ -82,7 +109,7 @@ abstract class ResourceIterator extends AbstractHasDispatcher implements Resourc
     {
         $this->limit = $limit;
         $this->resetState();
-
+        
         return $this;
     }
 
@@ -90,16 +117,17 @@ abstract class ResourceIterator extends AbstractHasDispatcher implements Resourc
     {
         $this->pageSize = $pageSize;
         $this->resetState();
-
+        
         return $this;
     }
 
     /**
      * Get an option from the iterator
      *
-     * @param string $key Key of the option to retrieve
-     *
-     * @return mixed|null Returns NULL if not set or the value if set
+     * @param string $key
+     *            Key of the option to retrieve
+     *            
+     * @return mixed|null NULL if not set or the value if set
      */
     public function get($key)
     {
@@ -109,15 +137,17 @@ abstract class ResourceIterator extends AbstractHasDispatcher implements Resourc
     /**
      * Set an option on the iterator
      *
-     * @param string $key   Key of the option to set
-     * @param mixed  $value Value to set for the option
-     *
+     * @param string $key
+     *            Key of the option to set
+     * @param mixed $value
+     *            Value to set for the option
+     *            
      * @return ResourceIterator
      */
     public function set($key, $value)
     {
         $this->data[$key] = $value;
-
+        
         return $this;
     }
 
@@ -159,37 +189,36 @@ abstract class ResourceIterator extends AbstractHasDispatcher implements Resourc
 
     public function valid()
     {
-        return !$this->invalid && (!$this->resources || $this->current() || $this->nextToken)
-            && (!$this->limit || $this->iteratedCount < $this->limit + 1);
+        return ! $this->invalid && (! $this->resources || $this->current() || $this->nextToken) && (! $this->limit || $this->iteratedCount < $this->limit + 1);
     }
 
     public function next()
     {
-        $this->iteratedCount++;
-
+        $this->iteratedCount ++;
+        
         // Check if a new set of resources needs to be retrieved
         $sendRequest = false;
-        if (!$this->resources) {
+        if (! $this->resources) {
             $sendRequest = true;
         } else {
             // iterate over the internal array
             $current = next($this->resources);
-            $sendRequest = $current === false && $this->nextToken && (!$this->limit || $this->iteratedCount < $this->limit + 1);
+            $sendRequest = $current === false && $this->nextToken && (! $this->limit || $this->iteratedCount < $this->limit + 1);
         }
-
+        
         if ($sendRequest) {
-
+            
             $this->dispatch('resource_iterator.before_send', array(
-                'iterator'  => $this,
+                'iterator' => $this,
                 'resources' => $this->resources
             ));
-
+            
             // Get a new command object from the original command
             $this->command = clone $this->originalCommand;
             // Send a request and retrieve the newly loaded resources
             $this->resources = $this->sendRequest();
-            $this->requestCount++;
-
+            $this->requestCount ++;
+            
             // If no resources were found, then the last request was not needed
             // and iteration must stop
             if (empty($this->resources)) {
@@ -200,9 +229,9 @@ abstract class ResourceIterator extends AbstractHasDispatcher implements Resourc
                 // Ensure that we rewind to the beginning of the array
                 reset($this->resources);
             }
-
+            
             $this->dispatch('resource_iterator.after_send', array(
-                'iterator'  => $this,
+                'iterator' => $this,
                 'resources' => $this->resources
             ));
         }
@@ -229,7 +258,7 @@ abstract class ResourceIterator extends AbstractHasDispatcher implements Resourc
         if ($this->limit && $this->iteratedCount + $this->pageSize > $this->limit) {
             return 1 + ($this->limit - $this->iteratedCount);
         }
-
+        
         return (int) $this->pageSize;
     }
 
@@ -246,7 +275,8 @@ abstract class ResourceIterator extends AbstractHasDispatcher implements Resourc
     }
 
     /**
-     * Send a request to retrieve the next page of results. Hook for subclasses to implement.
+     * Send a request to retrieve the next page of results.
+     * Hook for subclasses to implement.
      *
      * @return array Returns the newly loaded resources
      */

@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Stream;
 
 use Guzzle\Common\Exception\InvalidArgumentException;
@@ -15,49 +14,57 @@ use Guzzle\Http\Url;
  */
 class PhpStreamRequestFactory implements StreamRequestFactoryInterface
 {
-    /** @var resource Stream context options */
+
+    /**
+     * @var resource Stream context options
+     */
     protected $context;
 
-    /** @var array Stream context */
+    /**
+     * @var array Stream context
+     */
     protected $contextOptions;
 
-    /** @var Url Stream URL */
+    /**
+     * @var Url Stream URL
+     */
     protected $url;
 
-    /** @var array Last response headers received by the HTTP request */
+    /**
+     * @var array Last response headers received by the HTTP request
+     */
     protected $lastResponseHeaders;
 
     /**
-     * {@inheritdoc}
      *
-     * The $params array can contain the following custom keys specific to the PhpStreamRequestFactory:
-     * - stream_class: The name of a class to create instead of a Guzzle\Stream\Stream object
+     * @ERROR!!! The $params array can contain the following custom keys specific to the PhpStreamRequestFactory:
+     *           - stream_class: The name of a class to create instead of a Guzzle\Stream\Stream object
      */
     public function fromRequest(RequestInterface $request, $context = array(), array $params = array())
     {
         if (is_resource($context)) {
             $this->contextOptions = stream_context_get_options($context);
             $this->context = $context;
-        } elseif (is_array($context) || !$context) {
+        } elseif (is_array($context) || ! $context) {
             $this->contextOptions = $context;
             $this->createContext($params);
         } elseif ($context) {
             throw new InvalidArgumentException('$context must be an array or resource');
         }
-
+        
         // Dispatch the before send event
         $request->dispatch('request.before_send', array(
-            'request'         => $request,
-            'context'         => $this->context,
+            'request' => $request,
+            'context' => $this->context,
             'context_options' => $this->contextOptions
         ));
-
+        
         $this->setUrl($request);
         $this->addDefaultContextOptions($request);
         $this->addSslOptions($request);
         $this->addBodyOptions($request);
         $this->addProxyOptions($request);
-
+        
         // Create the file handle but silence errors
         return $this->createStream($params)
             ->setCustomData('request', $request)
@@ -67,16 +74,22 @@ class PhpStreamRequestFactory implements StreamRequestFactoryInterface
     /**
      * Set an option on the context and the internal options array
      *
-     * @param string $wrapper   Stream wrapper name of http
-     * @param string $name      Context name
-     * @param mixed  $value     Context value
-     * @param bool   $overwrite Set to true to overwrite an existing value
+     * @param string $wrapper
+     *            Stream wrapper name of http
+     * @param string $name
+     *            Context name
+     * @param mixed $value
+     *            Context value
+     * @param bool $overwrite
+     *            Set to true to overwrite an existing value
      */
     protected function setContextValue($wrapper, $name, $value, $overwrite = false)
     {
-        if (!isset($this->contextOptions[$wrapper])) {
-            $this->contextOptions[$wrapper] = array($name => $value);
-        } elseif (!$overwrite && isset($this->contextOptions[$wrapper][$name])) {
+        if (! isset($this->contextOptions[$wrapper])) {
+            $this->contextOptions[$wrapper] = array(
+                $name => $value
+            );
+        } elseif (! $overwrite && isset($this->contextOptions[$wrapper][$name])) {
             return;
         }
         $this->contextOptions[$wrapper][$name] = $value;
@@ -86,12 +99,14 @@ class PhpStreamRequestFactory implements StreamRequestFactoryInterface
     /**
      * Create a stream context
      *
-     * @param array $params Parameter array
+     * @param array $params
+     *            Parameter array
      */
     protected function createContext(array $params)
     {
         $options = $this->contextOptions;
-        $this->context = $this->createResource(function () use ($params, $options) {
+        $this->context = $this->createResource(function () use($params, $options)
+        {
             return stream_context_create($options, $params);
         });
     }
@@ -109,18 +124,19 @@ class PhpStreamRequestFactory implements StreamRequestFactoryInterface
     /**
      * Adds the default context options to the stream context options
      *
-     * @param RequestInterface $request Request
+     * @param RequestInterface $request
+     *            Request
      */
     protected function addDefaultContextOptions(RequestInterface $request)
     {
         $this->setContextValue('http', 'method', $request->getMethod());
         $headers = $request->getHeaderLines();
-
+        
         // "Connection: close" is required to get streams to work in HTTP 1.1
-        if (!$request->hasHeader('Connection')) {
+        if (! $request->hasHeader('Connection')) {
             $headers[] = 'Connection: close';
         }
-
+        
         $this->setContextValue('http', 'header', $headers);
         $this->setContextValue('http', 'protocol_version', $request->getProtocolVersion());
         $this->setContextValue('http', 'ignore_errors', true);
@@ -129,17 +145,18 @@ class PhpStreamRequestFactory implements StreamRequestFactoryInterface
     /**
      * Set the URL to use with the factory
      *
-     * @param RequestInterface $request Request that owns the URL
+     * @param RequestInterface $request
+     *            Request that owns the URL
      */
     protected function setUrl(RequestInterface $request)
     {
         $this->url = $request->getUrl(true);
-
+        
         // Check for basic Auth username
         if ($request->getUsername()) {
             $this->url->setUsername($request->getUsername());
         }
-
+        
         // Check for basic Auth password
         if ($request->getPassword()) {
             $this->url->setPassword($request->getPassword());
@@ -149,7 +166,8 @@ class PhpStreamRequestFactory implements StreamRequestFactoryInterface
     /**
      * Add SSL options to the stream context
      *
-     * @param RequestInterface $request Request
+     * @param RequestInterface $request
+     *            Request
      */
     protected function addSslOptions(RequestInterface $request)
     {
@@ -166,21 +184,21 @@ class PhpStreamRequestFactory implements StreamRequestFactoryInterface
     /**
      * Add body (content) specific options to the context options
      *
-     * @param RequestInterface $request
+     * @param RequestInterface $request            
      */
     protected function addBodyOptions(RequestInterface $request)
     {
         // Add the content for the request if needed
-        if (!($request instanceof EntityEnclosingRequestInterface)) {
+        if (! ($request instanceof EntityEnclosingRequestInterface)) {
             return;
         }
-
+        
         if (count($request->getPostFields())) {
             $this->setContextValue('http', 'content', (string) $request->getPostFields(), true);
         } elseif ($request->getBody()) {
             $this->setContextValue('http', 'content', (string) $request->getBody(), true);
         }
-
+        
         // Always ensure a content-length header is sent
         if (isset($this->contextOptions['http']['content'])) {
             $headers = isset($this->contextOptions['http']['header']) ? $this->contextOptions['http']['header'] : array();
@@ -192,7 +210,8 @@ class PhpStreamRequestFactory implements StreamRequestFactoryInterface
     /**
      * Add proxy parameters to the context if needed
      *
-     * @param RequestInterface $request Request
+     * @param RequestInterface $request
+     *            Request
      */
     protected function addProxyOptions(RequestInterface $request)
     {
@@ -204,8 +223,9 @@ class PhpStreamRequestFactory implements StreamRequestFactoryInterface
     /**
      * Create the stream for the request with the context options
      *
-     * @param array $params Parameters of the stream
-     *
+     * @param array $params
+     *            Parameters of the stream
+     *            
      * @return StreamInterface
      */
     protected function createStream(array $params)
@@ -213,29 +233,32 @@ class PhpStreamRequestFactory implements StreamRequestFactoryInterface
         $http_response_header = null;
         $url = $this->url;
         $context = $this->context;
-        $fp = $this->createResource(function () use ($context, $url, &$http_response_header) {
+        $fp = $this->createResource(function () use($context, $url, &$http_response_header)
+        {
             return fopen((string) $url, 'r', false, $context);
         });
-
+        
         // Determine the class to instantiate
         $className = isset($params['stream_class']) ? $params['stream_class'] : __NAMESPACE__ . '\\Stream';
-
-        /** @var $stream StreamInterface */
+        
+        /**
+         * @var $stream StreamInterface
+         */
         $stream = new $className($fp);
-
+        
         // Track the response headers of the request
         if (isset($http_response_header)) {
             $this->lastResponseHeaders = $http_response_header;
             $this->processResponseHeaders($stream);
         }
-
+        
         return $stream;
     }
 
     /**
      * Process response headers
      *
-     * @param StreamInterface $stream
+     * @param StreamInterface $stream            
      */
     protected function processResponseHeaders(StreamInterface $stream)
     {
@@ -250,26 +273,28 @@ class PhpStreamRequestFactory implements StreamRequestFactoryInterface
     /**
      * Create a resource and check to ensure it was created successfully
      *
-     * @param callable $callback Closure to invoke that must return a valid resource
-     *
+     * @param callable $callback
+     *            Closure to invoke that must return a valid resource
+     *            
      * @return resource
      * @throws RuntimeException on error
      */
     protected function createResource($callback)
     {
         $errors = null;
-        set_error_handler(function ($_, $msg, $file, $line) use (&$errors) {
+        set_error_handler(function ($_, $msg, $file, $line) use(&$errors)
+        {
             $errors[] = array(
                 'message' => $msg,
-                'file'    => $file,
-                'line'    => $line
+                'file' => $file,
+                'line' => $line
             );
             return true;
         });
         $resource = call_user_func($callback);
         restore_error_handler();
-
-        if (!$resource) {
+        
+        if (! $resource) {
             $message = 'Error creating resource. ';
             foreach ($errors as $err) {
                 foreach ($err as $key => $value) {
@@ -278,7 +303,7 @@ class PhpStreamRequestFactory implements StreamRequestFactoryInterface
             }
             throw new RuntimeException(trim($message));
         }
-
+        
         return $resource;
     }
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Plugin\Backoff;
 
 use Guzzle\Http\Message\Request;
@@ -11,10 +10,14 @@ use Guzzle\Plugin\Backoff\CallbackBackoffStrategy;
  */
 class AbstractBackoffStrategyTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     protected function getMockStrategy()
     {
         return $this->getMockBuilder('Guzzle\Plugin\Backoff\AbstractBackoffStrategy')
-            ->setMethods(array('getDelay', 'makesDecision'))
+            ->setMethods(array(
+            'getDelay',
+            'makesDecision'
+        ))
             ->getMockForAbstractClass();
     }
 
@@ -22,7 +25,9 @@ class AbstractBackoffStrategyTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $request = new Request('GET', 'http://www.foo.com');
         $mock = $this->getMockStrategy();
-        $mock->expects($this->atLeastOnce())->method('getDelay')->will($this->returnValue(null));
+        $mock->expects($this->atLeastOnce())
+            ->method('getDelay')
+            ->will($this->returnValue(null));
         $this->assertEquals(0, $mock->getBackoffPeriod(0, $request));
     }
 
@@ -30,7 +35,9 @@ class AbstractBackoffStrategyTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $request = new Request('GET', 'http://www.foo.com');
         $mock = $this->getMockStrategy();
-        $mock->expects($this->atLeastOnce())->method('getDelay')->will($this->returnValue(false));
+        $mock->expects($this->atLeastOnce())
+            ->method('getDelay')
+            ->will($this->returnValue(false));
         $this->assertEquals(false, $mock->getBackoffPeriod(0, $request));
     }
 
@@ -38,14 +45,22 @@ class AbstractBackoffStrategyTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $request = new Request('GET', 'http://www.foo.com');
         $mock = $this->getMockStrategy();
-        $mock->expects($this->atLeastOnce())->method('getDelay')->will($this->returnValue(null));
-        $mock->expects($this->any())->method('makesDecision')->will($this->returnValue(false));
-
+        $mock->expects($this->atLeastOnce())
+            ->method('getDelay')
+            ->will($this->returnValue(null));
+        $mock->expects($this->any())
+            ->method('makesDecision')
+            ->will($this->returnValue(false));
+        
         $mock2 = $this->getMockStrategy();
-        $mock2->expects($this->atLeastOnce())->method('getDelay')->will($this->returnValue(10));
-        $mock2->expects($this->atLeastOnce())->method('makesDecision')->will($this->returnValue(true));
+        $mock2->expects($this->atLeastOnce())
+            ->method('getDelay')
+            ->will($this->returnValue(10));
+        $mock2->expects($this->atLeastOnce())
+            ->method('makesDecision')
+            ->will($this->returnValue(true));
         $mock->setNext($mock2);
-
+        
         $this->assertEquals(10, $mock->getBackoffPeriod(0, $request));
     }
 
@@ -66,10 +81,22 @@ class AbstractBackoffStrategyTest extends \Guzzle\Tests\GuzzleTestCase
 
     public function testSkipsOtherDecisionsInChainWhenOneReturnsTrue()
     {
-        $a = new CallbackBackoffStrategy(function () { return null; }, true);
-        $b = new CallbackBackoffStrategy(function () { return true; }, true);
-        $c = new CallbackBackoffStrategy(function () { return null; }, true);
-        $d = new CallbackBackoffStrategy(function () { return 10; }, false);
+        $a = new CallbackBackoffStrategy(function ()
+        {
+            return null;
+        }, true);
+        $b = new CallbackBackoffStrategy(function ()
+        {
+            return true;
+        }, true);
+        $c = new CallbackBackoffStrategy(function ()
+        {
+            return null;
+        }, true);
+        $d = new CallbackBackoffStrategy(function ()
+        {
+            return 10;
+        }, false);
         $a->setNext($b);
         $b->setNext($c);
         $c->setNext($d);
@@ -78,8 +105,14 @@ class AbstractBackoffStrategyTest extends \Guzzle\Tests\GuzzleTestCase
 
     public function testReturnsZeroWhenDecisionMakerReturnsTrueButNoFurtherStrategiesAreInTheChain()
     {
-        $a = new CallbackBackoffStrategy(function () { return null; }, true);
-        $b = new CallbackBackoffStrategy(function () { return true; }, true);
+        $a = new CallbackBackoffStrategy(function ()
+        {
+            return null;
+        }, true);
+        $b = new CallbackBackoffStrategy(function ()
+        {
+            return true;
+        }, true);
         $a->setNext($b);
         $this->assertSame(0, $a->getBackoffPeriod(2, new Request('GET', 'http://www.foo.com')));
     }

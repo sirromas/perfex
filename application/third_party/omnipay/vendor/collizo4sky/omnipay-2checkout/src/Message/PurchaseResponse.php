@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\TwoCheckoutPlus\Message;
 
 use Omnipay\Common\Message\AbstractResponse;
@@ -10,7 +9,9 @@ use Omnipay\Common\Message\RedirectResponseInterface;
  */
 class PurchaseResponse extends AbstractResponse implements RedirectResponseInterface
 {
+
     protected $liveEndpoint = 'https://www.2checkout.com/checkout/purchase';
+
     protected $testEndpoint = 'https://sandbox.2checkout.com/checkout/purchase';
 
     /**
@@ -28,6 +29,7 @@ class PurchaseResponse extends AbstractResponse implements RedirectResponseInter
     }
 
     /**
+     *
      * @return bool
      */
     public function isSuccessful()
@@ -36,6 +38,7 @@ class PurchaseResponse extends AbstractResponse implements RedirectResponseInter
     }
 
     /**
+     *
      * @return bool
      */
     public function isRedirect()
@@ -44,22 +47,24 @@ class PurchaseResponse extends AbstractResponse implements RedirectResponseInter
     }
 
     /**
+     *
      * @return string
      */
     public function getRedirectUrl()
     {
         $endpoint = $this->getEndPoint();
-
+        
         // remove the sandbox parameter.
         unset($this->data['sandbox']);
-
-        $url = $endpoint.'?'.http_build_query($this->data);
-
+        
+        $url = $endpoint . '?' . http_build_query($this->data);
+        
         // Fix for some sites that encode the entities
         return str_replace('&amp;', '&', $url);
     }
 
     /**
+     *
      * @return string
      */
     public function getRedirectMethod()

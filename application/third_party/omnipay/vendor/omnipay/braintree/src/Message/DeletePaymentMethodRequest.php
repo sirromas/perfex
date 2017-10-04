@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\Braintree\Message;
 
 use Omnipay\Common\Message\ResponseInterface;
@@ -11,6 +10,7 @@ use Omnipay\Common\Message\ResponseInterface;
  */
 class DeletePaymentMethodRequest extends AbstractRequest
 {
+
     public function getData()
     {
         return $this->getToken();
@@ -19,13 +19,14 @@ class DeletePaymentMethodRequest extends AbstractRequest
     /**
      * Send the request with specified data
      *
-     * @param  mixed $data The data to send
+     * @param mixed $data
+     *            The data to send
      * @return ResponseInterface
      */
     public function sendData($data)
     {
         $response = $this->braintree->paymentMethod()->delete($data);
-
+        
         return $this->createResponse($response);
     }
 }

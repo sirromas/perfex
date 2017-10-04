@@ -4,8 +4,8 @@ namespace Braintree;
 /**
  * Braintree PaymentMethod module
  *
- * @package    Braintree
- * @category   Resources
+ * @package Braintree
+ * @category Resources
  */
 
 /**
@@ -14,13 +14,12 @@ namespace Braintree;
  * <b>== More information ==</b>
  *
  *
- * @package    Braintree
- * @category   Resources
+ * @package Braintree
+ * @category Resources
  */
 class PaymentMethod extends Base
 {
     // static methods redirecting to gateway
-
     public static function create($attribs)
     {
         return Configuration::gateway()->paymentMethod()->create($attribs);
@@ -36,7 +35,7 @@ class PaymentMethod extends Base
         return Configuration::gateway()->paymentMethod()->update($token, $attribs);
     }
 
-    public static function delete($token, $options=[])
+    public static function delete($token, $options = [])
     {
         return Configuration::gateway()->paymentMethod()->delete($token, $options);
     }

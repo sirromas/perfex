@@ -1,11 +1,11 @@
 <?php
-
 namespace Omnipay\Stripe\Message;
 
 use Omnipay\Tests\TestCase;
 
 class UpdateCustomerRequestTest extends TestCase
 {
+
     public function setUp()
     {
         $this->request = new UpdateCustomerRequest($this->getHttpClient(), $this->getHttpRequest());
@@ -21,10 +21,12 @@ class UpdateCustomerRequestTest extends TestCase
     {
         $this->request->setEmail('customer@business.dom');
         $this->request->setDescription('New customer');
-        $this->request->setMetadata(array('field' => 'value'));
-
+        $this->request->setMetadata(array(
+            'field' => 'value'
+        ));
+        
         $data = $this->request->getData();
-
+        
         $this->assertSame('customer@business.dom', $data['email']);
         $this->assertSame('New customer', $data['description']);
         $this->assertArrayHasKey('field', $data['metadata']);
@@ -35,7 +37,7 @@ class UpdateCustomerRequestTest extends TestCase
     {
         $this->request->setToken('xyz');
         $data = $this->request->getData();
-
+        
         $this->assertSame('xyz', $data['card']);
     }
 
@@ -44,7 +46,7 @@ class UpdateCustomerRequestTest extends TestCase
         $card = $this->getValidCard();
         $this->request->setCard($card);
         $data = $this->request->getData();
-
+        
         $this->assertSame($card['number'], $data['card']['number']);
     }
 
@@ -52,7 +54,7 @@ class UpdateCustomerRequestTest extends TestCase
     {
         $this->setMockHttpResponse('UpdateCustomerSuccess.txt');
         $response = $this->request->send();
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());
@@ -64,7 +66,7 @@ class UpdateCustomerRequestTest extends TestCase
     {
         $this->setMockHttpResponse('UpdateCustomerFailure.txt');
         $response = $this->request->send();
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());

@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Common;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -11,7 +10,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class AbstractHasDispatcher implements HasDispatcherInterface
 {
-    /** @var EventDispatcherInterface */
+
+    /**
+     * @var EventDispatcherInterface
+     */
     protected $eventDispatcher;
 
     public static function getAllEvents()
@@ -22,16 +24,16 @@ class AbstractHasDispatcher implements HasDispatcherInterface
     public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
-
+        
         return $this;
     }
 
     public function getEventDispatcher()
     {
-        if (!$this->eventDispatcher) {
+        if (! $this->eventDispatcher) {
             $this->eventDispatcher = new EventDispatcher();
         }
-
+        
         return $this->eventDispatcher;
     }
 
@@ -43,7 +45,7 @@ class AbstractHasDispatcher implements HasDispatcherInterface
     public function addSubscriber(EventSubscriberInterface $subscriber)
     {
         $this->getEventDispatcher()->addSubscriber($subscriber);
-
+        
         return $this;
     }
 }

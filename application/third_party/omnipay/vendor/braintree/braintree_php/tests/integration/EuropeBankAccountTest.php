@@ -8,6 +8,7 @@ use Braintree;
 
 class EuropeBankAccountTest extends Setup
 {
+
     public function testCanExchangeNonceForEuropeBankAccount()
     {
         $gateway = new Braintree\Gateway([
@@ -16,7 +17,7 @@ class EuropeBankAccountTest extends Setup
             'publicKey' => 'altpay_merchant_public_key',
             'privateKey' => 'altpay_merchant_private_key'
         ]);
-
+        
         $result = $gateway->customer()->create();
         $this->assertTrue($result->success);
         $customer = $result->customer;
@@ -44,7 +45,7 @@ class EuropeBankAccountTest extends Setup
             "customerId" => $customer->id,
             "paymentMethodNonce" => $nonce
         ]);
-
+        
         $this->assertTrue($result->success);
         $paymentMethod = $result->paymentMethod;
         $account = $gateway->paymentMethod()->find($paymentMethod->token);

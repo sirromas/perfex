@@ -9,6 +9,7 @@ use Braintree;
 
 class PaymentMethodNonceTest extends Setup
 {
+
     public function testCreate_fromPaymentMethodToken()
     {
         $customer = Braintree\Customer::createNoValidate();
@@ -16,11 +17,11 @@ class PaymentMethodNonceTest extends Setup
             'customerId' => $customer->id,
             'cardholderName' => 'Cardholder',
             'number' => '5105105105105100',
-            'expirationDate' => '05/12',
+            'expirationDate' => '05/12'
         ])->creditCard;
-
+        
         $result = Braintree\PaymentMethodNonce::create($card->token);
-
+        
         $this->assertTrue($result->success);
         $this->assertNotNull($result->paymentMethodNonce);
         $this->assertNotNull($result->paymentMethodNonce->nonce);
@@ -44,7 +45,7 @@ class PaymentMethodNonceTest extends Setup
         $nonce = Helper::generate3DSNonce($creditCard);
         $foundNonce = Braintree\PaymentMethodNonce::find($nonce);
         $info = $foundNonce->threeDSecureInfo;
-
+        
         $this->assertEquals($nonce, $foundNonce->nonce);
         $this->assertEquals('CreditCard', $foundNonce->type);
         $this->assertEquals('Y', $info->enrolled);
@@ -63,10 +64,10 @@ class PaymentMethodNonceTest extends Setup
                 "expirationYear" => "2099"
             ]
         ]);
-
+        
         $foundNonce = Braintree\PaymentMethodNonce::find($nonce);
         $info = $foundNonce->threeDSecureInfo;
-
+        
         $this->assertEquals($nonce, $foundNonce->nonce);
         $this->assertNull($info);
     }

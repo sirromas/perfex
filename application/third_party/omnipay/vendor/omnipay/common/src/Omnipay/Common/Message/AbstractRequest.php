@@ -2,7 +2,6 @@
 /**
  * Abstract Request
  */
-
 namespace Omnipay\Common\Message;
 
 use Guzzle\Http\ClientInterface;
@@ -29,31 +28,31 @@ use InvalidArgumentException;
  * Example -- creating a request:
  *
  * <code>
- *   class MyRequest extends \Omnipay\Common\Message\AbstractRequest {};
+ * class MyRequest extends \Omnipay\Common\Message\AbstractRequest {};
  *
- *   class MyGateway extends \Omnipay\Common\AbstractGateway {
- *     function myRequest($parameters) {
- *       $this->createRequest('MyRequest', $parameters);
- *     }
- *   }
+ * class MyGateway extends \Omnipay\Common\AbstractGateway {
+ * function myRequest($parameters) {
+ * $this->createRequest('MyRequest', $parameters);
+ * }
+ * }
  *
- *   // Create the gateway object
- *   $gw = Omnipay::create('MyGateway');
+ * // Create the gateway object
+ * $gw = Omnipay::create('MyGateway');
  *
- *   // Create the request object
- *   $myRequest = $gw->myRequest($someParameters);
+ * // Create the request object
+ * $myRequest = $gw->myRequest($someParameters);
  * </code>
  *
  * Example -- validating and sending a request:
  *
  * <code>
- *   try {
- *     $myRequest->validate();
- *     $myResponse = $myRequest->send();
- *   } catch (InvalidRequestException $e) {
- *     print "Something went wrong: " . $e->getMessage() . "\n";
- *   }
- *   // now do something with the $myResponse object, test for success, etc.
+ * try {
+ * $myRequest->validate();
+ * $myResponse = $myRequest->send();
+ * } catch (InvalidRequestException $e) {
+ * print "Something went wrong: " . $e->getMessage() . "\n";
+ * }
+ * // now do something with the $myResponse object, test for success, etc.
  * </code>
  *
  * @see RequestInterface
@@ -61,6 +60,7 @@ use InvalidArgumentException;
  */
 abstract class AbstractRequest implements RequestInterface
 {
+
     /**
      * The request parameters
      *
@@ -90,11 +90,13 @@ abstract class AbstractRequest implements RequestInterface
     protected $response;
 
     /**
+     *
      * @var bool
      */
     protected $zeroAmountAllowed = true;
 
     /**
+     *
      * @var bool
      */
     protected $negativeAmountAllowed = false;
@@ -102,8 +104,10 @@ abstract class AbstractRequest implements RequestInterface
     /**
      * Create a new Request
      *
-     * @param ClientInterface $httpClient  A Guzzle client to make API calls with
-     * @param HttpRequest     $httpRequest A Symfony HTTP request object
+     * @param ClientInterface $httpClient
+     *            A Guzzle client to make API calls with
+     * @param HttpRequest $httpRequest
+     *            A Symfony HTTP request object
      */
     public function __construct(ClientInterface $httpClient, HttpRequest $httpRequest)
     {
@@ -117,8 +121,9 @@ abstract class AbstractRequest implements RequestInterface
      *
      * If any unknown parameters passed, they will be ignored.
      *
-     * @param array $parameters An associative array of parameters
-     *
+     * @param array $parameters
+     *            An associative array of parameters
+     *            
      * @return $this
      * @throws RuntimeException
      */
@@ -127,11 +132,11 @@ abstract class AbstractRequest implements RequestInterface
         if (null !== $this->response) {
             throw new RuntimeException('Request cannot be modified after it has been sent!');
         }
-
-        $this->parameters = new ParameterBag;
-
+        
+        $this->parameters = new ParameterBag();
+        
         Helper::initialize($this, $parameters);
-
+        
         return $this;
     }
 
@@ -148,7 +153,8 @@ abstract class AbstractRequest implements RequestInterface
     /**
      * Get a single parameter.
      *
-     * @param string $key The parameter key
+     * @param string $key
+     *            The parameter key
      * @return mixed
      */
     protected function getParameter($key)
@@ -159,8 +165,10 @@ abstract class AbstractRequest implements RequestInterface
     /**
      * Set a single parameter
      *
-     * @param string $key The parameter key
-     * @param mixed $value The value to set
+     * @param string $key
+     *            The parameter key
+     * @param mixed $value
+     *            The value to set
      * @return AbstractRequest Provides a fluent interface
      * @throws RuntimeException if a request parameter is modified after the request has been sent.
      */
@@ -169,9 +177,9 @@ abstract class AbstractRequest implements RequestInterface
         if (null !== $this->response) {
             throw new RuntimeException('Request cannot be modified after it has been sent!');
         }
-
+        
         $this->parameters->set($key, $value);
-
+        
         return $this;
     }
 
@@ -188,7 +196,8 @@ abstract class AbstractRequest implements RequestInterface
     /**
      * Sets the test mode of the request.
      *
-     * @param boolean $value True for test mode on.
+     * @param boolean $value
+     *            True for test mode on.
      * @return AbstractRequest
      */
     public function setTestMode($value)
@@ -202,7 +211,8 @@ abstract class AbstractRequest implements RequestInterface
      * This method is called internally by gateways to avoid wasting time with an API call
      * when the request is clearly invalid.
      *
-     * @param string ... a variable length list of required parameters
+     * @param
+     *            string ... a variable length list of required parameters
      * @throws InvalidRequestException
      */
     public function validate()
@@ -228,15 +238,15 @@ abstract class AbstractRequest implements RequestInterface
     /**
      * Sets the card.
      *
-     * @param CreditCard $value
+     * @param CreditCard $value            
      * @return AbstractRequest Provides a fluent interface
      */
     public function setCard($value)
     {
-        if ($value && !$value instanceof CreditCard) {
+        if ($value && ! $value instanceof CreditCard) {
             $value = new CreditCard($value);
         }
-
+        
         return $this->setParameter('card', $value);
     }
 
@@ -253,7 +263,7 @@ abstract class AbstractRequest implements RequestInterface
     /**
      * Sets the card token.
      *
-     * @param string $value
+     * @param string $value            
      * @return AbstractRequest Provides a fluent interface
      */
     public function setToken($value)
@@ -274,7 +284,7 @@ abstract class AbstractRequest implements RequestInterface
     /**
      * Sets the card reference.
      *
-     * @param string $value
+     * @param string $value            
      * @return AbstractRequest Provides a fluent interface
      */
     public function setCardReference($value)
@@ -285,11 +295,10 @@ abstract class AbstractRequest implements RequestInterface
     /**
      * Convert an amount into a float.
      *
-     * @var string|int|float $value The value to convert.
+     * @var string|int|float value to convert.
      * @throws InvalidRequestException on any validation failure.
      * @return float The amount converted to a float.
      */
-
     public function toFloat($value)
     {
         try {
@@ -309,37 +318,35 @@ abstract class AbstractRequest implements RequestInterface
     public function getAmount()
     {
         $amount = $this->getParameter('amount');
-
+        
         if ($amount !== null) {
             // Don't allow integers for currencies that support decimals.
             // This is for legacy reasons - upgrades from v0.9
             if ($this->getCurrencyDecimalPlaces() > 0) {
                 if (is_int($amount) || (is_string($amount) && false === strpos((string) $amount, '.'))) {
-                    throw new InvalidRequestException(
-                        'Please specify amount as a string or float, '
-                        . 'with decimal places (e.g. \'10.00\' to represent $10.00).'
-                    );
-                };
+                    throw new InvalidRequestException('Please specify amount as a string or float, ' . 'with decimal places (e.g. \'10.00\' to represent $10.00).');
+                }
+                ;
             }
-
+            
             $amount = $this->toFloat($amount);
-
+            
             // Check for a negative amount.
-            if (!$this->negativeAmountAllowed && $amount < 0) {
+            if (! $this->negativeAmountAllowed && $amount < 0) {
                 throw new InvalidRequestException('A negative amount is not allowed.');
             }
-
+            
             // Check for a zero amount.
-            if (!$this->zeroAmountAllowed && $amount === 0.0) {
+            if (! $this->zeroAmountAllowed && $amount === 0.0) {
                 throw new InvalidRequestException('A zero amount is not allowed.');
             }
-
+            
             // Check for rounding that may occur if too many significant decimal digits are supplied.
             $decimal_count = strlen(substr(strrchr(sprintf('%.8g', $amount), '.'), 1));
             if ($decimal_count > $this->getCurrencyDecimalPlaces()) {
                 throw new InvalidRequestException('Amount precision is too high for currency.');
             }
-
+            
             return $this->formatCurrency($amount);
         }
     }
@@ -347,7 +354,7 @@ abstract class AbstractRequest implements RequestInterface
     /**
      * Sets the payment amount.
      *
-     * @param string $value
+     * @param string $value            
      * @return AbstractRequest Provides a fluent interface
      */
     public function setAmount($value)
@@ -378,7 +385,7 @@ abstract class AbstractRequest implements RequestInterface
     /**
      * Sets the payment currency code.
      *
-     * @param string $value
+     * @param string $value            
      * @return AbstractRequest Provides a fluent interface
      */
     public function setCurrency($value)
@@ -411,7 +418,7 @@ abstract class AbstractRequest implements RequestInterface
         if ($currency = Currency::find($this->getCurrency())) {
             return $currency->getDecimals();
         }
-
+        
         return 2;
     }
 
@@ -427,12 +434,7 @@ abstract class AbstractRequest implements RequestInterface
      */
     public function formatCurrency($amount)
     {
-        return number_format(
-            $amount,
-            $this->getCurrencyDecimalPlaces(),
-            '.',
-            ''
-        );
+        return number_format($amount, $this->getCurrencyDecimalPlaces(), '.', '');
     }
 
     /**
@@ -448,7 +450,7 @@ abstract class AbstractRequest implements RequestInterface
     /**
      * Sets the request description.
      *
-     * @param string $value
+     * @param string $value            
      * @return AbstractRequest Provides a fluent interface
      */
     public function setDescription($value)
@@ -471,7 +473,7 @@ abstract class AbstractRequest implements RequestInterface
     /**
      * Sets the transaction ID.
      *
-     * @param string $value
+     * @param string $value            
      * @return AbstractRequest Provides a fluent interface
      */
     public function setTransactionId($value)
@@ -495,7 +497,7 @@ abstract class AbstractRequest implements RequestInterface
     /**
      * Sets the transaction reference.
      *
-     * @param string $value
+     * @param string $value            
      * @return AbstractRequest Provides a fluent interface
      */
     public function setTransactionReference($value)
@@ -506,7 +508,7 @@ abstract class AbstractRequest implements RequestInterface
     /**
      * A list of items in this order
      *
-     * @return ItemBag|null A bag containing items in this order
+     * @return ItemBag|null bag containing items in this order
      */
     public function getItems()
     {
@@ -516,15 +518,16 @@ abstract class AbstractRequest implements RequestInterface
     /**
      * Set the items in this order
      *
-     * @param ItemBag|array $items An array of items in this order
+     * @param ItemBag|array $items
+     *            An array of items in this order
      * @return AbstractRequest
      */
     public function setItems($items)
     {
-        if ($items && !$items instanceof ItemBag) {
+        if ($items && ! $items instanceof ItemBag) {
             $items = new ItemBag($items);
         }
-
+        
         return $this->setParameter('items', $items);
     }
 
@@ -541,7 +544,7 @@ abstract class AbstractRequest implements RequestInterface
     /**
      * Sets the client IP address.
      *
-     * @param string $value
+     * @param string $value            
      * @return AbstractRequest Provides a fluent interface
      */
     public function setClientIp($value)
@@ -562,7 +565,7 @@ abstract class AbstractRequest implements RequestInterface
     /**
      * Sets the request return URL.
      *
-     * @param string $value
+     * @param string $value            
      * @return AbstractRequest Provides a fluent interface
      */
     public function setReturnUrl($value)
@@ -583,7 +586,7 @@ abstract class AbstractRequest implements RequestInterface
     /**
      * Sets the request cancel URL.
      *
-     * @param string $value
+     * @param string $value            
      * @return AbstractRequest Provides a fluent interface
      */
     public function setCancelUrl($value)
@@ -604,7 +607,7 @@ abstract class AbstractRequest implements RequestInterface
     /**
      * Sets the request notify URL.
      *
-     * @param string $value
+     * @param string $value            
      * @return AbstractRequest Provides a fluent interface
      */
     public function setNotifyUrl($value)
@@ -631,7 +634,7 @@ abstract class AbstractRequest implements RequestInterface
      * This field is used by some European gateways, and normally represents
      * the bank where an account is held (separate from the card brand).
      *
-     * @param string $value
+     * @param string $value            
      * @return AbstractRequest Provides a fluent interface
      */
     public function setIssuer($value)
@@ -658,7 +661,7 @@ abstract class AbstractRequest implements RequestInterface
      * This field is used by some European gateways, which support
      * multiple payment providers with a single API.
      *
-     * @param string $value
+     * @param string $value            
      * @return AbstractRequest Provides a fluent interface
      */
     public function setPaymentMethod($value)
@@ -674,7 +677,7 @@ abstract class AbstractRequest implements RequestInterface
     public function send()
     {
         $data = $this->getData();
-
+        
         return $this->sendData($data);
     }
 
@@ -688,7 +691,7 @@ abstract class AbstractRequest implements RequestInterface
         if (null === $this->response) {
             throw new RuntimeException('You must call send() before accessing the Response!');
         }
-
+        
         return $this->response;
     }
 }

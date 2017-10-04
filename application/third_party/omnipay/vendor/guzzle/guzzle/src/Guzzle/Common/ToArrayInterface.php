@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Common;
 
 /**
@@ -7,6 +6,7 @@ namespace Guzzle\Common;
  */
 interface ToArrayInterface
 {
+
     /**
      * Get the array representation of an object
      *

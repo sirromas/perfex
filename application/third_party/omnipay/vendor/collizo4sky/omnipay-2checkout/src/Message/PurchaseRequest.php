@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\TwoCheckoutPlus\Message;
 
 /**
@@ -9,48 +8,49 @@ namespace Omnipay\TwoCheckoutPlus\Message;
  */
 class PurchaseRequest extends AbstractRequest
 {
+
     public function getData()
     {
         $this->validate('accountNumber', 'returnUrl');
-
+        
         $data = array();
         $data['sid'] = $this->getAccountNumber();
         $data['mode'] = '2CO';
         $data['merchant_order_id'] = $this->getTransactionId();
         $data['currency_code'] = $this->getCurrency();
         $data['x_receipt_link_url'] = $this->getReturnUrl();
-
+        
         // Do not pass for live sales i.e if its false.
         if ($this->getDemoMode()) {
             $data['demo'] = 'Y';
         }
-
+        
         if ($this->getLanguage()) {
             $data['lang'] = $this->getLanguage();
         }
-
+        
         if ($this->getPurchaseStep()) {
             $data['purchase_step'] = $this->getPurchaseStep();
         }
-
+        
         if ($this->getCoupon()) {
             $data['coupon'] = $this->getCoupon();
         }
-
+        
         // needed to determine which API endpoint to use in OffsiteResponse
         if ($this->getTestMode()) {
             $data['sandbox'] = true;
         }
-
+        
         $i = 0;
-
+        
         // Setup Products information
         foreach ($this->getCart() as $item) {
             $data['li_' . $i . '_type'] = $item['type'];
             $data['li_' . $i . '_name'] = $item['name'];
             $data['li_' . $i . '_price'] = $item['price'];
             $data['li_' . $i . '_quantity'] = $item['quantity'];
-
+            
             // optional item/product parameters
             if (isset($item['tangible'])) {
                 $data['li_' . $i . '_tangible'] = $item['tangible'];
@@ -70,10 +70,10 @@ class PurchaseRequest extends AbstractRequest
             if (isset($item['startup_fee'])) {
                 $data['li_' . $i . '_startup_fee'] = $item['startup_fee'];
             }
-
-            ++$i;
+            
+            ++ $i;
         }
-
+        
         if ($this->getCard()) {
             $data['card_holder_name'] = $this->getCard()->getName();
             $data['street_address'] = $this->getCard()->getAddress1();
@@ -85,16 +85,18 @@ class PurchaseRequest extends AbstractRequest
             $data['phone'] = $this->getCard()->getPhone();
             $data['email'] = $this->getCard()->getEmail();
         }
-
-        $data = array_filter($data, function ($value) {
-            return !is_null($value);
+        
+        $data = array_filter($data, function ($value)
+        {
+            return ! is_null($value);
         });
-
+        
         return $data;
     }
 
     /**
-     * @param mixed $data
+     *
+     * @param mixed $data            
      *
      * @return PurchaseResponse
      */

@@ -8,6 +8,7 @@ use Braintree;
 
 class ErrorTest extends Setup
 {
+
     public function testValueForHtmlField()
     {
         $result = Braintree\Customer::create([

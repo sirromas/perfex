@@ -1,7 +1,7 @@
 <?php init_head(); ?>
 <div id="wrapper">
-    <div class="content">
-        <div class="row">
+	<div class="content">
+		<div class="row">
             <?php include_once(APPPATH . 'views/admin/includes/alerts.php'); ?>
             <?php do_action( 'before_start_render_dashboard_content' ); ?>
             <?php do_action('before_top_column_dashboard'); ?>
@@ -22,10 +22,11 @@
                         <?php $this->load->view('admin/includes/widgets/leads_chart'); ?>
                     </div>
                     <?php } ?>
-                    <div class="col-md-<?php if(!is_staff_member()){echo 12;}else{echo 6;};?> col-sm-12">
+                    <div
+						class="col-md-<?php if(!is_staff_member()){echo 12;}else{echo 6;};?> col-sm-12">
                         <?php $this->load->view('admin/includes/widgets/projects_chart'); ?>
                     </div>
-                </div>
+				</div>
                 <?php $this->load->view('admin/includes/widgets/weekly_payments_chart'); ?>
                 <?php do_action('left_column_end_dashboard'); ?>
             </div>
@@ -40,7 +41,7 @@
             </div>
             <?php do_action('after_right_column_dashboard'); ?>
         </div>
-    </div>
+	</div>
 </div>
 </div>
 <script>

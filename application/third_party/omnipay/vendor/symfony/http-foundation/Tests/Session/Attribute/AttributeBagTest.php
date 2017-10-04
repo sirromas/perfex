@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\Tests\Session\Attribute;
 
 use PHPUnit\Framework\TestCase;
@@ -21,12 +20,15 @@ use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
  */
 class AttributeBagTest extends TestCase
 {
+
     /**
+     *
      * @var array
      */
     private $array;
 
     /**
+     *
      * @var AttributeBag
      */
     private $bag;
@@ -39,14 +41,14 @@ class AttributeBagTest extends TestCase
             'user.login' => 'drak',
             'csrf.token' => array(
                 'a' => '1234',
-                'b' => '4321',
+                'b' => '4321'
             ),
             'category' => array(
                 'fishing' => array(
                     'first' => 'cod',
-                    'second' => 'sole',
-                ),
-            ),
+                    'second' => 'sole'
+                )
+            )
         );
         $this->bag = new AttributeBag('_sf2');
         $this->bag->initialize($this->array);
@@ -63,7 +65,9 @@ class AttributeBagTest extends TestCase
         $bag = new AttributeBag();
         $bag->initialize($this->array);
         $this->assertEquals($this->array, $bag->all());
-        $array = array('should' => 'change');
+        $array = array(
+            'should' => 'change'
+        );
         $bag->initialize($array);
         $this->assertEquals($array, $bag->all());
     }
@@ -116,7 +120,7 @@ class AttributeBagTest extends TestCase
     public function testAll()
     {
         $this->assertEquals($this->array, $this->bag->all());
-
+        
         $this->bag->set('hello', 'fabien');
         $array = $this->array;
         $array['hello'] = 'fabien';
@@ -140,11 +144,11 @@ class AttributeBagTest extends TestCase
         $this->assertEquals('world', $this->bag->get('hello'));
         $this->bag->remove('hello');
         $this->assertNull($this->bag->get('hello'));
-
+        
         $this->assertEquals('be happy', $this->bag->get('always'));
         $this->bag->remove('always');
         $this->assertNull($this->bag->get('always'));
-
+        
         $this->assertEquals('drak', $this->bag->get('user.login'));
         $this->bag->remove('user.login');
         $this->assertNull($this->bag->get('user.login'));
@@ -159,15 +163,59 @@ class AttributeBagTest extends TestCase
     public function attributesProvider()
     {
         return array(
-            array('hello', 'world', true),
-            array('always', 'be happy', true),
-            array('user.login', 'drak', true),
-            array('csrf.token', array('a' => '1234', 'b' => '4321'), true),
-            array('category', array('fishing' => array('first' => 'cod', 'second' => 'sole')), true),
-            array('user2.login', null, false),
-            array('never', null, false),
-            array('bye', null, false),
-            array('bye/for/now', null, false),
+            array(
+                'hello',
+                'world',
+                true
+            ),
+            array(
+                'always',
+                'be happy',
+                true
+            ),
+            array(
+                'user.login',
+                'drak',
+                true
+            ),
+            array(
+                'csrf.token',
+                array(
+                    'a' => '1234',
+                    'b' => '4321'
+                ),
+                true
+            ),
+            array(
+                'category',
+                array(
+                    'fishing' => array(
+                        'first' => 'cod',
+                        'second' => 'sole'
+                    )
+                ),
+                true
+            ),
+            array(
+                'user2.login',
+                null,
+                false
+            ),
+            array(
+                'never',
+                null,
+                false
+            ),
+            array(
+                'bye',
+                null,
+                false
+            ),
+            array(
+                'bye/for/now',
+                null,
+                false
+            )
         );
     }
 
@@ -176,9 +224,9 @@ class AttributeBagTest extends TestCase
         $i = 0;
         foreach ($this->bag as $key => $val) {
             $this->assertEquals($this->array[$key], $val);
-            ++$i;
+            ++ $i;
         }
-
+        
         $this->assertEquals(count($this->array), $i);
     }
 

@@ -3,7 +3,6 @@
 /**
  * Stripe List Transfers Request (Connect only).
  */
-
 namespace Omnipay\Stripe\Message\Transfers;
 
 use Omnipay\Stripe\Message\AbstractRequest;
@@ -19,7 +18,9 @@ use Omnipay\Stripe\Message\AbstractRequest;
  */
 class ListTransfersRequest extends AbstractRequest
 {
+
     /**
+     *
      * @return mixed
      */
     public function getLimit()
@@ -28,7 +29,8 @@ class ListTransfersRequest extends AbstractRequest
     }
 
     /**
-     * @param string $value
+     *
+     * @param string $value            
      *
      * @return \Omnipay\Common\Message\AbstractRequest
      */
@@ -38,6 +40,7 @@ class ListTransfersRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return mixed
      */
     public function getDestination()
@@ -46,7 +49,8 @@ class ListTransfersRequest extends AbstractRequest
     }
 
     /**
-     * @param string $value
+     *
+     * @param string $value            
      *
      * @return \Omnipay\Common\Message\AbstractRequest
      */
@@ -66,7 +70,8 @@ class ListTransfersRequest extends AbstractRequest
     }
 
     /**
-     * @param string $value
+     *
+     * @param string $value            
      *
      * @return \Omnipay\Common\Message\AbstractRequest
      */
@@ -76,7 +81,8 @@ class ListTransfersRequest extends AbstractRequest
     }
 
     /**
-     * A cursor for use in pagination. `ending_before` is an object ID that defines your place in the list.
+     * A cursor for use in pagination.
+     * `ending_before` is an object ID that defines your place in the list.
      * For instance, if you make a list request and receive 100 objects, starting with `obj_bar`, your
      * subsequent call can include `ending_before=obj_ba`r in order to fetch the previous page of the list.
      *
@@ -88,7 +94,8 @@ class ListTransfersRequest extends AbstractRequest
     }
 
     /**
-     * @param string $value
+     *
+     * @param string $value            
      *
      * @return \Omnipay\Common\Message\AbstractRequest
      */
@@ -98,7 +105,8 @@ class ListTransfersRequest extends AbstractRequest
     }
 
     /**
-     * A cursor for use in pagination. `starting_after` is an object ID that defines your place in the list.
+     * A cursor for use in pagination.
+     * `starting_after` is an object ID that defines your place in the list.
      * For instance, if you make a list request and receive 100 objects, ending with `obj_foo`, your
      * subsequent call can include `starting_after=obj_foo` in order to fetch the next page of the list.
      *
@@ -110,7 +118,8 @@ class ListTransfersRequest extends AbstractRequest
     }
 
     /**
-     * @param string $value
+     *
+     * @param string $value            
      *
      * @return \Omnipay\Common\Message\AbstractRequest
      */
@@ -120,45 +129,51 @@ class ListTransfersRequest extends AbstractRequest
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getData()
     {
         $data = array();
-
+        
         if ($this->getLimit()) {
             $data['limit'] = $this->getLimit();
         }
-
+        
         if ($this->getDestination()) {
             $data['destination'] = $this->getDestination();
         }
-
+        
         if ($this->getTransferGroup()) {
             $data['transfer_group'] = $this->getTransferGroup();
         }
-
+        
         if ($this->getEndingBefore()) {
             $data['ending_before'] = $this->getEndingBefore();
         }
-
+        
         if ($this->getStartingAfter()) {
             $data['starting_after'] = $this->getStartingAfter();
         }
-
+        
         return $data;
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getEndpoint()
     {
-        return $this->endpoint.'/transfers';
+        return $this->endpoint . '/transfers';
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getHttpMethod()
     {

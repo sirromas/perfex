@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\Common\Message;
 
 /**
@@ -7,8 +6,11 @@ namespace Omnipay\Common\Message;
  */
 interface NotificationInterface extends MessageInterface
 {
+
     const STATUS_COMPLETED = 'completed';
+
     const STATUS_PENDING = 'pending';
+
     const STATUS_FAILED = 'failed';
 
     /**
@@ -22,7 +24,7 @@ interface NotificationInterface extends MessageInterface
      * Was the transaction successful?
      *
      * @return string Transaction status, one of {@see STATUS_COMPLETED}, {@see #STATUS_PENDING},
-     * or {@see #STATUS_FAILED}.
+     *         or {@see #STATUS_FAILED}.
      */
     public function getTransactionStatus();
 

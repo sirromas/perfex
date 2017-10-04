@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Service\Command;
 
 use Guzzle\Service\Command\LocationVisitor\VisitorFlyweight;
@@ -11,6 +10,7 @@ use Guzzle\Service\Command\LocationVisitor\Response\JsonVisitor as JsonResponseV
  */
 class VisitorFlyweightTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testUsesDefaultMappingsWithGetInstance()
     {
         $f = VisitorFlyweight::getInstance();

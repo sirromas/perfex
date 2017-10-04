@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Service\Command;
 
 use Guzzle\Common\Collection;
@@ -16,6 +15,7 @@ use Guzzle\Common\ToArrayInterface;
  */
 interface CommandInterface extends \ArrayAccess, ToArrayInterface
 {
+
     /**
      * Get the short form name of the command
      *
@@ -48,8 +48,9 @@ interface CommandInterface extends \ArrayAccess, ToArrayInterface
     /**
      * Set the client object that will execute the command
      *
-     * @param ClientInterface $client The client object that will execute the command
-     *
+     * @param ClientInterface $client
+     *            The client object that will execute the command
+     *            
      * @return self
      */
     public function setClient(ClientInterface $client);
@@ -81,8 +82,9 @@ interface CommandInterface extends \ArrayAccess, ToArrayInterface
     /**
      * Set the result of the command
      *
-     * @param mixed $result Result to set
-     *
+     * @param mixed $result
+     *            Result to set
+     *            
      * @return self
      */
     public function setResult($result);
@@ -119,8 +121,9 @@ interface CommandInterface extends \ArrayAccess, ToArrayInterface
     /**
      * Specify a callable to execute when the command completes
      *
-     * @param mixed $callable Callable to execute when the command completes. The callable must accept a
-     *                        {@see CommandInterface} object as the only argument.
+     * @param mixed $callable
+     *            Callable to execute when the command completes. The callable must accept a
+     *            {@see CommandInterface} object as the only argument.
      * @return self
      * @throws InvalidArgumentException
      */

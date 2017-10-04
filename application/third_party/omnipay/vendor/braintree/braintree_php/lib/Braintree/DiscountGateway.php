@@ -3,8 +3,11 @@ namespace Braintree;
 
 class DiscountGateway
 {
+
     private $_gateway;
+
     private $_config;
+
     private $_http;
 
     public function __construct($gateway)
@@ -19,13 +22,12 @@ class DiscountGateway
     {
         $path = $this->_config->merchantPath() . '/discounts';
         $response = $this->_http->get($path);
-
-        $discounts = ["discount" => $response['discounts']];
-
-        return Util::extractAttributeAsArray(
-            $discounts,
-            'discount'
-        );
+        
+        $discounts = [
+            "discount" => $response['discounts']
+        ];
+        
+        return Util::extractAttributeAsArray($discounts, 'discount');
     }
 }
 class_alias('Braintree\DiscountGateway', 'Braintree_DiscountGateway');

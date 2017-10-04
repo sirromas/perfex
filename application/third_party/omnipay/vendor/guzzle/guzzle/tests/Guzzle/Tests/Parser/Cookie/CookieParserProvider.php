@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Parser\Cookie;
 
 use Guzzle\Http\Url;
@@ -9,6 +8,7 @@ use Guzzle\Http\Url;
  */
 class CookieParserProvider extends \Guzzle\Tests\GuzzleTestCase
 {
+
     /**
      * Provides the parsed information from a cookie
      *
@@ -39,11 +39,25 @@ class CookieParserProvider extends \Guzzle\Tests\GuzzleTestCase
                     'http_only' => false
                 )
             ),
-            array('', false),
-            array('foo', false),
+            array(
+                '',
+                false
+            ),
+            array(
+                'foo',
+                false
+            ),
+            
             // Test setting a blank value for a cookie
-            array(array(
-                'foo=', 'foo =', 'foo =;', 'foo= ;', 'foo =', 'foo= '),
+            array(
+                array(
+                    'foo=',
+                    'foo =',
+                    'foo =;',
+                    'foo= ;',
+                    'foo =',
+                    'foo= '
+                ),
                 array(
                     'cookies' => array(
                         'foo' => ''
@@ -62,9 +76,21 @@ class CookieParserProvider extends \Guzzle\Tests\GuzzleTestCase
                     'http_only' => false
                 )
             ),
+            
             // Test setting a value and removing quotes
-            array(array(
-                'foo=1', 'foo =1', 'foo =1;', 'foo=1 ;', 'foo =1', 'foo= 1', 'foo = 1 ;', 'foo="1"', 'foo="1";', 'foo= "1";'),
+            array(
+                array(
+                    'foo=1',
+                    'foo =1',
+                    'foo =1;',
+                    'foo=1 ;',
+                    'foo =1',
+                    'foo= 1',
+                    'foo = 1 ;',
+                    'foo="1"',
+                    'foo="1";',
+                    'foo= "1";'
+                ),
                 array(
                     'cookies' => array(
                         'foo' => '1'
@@ -83,13 +109,18 @@ class CookieParserProvider extends \Guzzle\Tests\GuzzleTestCase
                     'http_only' => false
                 )
             ),
+            
             // Test setting multiple values
-            array(array(
-                'foo=1; bar=2;', 'foo =1; bar = "2"', 'foo=1;   bar=2'),
+            array(
+                array(
+                    'foo=1; bar=2;',
+                    'foo =1; bar = "2"',
+                    'foo=1;   bar=2'
+                ),
                 array(
                     'cookies' => array(
                         'foo' => '1',
-                        'bar' => '2',
+                        'bar' => '2'
                     ),
                     'data' => array(),
                     'discard' => null,
@@ -105,9 +136,14 @@ class CookieParserProvider extends \Guzzle\Tests\GuzzleTestCase
                     'http_only' => false
                 )
             ),
+            
             // Tests getting the domain and path from a reference request
-            array(array(
-                'foo=1; port="80,8081"; httponly', 'foo=1; port="80,8081"; domain=www.test.com; HttpOnly;', 'foo=1; ; domain=www.test.com; path=/path; port="80,8081"; HttpOnly;'),
+            array(
+                array(
+                    'foo=1; port="80,8081"; httponly',
+                    'foo=1; port="80,8081"; domain=www.test.com; HttpOnly;',
+                    'foo=1; ; domain=www.test.com; path=/path; port="80,8081"; HttpOnly;'
+                ),
                 array(
                     'cookies' => array(
                         'foo' => 1
@@ -118,7 +154,10 @@ class CookieParserProvider extends \Guzzle\Tests\GuzzleTestCase
                     'expires' => null,
                     'max_age' => null,
                     'path' => '/path',
-                    'port' => array('80', '8081'),
+                    'port' => array(
+                        '80',
+                        '8081'
+                    ),
                     'secure' => null,
                     'version' => null,
                     'comment' => null,
@@ -127,6 +166,7 @@ class CookieParserProvider extends \Guzzle\Tests\GuzzleTestCase
                 ),
                 'http://www.test.com/path/'
             ),
+            
             // Some of the following tests are based on http://framework.zend.com/svn/framework/standard/trunk/tests/Zend/Http/CookieTest.php
             array(
                 'justacookie=foo; domain=example.com',
@@ -248,6 +288,7 @@ class CookieParserProvider extends \Guzzle\Tests\GuzzleTestCase
                     'http_only' => false
                 )
             ),
+            
             // rfc6265#section-5.1.4
             array(
                 'cookie=value',
@@ -332,7 +373,7 @@ class CookieParserProvider extends \Guzzle\Tests\GuzzleTestCase
                     'http_only' => false
                 ),
                 'http://example.com/real/path/'
-            ),
+            )
         );
     }
 
@@ -343,7 +384,7 @@ class CookieParserProvider extends \Guzzle\Tests\GuzzleTestCase
     {
         $c = $this->cookieParserClass;
         $parser = new $c();
-
+        
         $request = null;
         if ($url) {
             $url = Url::factory($url);
@@ -353,10 +394,10 @@ class CookieParserProvider extends \Guzzle\Tests\GuzzleTestCase
             $host = '';
             $path = '';
         }
-
+        
         foreach ((array) $cookie as $c) {
             $p = $parser->parseCookie($c, $host, $path);
-
+            
             // Remove expires values from the assertion if they are relatively equal by allowing a 5 minute difference
             if ($p['expires'] != $parsed['expires']) {
                 if (abs($p['expires'] - $parsed['expires']) < 300) {
@@ -364,12 +405,12 @@ class CookieParserProvider extends \Guzzle\Tests\GuzzleTestCase
                     unset($parsed['expires']);
                 }
             }
-
+            
             if (is_array($parsed)) {
                 foreach ($parsed as $key => $value) {
                     $this->assertEquals($parsed[$key], $p[$key], 'Comparing ' . $key . ' ' . var_export($value, true) . ' : ' . var_export($parsed, true) . ' | ' . var_export($p, true));
                 }
-
+                
                 foreach ($p as $key => $value) {
                     $this->assertEquals($p[$key], $parsed[$key], 'Comparing ' . $key . ' ' . var_export($value, true) . ' : ' . var_export($parsed, true) . ' | ' . var_export($p, true));
                 }

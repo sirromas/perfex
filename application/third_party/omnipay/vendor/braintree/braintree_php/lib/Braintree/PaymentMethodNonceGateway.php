@@ -4,8 +4,8 @@ namespace Braintree;
 /**
  * Braintree PaymentMethodNonceGateway module
  *
- * @package    Braintree
- * @category   Resources
+ * @package Braintree
+ * @category Resources
  */
 
 /**
@@ -14,13 +14,16 @@ namespace Braintree;
  * <b>== More information ==</b>
  *
  *
- * @package    Braintree
- * @category   Resources
+ * @package Braintree
+ * @category Resources
  */
 class PaymentMethodNonceGateway
 {
+
     private $_gateway;
+
     private $_config;
+
     private $_http;
 
     public function __construct($gateway)
@@ -30,22 +33,19 @@ class PaymentMethodNonceGateway
         $this->_http = new Http($gateway->config);
     }
 
-
     public function create($token)
     {
         $subPath = '/payment_methods/' . $token . '/nonces';
         $fullPath = $this->_config->merchantPath() . $subPath;
         $response = $this->_http->post($fullPath);
-
-        return new Result\Successful(
-            PaymentMethodNonce::factory($response['paymentMethodNonce']),
-            "paymentMethodNonce"
-        );
+        
+        return new Result\Successful(PaymentMethodNonce::factory($response['paymentMethodNonce']), "paymentMethodNonce");
     }
 
     /**
-     * @access public
      *
+     * @access public
+     *        
      */
     public function find($nonce)
     {
@@ -54,11 +54,8 @@ class PaymentMethodNonceGateway
             $response = $this->_http->get($path);
             return PaymentMethodNonce::factory($response['paymentMethodNonce']);
         } catch (Exception\NotFound $e) {
-            throw new Exception\NotFound(
-            'payment method nonce with id ' . $nonce . ' not found'
-            );
+            throw new Exception\NotFound('payment method nonce with id ' . $nonce . ' not found');
         }
-
     }
 }
 class_alias('Braintree\PaymentMethodNonceGateway', 'Braintree_PaymentMethodNonceGateway');

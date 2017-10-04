@@ -2,7 +2,6 @@
 /**
  * PayPal REST Capture Request
  */
-
 namespace Omnipay\PayPal\Message;
 
 /**
@@ -25,13 +24,13 @@ namespace Omnipay\PayPal\Message;
  * See RestAuthorizeRequest for the first part of this example transaction:
  *
  * <code>
- *   // Once the transaction has been authorized, we can capture it for final payment.
- *   $transaction = $gateway->capture(array(
- *       'amount'        => '10.00',
- *       'currency'      => 'AUD',
- *   ));
- *   $transaction->setTransactionReference($auth_id);
- *   $response = $transaction->send();
+ * // Once the transaction has been authorized, we can capture it for final payment.
+ * $transaction = $gateway->capture(array(
+ * 'amount' => '10.00',
+ * 'currency' => 'AUD',
+ * ));
+ * $transaction->setTransactionReference($auth_id);
+ * $response = $transaction->send();
  * </code>
  *
  * @see RestAuthorizeRequest
@@ -39,16 +38,17 @@ namespace Omnipay\PayPal\Message;
  */
 class RestCaptureRequest extends AbstractRestRequest
 {
+
     public function getData()
     {
         $this->validate('transactionReference', 'amount');
-
+        
         return array(
             'amount' => array(
                 'currency' => $this->getCurrency(),
-                'total' => $this->getAmount(),
+                'total' => $this->getAmount()
             ),
-            'is_final_capture' => true,
+            'is_final_capture' => true
         );
     }
 

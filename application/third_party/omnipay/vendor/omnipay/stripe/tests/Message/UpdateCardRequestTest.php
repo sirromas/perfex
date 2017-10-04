@@ -1,11 +1,11 @@
 <?php
-
 namespace Omnipay\Stripe\Message;
 
 use Omnipay\Tests\TestCase;
 
 class UpdateCardRequestTest extends TestCase
 {
+
     public function setUp()
     {
         $this->request = new UpdateCardRequest($this->getHttpClient(), $this->getHttpRequest());
@@ -23,7 +23,7 @@ class UpdateCardRequestTest extends TestCase
         $card = $this->getValidCard();
         $this->request->setCard($card);
         $data = $this->request->getData();
-
+        
         $this->assertSame($card['billingAddress1'], $data['address_line1']);
         $this->assertSame($card['number'], $data['number']);
     }
@@ -32,7 +32,7 @@ class UpdateCardRequestTest extends TestCase
     {
         $this->setMockHttpResponse('UpdateCardSuccess.txt');
         $response = $this->request->send();
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());
@@ -44,7 +44,7 @@ class UpdateCardRequestTest extends TestCase
     {
         $this->setMockHttpResponse('UpdateCardFailure.txt');
         $response = $this->request->send();
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());

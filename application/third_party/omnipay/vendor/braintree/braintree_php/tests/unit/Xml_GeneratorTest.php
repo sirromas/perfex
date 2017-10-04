@@ -8,6 +8,7 @@ use Braintree;
 
 class GeneratorTest extends Setup
 {
+
     public function testSetsTypeAttributeForBooleans()
     {
         $expected = <<<XML
@@ -19,7 +20,10 @@ class GeneratorTest extends Setup
 
 XML;
         $xml = Braintree\Xml::buildXmlFromArray([
-            'root' => ['yes' => true, 'no' => false]
+            'root' => [
+                'yes' => true,
+                'no' => false
+            ]
         ]);
         $this->assertEquals($expected, $xml);
     }
@@ -37,7 +41,12 @@ XML;
 
 XML;
         $xml = Braintree\Xml::buildXmlFromArray([
-            'root' => ['stuff' => ['foo', 'bar']]
+            'root' => [
+                'stuff' => [
+                    'foo',
+                    'bar'
+                ]
+            ]
         ]);
         $this->assertEquals($expected, $xml);
     }
@@ -55,7 +64,12 @@ XML;
 
 XML;
         $xml = Braintree\Xml::buildXmlFromArray([
-            'root' => ['someStuff' => ['innerFoo' => 42, 'barBarBar' => 3]]
+            'root' => [
+                'someStuff' => [
+                    'innerFoo' => 42,
+                    'barBarBar' => 3
+                ]
+            ]
         ]);
         $this->assertEquals($expected, $xml);
     }
@@ -73,7 +87,12 @@ XML;
 
 XML;
         $xml = Braintree\Xml::buildXmlFromArray([
-            'root' => ['stuff' => [true, false]]
+            'root' => [
+                'stuff' => [
+                    true,
+                    false
+                ]
+            ]
         ]);
         $this->assertEquals($expected, $xml);
     }
@@ -88,7 +107,9 @@ XML;
 
 XML;
         $xml = Braintree\Xml::buildXmlFromArray([
-            'root' => ['stuff' => []]
+            'root' => [
+                'stuff' => []
+            ]
         ]);
         $this->assertEquals($expected, $xml);
     }
@@ -103,7 +124,9 @@ XML;
 
 XML;
         $xml = Braintree\Xml::buildXmlFromArray([
-            'root' => ['stuff' => '<>&\'"']
+            'root' => [
+                'stuff' => '<>&\'"'
+            ]
         ]);
         $this->assertEquals($expected, $xml);
     }
@@ -113,9 +136,9 @@ XML;
         $date = new \DateTime();
         $date->setTimestamp(strtotime('2016-05-17T21:22:26Z'));
         $date->setTimezone(new \DateTimeZone('Europe/Paris'));
-
+        
         $originalDate = clone $date;
-
+        
         $expected = <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
@@ -123,11 +146,13 @@ XML;
 </root>
 
 XML;
-
+        
         $xml = Braintree\Xml::buildXmlFromArray([
-            'root' => ['stuff' => $date]
+            'root' => [
+                'stuff' => $date
+            ]
         ]);
-
+        
         $this->assertEquals($originalDate, $date);
         $this->assertEquals($expected, $xml);
     }

@@ -8,10 +8,11 @@ use Braintree;
 
 class AddOnsTest extends Setup
 {
+
     public function testAll_returnsAllAddOns()
     {
         $newId = strval(rand());
-
+        
         $addOnParams = [
             "amount" => "100.00",
             "description" => "some description",
@@ -21,21 +22,21 @@ class AddOnsTest extends Setup
             "neverExpires" => "false",
             "numberOfBillingCycles" => "1"
         ];
-
+        
         $http = new Braintree\Http(Braintree\Configuration::$global);
         $path = Braintree\Configuration::$global->merchantPath() . "/modifications/create_modification_for_tests";
-        $http->post($path, ["modification" => $addOnParams]);
-
+        $http->post($path, [
+            "modification" => $addOnParams
+        ]);
+        
         $addOns = Braintree\AddOn::all();
-
-        foreach ($addOns as $addOn)
-        {
-            if ($addOn->id == $newId)
-            {
+        
+        foreach ($addOns as $addOn) {
+            if ($addOn->id == $newId) {
                 $actualAddOn = $addOn;
             }
         }
-
+        
         $this->assertNotNull($actualAddOn);
         $this->assertEquals($addOnParams["amount"], $actualAddOn->amount);
         $this->assertEquals($addOnParams["description"], $actualAddOn->description);
@@ -49,7 +50,7 @@ class AddOnsTest extends Setup
     public function testGatewayAll_returnsAllAddOns()
     {
         $newId = strval(rand());
-
+        
         $addOnParams = [
             "amount" => "100.00",
             "description" => "some description",
@@ -59,11 +60,13 @@ class AddOnsTest extends Setup
             "neverExpires" => "false",
             "numberOfBillingCycles" => "1"
         ];
-
+        
         $http = new Braintree\Http(Braintree\Configuration::$global);
         $path = Braintree\Configuration::$global->merchantPath() . "/modifications/create_modification_for_tests";
-        $http->post($path, ["modification" => $addOnParams]);
-
+        $http->post($path, [
+            "modification" => $addOnParams
+        ]);
+        
         $gateway = new Braintree\Gateway([
             'environment' => 'development',
             'merchantId' => 'integration_merchant_id',
@@ -71,15 +74,13 @@ class AddOnsTest extends Setup
             'privateKey' => 'integration_private_key'
         ]);
         $addOns = $gateway->addOn()->all();
-
-        foreach ($addOns as $addOn)
-        {
-            if ($addOn->id == $newId)
-            {
+        
+        foreach ($addOns as $addOn) {
+            if ($addOn->id == $newId) {
                 $actualAddOn = $addOn;
             }
         }
-
+        
         $this->assertNotNull($actualAddOn);
         $this->assertEquals($addOnParams["amount"], $actualAddOn->amount);
         $this->assertEquals($addOnParams["description"], $actualAddOn->description);

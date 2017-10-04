@@ -2,7 +2,6 @@
 /**
  * PayPal Abstract Request
  */
-
 namespace Omnipay\PayPal\Message;
 
 use Omnipay\Common\ItemBag;
@@ -13,30 +12,32 @@ use Omnipay\PayPal\PayPalItemBag;
  * PayPal Abstract Request
  *
  * This class forms the base class for PayPal Express Checkout and Pro Checkout
- * requests.  These are also known as "Payflow Gateway" requests and also
+ * requests. These are also known as "Payflow Gateway" requests and also
  * "PayPal Classic APIs".
  *
  * According to the PayPal documentation:
  *
  * * This is the recommended way to integrate when you want to accept payments
- *   with a completely customizable solution. This integration method leverages
- *   the PayPal Payflow Gateway to transmit payments your PayPal Internet Merchant
- *   Account; it also gives the merchant the flexibility to change payment
- *   processors without having to re-do their technical integration. When using
- *   PayPal Payments Pro (Payflow Edition) using Payflow Gateway integration,
- *   merchants can use Transparent Redirect feature to help manage PCI compliance. 
+ * with a completely customizable solution. This integration method leverages
+ * the PayPal Payflow Gateway to transmit payments your PayPal Internet Merchant
+ * Account; it also gives the merchant the flexibility to change payment
+ * processors without having to re-do their technical integration. When using
+ * PayPal Payments Pro (Payflow Edition) using Payflow Gateway integration,
+ * merchants can use Transparent Redirect feature to help manage PCI compliance.
  *
  * @link https://developer.paypal.com/docs/classic/products/payflow-gateway/
  * @link https://developer.paypal.com/docs/classic/express-checkout/gs_expresscheckout/
- * @link https://developer.paypal.com/docs/classic/products/ppp-payflow-edition/ 
+ * @link https://developer.paypal.com/docs/classic/products/ppp-payflow-edition/
  * @link https://devtools-paypal.com/integrationwizard/
  * @link http://paypal.github.io/sdk/
  */
 abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 {
+
     const API_VERSION = '119.0';
 
     protected $liveEndpoint = 'https://api-3t.paypal.com/nvp';
+
     protected $testEndpoint = 'https://api-3t.sandbox.paypal.com/nvp';
 
     public function getUsername()
@@ -233,14 +234,14 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     {
         return $this->getParameter('localeCode');
     }
-
+    
     /*
      * Used to change the locale of PayPal pages.
      * Accepts 2 or 5 character language codes as described here:
      * https://developer.paypal.com/docs/classic/express-checkout/integration-guide/ECCustomizing/
      *
      * If no value/invalid value is passed, the gateway will default it for you
-    */
+     */
     public function setLocaleCode($value)
     {
         return $this->setParameter('localeCode', $value);
@@ -288,7 +289,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         $data['SIGNATURE'] = $this->getSignature();
         $data['SUBJECT'] = $this->getSubject();
         $bnCode = $this->getButtonSource();
-        if (!empty($bnCode)) {
+        if (! empty($bnCode)) {
             $data['BUTTONSOURCE'] = $bnCode;
         }
         
@@ -309,12 +310,12 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
                 if ($item instanceof PayPalItem) {
                     $data["L_PAYMENTREQUEST_0_NUMBER$n"] = $item->getCode();
                 }
-
+                
                 $data["PAYMENTREQUEST_0_ITEMAMT"] += $item->getQuantity() * $this->formatCurrency($item->getPrice());
             }
             $data["PAYMENTREQUEST_0_ITEMAMT"] = $this->formatCurrency($data["PAYMENTREQUEST_0_ITEMAMT"]);
         }
-
+        
         return $data;
     }
 
@@ -323,7 +324,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         $httpRequest = $this->httpClient->post($this->getEndpoint(), null, http_build_query($data, '', '&'));
         $httpRequest->getCurlOptions()->set(CURLOPT_SSLVERSION, 6); // CURL_SSLVERSION_TLSv1_2 for libcurl < 7.35
         $httpResponse = $httpRequest->send();
-
+        
         return $this->createResponse($httpResponse->getBody());
     }
 
@@ -340,14 +341,15 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     /**
      * Set the items in this order
      *
-     * @param ItemBag|array $items An array of items in this order
+     * @param ItemBag|array $items
+     *            An array of items in this order
      */
     public function setItems($items)
     {
-        if ($items && !$items instanceof ItemBag) {
+        if ($items && ! $items instanceof ItemBag) {
             $items = new PayPalItemBag($items);
         }
-
+        
         return $this->setParameter('items', $items);
     }
 }

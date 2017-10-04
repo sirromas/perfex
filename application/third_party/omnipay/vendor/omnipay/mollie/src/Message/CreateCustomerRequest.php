@@ -9,6 +9,7 @@ namespace Omnipay\Mollie\Message;
 
 class CreateCustomerRequest extends AbstractRequest
 {
+
     /**
      * Get the customer's email address.
      *
@@ -20,7 +21,9 @@ class CreateCustomerRequest extends AbstractRequest
     }
 
     /**
-     * @param $value
+     *
+     * @param
+     *            $value
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setEmail($value)
@@ -43,7 +46,8 @@ class CreateCustomerRequest extends AbstractRequest
     /**
      * Optional value.
      *
-     * @param $value
+     * @param
+     *            $value
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setLocale($value)
@@ -64,7 +68,8 @@ class CreateCustomerRequest extends AbstractRequest
     /**
      * Optional value.
      *
-     * @param $value
+     * @param
+     *            $value
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setMetadata($value)
@@ -73,41 +78,44 @@ class CreateCustomerRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return array
      */
     public function getData()
     {
         $this->validate('apiKey', 'description', 'email');
-
-        $data                = array();
-        $data['name']        = $this->getDescription();
-        $data['email']       = $this->getEmail();
-        $data['metadata']    = $this->getMetadata();
-        $data['locale']      = $this->getLocale();
-
+        
+        $data = array();
+        $data['name'] = $this->getDescription();
+        $data['email'] = $this->getEmail();
+        $data['metadata'] = $this->getMetadata();
+        $data['locale'] = $this->getLocale();
+        
         if ($this->getMetadata()) {
             $data['metadata'] = $this->getMetadata();
         }
-
+        
         return $data;
     }
 
     /**
-     * @param mixed $data
+     *
+     * @param mixed $data            
      * @return CreateCustomerResponse
      */
     public function sendData($data)
     {
         $httpResponse = $this->sendRequest('POST', '/customers', $data);
-
+        
         return $this->response = new CreateCustomerResponse($this, $httpResponse->json());
     }
 
     /**
+     *
      * @return string
      */
     public function getEndpoint()
     {
-        return $this->endpoint.'/customers';
+        return $this->endpoint . '/customers';
     }
 }

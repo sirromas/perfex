@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\AuthorizeNet\Message;
 
 /**
@@ -7,8 +6,11 @@ namespace Omnipay\AuthorizeNet\Message;
  */
 abstract class CIMAbstractRequest extends AIMAbstractRequest
 {
+
     const VALIDATION_MODE_TEST = 'testMode';
+
     const VALIDATION_MODE_LIVE = 'liveMode';
+
     const VALIDATION_MODE_NONE = 'none';
 
     protected function addTransactionType(\SimpleXMLElement $data)
@@ -24,11 +26,11 @@ abstract class CIMAbstractRequest extends AIMAbstractRequest
     public function getValidationMode()
     {
         $validationMode = $this->getParameter('validationMode');
-
+        
         if ($validationMode !== self::VALIDATION_MODE_NONE) {
             $validationMode = $this->getDeveloperMode() ? self::VALIDATION_MODE_TEST : self::VALIDATION_MODE_LIVE;
         }
-
+        
         return $validationMode;
     }
 
@@ -75,8 +77,9 @@ abstract class CIMAbstractRequest extends AIMAbstractRequest
     /**
      * Flag to force update consumer payment profile if duplicate is found
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return $this
      */
     public function setForceCardUpdate($value)
@@ -101,11 +104,14 @@ abstract class CIMAbstractRequest extends AIMAbstractRequest
 
     public function sendData($data)
     {
-        $headers = array('Content-Type' => 'text/xml; charset=utf-8');
-
+        $headers = array(
+            'Content-Type' => 'text/xml; charset=utf-8'
+        );
+        
         $data = $data->saveXml();
-        $httpResponse = $this->httpClient->post($this->getEndpoint(), $headers, $data)->send();
-
+        $httpResponse = $this->httpClient->post($this->getEndpoint(), $headers, $data)
+            ->send();
+        
         return $this->response = new CIMResponse($this, $httpResponse->getBody());
     }
 }

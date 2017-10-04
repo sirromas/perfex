@@ -7,9 +7,9 @@ use Braintree\Instance;
  * VisaCheckoutCard details from a transaction
  * creates an instance of VisaCheckoutCardDetails
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Transaction
- *
+ *            
  * @property-read string $bin
  * @property-read string $callId
  * @property-read string $cardType
@@ -36,17 +36,19 @@ use Braintree\Instance;
  */
 class VisaCheckoutCardDetails extends Instance
 {
+
     protected $_attributes = [];
 
     /**
+     *
      * @ignore
+     *
      */
     public function __construct($attributes)
     {
         parent::__construct($attributes);
         $this->_attributes['expirationDate'] = $this->expirationMonth . '/' . $this->expirationYear;
         $this->_attributes['maskedNumber'] = $this->bin . '******' . $this->last4;
-
     }
 }
 class_alias('Braintree\Transaction\VisaCheckoutCardDetails', 'Braintree_Transaction_VisaCheckoutCardDetails');

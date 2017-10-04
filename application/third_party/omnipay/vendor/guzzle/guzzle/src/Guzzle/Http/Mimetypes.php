@@ -1,17 +1,22 @@
 <?php
-
 namespace Guzzle\Http;
 
 /**
  * Provides mappings of file extensions to mimetypes
+ * 
  * @link http://svn.apache.org/repos/asf/httpd/httpd/branches/1.3.x/conf/mime.types
  */
 class Mimetypes
 {
-    /** @var self */
+
+    /**
+     * @var self
+     */
     protected static $instance;
 
-    /** @var array Mapping of extension to mimetype */
+    /**
+     * @var array Mapping of extension to mimetype
+     */
     protected $mimetypes = array(
         '3dml' => 'text/vnd.in3d.3dml',
         '3g2' => 'video/3gpp2',
@@ -921,38 +926,38 @@ class Mimetypes
     /**
      * Get a singleton instance of the class
      *
-     * @return self
-     * @codeCoverageIgnore
+     * @return self @codeCoverageIgnore
      */
     public static function getInstance()
     {
-        if (!self::$instance) {
+        if (! self::$instance) {
             self::$instance = new self();
         }
-
+        
         return self::$instance;
     }
 
     /**
      * Get a mimetype value from a file extension
      *
-     * @param string $extension File extension
-     *
+     * @param string $extension
+     *            File extension
+     *            
      * @return string|null
-     *
      */
     public function fromExtension($extension)
     {
         $extension = strtolower($extension);
-
+        
         return isset($this->mimetypes[$extension]) ? $this->mimetypes[$extension] : null;
     }
 
     /**
      * Get a mimetype from a filename
      *
-     * @param string $filename Filename to generate a mimetype from
-     *
+     * @param string $filename
+     *            Filename to generate a mimetype from
+     *            
      * @return string|null
      */
     public function fromFilename($filename)

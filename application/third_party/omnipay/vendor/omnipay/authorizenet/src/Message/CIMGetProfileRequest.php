@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\AuthorizeNet\Message;
 
 /**
@@ -7,25 +6,29 @@ namespace Omnipay\AuthorizeNet\Message;
  */
 class CIMGetProfileRequest extends CIMAbstractRequest
 {
+
     protected $requestType = 'getCustomerProfileRequest';
 
     public function getData()
     {
         $this->validate('customerProfileId');
-
+        
         $data = $this->getBaseData();
-
+        
         $data->customerProfileId = $this->getCustomerProfileId();
-
+        
         return $data;
     }
 
     public function sendData($data)
     {
-        $headers = array('Content-Type' => 'text/xml; charset=utf-8');
+        $headers = array(
+            'Content-Type' => 'text/xml; charset=utf-8'
+        );
         $data = $data->saveXml();
-        $httpResponse = $this->httpClient->post($this->getEndpoint(), $headers, $data)->send();
-
+        $httpResponse = $this->httpClient->post($this->getEndpoint(), $headers, $data)
+            ->send();
+        
         return $this->response = new CIMGetProfileResponse($this, $httpResponse->getBody());
     }
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Batch;
 
 /**
@@ -7,10 +6,12 @@ namespace Guzzle\Batch;
  */
 interface BatchTransferInterface
 {
+
     /**
      * Transfer an array of items
      *
-     * @param array $batch Array of items to transfer
+     * @param array $batch
+     *            Array of items to transfer
      */
     public function transfer(array $batch);
 }

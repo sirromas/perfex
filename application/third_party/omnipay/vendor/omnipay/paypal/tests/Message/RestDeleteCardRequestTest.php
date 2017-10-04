@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal\Message;
 
 use Omnipay\Common\CreditCard;
@@ -7,18 +6,25 @@ use Omnipay\Tests\TestCase;
 
 class RestDeleteCardRequestTest extends TestCase
 {
-    /** @var RestDeleteCardRequest */
+
+    /**
+     * @var RestDeleteCardRequest
+     */
     private $request;
 
-    /** @var CreditCard */
+    /**
+     * @var CreditCard
+     */
     private $card;
 
     public function setUp()
     {
         parent::setUp();
-
+        
         $this->request = new RestDeleteCardRequest($this->getHttpClient(), $this->getHttpRequest());
-        $this->request->initialize(array('cardReference' => 'CARD-TEST123'));
+        $this->request->initialize(array(
+            'cardReference' => 'CARD-TEST123'
+        ));
     }
 
     public function testGetData()

@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal\Message;
 
 use Omnipay\Common\Message\AbstractResponse;
@@ -10,6 +9,7 @@ use Omnipay\Common\Message\RequestInterface;
  */
 class Response extends AbstractResponse
 {
+
     public function __construct(RequestInterface $request, $data)
     {
         $this->request = $request;
@@ -18,21 +18,25 @@ class Response extends AbstractResponse
 
     public function isPending()
     {
-        return isset($this->data['PAYMENTINFO_0_PAYMENTSTATUS'])
-            && $this->data['PAYMENTINFO_0_PAYMENTSTATUS'] == 'Pending';
+        return isset($this->data['PAYMENTINFO_0_PAYMENTSTATUS']) && $this->data['PAYMENTINFO_0_PAYMENTSTATUS'] == 'Pending';
     }
 
     public function isSuccessful()
     {
-        return isset($this->data['ACK']) && in_array($this->data['ACK'], array('Success', 'SuccessWithWarning'));
+        return isset($this->data['ACK']) && in_array($this->data['ACK'], array(
+            'Success',
+            'SuccessWithWarning'
+        ));
     }
 
     public function getTransactionReference()
     {
-        foreach (array('REFUNDTRANSACTIONID',
+        foreach (array(
+            'REFUNDTRANSACTIONID',
             'TRANSACTIONID',
             'PAYMENTINFO_0_TRANSACTIONID',
-            'AUTHORIZATIONID') as $key) {
+            'AUTHORIZATIONID'
+        ) as $key) {
             if (isset($this->data[$key])) {
                 return $this->data[$key];
             }

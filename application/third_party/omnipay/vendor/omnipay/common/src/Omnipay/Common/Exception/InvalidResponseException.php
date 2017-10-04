@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\Common\Exception;
 
 /**
@@ -9,6 +8,7 @@ namespace Omnipay\Common\Exception;
  */
 class InvalidResponseException extends \Exception implements OmnipayException
 {
+
     public function __construct($message = "Invalid response from payment gateway", $code = 0, $previous = null)
     {
         parent::__construct($message, $code, $previous);

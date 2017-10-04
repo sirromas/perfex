@@ -7,9 +7,9 @@ use Braintree\Instance;
  * Creates an instance of AddressDetails as returned from a transaction
  *
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Transaction
- *
+ *            
  * @property-read string $firstName
  * @property-read string $lastName
  * @property-read string $company
@@ -22,6 +22,7 @@ use Braintree\Instance;
  */
 class AddressDetails extends Instance
 {
+
     protected $_attributes = [];
 }
 class_alias('Braintree\Transaction\AddressDetails', 'Braintree_Transaction_AddressDetails');

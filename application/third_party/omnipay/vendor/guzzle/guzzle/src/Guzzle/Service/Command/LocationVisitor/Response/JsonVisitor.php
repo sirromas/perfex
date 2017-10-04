@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Service\Command\LocationVisitor\Response;
 
 use Guzzle\Http\Message\Response;
@@ -16,19 +15,15 @@ use Guzzle\Service\Command\CommandInterface;
  */
 class JsonVisitor extends AbstractResponseVisitor
 {
+
     public function before(CommandInterface $command, array &$result)
     {
         // Ensure that the result of the command is always rooted with the parsed JSON data
         $result = $command->getResponse()->json();
     }
 
-    public function visit(
-        CommandInterface $command,
-        Response $response,
-        Parameter $param,
-        &$value,
-        $context =  null
-    ) {
+    public function visit(CommandInterface $command, Response $response, Parameter $param, &$value, $context = null)
+    {
         $name = $param->getName();
         $key = $param->getWireName();
         if (isset($value[$key])) {
@@ -43,22 +38,24 @@ class JsonVisitor extends AbstractResponseVisitor
     /**
      * Recursively process a parameter while applying filters
      *
-     * @param Parameter $param API parameter being validated
-     * @param mixed     $value Value to validate and process. The value may change during this process.
+     * @param Parameter $param
+     *            API parameter being validated
+     * @param mixed $value
+     *            Value to validate and process. The value may change during this process.
      */
     protected function recursiveProcess(Parameter $param, &$value)
     {
         if ($value === null) {
             return;
         }
-
+        
         if (is_array($value)) {
             $type = $param->getType();
             if ($type == 'array') {
                 foreach ($value as &$item) {
                     $this->recursiveProcess($param->getItems(), $item);
                 }
-            } elseif ($type == 'object' && !isset($value[0])) {
+            } elseif ($type == 'object' && ! isset($value[0])) {
                 // On the above line, we ensure that the array is associative and not numerically indexed
                 $knownProperties = array();
                 if ($properties = $param->getProperties()) {
@@ -75,7 +72,7 @@ class JsonVisitor extends AbstractResponseVisitor
                         }
                     }
                 }
-
+                
                 // Remove any unknown and potentially unsafe properties
                 if ($param->getAdditionalProperties() === false) {
                     $value = array_intersect_key($value, $knownProperties);
@@ -87,7 +84,7 @@ class JsonVisitor extends AbstractResponseVisitor
                 }
             }
         }
-
+        
         $value = $param->filter($value);
     }
 }

@@ -1,11 +1,11 @@
 <?php
-
 namespace Omnipay\Common\Exception;
 
 use Omnipay\Tests\TestCase;
 
 class InvalidResponseExceptionTest extends TestCase
 {
+
     public function testConstructWithDefaultMessage()
     {
         $exception = new InvalidResponseException();

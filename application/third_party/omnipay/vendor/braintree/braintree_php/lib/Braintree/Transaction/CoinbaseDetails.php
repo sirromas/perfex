@@ -6,7 +6,7 @@ use Braintree\Instance;
 /**
  * Coinbase details from a transaction
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Transaction
  */
 
@@ -14,9 +14,9 @@ use Braintree\Instance;
  * creates an instance of Coinbase
  *
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Transaction
- *
+ *            
  * @property-read string $token
  * @property-read string $userId
  * @property-read string $userName
@@ -25,10 +25,13 @@ use Braintree\Instance;
  */
 class CoinbaseDetails extends Instance
 {
+
     protected $_attributes = [];
 
     /**
+     *
      * @ignore
+     *
      */
     public function __construct($attributes)
     {

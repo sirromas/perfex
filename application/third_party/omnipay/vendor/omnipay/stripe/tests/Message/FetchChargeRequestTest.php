@@ -1,11 +1,11 @@
 <?php
-
 namespace Omnipay\Stripe\Message;
 
 use Omnipay\Tests\TestCase;
 
 class FetchChargeRequestTest extends TestCase
 {
+
     public function setUp()
     {
         $this->request = new FetchChargeRequest($this->getHttpClient(), $this->getHttpRequest());
@@ -21,7 +21,7 @@ class FetchChargeRequestTest extends TestCase
     {
         $this->setMockHttpResponse('FetchChargeSuccess.txt');
         $response = $this->request->send();
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertSame('ch_180ZdUCryC0oikg4v4lc4F59D', $response->getChargeReference());
@@ -33,7 +33,7 @@ class FetchChargeRequestTest extends TestCase
     {
         $this->setMockHttpResponse('FetchChargeFailure.txt');
         $response = $this->request->send();
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getChargeReference());

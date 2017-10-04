@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\Tests\Session;
 
 use PHPUnit\Framework\TestCase;
@@ -26,12 +25,15 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
  */
 class SessionTest extends TestCase
 {
+
     /**
+     *
      * @var \Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface
      */
     protected $storage;
 
     /**
+     *
      * @var \Symfony\Component\HttpFoundation\Session\SessionInterface
      */
     protected $session;
@@ -101,13 +103,19 @@ class SessionTest extends TestCase
     {
         $this->session->set($key, $value);
         $this->assertTrue($this->session->has($key));
-        $this->assertFalse($this->session->has($key.'non_value'));
+        $this->assertFalse($this->session->has($key . 'non_value'));
     }
 
     public function testReplace()
     {
-        $this->session->replace(array('happiness' => 'be good', 'symfony' => 'awesome'));
-        $this->assertEquals(array('happiness' => 'be good', 'symfony' => 'awesome'), $this->session->all());
+        $this->session->replace(array(
+            'happiness' => 'be good',
+            'symfony' => 'awesome'
+        ));
+        $this->assertEquals(array(
+            'happiness' => 'be good',
+            'symfony' => 'awesome'
+        ), $this->session->all());
         $this->session->replace(array());
         $this->assertEquals(array(), $this->session->all());
     }
@@ -135,9 +143,27 @@ class SessionTest extends TestCase
     public function setProvider()
     {
         return array(
-            array('foo', 'bar', array('foo' => 'bar')),
-            array('foo.bar', 'too much beer', array('foo.bar' => 'too much beer')),
-            array('great', 'symfony is great', array('great' => 'symfony is great')),
+            array(
+                'foo',
+                'bar',
+                array(
+                    'foo' => 'bar'
+                )
+            ),
+            array(
+                'foo.bar',
+                'too much beer',
+                array(
+                    'foo.bar' => 'too much beer'
+                )
+            ),
+            array(
+                'great',
+                'symfony is great',
+                array(
+                    'great' => 'symfony is great'
+                )
+            )
         );
     }
 
@@ -149,7 +175,9 @@ class SessionTest extends TestCase
         $this->session->set('hi.world', 'have a nice day');
         $this->session->set($key, $value);
         $this->session->remove($key);
-        $this->assertEquals(array('hi.world' => 'have a nice day'), $this->session->all());
+        $this->assertEquals(array(
+            'hi.world' => 'have a nice day'
+        ), $this->session->all());
     }
 
     public function testInvalidate()
@@ -177,7 +205,7 @@ class SessionTest extends TestCase
     {
         $this->session->start();
         $this->session->save();
-
+        
         $this->assertFalse($this->session->isStarted());
     }
 
@@ -195,17 +223,20 @@ class SessionTest extends TestCase
 
     public function testGetIterator()
     {
-        $attributes = array('hello' => 'world', 'symfony' => 'rocks');
+        $attributes = array(
+            'hello' => 'world',
+            'symfony' => 'rocks'
+        );
         foreach ($attributes as $key => $val) {
             $this->session->set($key, $val);
         }
-
+        
         $i = 0;
         foreach ($this->session as $key => $val) {
             $this->assertEquals($attributes[$key], $val);
-            ++$i;
+            ++ $i;
         }
-
+        
         $this->assertEquals(count($attributes), $i);
     }
 
@@ -213,7 +244,7 @@ class SessionTest extends TestCase
     {
         $this->session->set('hello', 'world');
         $this->session->set('symfony', 'rocks');
-
+        
         $this->assertCount(2, $this->session);
     }
 

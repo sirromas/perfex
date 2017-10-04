@@ -4,8 +4,8 @@ namespace Braintree;
 /**
  * Braintree PayPalAccount module
  *
- * @package    Braintree
- * @category   Resources
+ * @package Braintree
+ * @category Resources
  */
 
 /**
@@ -14,9 +14,9 @@ namespace Braintree;
  * <b>== More information ==</b>
  *
  *
- * @package    Braintree
- * @category   Resources
- *
+ * @package Braintree
+ * @category Resources
+ *          
  * @property-read string $customerId
  * @property-read string $email
  * @property-read string $token
@@ -24,11 +24,13 @@ namespace Braintree;
  */
 class PayPalAccount extends Base
 {
+
     /**
-     *  factory method: returns an instance of PayPalAccount
-     *  to the requesting method, with populated properties
+     * factory method: returns an instance of PayPalAccount
+     * to the requesting method, with populated properties
      *
      * @ignore
+     *
      * @return PayPalAccount
      */
     public static function factory($attributes)
@@ -37,9 +39,9 @@ class PayPalAccount extends Base
         $instance->_initialize($attributes);
         return $instance;
     }
-
+    
     /* instance methods */
-
+    
     /**
      * returns false if default is null or false
      *
@@ -54,38 +56,37 @@ class PayPalAccount extends Base
      * sets instance properties from an array of values
      *
      * @access protected
-     * @param array $paypalAccountAttribs array of paypalAccount data
+     * @param array $paypalAccountAttribs
+     *            array of paypalAccount data
      * @return void
      */
     protected function _initialize($paypalAccountAttribs)
     {
         // set the attributes
         $this->_attributes = $paypalAccountAttribs;
-
+        
         $subscriptionArray = [];
         if (isset($paypalAccountAttribs['subscriptions'])) {
-            foreach ($paypalAccountAttribs['subscriptions'] AS $subscription) {
+            foreach ($paypalAccountAttribs['subscriptions'] as $subscription) {
                 $subscriptionArray[] = Subscription::factory($subscription);
             }
         }
-
+        
         $this->_set('subscriptions', $subscriptionArray);
     }
 
     /**
      * create a printable representation of the object as:
      * ClassName[property=value, property=value]
+     * 
      * @return string
      */
-    public function  __toString()
+    public function __toString()
     {
-        return __CLASS__ . '[' .
-                Util::attributesToString($this->_attributes) . ']';
+        return __CLASS__ . '[' . Util::attributesToString($this->_attributes) . ']';
     }
-
-
+    
     // static methods redirecting to gateway
-
     public static function find($token)
     {
         return Configuration::gateway()->payPalAccount()->find($token);

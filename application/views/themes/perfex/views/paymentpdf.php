@@ -1,23 +1,23 @@
 <?php
 $dimensions = $pdf->getPageDimensions();
-if($tag != ''){
-    $pdf->SetFillColor(240,240,240);
-    $pdf->SetDrawColor(245,245,245);
-    $pdf->SetXY(0,0);
-    $pdf->SetFont($font_name,'B',15);
+if ($tag != '') {
+    $pdf->SetFillColor(240, 240, 240);
+    $pdf->SetDrawColor(245, 245, 245);
+    $pdf->SetXY(0, 0);
+    $pdf->SetFont($font_name, 'B', 15);
     $pdf->SetTextColor(0);
     $pdf->SetLineWidth(0.75);
     $pdf->StartTransform();
-    $pdf->Rotate(-35,109,235);
-    $pdf->Cell(100,1,mb_strtoupper($tag,'UTF-8'),'TB',0,'C','1');
+    $pdf->Rotate(- 35, 109, 235);
+    $pdf->Cell(100, 1, mb_strtoupper($tag, 'UTF-8'), 'TB', 0, 'C', '1');
     $pdf->StopTransform();
-    $pdf->SetFont($font_name,'',$font_size);
+    $pdf->SetFont($font_name, '', $font_size);
     $pdf->setX(10);
     $pdf->setY(23);
 }
 
 // Get Y position for the separation
-$y            = $pdf->getY();
+$y = $pdf->getY();
 
 $company_info = '<div style="color:#424242;">';
 $company_info .= format_organization_info();
@@ -32,18 +32,18 @@ $client_details = format_customer_info($payment->invoice_data, 'payment', 'billi
 $pdf->writeHTMLCell(($dimensions['wk'] / 2) - $dimensions['lm'], '', '', ($swap == '1' ? $y : ''), $client_details, 0, 1, false, true, ($swap == '1' ? 'J' : 'R'), true);
 $pdf->SetFontSize(15);
 $pdf->Ln(5);
-$pdf->Cell(0, 0, mb_strtoupper(_l('payment_receipt'),'UTF-8'), 0, 1, 'C', 0, '', 0);
+$pdf->Cell(0, 0, mb_strtoupper(_l('payment_receipt'), 'UTF-8'), 0, 1, 'C', 0, '', 0);
 $pdf->SetFontSize($font_size);
 $pdf->Ln(15);
 $pdf->Cell(0, 0, _l('payment_date') . ' ' . _d($payment->date), 0, 1, 'L', 0, '', 0);
 $pdf->Ln(2);
 $pdf->writeHTMLCell(80, '', '', '', '<hr/>', 0, 1, false, true, 'L', true);
 $payment_name = $payment->name;
-if(!empty($payment->paymentmethod)){
-    $payment_name .= ' - '. $payment->paymentmethod;
+if (! empty($payment->paymentmethod)) {
+    $payment_name .= ' - ' . $payment->paymentmethod;
 }
-$pdf->Cell(0, 0, _l('payment_view_mode') . ' ' . $payment_name , 0, 1, 'L', 0, '', 0);
-if(!empty($payment->transactionid)) {
+$pdf->Cell(0, 0, _l('payment_view_mode') . ' ' . $payment_name, 0, 1, 'L', 0, '', 0);
+if (! empty($payment->transactionid)) {
     $pdf->Ln(2);
     $pdf->writeHTMLCell(80, '', '', '', '<hr/>', 0, 1, false, true, 'L', true);
     $pdf->Cell(0, 0, _l('payment_transaction_id') . ': ' . $payment->transactionid, 0, 1, 'L', 0, '', 0);

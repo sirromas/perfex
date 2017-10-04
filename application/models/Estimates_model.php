@@ -1,8 +1,18 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
 class Estimates_model extends CRM_Model
 {
-    private $shipping_fields = array('shipping_street', 'shipping_city', 'shipping_city', 'shipping_state', 'shipping_zip', 'shipping_country');
+
+    private $shipping_fields = array(
+        'shipping_street',
+        'shipping_city',
+        'shipping_city',
+        'shipping_state',
+        'shipping_zip',
+        'shipping_country'
+    );
+
     private $statuses;
 
     public function __construct()
@@ -19,6 +29,7 @@ class Estimates_model extends CRM_Model
 
     /**
      * Get unique sale agent for estimates / Used for filters
+     * 
      * @return array
      */
     public function get_sale_agents()
@@ -28,8 +39,11 @@ class Estimates_model extends CRM_Model
 
     /**
      * Get estimate/s
-     * @param  mixed $id    estimate id
-     * @param  array  $where perform where
+     * 
+     * @param mixed $id
+     *            estimate id
+     * @param array $where
+     *            perform where
      * @return mixed
      */
     public function get($id = '', $where = array())
@@ -42,7 +56,7 @@ class Estimates_model extends CRM_Model
             $this->db->where('tblestimates.id', $id);
             $estimate = $this->db->get()->row();
             if ($estimate) {
-                $estimate->attachments                           = $this->get_attachments($id);
+                $estimate->attachments = $this->get_attachments($id);
                 $estimate->visible_attachments_to_customer_found = false;
                 foreach ($estimate->attachments as $attachment) {
                     if ($attachment['visible_to_customer'] == 1) {
@@ -57,16 +71,17 @@ class Estimates_model extends CRM_Model
                 }
                 $estimate->client = $this->clients_model->get($estimate->clientid);
             }
-
+            
             return $estimate;
         }
         $this->db->order_by('number,YEAR(date)', 'desc');
-
+        
         return $this->db->get()->result_array();
     }
 
     /**
      * Get estimate statuses
+     * 
      * @return array
      */
     public function get_statuses()
@@ -76,50 +91,51 @@ class Estimates_model extends CRM_Model
 
     /**
      * Function that will perform estimates pipeline query
-     * @param  mixed  $status
-     * @param  string  $search
-     * @param  integer $page
-     * @param  array   $sort
-     * @param  boolean $count
+     * 
+     * @param mixed $status            
+     * @param string $search            
+     * @param integer $page            
+     * @param array $sort            
+     * @param boolean $count            
      * @return array
      */
     public function do_kanban_query($status, $search = '', $page = 1, $sort = array(), $count = false)
     {
-        $default_pipeline_order      = get_option('default_estimates_pipeline_sort');
+        $default_pipeline_order = get_option('default_estimates_pipeline_sort');
         $default_pipeline_order_type = get_option('default_estimates_pipeline_sort_type');
-        $limit                       = get_option('estimates_pipeline_limit');
-
-        $fields_client    = $this->db->list_fields('tblclients');
+        $limit = get_option('estimates_pipeline_limit');
+        
+        $fields_client = $this->db->list_fields('tblclients');
         $fields_estimates = $this->db->list_fields('tblestimates');
-
+        
         $has_permission_view = has_permission('estimates', '', 'view');
-
+        
         $this->db->select('tblestimates.id,status,invoiceid,CASE company WHEN "" THEN (SELECT CONCAT(firstname, " ", lastname) FROM tblcontacts WHERE userid = tblclients.userid and is_primary = 1) ELSE company END as company,total,currency,symbol,date,expirydate,clientid');
         $this->db->from('tblestimates');
         $this->db->join('tblclients', 'tblclients.userid = tblestimates.clientid');
         $this->db->join('tblcurrencies', 'tblestimates.currency = tblcurrencies.id');
         $this->db->where('status', $status);
-        if (!$has_permission_view) {
+        if (! $has_permission_view) {
             $this->db->where('addedfrom', get_staff_user_id());
         }
-
+        
         if ($search != '') {
-            if (!_startsWith($search, '#')) {
+            if (! _startsWith($search, '#')) {
                 $where = '(';
-                $i     = 0;
+                $i = 0;
                 foreach ($fields_client as $f) {
                     $where .= 'tblclients.' . $f . ' LIKE "%' . $search . '%"';
                     $where .= ' OR ';
-                    $i++;
+                    $i ++;
                 }
                 $i = 0;
                 foreach ($fields_estimates as $f) {
                     $where .= 'tblestimates.' . $f . ' LIKE "%' . $search . '%"';
                     $where .= ' OR ';
-
-                    $i++;
+                    
+                    $i ++;
                 }
-                $where = substr($where, 0, -4);
+                $where = substr($where, 0, - 4);
                 $where .= ')';
                 $this->db->where($where);
             } else {
@@ -130,23 +146,23 @@ class Estimates_model extends CRM_Model
                 ');
             }
         }
-
+        
         if (isset($sort['sort_by']) && $sort['sort_by'] && isset($sort['sort']) && $sort['sort']) {
             $this->db->order_by('tblestimates.' . $sort['sort_by'], $sort['sort']);
         } else {
             $this->db->order_by('tblestimates.' . $default_pipeline_order, $default_pipeline_order_type);
         }
-
-        if($count == false){
+        
+        if ($count == false) {
             if ($page > 1) {
-                $page--;
+                $page --;
                 $position = ($page * $limit);
                 $this->db->limit($limit, $position);
             } else {
                 $this->db->limit($limit);
             }
         }
-
+        
         if ($count == false) {
             return $this->db->get()->result_array();
         } else {
@@ -156,60 +172,61 @@ class Estimates_model extends CRM_Model
 
     /**
      * Convert estimate to invoice
-     * @param  mixed $id estimate id
-     * @return mixed     New invoice ID
+     * 
+     * @param mixed $id
+     *            estimate id
+     * @return mixed New invoice ID
      */
     public function convert_to_invoice($id, $client = false, $draft_invoice = false)
     {
         // Recurring invoice date is okey lets convert it to new invoice
         $_estimate = $this->get($id);
-
+        
         $new_invoice_data = array();
         if ($draft_invoice == true) {
             $new_invoice_data['save_as_draft'] = true;
         }
-        $new_invoice_data['clientid']   = $_estimate->clientid;
+        $new_invoice_data['clientid'] = $_estimate->clientid;
         $new_invoice_data['project_id'] = $_estimate->project_id;
-        $new_invoice_data['number']     = get_option('next_invoice_number');
-        $new_invoice_data['date']       = _d(date('Y-m-d'));
-        $new_invoice_data['duedate']    = _d(date('Y-m-d'));
+        $new_invoice_data['number'] = get_option('next_invoice_number');
+        $new_invoice_data['date'] = _d(date('Y-m-d'));
+        $new_invoice_data['duedate'] = _d(date('Y-m-d'));
         if (get_option('invoice_due_after') != 0) {
             $new_invoice_data['duedate'] = _d(date('Y-m-d', strtotime('+' . get_option('invoice_due_after') . ' DAY', strtotime(date('Y-m-d')))));
         }
         $new_invoice_data['show_quantity_as'] = $_estimate->show_quantity_as;
-        $new_invoice_data['currency']         = $_estimate->currency;
-        $new_invoice_data['subtotal']         = $_estimate->subtotal;
-        $new_invoice_data['total']            = $_estimate->total;
-        $new_invoice_data['adjustment']       = $_estimate->adjustment;
+        $new_invoice_data['currency'] = $_estimate->currency;
+        $new_invoice_data['subtotal'] = $_estimate->subtotal;
+        $new_invoice_data['total'] = $_estimate->total;
+        $new_invoice_data['adjustment'] = $_estimate->adjustment;
         $new_invoice_data['discount_percent'] = $_estimate->discount_percent;
-        $new_invoice_data['discount_total']   = $_estimate->discount_total;
-        $new_invoice_data['discount_type']    = $_estimate->discount_type;
-        $new_invoice_data['sale_agent']       = $_estimate->sale_agent;
+        $new_invoice_data['discount_total'] = $_estimate->discount_total;
+        $new_invoice_data['discount_type'] = $_estimate->discount_type;
+        $new_invoice_data['sale_agent'] = $_estimate->sale_agent;
         // Since version 1.0.6
-        $new_invoice_data['billing_street']   = $_estimate->billing_street;
-        $new_invoice_data['billing_city']     = $_estimate->billing_city;
-        $new_invoice_data['billing_state']    = $_estimate->billing_state;
-        $new_invoice_data['billing_zip']      = $_estimate->billing_zip;
-        $new_invoice_data['billing_country']  = $_estimate->billing_country;
-        $new_invoice_data['shipping_street']  = $_estimate->shipping_street;
-        $new_invoice_data['shipping_city']    = $_estimate->shipping_city;
-        $new_invoice_data['shipping_state']   = $_estimate->shipping_state;
-        $new_invoice_data['shipping_zip']     = $_estimate->shipping_zip;
+        $new_invoice_data['billing_street'] = $_estimate->billing_street;
+        $new_invoice_data['billing_city'] = $_estimate->billing_city;
+        $new_invoice_data['billing_state'] = $_estimate->billing_state;
+        $new_invoice_data['billing_zip'] = $_estimate->billing_zip;
+        $new_invoice_data['billing_country'] = $_estimate->billing_country;
+        $new_invoice_data['shipping_street'] = $_estimate->shipping_street;
+        $new_invoice_data['shipping_city'] = $_estimate->shipping_city;
+        $new_invoice_data['shipping_state'] = $_estimate->shipping_state;
+        $new_invoice_data['shipping_zip'] = $_estimate->shipping_zip;
         $new_invoice_data['shipping_country'] = $_estimate->shipping_country;
         if ($_estimate->include_shipping == 1) {
             $new_invoice_data['include_shipping'] = 1;
         }
         $new_invoice_data['show_shipping_on_invoice'] = $_estimate->show_shipping_on_estimate;
-        $new_invoice_data['terms']                    = get_option('predefined_terms_invoice');
-        $new_invoice_data['clientnote']               = get_option('predefined_clientnote_invoice');
+        $new_invoice_data['terms'] = get_option('predefined_terms_invoice');
+        $new_invoice_data['clientnote'] = get_option('predefined_clientnote_invoice');
         // Set to unpaid status automatically
-        $new_invoice_data['status']                   = 1;
-        $new_invoice_data['clientnote']               = '';
-        $new_invoice_data['adminnote']                = '';
-
-
+        $new_invoice_data['status'] = 1;
+        $new_invoice_data['clientnote'] = '';
+        $new_invoice_data['adminnote'] = '';
+        
         $this->load->model('payment_modes_model');
-        $modes      = $this->payment_modes_model->get('', array(
+        $modes = $this->payment_modes_model->get('', array(
             'expenses_only !=' => 1
         ));
         $temp_modes = array();
@@ -220,28 +237,28 @@ class Estimates_model extends CRM_Model
             $temp_modes[] = $mode['id'];
         }
         $new_invoice_data['allowed_payment_modes'] = $temp_modes;
-        $new_invoice_data['newitems']              = array();
-        $key                                       = 1;
+        $new_invoice_data['newitems'] = array();
+        $key = 1;
         foreach ($_estimate->items as $item) {
-            $new_invoice_data['newitems'][$key]['description']      = $item['description'];
+            $new_invoice_data['newitems'][$key]['description'] = $item['description'];
             $new_invoice_data['newitems'][$key]['long_description'] = $item['long_description'];
-            $new_invoice_data['newitems'][$key]['qty']              = $item['qty'];
-            $new_invoice_data['newitems'][$key]['unit']             = $item['unit'];
-            $new_invoice_data['newitems'][$key]['taxname']          = array();
-            $taxes                                                  = get_estimate_item_taxes($item['id']);
+            $new_invoice_data['newitems'][$key]['qty'] = $item['qty'];
+            $new_invoice_data['newitems'][$key]['unit'] = $item['unit'];
+            $new_invoice_data['newitems'][$key]['taxname'] = array();
+            $taxes = get_estimate_item_taxes($item['id']);
             foreach ($taxes as $tax) {
                 // tax name is in format TAX1|10.00
                 array_push($new_invoice_data['newitems'][$key]['taxname'], $tax['taxname']);
             }
-            $new_invoice_data['newitems'][$key]['rate']  = $item['rate'];
+            $new_invoice_data['newitems'][$key]['rate'] = $item['rate'];
             $new_invoice_data['newitems'][$key]['order'] = $item['item_order'];
-            $key++;
+            $key ++;
         }
         $this->load->model('invoices_model');
         $id = $this->invoices_model->add($new_invoice_data);
         if ($id) {
             // Customer accepted the estimate and is auto converted to invoice
-            if (!is_staff_logged_in()) {
+            if (! is_staff_logged_in()) {
                 $this->db->where('rel_type', 'invoice');
                 $this->db->where('rel_id', $id);
                 $this->db->delete('tblsalesactivity');
@@ -256,7 +273,7 @@ class Estimates_model extends CRM_Model
                 'addedfrom' => $_estimate->addedfrom,
                 'sale_agent' => $_estimate->sale_agent
             ));
-
+            
             // Update estimate with the new invoice data and set to status accepted
             $this->db->where('id', $_estimate->id);
             $this->db->update('tblestimates', array(
@@ -269,79 +286,84 @@ class Estimates_model extends CRM_Model
                     '<a href="' . admin_url('invoices/list_invoices/' . $id) . '">' . format_invoice_number($id) . '</a>'
                 )));
             }
-
-            do_action('estimate_converted_to_invoice', array('invoice_id'=>$id, 'estimate_id'=>$_estimate->id));
+            
+            do_action('estimate_converted_to_invoice', array(
+                'invoice_id' => $id,
+                'estimate_id' => $_estimate->id
+            ));
         }
-
+        
         return $id;
     }
 
     /**
      * Copy estimate
-     * @param  mixed $id estimate id to copy
+     * 
+     * @param mixed $id
+     *            estimate id to copy
      * @return mixed
      */
     public function copy($id)
     {
-        $_estimate                             = $this->get($id);
-        $new_estimate_data                     = array();
-        $new_estimate_data['clientid']         = $_estimate->clientid;
-        $new_estimate_data['project_id']       = $_estimate->project_id;
-        $new_estimate_data['number']           = get_option('next_estimate_number');
-        $new_estimate_data['date']             = _d(date('Y-m-d'));
+        $_estimate = $this->get($id);
+        $new_estimate_data = array();
+        $new_estimate_data['clientid'] = $_estimate->clientid;
+        $new_estimate_data['project_id'] = $_estimate->project_id;
+        $new_estimate_data['number'] = get_option('next_estimate_number');
+        $new_estimate_data['date'] = _d(date('Y-m-d'));
         $new_estimate_data['expirydate'] = null;
-
+        
         if ($_estimate->expirydate && get_option('estimate_due_after') != 0) {
-            $new_estimate_data['expirydate']       = _d(date('Y-m-d', strtotime('+' . get_option('estimate_due_after') . ' DAY', strtotime(date('Y-m-d')))));
+            $new_estimate_data['expirydate'] = _d(date('Y-m-d', strtotime('+' . get_option('estimate_due_after') . ' DAY', strtotime(date('Y-m-d')))));
         }
-
+        
         $new_estimate_data['show_quantity_as'] = $_estimate->show_quantity_as;
-        $new_estimate_data['currency']         = $_estimate->currency;
-        $new_estimate_data['subtotal']         = $_estimate->subtotal;
-        $new_estimate_data['total']            = $_estimate->total;
-        $new_estimate_data['adminnote']        = $_estimate->adminnote;
-        $new_estimate_data['adjustment']       = $_estimate->adjustment;
+        $new_estimate_data['currency'] = $_estimate->currency;
+        $new_estimate_data['subtotal'] = $_estimate->subtotal;
+        $new_estimate_data['total'] = $_estimate->total;
+        $new_estimate_data['adminnote'] = $_estimate->adminnote;
+        $new_estimate_data['adjustment'] = $_estimate->adjustment;
         $new_estimate_data['discount_percent'] = $_estimate->discount_percent;
-        $new_estimate_data['discount_total']   = $_estimate->discount_total;
-        $new_estimate_data['discount_type']    = $_estimate->discount_type;
-        $new_estimate_data['terms']            = $_estimate->terms;
-        $new_estimate_data['sale_agent']       = $_estimate->sale_agent;
-        $new_estimate_data['reference_no']     = $_estimate->reference_no;
+        $new_estimate_data['discount_total'] = $_estimate->discount_total;
+        $new_estimate_data['discount_type'] = $_estimate->discount_type;
+        $new_estimate_data['terms'] = $_estimate->terms;
+        $new_estimate_data['sale_agent'] = $_estimate->sale_agent;
+        $new_estimate_data['reference_no'] = $_estimate->reference_no;
         // Since version 1.0.6
-        $new_estimate_data['billing_street']   = $_estimate->billing_street;
-        $new_estimate_data['billing_city']     = $_estimate->billing_city;
-        $new_estimate_data['billing_state']    = $_estimate->billing_state;
-        $new_estimate_data['billing_zip']      = $_estimate->billing_zip;
-        $new_estimate_data['billing_country']  = $_estimate->billing_country;
-        $new_estimate_data['shipping_street']  = $_estimate->shipping_street;
-        $new_estimate_data['shipping_city']    = $_estimate->shipping_city;
-        $new_estimate_data['shipping_state']   = $_estimate->shipping_state;
-        $new_estimate_data['shipping_zip']     = $_estimate->shipping_zip;
+        $new_estimate_data['billing_street'] = $_estimate->billing_street;
+        $new_estimate_data['billing_city'] = $_estimate->billing_city;
+        $new_estimate_data['billing_state'] = $_estimate->billing_state;
+        $new_estimate_data['billing_zip'] = $_estimate->billing_zip;
+        $new_estimate_data['billing_country'] = $_estimate->billing_country;
+        $new_estimate_data['shipping_street'] = $_estimate->shipping_street;
+        $new_estimate_data['shipping_city'] = $_estimate->shipping_city;
+        $new_estimate_data['shipping_state'] = $_estimate->shipping_state;
+        $new_estimate_data['shipping_zip'] = $_estimate->shipping_zip;
         $new_estimate_data['shipping_country'] = $_estimate->shipping_country;
         if ($_estimate->include_shipping == 1) {
             $new_estimate_data['include_shipping'] = $_estimate->include_shipping;
         }
         $new_estimate_data['show_shipping_on_estimate'] = $_estimate->show_shipping_on_estimate;
         // Set to unpaid status automatically
-        $new_estimate_data['status']                    = 1;
-        $new_estimate_data['clientnote']                = $_estimate->clientnote;
-        $new_estimate_data['adminnote']                 = '';
-        $new_estimate_data['newitems']                  = array();
-        $key                                            = 1;
+        $new_estimate_data['status'] = 1;
+        $new_estimate_data['clientnote'] = $_estimate->clientnote;
+        $new_estimate_data['adminnote'] = '';
+        $new_estimate_data['newitems'] = array();
+        $key = 1;
         foreach ($_estimate->items as $item) {
-            $new_estimate_data['newitems'][$key]['description']      = $item['description'];
+            $new_estimate_data['newitems'][$key]['description'] = $item['description'];
             $new_estimate_data['newitems'][$key]['long_description'] = clear_textarea_breaks($item['long_description']);
-            $new_estimate_data['newitems'][$key]['qty']              = $item['qty'];
-            $new_estimate_data['newitems'][$key]['unit']             = $item['unit'];
-            $new_estimate_data['newitems'][$key]['taxname']          = array();
-            $taxes                                                   = get_estimate_item_taxes($item['id']);
+            $new_estimate_data['newitems'][$key]['qty'] = $item['qty'];
+            $new_estimate_data['newitems'][$key]['unit'] = $item['unit'];
+            $new_estimate_data['newitems'][$key]['taxname'] = array();
+            $taxes = get_estimate_item_taxes($item['id']);
             foreach ($taxes as $tax) {
                 // tax name is in format TAX1|10.00
                 array_push($new_estimate_data['newitems'][$key]['taxname'], $tax['taxname']);
             }
-            $new_estimate_data['newitems'][$key]['rate']  = $item['rate'];
+            $new_estimate_data['newitems'][$key]['rate'] = $item['rate'];
             $new_estimate_data['newitems'][$key]['order'] = $item['item_order'];
-            $key++;
+            $key ++;
         }
         $id = $this->add($new_estimate_data);
         if ($id) {
@@ -351,7 +373,7 @@ class Estimates_model extends CRM_Model
                 if ($value == '') {
                     continue;
                 }
-
+                
                 $this->db->insert('tblcustomfieldsvalues', array(
                     'relid' => $id,
                     'fieldid' => $field['id'],
@@ -359,21 +381,22 @@ class Estimates_model extends CRM_Model
                     'value' => $value
                 ));
             }
-
+            
             $tags = get_tags_in($_estimate->id, 'estimate');
             handle_tags_save($tags, $id, 'estimate');
-
+            
             logActivity('Copied Estimate ' . format_estimate_number($_estimate->id));
-
+            
             return $id;
         }
-
+        
         return false;
     }
 
     /**
      * Performs estimates totals status
-     * @param  array $data
+     * 
+     * @param array $data            
      * @return array
      */
     public function get_estimates_total($data)
@@ -393,18 +416,18 @@ class Estimates_model extends CRM_Model
         } else {
             $currencyid = $this->currencies_model->get_base_currency()->id;
         }
-
+        
         $symbol = $this->currencies_model->get_currency_symbol($currencyid);
-        $where  = '';
+        $where = '';
         if (isset($data['customer_id']) && $data['customer_id'] != '') {
             $where = ' AND clientid=' . $data['customer_id'];
         }
-
+        
         if (isset($data['project_id']) && $data['project_id'] != '') {
             $where .= ' AND project_id=' . $data['project_id'];
         }
-
-        if (!has_permission('estimates', '', 'view')) {
+        
+        if (! has_permission('estimates', '', 'view')) {
             $where .= ' AND addedfrom=' . get_staff_user_id();
         }
         $sql = 'SELECT';
@@ -414,32 +437,34 @@ class Estimates_model extends CRM_Model
             if (isset($data['years']) && count($data['years']) > 0) {
                 $sql .= ' AND YEAR(date) IN (' . implode(', ', $data['years']) . ')';
             } else {
-                $sql .= ' AND YEAR(date) = '.date('Y');
+                $sql .= ' AND YEAR(date) = ' . date('Y');
             }
             $sql .= $where;
             $sql .= ') as "' . $estimate_status . '",';
         }
-
-        $sql     = substr($sql, 0, -1);
-        $result  = $this->db->query($sql)->result_array();
+        
+        $sql = substr($sql, 0, - 1);
+        $result = $this->db->query($sql)->result_array();
         $_result = array();
-        $i       = 1;
+        $i = 1;
         foreach ($result as $key => $val) {
             foreach ($val as $status => $total) {
-                $_result[$i]['total']  = $total;
+                $_result[$i]['total'] = $total;
                 $_result[$i]['symbol'] = $symbol;
                 $_result[$i]['status'] = $status;
-                $i++;
+                $i ++;
             }
         }
         $_result['currencyid'] = $currencyid;
-
+        
         return $_result;
     }
 
     /**
      * Get all estimate items
-     * @param  mixed $id estimateid
+     * 
+     * @param mixed $id
+     *            estimateid
      * @return array
      */
     public function get_estimate_items($id)
@@ -449,13 +474,15 @@ class Estimates_model extends CRM_Model
         $this->db->where('rel_id', $id);
         $this->db->where('rel_type', 'estimate');
         $this->db->order_by('item_order', 'asc');
-
+        
         return $this->db->get()->result_array();
     }
 
     /**
      * Insert new estimate to database
-     * @param array $data invoiec data
+     * 
+     * @param array $data
+     *            invoiec data
      * @return mixed - false if not insert, estimate ID if succes
      */
     public function add($data)
@@ -465,7 +492,7 @@ class Estimates_model extends CRM_Model
             $saveAndSend = true;
             unset($data['save_and_send']);
         }
-
+        
         $unsetters = array(
             'currency_symbol',
             'price',
@@ -483,24 +510,24 @@ class Estimates_model extends CRM_Model
                 unset($data[$unseter]);
             }
         }
-        $data['prefix']        = get_option('estimate_prefix');
+        $data['prefix'] = get_option('estimate_prefix');
         $data['number_format'] = get_option('estimate_number_format');
-
+        
         if (isset($data['custom_fields'])) {
             $custom_fields = $data['custom_fields'];
             unset($data['custom_fields']);
         }
         $data['date'] = to_sql_date($data['date']);
-        if (!empty($data['expirydate'])) {
+        if (! empty($data['expirydate'])) {
             $data['expirydate'] = to_sql_date($data['expirydate']);
         } else {
             unset($data['expirydate']);
         }
-
-        if (isset($data['project_id']) && $data['project_id'] == '' || !isset($data['project_id'])) {
+        
+        if (isset($data['project_id']) && $data['project_id'] == '' || ! isset($data['project_id'])) {
             $data['project_id'] = 0;
         }
-
+        
         $data['hash'] = md5(rand() . microtime());
         // Check if the key exists
         $this->db->where('hash', $data['hash']);
@@ -508,33 +535,32 @@ class Estimates_model extends CRM_Model
         if ($exists) {
             $data['hash'] = md5(rand() . microtime());
         }
-
-
+        
         $tags = '';
         if (isset($data['tags'])) {
-            $tags  = $data['tags'];
+            $tags = $data['tags'];
             unset($data['tags']);
         }
-
-        $data['adminnote']  = nl2br($data['adminnote']);
+        
+        $data['adminnote'] = nl2br($data['adminnote']);
         $data['clientnote'] = nl2br_save_html($data['clientnote']);
-        $data['terms']      = nl2br_save_html($data['terms']);
-
+        $data['terms'] = nl2br_save_html($data['terms']);
+        
         $data['datecreated'] = date('Y-m-d H:i:s');
-        $data['addedfrom']   = get_staff_user_id();
-        $items               = array();
+        $data['addedfrom'] = get_staff_user_id();
+        $items = array();
         if (isset($data['newitems'])) {
             $items = $data['newitems'];
             unset($data['newitems']);
         }
-        if (!isset($data['include_shipping'])) {
+        if (! isset($data['include_shipping'])) {
             foreach ($this->shipping_fields as $_s_field) {
                 if (isset($data[$_s_field])) {
                     $data[$_s_field] = null;
                 }
             }
             $data['show_shipping_on_estimate'] = 1;
-            $data['include_shipping']          = 0;
+            $data['include_shipping'] = 0;
         } else {
             $data['include_shipping'] = 1;
             // set by default for the next time to be checked
@@ -554,14 +580,14 @@ class Estimates_model extends CRM_Model
         if ($data['sale_agent'] == '') {
             $data['sale_agent'] = 0;
         }
-
-        if ((isset($data['adjustment']) && !is_numeric($data['adjustment'])) || !isset($data['adjustment'])) {
+        
+        if ((isset($data['adjustment']) && ! is_numeric($data['adjustment'])) || ! isset($data['adjustment'])) {
             $data['adjustment'] = 0;
         } elseif (isset($data['adjustment']) && is_numeric($data['adjustment'])) {
             $data['adjustment'] = number_format($data['adjustment'], get_decimal_places(), '.', '');
         }
-
-        $data  = $_data['data'];
+        
+        $data = $_data['data'];
         $items = $_data['items'];
         $this->db->insert('tblestimates', $data);
         $insert_id = $this->db->insert_id();
@@ -570,13 +596,13 @@ class Estimates_model extends CRM_Model
             $this->db->where('name', 'next_estimate_number');
             $this->db->set('value', 'value+1', false);
             $this->db->update('tbloptions');
-
+            
             if (isset($custom_fields)) {
                 handle_custom_fields_post($insert_id, $custom_fields);
             }
-
+            
             handle_tags_save($tags, $insert_id, 'estimate');
-
+            
             if (count($items) > 0) {
                 foreach ($items as $key => $item) {
                     $this->db->insert('tblitems_in', array(
@@ -594,18 +620,24 @@ class Estimates_model extends CRM_Model
                         if (isset($item['taxname']) && is_array($item['taxname'])) {
                             foreach ($item['taxname'] as $taxname) {
                                 if ($taxname != '') {
-                                    $tax_array    = explode('|', $taxname);
+                                    $tax_array = explode('|', $taxname);
                                     if (isset($tax_array[0]) && isset($tax_array[1])) {
                                         $tax_name = trim($tax_array[0]);
                                         $tax_rate = trim($tax_array[1]);
-                                        if (total_rows('tblitemstax', array('itemid'=>$itemid, 'taxrate'=>$tax_rate, 'taxname'=>$tax_name, 'rel_id'=>$insert_id, 'rel_type'=>'estimate')) == 0) {
-                                            $this->db->insert('tblitemstax', array(
+                                        if (total_rows('tblitemstax', array(
                                             'itemid' => $itemid,
                                             'taxrate' => $tax_rate,
                                             'taxname' => $tax_name,
                                             'rel_id' => $insert_id,
                                             'rel_type' => 'estimate'
-                                        ));
+                                        )) == 0) {
+                                            $this->db->insert('tblitemstax', array(
+                                                'itemid' => $itemid,
+                                                'taxrate' => $tax_rate,
+                                                'taxname' => $tax_name,
+                                                'rel_id' => $insert_id,
+                                                'rel_type' => 'estimate'
+                                            ));
                                         }
                                     }
                                 }
@@ -616,45 +648,50 @@ class Estimates_model extends CRM_Model
             }
             $this->update_total_tax($insert_id);
             $this->log_estimate_activity($insert_id, 'estimate_activity_created');
-            if($saveAndSend === true){
-                $this->send_estimate_to_client($insert_id,'',true,'',true);
+            if ($saveAndSend === true) {
+                $this->send_estimate_to_client($insert_id, '', true, '', true);
             }
             do_action('after_estimate_added', $insert_id);
             return $insert_id;
         }
-
+        
         return false;
     }
 
     /**
      * Get item by id
-     * @param  mixed $id item id
+     * 
+     * @param mixed $id
+     *            item id
      * @return object
      */
     public function get_estimate_item($id)
     {
         $this->db->where('id', $id);
-
+        
         return $this->db->get('tblitems_in')->row();
     }
 
     /**
      * Update estimate data
-     * @param  array $data estimate data
-     * @param  mixed $id   estimateid
+     * 
+     * @param array $data
+     *            estimate data
+     * @param mixed $id
+     *            estimateid
      * @return boolean
      */
     public function update($data, $id)
     {
-        $data['number']           = trim($data['number']);
-        $affectedRows             = 0;
-        $original_estimate        = $this->get($id);
-        $original_status          = $original_estimate->status;
-        $original_number          = $original_estimate->number;
+        $data['number'] = trim($data['number']);
+        $affectedRows = 0;
+        $original_estimate = $this->get($id);
+        $original_status = $original_estimate->status;
+        $original_number = $original_estimate->number;
         $original_number_formatted = format_estimate_number($id);
-
+        
         $saveAndSend = false;
-        if(isset($data['save_and_send'])){
+        if (isset($data['save_and_send'])) {
             $saveAndSend = true;
             unset($data['save_and_send']);
         }
@@ -670,8 +707,8 @@ class Estimates_model extends CRM_Model
             'tax',
             'rate',
             'quantity',
-            'item_select',
-            );
+            'item_select'
+        );
         foreach ($unsetters as $u) {
             if (isset($data[$u])) {
                 unset($data[$u]);
@@ -687,7 +724,7 @@ class Estimates_model extends CRM_Model
             $newitems = $data['newitems'];
             unset($data['newitems']);
         }
-        if ((isset($data['adjustment']) && !is_numeric($data['adjustment'])) || !isset($data['adjustment'])) {
+        if ((isset($data['adjustment']) && ! is_numeric($data['adjustment'])) || ! isset($data['adjustment'])) {
             $data['adjustment'] = 0;
         } elseif (isset($data['adjustment']) && is_numeric($data['adjustment'])) {
             $data['adjustment'] = number_format($data['adjustment'], get_decimal_places(), '.', '');
@@ -695,16 +732,16 @@ class Estimates_model extends CRM_Model
         if ($data['sale_agent'] == '') {
             $data['sale_agent'] = 0;
         }
-
-        if (isset($data['project_id']) && $data['project_id'] == '' || !isset($data['project_id'])) {
+        
+        if (isset($data['project_id']) && $data['project_id'] == '' || ! isset($data['project_id'])) {
             $data['project_id'] = 0;
         }
-
-        $data['adminnote']  = nl2br($data['adminnote']);
+        
+        $data['adminnote'] = nl2br($data['adminnote']);
         $data['clientnote'] = nl2br_save_html($data['clientnote']);
-        $data['terms']      = nl2br_save_html($data['terms']);
-
-        $data['date']       = to_sql_date($data['date']);
+        $data['terms'] = nl2br_save_html($data['terms']);
+        
+        $data['date'] = to_sql_date($data['date']);
         $data['expirydate'] = to_sql_date($data['expirydate']);
         if ($data['discount_total'] == 0) {
             $data['discount_type'] = '';
@@ -712,26 +749,26 @@ class Estimates_model extends CRM_Model
         if (isset($data['custom_fields'])) {
             $custom_fields = $data['custom_fields'];
             if (handle_custom_fields_post($id, $custom_fields)) {
-                $affectedRows++;
+                $affectedRows ++;
             }
             unset($data['custom_fields']);
         }
-
+        
         if (isset($data['tags'])) {
             if (handle_tags_save($data['tags'], $id, 'estimate')) {
-                $affectedRows++;
+                $affectedRows ++;
             }
             unset($data['tags']);
         }
-
-        if (!isset($data['include_shipping'])) {
+        
+        if (! isset($data['include_shipping'])) {
             foreach ($this->shipping_fields as $_s_field) {
                 if (isset($data[$_s_field])) {
                     $data[$_s_field] = null;
                 }
             }
             $data['show_shipping_on_estimate'] = 1;
-            $data['include_shipping']          = 0;
+            $data['include_shipping'] = 0;
         } else {
             $data['include_shipping'] = 1;
             // set by default for the next time to be checked
@@ -751,11 +788,11 @@ class Estimates_model extends CRM_Model
         if (isset($data['removed_items'])) {
             $action_data['removed_items'] = $data['removed_items'];
         }
-        $_data                 = do_action('before_estimate_updated', $action_data);
+        $_data = do_action('before_estimate_updated', $action_data);
         $data['removed_items'] = $_data['removed_items'];
-        $newitems              = $_data['newitems'];
-        $items                 = $_data['items'];
-        $data                  = $_data['data'];
+        $newitems = $_data['newitems'];
+        $items = $_data['items'];
+        $data = $_data['data'];
         // Delete items checked to be removed from database
         if (isset($data['removed_items'])) {
             foreach ($data['removed_items'] as $remove_item_id) {
@@ -766,7 +803,7 @@ class Estimates_model extends CRM_Model
                     $this->log_estimate_activity($id, 'invoice_estimate_activity_removed_item', false, serialize(array(
                         $original_item->description
                     )));
-                    $affectedRows++;
+                    $affectedRows ++;
                     $this->db->where('itemid', $remove_item_id);
                     $this->db->where('rel_type', 'estimate');
                     $this->db->delete('tblitemstax');
@@ -785,7 +822,9 @@ class Estimates_model extends CRM_Model
                 )));
                 if ($data['status'] == 2) {
                     $this->db->where('id', $id);
-                    $this->db->update('tblestimates', array('sent'=>1));
+                    $this->db->update('tblestimates', array(
+                        'sent' => 1
+                    ));
                 }
             }
             if ($original_number != $data['number']) {
@@ -794,20 +833,20 @@ class Estimates_model extends CRM_Model
                     format_estimate_number($original_estimate->id)
                 )));
             }
-            $affectedRows++;
+            $affectedRows ++;
         }
         $this->load->model('taxes_model');
         if (count($items) > 0) {
             foreach ($items as $key => $item) {
                 $estimate_item_id = $item['itemid'];
-                $original_item    = $this->get_estimate_item($estimate_item_id);
+                $original_item = $this->get_estimate_item($estimate_item_id);
                 $this->db->where('id', $estimate_item_id);
                 $this->db->update('tblitems_in', array(
                     'item_order' => $item['order'],
                     'unit' => $item['unit']
                 ));
                 if ($this->db->affected_rows() > 0) {
-                    $affectedRows++;
+                    $affectedRows ++;
                 }
                 // Check for invoice item short description change
                 $this->db->where('id', $estimate_item_id);
@@ -819,7 +858,7 @@ class Estimates_model extends CRM_Model
                         $original_item->description,
                         $item['description']
                     )));
-                    $affectedRows++;
+                    $affectedRows ++;
                 }
                 // Check for item long description change
                 $this->db->where('id', $estimate_item_id);
@@ -831,51 +870,51 @@ class Estimates_model extends CRM_Model
                         $original_item->long_description,
                         $item['long_description']
                     )));
-                    $affectedRows++;
+                    $affectedRows ++;
                 }
-                if (!isset($item['taxname']) || (isset($item['taxname']) && count($item['taxname']) == 0)) {
+                if (! isset($item['taxname']) || (isset($item['taxname']) && count($item['taxname']) == 0)) {
                     $this->db->where('itemid', $estimate_item_id);
                     $this->db->where('rel_type', 'estimate');
                     $this->db->delete('tblitemstax');
                 } else {
-                    $item_taxes        = get_estimate_item_taxes($estimate_item_id);
+                    $item_taxes = get_estimate_item_taxes($estimate_item_id);
                     $_item_taxes_names = array();
                     foreach ($item_taxes as $_item_tax) {
                         array_push($_item_taxes_names, $_item_tax['taxname']);
                     }
                     $i = 0;
                     foreach ($_item_taxes_names as $_item_tax) {
-                        if (!in_array($_item_tax, $item['taxname'])) {
+                        if (! in_array($_item_tax, $item['taxname'])) {
                             $this->db->where('id', $item_taxes[$i]['id']);
                             $this->db->delete('tblitemstax');
                             if ($this->db->affected_rows() > 0) {
-                                $affectedRows++;
+                                $affectedRows ++;
                             }
                         }
-                        $i++;
+                        $i ++;
                     }
                     if (isset($item['taxname']) && is_array($item['taxname'])) {
                         foreach ($item['taxname'] as $taxname) {
                             if ($taxname != '') {
-                                $tax_array    = explode('|', $taxname);
+                                $tax_array = explode('|', $taxname);
                                 $tax_name = trim($tax_array[0]);
                                 $tax_rate = trim($tax_array[1]);
                                 if (total_rows('tblitemstax', array(
-                                'taxname' => $tax_name,
-                                'itemid' => $estimate_item_id,
-                                'taxrate' => $tax_rate,
-                                'rel_id' => $id,
-                                'rel_type' => 'estimate'
-                            )) == 0) {
-                                    $this->db->insert('tblitemstax', array(
-                                    'taxrate' => $tax_rate,
                                     'taxname' => $tax_name,
                                     'itemid' => $estimate_item_id,
+                                    'taxrate' => $tax_rate,
                                     'rel_id' => $id,
                                     'rel_type' => 'estimate'
-                                ));
+                                )) == 0) {
+                                    $this->db->insert('tblitemstax', array(
+                                        'taxrate' => $tax_rate,
+                                        'taxname' => $tax_name,
+                                        'itemid' => $estimate_item_id,
+                                        'rel_id' => $id,
+                                        'rel_type' => 'estimate'
+                                    ));
                                     if ($this->db->affected_rows() > 0) {
-                                        $affectedRows++;
+                                        $affectedRows ++;
                                     }
                                 }
                             }
@@ -892,7 +931,7 @@ class Estimates_model extends CRM_Model
                         $original_item->rate,
                         $item['rate']
                     )));
-                    $affectedRows++;
+                    $affectedRows ++;
                 }
                 // CHeck for invoice quantity change
                 $this->db->where('id', $estimate_item_id);
@@ -905,7 +944,7 @@ class Estimates_model extends CRM_Model
                         $original_item->qty,
                         $item['qty']
                     )));
-                    $affectedRows++;
+                    $affectedRows ++;
                 }
             }
         }
@@ -926,26 +965,26 @@ class Estimates_model extends CRM_Model
                     if (isset($item['taxname']) && is_array($item['taxname'])) {
                         foreach ($item['taxname'] as $taxname) {
                             if ($taxname != '') {
-                                $tax_array    = explode('|', $taxname);
+                                $tax_array = explode('|', $taxname);
                                 if (isset($tax_array[0]) && isset($tax_array[1])) {
                                     $tax_name = trim($tax_array[0]);
                                     $tax_rate = trim($tax_array[1]);
                                     if (total_rows('tblitemstax', array(
-                                'taxname' => $tax_name,
-                                'itemid' => $new_item_added,
-                                'taxrate' => $tax_rate,
-                                'rel_id' => $id,
-                                'rel_type' => 'estimate'
-                            )) == 0) {
+                                        'taxname' => $tax_name,
+                                        'itemid' => $new_item_added,
+                                        'taxrate' => $tax_rate,
+                                        'rel_id' => $id,
+                                        'rel_type' => 'estimate'
+                                    )) == 0) {
                                         $this->db->insert('tblitemstax', array(
-                                    'taxrate' => $tax_rate,
-                                    'taxname' => $tax_name,
-                                    'itemid' => $new_item_added,
-                                    'rel_id' => $id,
-                                    'rel_type' => 'estimate'
-                                ));
+                                            'taxrate' => $tax_rate,
+                                            'taxname' => $tax_name,
+                                            'itemid' => $new_item_added,
+                                            'rel_id' => $id,
+                                            'rel_type' => 'estimate'
+                                        ));
                                         if ($this->db->affected_rows() > 0) {
-                                            $affectedRows++;
+                                            $affectedRows ++;
                                         }
                                     }
                                 }
@@ -955,23 +994,23 @@ class Estimates_model extends CRM_Model
                     $this->log_estimate_activity($id, 'invoice_estimate_activity_added_item', false, serialize(array(
                         $item['description']
                     )));
-                    $affectedRows++;
+                    $affectedRows ++;
                 }
             }
         }
         if ($affectedRows > 0) {
             $this->update_total_tax($id);
         }
-
-        if($saveAndSend === true){
-            $this->send_estimate_to_client($id,'',true,'',true);
+        
+        if ($saveAndSend === true) {
+            $this->send_estimate_to_client($id, '', true, '', true);
         }
-
-        if($affectedRows > 0){
+        
+        if ($affectedRows > 0) {
             do_action('after_estimate_updated', $id);
             return true;
         }
-
+        
         return false;
     }
 
@@ -981,40 +1020,39 @@ class Estimates_model extends CRM_Model
         $this->db->update('tblestimates', array(
             'status' => $action
         ));
-
+        
         $notifiedUsers = array();
-
+        
         if ($this->db->affected_rows() > 0) {
             $estimate = $this->get($id);
             if ($client == true) {
                 $this->db->where('staffid', $estimate->addedfrom);
                 $this->db->or_where('staffid', $estimate->sale_agent);
                 $staff_estimate = $this->db->get('tblstaff')->result_array();
-                $invoiceid      = false;
-                $invoiced       = false;
-
+                $invoiceid = false;
+                $invoiced = false;
+                
                 $this->load->model('emails_model');
-
+                
                 $this->emails_model->set_rel_id($id);
                 $this->emails_model->set_rel_type('estimate');
-
+                
                 $merge_fields_for_staff_email = array();
-                if (!is_client_logged_in()) {
+                if (! is_client_logged_in()) {
                     $contact_id = get_primary_contact_user_id($estimate->clientid);
                 } else {
                     $contact_id = get_contact_user_id();
                 }
                 $merge_fields_for_staff_email = array_merge($merge_fields_for_staff_email, get_client_contact_merge_fields($estimate->clientid, $contact_id));
                 $merge_fields_for_staff_email = array_merge($merge_fields_for_staff_email, get_estimate_merge_fields($estimate->id));
-
-
+                
                 if ($action == 4) {
                     if (get_option('estimate_auto_convert_to_invoice_on_client_accept') == 1) {
                         $invoiceid = $this->convert_to_invoice($id, true);
                         $this->load->model('invoices_model');
                         if ($invoiceid) {
                             $invoiced = true;
-                            $invoice  = $this->invoices_model->get($invoiceid);
+                            $invoice = $this->invoices_model->get($invoiceid);
                             $this->log_estimate_activity($id, 'estimate_activity_client_accepted_and_converted', true, serialize(array(
                                 '<a href="' . admin_url('invoices/list_invoices/' . $invoiceid) . '">' . format_invoice_number($invoice->id) . '</a>'
                             )));
@@ -1022,7 +1060,7 @@ class Estimates_model extends CRM_Model
                     } else {
                         $this->log_estimate_activity($id, 'estimate_activity_client_accepted', true);
                     }
-
+                    
                     // Send thank you email to all contacts with permission estimates
                     $contacts = $this->clients_model->get_contacts($estimate->clientid);
                     foreach ($contacts as $contact) {
@@ -1049,9 +1087,9 @@ class Estimates_model extends CRM_Model
                         // Send staff email notification that customer accepted estimate
                         $this->emails_model->send_email_template('estimate-accepted-to-staff', $member['email'], $merge_fields_for_staff_email);
                     }
-
+                    
                     pusher_trigger_notification($notifiedUsers);
-
+                    
                     return array(
                         'invoiced' => $invoiced,
                         'invoiceid' => $invoiceid
@@ -1067,17 +1105,17 @@ class Estimates_model extends CRM_Model
                                 format_estimate_number($estimate->id)
                             ))
                         ));
-
+                        
                         if ($notified) {
                             array_push($notifiedUsers, $member['staffid']);
                         }
                         // Send staff email notification that customer declined estimate
                         $this->emails_model->send_email_template('estimate-declined-to-staff', $member['email'], $merge_fields_for_staff_email);
                     }
-
+                    
                     pusher_trigger_notification($notifiedUsers);
                     $this->log_estimate_activity($id, 'estimate_activity_client_declined', true);
-
+                    
                     return array(
                         'invoiced' => $invoiced,
                         'invoiceid' => $invoiceid
@@ -1086,24 +1124,28 @@ class Estimates_model extends CRM_Model
             } else {
                 if ($action == 2) {
                     $this->db->where('id', $id);
-                    $this->db->update('tblestimates', array('sent'=>1));
+                    $this->db->update('tblestimates', array(
+                        'sent' => 1
+                    ));
                 }
                 // Admin marked estimate
                 $this->log_estimate_activity($id, 'estimate_activity_marked', false, serialize(array(
                     '<status>' . $action . '</status>'
                 )));
-
+                
                 return true;
             }
         }
-
+        
         return false;
     }
 
     /**
      * Get estimate attachments
-     * @param  mixed $estimate_id
-     * @param  string $id          attachment id
+     * 
+     * @param mixed $estimate_id            
+     * @param string $id
+     *            attachment id
      * @return mixed
      */
     public function get_attachments($estimate_id, $id = '')
@@ -1124,14 +1166,16 @@ class Estimates_model extends CRM_Model
     }
 
     /**
-     *  Delete proposal attachment
-     * @param   mixed $id  attachmentid
-     * @return  boolean
+     * Delete proposal attachment
+     * 
+     * @param mixed $id
+     *            attachmentid
+     * @return boolean
      */
     public function delete_attachment($id)
     {
         $attachment = $this->get_attachments('', $id);
-        $deleted    = false;
+        $deleted = false;
         if ($attachment) {
             if (empty($attachment->external)) {
                 unlink(get_upload_path_by_type('estimate') . $attachment->rel_id . '/' . $attachment->file_name);
@@ -1142,7 +1186,7 @@ class Estimates_model extends CRM_Model
                 $deleted = true;
                 logActivity('Estimate Attachment Deleted [EstimateID: ' . $attachment->rel_id . ']');
             }
-
+            
             if (is_dir(get_upload_path_by_type('estimate') . $attachment->rel_id)) {
                 // Check if no attachments left, so we can delete the folder also
                 $other_attachments = list_files(get_upload_path_by_type('estimate') . $attachment->rel_id);
@@ -1152,24 +1196,26 @@ class Estimates_model extends CRM_Model
                 }
             }
         }
-
+        
         return $deleted;
     }
 
     /**
      * Delete estimate items and all connections
-     * @param  mixed $id estimateid
+     * 
+     * @param mixed $id
+     *            estimateid
      * @return boolean
      */
     public function delete($id)
     {
         if (get_option('delete_only_on_last_estimate') == 1) {
-            if (!is_last_estimate($id)) {
+            if (! is_last_estimate($id)) {
                 return false;
             }
         }
         $estimate = $this->get($id);
-        if (!is_null($estimate->invoiceid)) {
+        if (! is_null($estimate->invoiceid)) {
             return array(
                 'is_invoiced_estimate_delete_error' => true
             );
@@ -1201,44 +1247,41 @@ class Estimates_model extends CRM_Model
             $this->db->where('rel_id', $id);
             $this->db->where('rel_type', 'estimate');
             $this->db->delete('tblnotes');
-
+            
             $this->db->where('rel_type', 'estimate');
             $this->db->where('rel_id', $id);
             $this->db->delete('tblviewstracking');
-
+            
             $this->db->where('rel_type', 'estimate');
             $this->db->where('rel_id', $id);
             $this->db->delete('tbltags_in');
-
+            
             $this->db->where('rel_type', 'estimate');
             $this->db->where('rel_id', $id);
             $this->db->delete('tblreminders');
-
+            
             $this->db->where('rel_id', $id);
             $this->db->where('rel_type', 'estimate');
             $this->db->delete('tblitems_in');
-
-
+            
             $this->db->where('rel_id', $id);
             $this->db->where('rel_type', 'estimate');
             $this->db->delete('tblitemstax');
-
-
+            
             $this->db->where('rel_id', $id);
             $this->db->where('rel_type', 'estimate');
             $this->db->delete('tblsalesactivity');
-
-
+            
             // Delete the custom field values
             $this->db->where('relid', $id);
             $this->db->where('fieldto', 'estimate');
             $this->db->delete('tblcustomfieldsvalues');
-
+            
             $attachments = $this->get_attachments($id);
             foreach ($attachments as $attachment) {
                 $this->delete_attachment($attachment['id']);
             }
-
+            
             // Get related tasks
             $this->db->where('rel_type', 'estimate');
             $this->db->where('rel_id', $id);
@@ -1246,16 +1289,18 @@ class Estimates_model extends CRM_Model
             foreach ($tasks as $task) {
                 $this->tasks_model->delete_task($task['id']);
             }
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * Set estimate to sent when email is successfuly sended to client
-     * @param mixed $id estimateid
+     * 
+     * @param mixed $id
+     *            estimateid
      */
     public function set_estimate_sent($id, $emails_sent = array())
     {
@@ -1276,31 +1321,33 @@ class Estimates_model extends CRM_Model
 
     /**
      * Function that update total tax in estimates table for each estimate
-     * @param  mixed $id estimate id
+     * 
+     * @param mixed $id
+     *            estimate id
      * @return void
      */
     public function update_total_tax($id)
     {
-        $total_tax         = 0;
-        $taxes             = array();
+        $total_tax = 0;
+        $taxes = array();
         $_calculated_taxes = array();
-        $estimate          = $this->get($id);
+        $estimate = $this->get($id);
         foreach ($estimate->items as $item) {
             $item_taxes = get_estimate_item_taxes($item['id']);
             if (count($item_taxes) > 0) {
                 foreach ($item_taxes as $tax) {
-                    $calc_tax     = 0;
+                    $calc_tax = 0;
                     $tax_not_calc = false;
-                    if (!in_array($tax['taxname'], $_calculated_taxes)) {
+                    if (! in_array($tax['taxname'], $_calculated_taxes)) {
                         array_push($_calculated_taxes, $tax['taxname']);
                         $tax_not_calc = true;
                     }
                     if ($tax_not_calc == true) {
-                        $taxes[$tax['taxname']]          = array();
+                        $taxes[$tax['taxname']] = array();
                         $taxes[$tax['taxname']]['total'] = array();
                         array_push($taxes[$tax['taxname']]['total'], (($item['qty'] * $item['rate']) / 100 * $tax['taxrate']));
                         $taxes[$tax['taxname']]['tax_name'] = $tax['taxname'];
-                        $taxes[$tax['taxname']]['taxrate']  = $tax['taxrate'];
+                        $taxes[$tax['taxname']]['taxrate'] = $tax['taxrate'];
                     } else {
                         array_push($taxes[$tax['taxname']]['total'], (($item['qty'] * $item['rate']) / 100 * $tax['taxrate']));
                     }
@@ -1311,7 +1358,7 @@ class Estimates_model extends CRM_Model
             $total = array_sum($tax['total']);
             if ($estimate->discount_percent != 0 && $estimate->discount_type == 'before_tax') {
                 $total_tax_calculated = ($total * $estimate->discount_percent) / 100;
-                $total                = ($total - $total_tax_calculated);
+                $total = ($total - $total_tax_calculated);
             }
             $total_tax += $total;
         }
@@ -1323,22 +1370,24 @@ class Estimates_model extends CRM_Model
 
     /**
      * Send expiration reminder to customer
-     * @param  mixed $id estimate id
+     * 
+     * @param mixed $id
+     *            estimate id
      * @return boolean
      */
     public function send_expiry_reminder($id)
     {
-        $estimate        = $this->get($id);
+        $estimate = $this->get($id);
         $estimate_number = format_estimate_number($estimate->id);
-        $pdf             = estimate_pdf($estimate);
-        $attach          = $pdf->Output($estimate_number . '.pdf', 'S');
-        $emails_sent     = array();
-        $contacts        = $this->clients_model->get_contacts($estimate->clientid);
+        $pdf = estimate_pdf($estimate);
+        $attach = $pdf->Output($estimate_number . '.pdf', 'S');
+        $emails_sent = array();
+        $contacts = $this->clients_model->get_contacts($estimate->clientid);
         $this->load->model('emails_model');
-
+        
         $this->emails_model->set_rel_id($id);
         $this->emails_model->set_rel_type('estimate');
-
+        
         foreach ($contacts as $contact) {
             if (has_contact_permission('estimates', $contact['id'])) {
                 $this->emails_model->add_attachment(array(
@@ -1354,7 +1403,7 @@ class Estimates_model extends CRM_Model
                 }
             }
         }
-
+        
         if (count($emails_sent) > 0) {
             $this->db->where('id', $id);
             $this->db->update('tblestimates', array(
@@ -1363,27 +1412,31 @@ class Estimates_model extends CRM_Model
             $this->log_estimate_activity($id, 'not_expiry_reminder_sent', false, serialize(array(
                 '<custom_data>' . implode(', ', $emails_sent) . '</custom_data>'
             )));
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * Send estimate to client
-     * @param  mixed  $id        estimateid
-     * @param  string  $template  email template to sent
-     * @param  boolean $attachpdf attach estimate pdf or not
+     * 
+     * @param mixed $id
+     *            estimateid
+     * @param string $template
+     *            email template to sent
+     * @param boolean $attachpdf
+     *            attach estimate pdf or not
      * @return boolean
      */
     public function send_estimate_to_client($id, $template = '', $attachpdf = true, $cc = '', $manually = false)
     {
         $this->load->model('emails_model');
-
+        
         $this->emails_model->set_rel_id($id);
         $this->emails_model->set_rel_type('estimate');
-
+        
         $estimate = $this->get($id);
         if ($template == '') {
             if ($estimate->sent == 0) {
@@ -1393,13 +1446,12 @@ class Estimates_model extends CRM_Model
             }
         }
         $estimate_number = format_estimate_number($estimate->id);
-
-
-        $emails_sent         = array();
-        $send                = false;
-        $sent_to             = $this->input->post('sent_to');
+        
+        $emails_sent = array();
+        $send = false;
+        $sent_to = $this->input->post('sent_to');
         if ($manually === true) {
-            $sent_to  = array();
+            $sent_to = array();
             $contacts = $this->clients_model->get_contacts($estimate->clientid);
             foreach ($contacts as $contact) {
                 if (has_contact_permission('estimates', $contact['id'])) {
@@ -1407,8 +1459,8 @@ class Estimates_model extends CRM_Model
                 }
             }
         }
-
-        $status_now          = $estimate->status;
+        
+        $status_now = $estimate->status;
         $status_auto_updated = false;
         if (is_array($sent_to) && count($sent_to) > 0) {
             $i = 0;
@@ -1420,13 +1472,13 @@ class Estimates_model extends CRM_Model
                 ));
                 $status_auto_updated = true;
             }
-
+            
             if ($attachpdf) {
                 $_pdf_estimate = $this->get($estimate->id);
-                $pdf    = estimate_pdf($_pdf_estimate);
+                $pdf = estimate_pdf($_pdf_estimate);
                 $attach = $pdf->Output($estimate_number . '.pdf', 'S');
             }
-
+            
             foreach ($sent_to as $contact_id) {
                 if ($contact_id != '') {
                     if ($attachpdf) {
@@ -1436,13 +1488,13 @@ class Estimates_model extends CRM_Model
                             'type' => 'application/pdf'
                         ));
                     }
-
+                    
                     if ($this->input->post('email_attachments')) {
                         $_other_attachments = $this->input->post('email_attachments');
-
+                        
                         foreach ($_other_attachments as $attachment) {
                             $_attachment = $this->get_attachments($id, $attachment);
-
+                            
                             $this->emails_model->add_attachment(array(
                                 'attachment' => get_upload_path_by_type('estimate') . $id . '/' . $_attachment->file_name,
                                 'filename' => $_attachment->file_name,
@@ -1451,14 +1503,14 @@ class Estimates_model extends CRM_Model
                             ));
                         }
                     }
-
+                    
                     $contact = $this->clients_model->get_contact($contact_id);
-
+                    
                     $merge_fields = array();
                     $merge_fields = array_merge($merge_fields, get_client_contact_merge_fields($estimate->clientid, $contact_id));
                     $merge_fields = array_merge($merge_fields, get_estimate_merge_fields($estimate->id));
                     // Send cc only for the first contact
-                    if (!empty($cc) && $i > 0) {
+                    if (! empty($cc) && $i > 0) {
                         $cc = '';
                     }
                     if ($this->emails_model->send_email_template($template, $contact->email, $merge_fields, '', $cc)) {
@@ -1466,14 +1518,14 @@ class Estimates_model extends CRM_Model
                         array_push($emails_sent, $contact->email);
                     }
                 }
-                $i++;
+                $i ++;
             }
         } else {
             return false;
         }
         if ($send) {
             $this->set_estimate_sent($id, $emails_sent);
-
+            
             return true;
         } else {
             if ($status_auto_updated) {
@@ -1484,13 +1536,15 @@ class Estimates_model extends CRM_Model
                 ));
             }
         }
-
+        
         return false;
     }
 
     /**
      * All estimate activity
-     * @param  mixed $id estimateid
+     * 
+     * @param mixed $id
+     *            estimateid
      * @return array
      */
     public function get_estimate_activity($id)
@@ -1498,27 +1552,30 @@ class Estimates_model extends CRM_Model
         $this->db->where('rel_id', $id);
         $this->db->where('rel_type', 'estimate');
         $this->db->order_by('date', 'asc');
-
+        
         return $this->db->get('tblsalesactivity')->result_array();
     }
 
     /**
      * Log estimate activity to database
-     * @param  mixed $id   estimateid
-     * @param  string $description activity description
+     * 
+     * @param mixed $id
+     *            estimateid
+     * @param string $description
+     *            activity description
      */
     public function log_estimate_activity($id, $description = '', $client = false, $additional_data = '')
     {
-        $staffid   = get_staff_user_id();
+        $staffid = get_staff_user_id();
         $full_name = get_staff_full_name(get_staff_user_id());
         if (DEFINED('CRON')) {
-            $staffid   = '[CRON]';
+            $staffid = '[CRON]';
             $full_name = '[CRON]';
         } elseif ($client == true) {
-            $staffid   = null;
+            $staffid = null;
             $full_name = '';
         }
-
+        
         $this->db->insert('tblsalesactivity', array(
             'description' => $description,
             'date' => date('Y-m-d H:i:s'),
@@ -1532,7 +1589,9 @@ class Estimates_model extends CRM_Model
 
     /**
      * Updates pipeline order when drag and drop
-     * @param  mixe $data $_POST data
+     * 
+     * @param mixe $data
+     *            $_POST data
      * @return void
      */
     public function update_pipeline($data)
@@ -1548,6 +1607,7 @@ class Estimates_model extends CRM_Model
 
     /**
      * Get estimate unique year for filtering
+     * 
      * @return array
      */
     public function get_estimates_years()

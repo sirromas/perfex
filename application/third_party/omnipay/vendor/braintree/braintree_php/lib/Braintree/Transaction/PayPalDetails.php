@@ -6,7 +6,7 @@ use Braintree\Instance;
 /**
  * PayPal details from a transaction
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Transaction
  */
 
@@ -14,9 +14,9 @@ use Braintree\Instance;
  * creates an instance of PayPalDetails
  *
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Transaction
- *
+ *            
  * @property-read string $payerEmail
  * @property-read string $paymentId
  * @property-read string $authorizationId
@@ -28,10 +28,13 @@ use Braintree\Instance;
  */
 class PayPalDetails extends Instance
 {
+
     protected $_attributes = [];
 
     /**
+     *
      * @ignore
+     *
      */
     public function __construct($attributes)
     {

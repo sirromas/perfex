@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Service\Command\LocationVisitor\Response;
 
 use Guzzle\Http\Message\Response;
@@ -11,13 +10,9 @@ use Guzzle\Service\Command\CommandInterface;
  */
 class HeaderVisitor extends AbstractResponseVisitor
 {
-    public function visit(
-        CommandInterface $command,
-        Response $response,
-        Parameter $param,
-        &$value,
-        $context =  null
-    ) {
+
+    public function visit(CommandInterface $command, Response $response, Parameter $param, &$value, $context = null)
+    {
         if ($param->getType() == 'object' && $param->getAdditionalProperties() instanceof Parameter) {
             $this->processPrefixedHeaders($response, $param, $value);
         } else {
@@ -28,9 +23,12 @@ class HeaderVisitor extends AbstractResponseVisitor
     /**
      * Process a prefixed header array
      *
-     * @param Response  $response Response that contains the headers
-     * @param Parameter $param    Parameter object
-     * @param array     $value    Value response array to modify
+     * @param Response $response
+     *            Response that contains the headers
+     * @param Parameter $param
+     *            Parameter object
+     * @param array $value
+     *            Value response array to modify
      */
     protected function processPrefixedHeaders(Response $response, Parameter $param, &$value)
     {

@@ -1,23 +1,26 @@
 <?php
-
 namespace Guzzle\Batch;
 
 use Guzzle\Batch\Exception\BatchTransferException;
 
 /**
- * BatchInterface decorator used to buffer exceptions encountered during a transfer.  The exceptions can then later be
+ * BatchInterface decorator used to buffer exceptions encountered during a transfer.
+ * The exceptions can then later be
  * processed after a batch flush has completed.
  */
 class ExceptionBufferingBatch extends AbstractBatchDecorator
 {
-    /** @var array Array of BatchTransferException exceptions */
+
+    /**
+     * @var array Array of BatchTransferException exceptions
+     */
     protected $exceptions = array();
 
     public function flush()
     {
         $items = array();
-
-        while (!$this->decoratedBatch->isEmpty()) {
+        
+        while (! $this->decoratedBatch->isEmpty()) {
             try {
                 $transferredItems = $this->decoratedBatch->flush();
             } catch (BatchTransferException $e) {
@@ -26,7 +29,7 @@ class ExceptionBufferingBatch extends AbstractBatchDecorator
             }
             $items = array_merge($items, $transferredItems);
         }
-
+        
         return $items;
     }
 

@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\EventDispatcher;
 
 /**
@@ -27,17 +26,21 @@ namespace Symfony\Component\EventDispatcher;
  */
 class Event
 {
+
     /**
+     *
      * @var bool Whether no further event listeners should be triggered
      */
     private $propagationStopped = false;
 
     /**
+     *
      * @var EventDispatcherInterface Dispatcher that dispatched this event
      */
     private $dispatcher;
 
     /**
+     *
      * @var string This event's name
      */
     private $name;
@@ -69,7 +72,7 @@ class Event
     /**
      * Stores the EventDispatcher that dispatches this Event.
      *
-     * @param EventDispatcherInterface $dispatcher
+     * @param EventDispatcherInterface $dispatcher            
      *
      * @deprecated since version 2.4, to be removed in 3.0. The event dispatcher is passed to the listener call.
      */
@@ -87,8 +90,8 @@ class Event
      */
     public function getDispatcher()
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0. The event dispatcher instance can be received in the listener call instead.', E_USER_DEPRECATED);
-
+        @trigger_error('The ' . __METHOD__ . ' method is deprecated since version 2.4 and will be removed in 3.0. The event dispatcher instance can be received in the listener call instead.', E_USER_DEPRECATED);
+        
         return $this->dispatcher;
     }
 
@@ -101,16 +104,17 @@ class Event
      */
     public function getName()
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0. The event name can be received in the listener call instead.', E_USER_DEPRECATED);
-
+        @trigger_error('The ' . __METHOD__ . ' method is deprecated since version 2.4 and will be removed in 3.0. The event name can be received in the listener call instead.', E_USER_DEPRECATED);
+        
         return $this->name;
     }
 
     /**
      * Sets the event's name property.
      *
-     * @param string $name The event name
-     *
+     * @param string $name
+     *            The event name
+     *            
      * @deprecated since version 2.4, to be removed in 3.0. The event name is passed to the listener call.
      */
     public function setName($name)

@@ -1,12 +1,13 @@
 <?php
-
 namespace Omnipay\Mollie\Message;
 
 use Omnipay\Tests\TestCase;
 
 class CompletePurchaseRequestTest extends TestCase
 {
+
     /**
+     *
      * @var \Omnipay\Mollie\Message\CompletePurchaseRequest
      */
     protected $request;
@@ -15,11 +16,11 @@ class CompletePurchaseRequestTest extends TestCase
     {
         $this->request = new CompletePurchaseRequest($this->getHttpClient(), $this->getHttpRequest());
         $this->request->initialize(array(
-            'apiKey' => 'mykey',
+            'apiKey' => 'mykey'
         ));
-
+        
         $this->getHttpRequest()->request->replace(array(
-            'id' => 'tr_Qzin4iTWrU',
+            'id' => 'tr_Qzin4iTWrU'
         ));
     }
 
@@ -30,16 +31,16 @@ class CompletePurchaseRequestTest extends TestCase
     public function testGetDataWithoutIDParameter()
     {
         $this->getHttpRequest()->request->remove('id');
-
+        
         $data = $this->request->getData();
-
+        
         $this->assertEmpty($data);
     }
 
     public function testGetData()
     {
         $data = $this->request->getData();
-
+        
         $this->assertSame("tr_Qzin4iTWrU", $data['id']);
         $this->assertCount(1, $data);
     }
@@ -48,7 +49,7 @@ class CompletePurchaseRequestTest extends TestCase
     {
         $this->setMockHttpResponse('CompletePurchaseSuccess.txt');
         $response = $this->request->send();
-
+        
         $this->assertInstanceOf('Omnipay\Mollie\Message\CompletePurchaseResponse', $response);
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isOpen());
@@ -61,7 +62,7 @@ class CompletePurchaseRequestTest extends TestCase
     {
         $this->setMockHttpResponse('CompletePurchaseExpired.txt');
         $response = $this->request->send();
-
+        
         $this->assertInstanceOf('Omnipay\Mollie\Message\CompletePurchaseResponse', $response);
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isPaid());
@@ -74,7 +75,7 @@ class CompletePurchaseRequestTest extends TestCase
     {
         $this->setMockHttpResponse('PurchaseFailure.txt');
         $response = $this->request->send();
-
+        
         $this->assertInstanceOf('Omnipay\Mollie\Message\CompletePurchaseResponse', $response);
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());

@@ -4,11 +4,12 @@ namespace Braintree;
 /**
  * Braintree Gateway module
  *
- * @package    Braintree
- * @category   Resources
+ * @package Braintree
+ * @category Resources
  */
 class Gateway
 {
+
     /**
      *
      * @var Configuration

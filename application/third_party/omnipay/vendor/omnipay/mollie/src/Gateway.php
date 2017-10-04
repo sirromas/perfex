@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\Mollie;
 
 use Omnipay\Common\AbstractGateway;
@@ -11,7 +10,9 @@ use Omnipay\Common\AbstractGateway;
  */
 class Gateway extends AbstractGateway
 {
+
     /**
+     *
      * @return string
      */
     public function getName()
@@ -20,6 +21,7 @@ class Gateway extends AbstractGateway
     }
 
     /**
+     *
      * @return array
      */
     public function getDefaultParameters()
@@ -30,6 +32,7 @@ class Gateway extends AbstractGateway
     }
 
     /**
+     *
      * @return string
      */
     public function getApiKey()
@@ -38,7 +41,8 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * @param  string $value
+     *
+     * @param string $value            
      * @return $this
      */
     public function setApiKey($value)
@@ -47,7 +51,8 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * @param  array $parameters
+     *
+     * @param array $parameters            
      * @return \Omnipay\Mollie\Message\FetchIssuersRequest
      */
     public function fetchIssuers(array $parameters = array())
@@ -56,7 +61,8 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * @param  array $parameters
+     *
+     * @param array $parameters            
      * @return \Omnipay\Mollie\Message\FetchPaymentMethodsRequest
      */
     public function fetchPaymentMethods(array $parameters = array())
@@ -65,7 +71,8 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * @param  array $parameters
+     *
+     * @param array $parameters            
      * @return \Omnipay\Mollie\Message\FetchTransactionRequest
      */
     public function fetchTransaction(array $parameters = array())
@@ -74,7 +81,8 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * @param  array $parameters
+     *
+     * @param array $parameters            
      * @return \Omnipay\Mollie\Message\PurchaseRequest
      */
     public function purchase(array $parameters = array())
@@ -83,7 +91,8 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * @param  array $parameters
+     *
+     * @param array $parameters            
      * @return \Omnipay\Mollie\Message\CompletePurchaseRequest
      */
     public function completePurchase(array $parameters = array())
@@ -92,7 +101,8 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * @param  array $parameters
+     *
+     * @param array $parameters            
      * @return \Omnipay\Mollie\Message\RefundRequest
      */
     public function refund(array $parameters = array())
@@ -101,7 +111,8 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * @param  array $parameters
+     *
+     * @param array $parameters            
      * @return \Omnipay\Mollie\Message\CreateCustomerRequest
      */
     public function createCustomer(array $parameters = array())
@@ -110,7 +121,8 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * @param  array $parameters
+     *
+     * @param array $parameters            
      * @return \Omnipay\Mollie\Message\UpdateCustomerRequest
      */
     public function updateCustomer(array $parameters = array())
@@ -119,7 +131,8 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * @param  array $parameters
+     *
+     * @param array $parameters            
      * @return \Omnipay\Mollie\Message\FetchCustomerRequest
      */
     public function fetchCustomer(array $parameters = array())

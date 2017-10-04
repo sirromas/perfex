@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Cache;
 
 /**
@@ -7,6 +6,7 @@ namespace Guzzle\Cache;
  */
 abstract class AbstractCacheAdapter implements CacheAdapterInterface
 {
+
     protected $cache;
 
     /**

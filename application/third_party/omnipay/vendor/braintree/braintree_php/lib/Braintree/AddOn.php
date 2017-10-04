@@ -3,9 +3,10 @@ namespace Braintree;
 
 class AddOn extends Modification
 {
+
     /**
      *
-     * @param array $attributes
+     * @param array $attributes            
      * @return AddOn
      */
     public static function factory($attributes)
@@ -14,7 +15,6 @@ class AddOn extends Modification
         $instance->_initialize($attributes);
         return $instance;
     }
-
 
     /**
      * static methods redirecting to gateway

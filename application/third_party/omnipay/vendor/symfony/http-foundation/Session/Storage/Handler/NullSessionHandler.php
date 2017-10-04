@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 /**
@@ -20,8 +19,11 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  */
 class NullSessionHandler implements \SessionHandlerInterface
 {
+
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function open($savePath, $sessionName)
     {
@@ -29,7 +31,9 @@ class NullSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function close()
     {
@@ -37,7 +41,9 @@ class NullSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function read($sessionId)
     {
@@ -45,7 +51,9 @@ class NullSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function write($sessionId, $data)
     {
@@ -53,7 +61,9 @@ class NullSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function destroy($sessionId)
     {
@@ -61,7 +71,9 @@ class NullSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function gc($maxlifetime)
     {

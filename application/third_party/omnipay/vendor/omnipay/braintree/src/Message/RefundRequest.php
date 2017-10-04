@@ -10,26 +10,28 @@ use Omnipay\Common\Message\ResponseInterface;
  */
 class RefundRequest extends AbstractRequest
 {
+
     public function getData()
     {
         $this->validate('transactionReference');
-
+        
         return array(
             'transactionReference' => $this->getTransactionReference(),
-            'amount' => $this->getAmount(),
+            'amount' => $this->getAmount()
         );
     }
 
     /**
      * Send the request with specified data
      *
-     * @param  mixed $data The data to send
+     * @param mixed $data
+     *            The data to send
      * @return ResponseInterface
      */
     public function sendData($data)
     {
         $response = $this->braintree->transaction()->refund($data['transactionReference'], $data['amount']);
-
+        
         return $this->createResponse($response);
     }
 }

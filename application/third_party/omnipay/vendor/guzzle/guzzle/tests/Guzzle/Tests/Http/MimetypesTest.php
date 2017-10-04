@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Http;
 
 use Guzzle\Http\Mimetypes;
@@ -9,6 +8,7 @@ use Guzzle\Http\Mimetypes;
  */
 class MimetypesTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testGetsFromExtension()
     {
         $this->assertEquals('text/x-php', Mimetypes::getInstance()->fromExtension('php'));

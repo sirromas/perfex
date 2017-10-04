@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\AuthorizeNet\Message;
 
 /**
@@ -7,5 +6,6 @@ namespace Omnipay\AuthorizeNet\Message;
  */
 class SIMPurchaseRequest extends SIMAuthorizeRequest
 {
+
     protected $action = 'AUTH_CAPTURE';
 }

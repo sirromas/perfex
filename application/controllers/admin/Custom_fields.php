@@ -1,22 +1,25 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
 class Custom_fields extends Admin_controller
 {
+
     private $pdf_fields = array();
+
     private $client_portal_fields = array();
 
     public function __construct()
     {
         parent::__construct();
         $this->load->model('custom_fields_model');
-        if (!is_admin()) {
+        if (! is_admin()) {
             access_denied('Access Custom Fields');
         }
         // Add the pdf allowed fields
-        $this->pdf_fields           = $this->custom_fields_model->get_pdf_allowed_fields();
+        $this->pdf_fields = $this->custom_fields_model->get_pdf_allowed_fields();
         $this->client_portal_fields = $this->custom_fields_model->get_client_portal_allowed_fields();
     }
-
+    
     /* List all custom fields */
     public function index()
     {
@@ -50,18 +53,18 @@ class Custom_fields extends Admin_controller
             $title = _l('add_new', _l('custom_field_lowercase'));
         } else {
             $data['custom_field'] = $this->custom_fields_model->get($id);
-            $title                = _l('edit', _l('custom_field_lowercase'));
+            $title = _l('edit', _l('custom_field_lowercase'));
         }
-        $data['pdf_fields']           = $this->pdf_fields;
+        $data['pdf_fields'] = $this->pdf_fields;
         $data['client_portal_fields'] = $this->client_portal_fields;
-        $data['title']                = $title;
+        $data['title'] = $title;
         $this->load->view('admin/custom_fields/customfield', $data);
     }
-
+    
     /* Delete announcement from database */
     public function delete($id)
     {
-        if (!$id) {
+        if (! $id) {
             redirect(admin_url('custom_fields'));
         }
         $response = $this->custom_fields_model->delete($id);
@@ -72,8 +75,8 @@ class Custom_fields extends Admin_controller
         }
         redirect(admin_url('custom_fields'));
     }
-
-    /* Change survey status active or inactive*/
+    
+    /* Change survey status active or inactive */
     public function change_custom_field_status($id, $status)
     {
         if ($this->input->is_ajax_request()) {

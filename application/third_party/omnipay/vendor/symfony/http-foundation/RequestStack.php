@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation;
 
 /**
@@ -18,7 +17,9 @@ namespace Symfony\Component\HttpFoundation;
  */
 class RequestStack
 {
+
     /**
+     *
      * @var Request[]
      */
     private $requests = array();
@@ -46,19 +47,20 @@ class RequestStack
      */
     public function pop()
     {
-        if (!$this->requests) {
+        if (! $this->requests) {
             return;
         }
-
+        
         return array_pop($this->requests);
     }
 
     /**
+     *
      * @return Request|null
      */
     public function getCurrentRequest()
     {
-        return end($this->requests) ?: null;
+        return end($this->requests) ?  : null;
     }
 
     /**
@@ -72,10 +74,10 @@ class RequestStack
      */
     public function getMasterRequest()
     {
-        if (!$this->requests) {
+        if (! $this->requests) {
             return;
         }
-
+        
         return $this->requests[0];
     }
 
@@ -93,11 +95,11 @@ class RequestStack
     public function getParentRequest()
     {
         $pos = count($this->requests) - 2;
-
-        if (!isset($this->requests[$pos])) {
+        
+        if (! isset($this->requests[$pos])) {
             return;
         }
-
+        
         return $this->requests[$pos];
     }
 }

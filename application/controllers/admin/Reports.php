@@ -1,7 +1,11 @@
 <?php
-
 defined('BASEPATH') or exit('No direct script access allowed');
 
+/**
+ *
+ * @author moyo
+ *        
+ */
 class Reports extends Admin_controller
 {
 
@@ -10,27 +14,25 @@ class Reports extends Admin_controller
     public function __construct()
     {
         parent::__construct();
-        if (!has_permission('reports', '', 'view')) {
+        if (! has_permission('reports', '', 'view')) {
             access_denied('reports');
         }
         $this->_instance = &get_instance();
         $this->load->model('reports_model');
     }
-
+    
     /* No access on this url */
-
+    
     /**
-     *
      */
     public function index()
     {
         redirect(admin_url());
     }
-
+    
     /* See knowledge base article reports */
-
+    
     /**
-     *
      */
     public function knowledge_base_articles()
     {
@@ -39,11 +41,9 @@ class Reports extends Admin_controller
         $data['title'] = _l('kb_reports');
         $this->load->view('admin/reports/knowledge_base_articles', $data);
     }
-
-
+    
     /* Report leads conversions */
     /**
-     *
      */
     public function leads()
     {
@@ -62,31 +62,27 @@ class Reports extends Admin_controller
     }
 
     /**
-     *
      */
     public function get_leads_data_ajax()
     {
         $item = $_POST['item'];
         $data = $this->reports_model->get_leads_conversion_report_data(json_decode($item));
         /*
-        echo "<pre>";
-        print_r($data);
-        echo "</pre>";
-        */
+         * echo "<pre>";
+         * print_r($data);
+         * echo "</pre>";
+         */
         echo $data;
-
     }
-
+    
     /* Sales reports */
     /**
-     *
      */
     public function sales()
     {
-
         $data['mysqlVersion'] = $this->db->query('SELECT VERSION() as version')->row();
         $data['sqlMode'] = $this->db->query('SELECT @@sql_mode as mode')->row();
-
+        
         if (is_using_multiple_currencies()) {
             $this->load->model('currencies_model');
             $data['currencies'] = $this->currencies_model->get();
@@ -100,33 +96,31 @@ class Reports extends Admin_controller
         $data['estimates_sale_agents'] = $this->estimates_model->get_sale_agents();
         $data['employees'] = $this->invoices_model->get_employees();
         $data['regions'] = $this->invoices_model->get_regions();
-
+        
         $data['invoices_sale_agents'] = $this->invoices_model->get_sale_agents();
-
+        
         $data['proposals_sale_agents'] = $this->proposals_model->get_sale_agents();
         $data['proposals_statuses'] = $this->proposals_model->get_statuses();
-
+        
         $data['invoice_taxes'] = $this->distinct_taxes('invoice');
         $data['estimate_taxes'] = $this->distinct_taxes('estimate');
         $data['proposal_taxes'] = $this->distinct_taxes('proposal');
-
-
+        
         $data['title'] = _l('sales_reports');
         $this->load->view('admin/reports/sales', $data);
     }
-
+    
     /* Customer report */
-
+    
     /**
-     *
      */
     public function customers_report()
     {
         if ($this->input->is_ajax_request()) {
-
+            
             $this->load->model('currencies_model');
             $this->load->model('invoices_model');
-
+            
             $select = array(
                 'CASE company WHEN "" THEN (SELECT CONCAT(firstname, " ", lastname) FROM tblcontacts WHERE userid = tblclients.userid and is_primary = 1) ELSE company END as company',
                 '(SELECT value FROM tblcustomfieldsvalues WHERE tblcustomfieldsvalues.fieldid=1 and tblcustomfieldsvalues.relid=tblclients.userid)',
@@ -136,20 +130,20 @@ class Reports extends Admin_controller
                 '(SELECT SUM(total) FROM tblinvoices WHERE tblinvoices.clientid = tblclients.userid AND status != 5)'
             );
             $where = array();
-
+            
             $custom_date_select = $this->get_where_report_period();
             if ($custom_date_select != '') {
                 $i = 0;
                 foreach ($select as $_select) {
                     if ($i > 3) {
-                        $_temp = substr($_select, 0, -1);
+                        $_temp = substr($_select, 0, - 1);
                         $_temp .= ' ' . $custom_date_select . ')';
                         $select[$i] = $_temp;
                     }
-                    $i++;
+                    $i ++;
                 }
             }
-
+            
             $by_currency = $this->input->post('report_currency');
             $currency = $this->currencies_model->get_base_currency();
             $currency_symbol = $this->currencies_model->get_currency_symbol($currency->id);
@@ -157,17 +151,16 @@ class Reports extends Admin_controller
                 $i = 0;
                 foreach ($select as $_select) {
                     if ($i > 3) {
-                        $_temp = substr($_select, 0, -1);
+                        $_temp = substr($_select, 0, - 1);
                         $_temp .= ' AND currency =' . $by_currency . ')';
                         $select[$i] = $_temp;
                     }
-                    $i++;
+                    $i ++;
                 }
                 $currency = $this->currencies_model->get($by_currency);
                 $currency_symbol = $this->currencies_model->get_currency_symbol($currency->id);
             }
-
-
+            
             if ($this->input->post('c_regions')) {
                 $regions = $this->input->post('c_regions');
                 $s_regions = array();
@@ -187,7 +180,7 @@ class Reports extends Admin_controller
                     } // end if count($s_regions) > 0
                 } // end if is_array($regions)
             }
-
+            
             if ($this->input->post('c_employees')) {
                 $employees = $this->input->post('c_employees');
                 $s_employees = array();
@@ -207,42 +200,41 @@ class Reports extends Admin_controller
                     array_push($where, 'AND userid IN (' . implode(', ', $s_employees) . ')');
                 }
             }
-
+            
             $aColumns = $select;
             $sIndexColumn = "userid";
             $sTable = 'tblclients';
-
+            
             $result = data_tables_init($aColumns, $sIndexColumn, $sTable, array(), $where, array(
                 'userid'
             ));
-
+            
             /*
-            echo "<pre>";
-            print_r($result);
-            echo "</pre>";
-            die ('Stopped');
-            */
-
-
+             * echo "<pre>";
+             * print_r($result);
+             * echo "</pre>";
+             * die ('Stopped');
+             */
+            
             $output = $result['output'];
             $rResult = $result['rResult'];
-            //$totalCustomers=count()
+            // $totalCustomers=count()
             $row = array();
             $x = 0;
-
+            
             foreach ($rResult as $aRow) {
                 $row = array();
-                for ($i = 0; $i < count($aColumns); $i++) {
-                    if (strpos($aColumns[$i], 'as') !== false && !isset($aRow[$aColumns[$i]])) {
+                for ($i = 0; $i < count($aColumns); $i ++) {
+                    if (strpos($aColumns[$i], 'as') !== false && ! isset($aRow[$aColumns[$i]])) {
                         $_data = $aRow[strafter($aColumns[$i], 'as ')];
-                    } // end if
-                    else {
+                    }  // end if
+else {
                         $_data = $aRow[$aColumns[$i]];
                     }
                     if ($i == 0) {
                         $_data = '<a href="' . admin_url('clients/client/' . $aRow['userid']) . '" target="_blank">' . $aRow['company'] . '</a>';
                     } // end if
-
+                    
                     if ($i == 2) {
                         $_data = $this->invoices_model->get_staff_name_by_id($aRow[$aColumns[$i]]);
                     } elseif ($aColumns[$i] == $select[4] || $aColumns[$i] == $select[5]) {
@@ -254,17 +246,15 @@ class Reports extends Admin_controller
                     $row[] = $_data;
                 }
                 $output['aaData'][] = $row;
-                $x++;
+                $x ++;
             } // end foreach
         } // end if $this->input->is_ajax_request()
-
+        
         echo json_encode($output);
         die();
     }
 
-
     /**
-     *
      */
     public function payments_received()
     {
@@ -285,12 +275,12 @@ class Reports extends Admin_controller
             $where = array(
                 'AND status != 5'
             );
-
+            
             $custom_date_select = $this->get_where_report_period('tblinvoicepaymentrecords.date');
             if ($custom_date_select != '') {
                 array_push($where, $custom_date_select);
             }
-
+            
             $by_currency = $this->input->post('report_currency');
             if ($by_currency) {
                 $currency = $this->currencies_model->get($by_currency);
@@ -298,9 +288,9 @@ class Reports extends Admin_controller
             } else {
                 $currency = $this->currencies_model->get_base_currency();
             }
-
+            
             $currency_symbol = $this->currencies_model->get_currency_symbol($currency->id);
-
+            
             $aColumns = $select;
             $sIndexColumn = "id";
             $sTable = 'tblinvoicepaymentrecords';
@@ -309,7 +299,7 @@ class Reports extends Admin_controller
                 'LEFT JOIN tblclients ON tblclients.userid = tblinvoices.clientid',
                 'LEFT JOIN tblinvoicepaymentsmodes ON tblinvoicepaymentsmodes.id = tblinvoicepaymentrecords.paymentmode'
             );
-
+            
             $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, array(
                 'number',
                 'clientid',
@@ -317,15 +307,15 @@ class Reports extends Admin_controller
                 'tblinvoicepaymentsmodes.id as paymentmodeid',
                 'paymentmethod'
             ));
-
+            
             $output = $result['output'];
             $rResult = $result['rResult'];
-
+            
             $footer_data['total_amount'] = 0;
             foreach ($rResult as $aRow) {
                 $row = array();
-                for ($i = 0; $i < count($aColumns); $i++) {
-                    if (strpos($aColumns[$i], 'as') !== false && !isset($aRow[$aColumns[$i]])) {
+                for ($i = 0; $i < count($aColumns); $i ++) {
+                    if (strpos($aColumns[$i], 'as') !== false && ! isset($aRow[$aColumns[$i]])) {
                         $_data = $aRow[strafter($aColumns[$i], 'as ')];
                     } else {
                         $_data = $aRow[$aColumns[$i]];
@@ -339,7 +329,7 @@ class Reports extends Admin_controller
                                 }
                             }
                         }
-                        if (!empty($aRow['paymentmethod'])) {
+                        if (! empty($aRow['paymentmethod'])) {
                             $_data .= ' - ' . $aRow['paymentmethod'];
                         }
                     } elseif ($aColumns[$i] == 'tblinvoicepaymentrecords.id') {
@@ -354,12 +344,12 @@ class Reports extends Admin_controller
                         $footer_data['total_amount'] += $_data;
                         $_data = format_money($_data, $currency_symbol);
                     }
-
+                    
                     $row[] = $_data;
                 }
                 $output['aaData'][] = $row;
             }
-
+            
             $footer_data['total_amount'] = format_money($footer_data['total_amount'], $currency_symbol);
             $output['sums'] = $footer_data;
             echo json_encode($output);
@@ -368,17 +358,16 @@ class Reports extends Admin_controller
     }
 
     /**
-     *
      */
     public function proposals_report()
     {
         if ($this->input->is_ajax_request()) {
             $this->load->model('currencies_model');
             $this->load->model('proposals_model');
-
+            
             $proposalsTaxes = $this->distinct_taxes('proposal');
             $totalTaxesColumns = count($proposalsTaxes);
-
+            
             $select = array(
                 'id',
                 'subject',
@@ -392,9 +381,9 @@ class Reports extends Admin_controller
                 'adjustment',
                 'status'
             );
-
+            
             $proposalsTaxesSelect = array_reverse($proposalsTaxes);
-
+            
             foreach ($proposalsTaxesSelect as $key => $tax) {
                 array_splice($select, 8, 0, '(
                     SELECT CASE
@@ -405,13 +394,13 @@ class Reports extends Admin_controller
                     INNER JOIN tblitemstax ON tblitemstax.itemid=tblitems_in.id
                     WHERE tblitems_in.rel_type="proposal" AND taxname="' . $tax['taxname'] . '" AND taxrate="' . $tax['taxrate'] . '" AND tblitems_in.rel_id=tblproposals.id) as total_tax_single_' . $key);
             }
-
+            
             $where = array();
             $custom_date_select = $this->get_where_report_period();
             if ($custom_date_select != '') {
                 array_push($where, $custom_date_select);
             }
-
+            
             if ($this->input->post('proposal_status')) {
                 $statuses = $this->input->post('proposal_status');
                 $_statuses = array();
@@ -426,7 +415,7 @@ class Reports extends Admin_controller
                     array_push($where, 'AND status IN (' . implode(', ', $_statuses) . ')');
                 }
             }
-
+            
             if ($this->input->post('proposals_sale_agents')) {
                 $agents = $this->input->post('proposals_sale_agents');
                 $_agents = array();
@@ -441,8 +430,7 @@ class Reports extends Admin_controller
                     array_push($where, 'AND assigned IN (' . implode(', ', $_agents) . ')');
                 }
             }
-
-
+            
             $by_currency = $this->input->post('report_currency');
             if ($by_currency) {
                 $currency = $this->currencies_model->get($by_currency);
@@ -450,23 +438,23 @@ class Reports extends Admin_controller
             } else {
                 $currency = $this->currencies_model->get_base_currency();
             }
-
+            
             $currency_symbol = $this->currencies_model->get_currency_symbol($currency->id);
-
+            
             $aColumns = $select;
             $sIndexColumn = "id";
             $sTable = 'tblproposals';
             $join = array();
-
+            
             $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, array(
                 'rel_id',
                 'rel_type',
                 'discount_percent'
             ));
-
+            
             $output = $result['output'];
             $rResult = $result['rResult'];
-
+            
             $footer_data = array(
                 'total' => 0,
                 'subtotal' => 0,
@@ -474,18 +462,18 @@ class Reports extends Admin_controller
                 'discount_total' => 0,
                 'adjustment' => 0
             );
-
+            
             foreach ($proposalsTaxes as $key => $tax) {
                 $footer_data['total_tax_single_' . $key] = 0;
             }
-
+            
             foreach ($rResult as $aRow) {
                 $row = array();
-
+                
                 $row[] = '<a href="' . admin_url('proposals/list_proposals/' . $aRow['id']) . '" target="_blank">' . format_proposal_number($aRow['id']) . '</a>';
-
+                
                 $row[] = '<a href="' . admin_url('proposals/list_proposals/' . $aRow['id']) . '" target="_blank">' . $aRow['subject'] . '</a>';
-
+                
                 if ($aRow['rel_type'] == 'lead') {
                     $row[] = '<a href="#" onclick="init_lead(' . $aRow['rel_id'] . ');return false;" target="_blank" data-toggle="tooltip" data-title="' . _l('lead') . '">' . $aRow['proposal_to'] . '</a>' . '<span class="hide">' . _l('lead') . '</span>';
                 } elseif ($aRow['rel_type'] == 'customer') {
@@ -493,43 +481,43 @@ class Reports extends Admin_controller
                 } else {
                     $row[] = '';
                 }
-
+                
                 $row[] = _d($aRow['date']);
-
+                
                 $row[] = _d($aRow['open_till']);
-
+                
                 $row[] = format_money($aRow['subtotal'], $currency_symbol);
                 $footer_data['subtotal'] += $aRow['subtotal'];
-
+                
                 $row[] = format_money($aRow['total'], $currency_symbol);
                 $footer_data['total'] += $aRow['total'];
-
+                
                 $row[] = format_money($aRow['total_tax'], $currency_symbol);
                 $footer_data['total_tax'] += $aRow['total_tax'];
-
+                
                 $t = $totalTaxesColumns - 1;
                 $i = 0;
                 foreach ($proposalsTaxes as $tax) {
                     $row[] = format_money(($aRow['total_tax_single_' . $t] == null ? 0 : $aRow['total_tax_single_' . $t]), $currency_symbol);
                     $footer_data['total_tax_single_' . $i] += ($aRow['total_tax_single_' . $t] == null ? 0 : $aRow['total_tax_single_' . $t]);
-                    $t--;
-                    $i++;
+                    $t --;
+                    $i ++;
                 }
-
+                
                 $row[] = format_money($aRow['discount_total'], $currency_symbol);
                 $footer_data['discount_total'] += $aRow['discount_total'];
-
+                
                 $row[] = format_money($aRow['adjustment'], $currency_symbol);
                 $footer_data['adjustment'] += $aRow['adjustment'];
-
+                
                 $row[] = format_proposal_status($aRow['status']);
                 $output['aaData'][] = $row;
             }
-
+            
             foreach ($footer_data as $key => $total) {
                 $footer_data[$key] = format_money($total, $currency_symbol);
             }
-
+            
             $output['sums'] = $footer_data;
             echo json_encode($output);
             die();
@@ -537,17 +525,16 @@ class Reports extends Admin_controller
     }
 
     /**
-     *
      */
     public function estimates_report()
     {
         if ($this->input->is_ajax_request()) {
             $this->load->model('currencies_model');
             $this->load->model('estimates_model');
-
+            
             $estimateTaxes = $this->distinct_taxes('estimate');
             $totalTaxesColumns = count($estimateTaxes);
-
+            
             $select = array(
                 'number',
                 'CASE company WHEN "" THEN (SELECT CONCAT(firstname, " ", lastname) FROM tblcontacts WHERE userid = tblclients.userid and is_primary = 1) ELSE company END as company',
@@ -563,9 +550,9 @@ class Reports extends Admin_controller
                 'reference_no',
                 'status'
             );
-
+            
             $estimatesTaxesSelect = array_reverse($estimateTaxes);
-
+            
             foreach ($estimatesTaxesSelect as $key => $tax) {
                 array_splice($select, 9, 0, '(
                     SELECT CASE
@@ -576,13 +563,13 @@ class Reports extends Admin_controller
                     INNER JOIN tblitemstax ON tblitemstax.itemid=tblitems_in.id
                     WHERE tblitems_in.rel_type="estimate" AND taxname="' . $tax['taxname'] . '" AND taxrate="' . $tax['taxrate'] . '" AND tblitems_in.rel_id=tblestimates.id) as total_tax_single_' . $key);
             }
-
+            
             $where = array();
             $custom_date_select = $this->get_where_report_period();
             if ($custom_date_select != '') {
                 array_push($where, $custom_date_select);
             }
-
+            
             if ($this->input->post('estimate_status')) {
                 $statuses = $this->input->post('estimate_status');
                 $_statuses = array();
@@ -597,7 +584,7 @@ class Reports extends Admin_controller
                     array_push($where, 'AND status IN (' . implode(', ', $_statuses) . ')');
                 }
             }
-
+            
             if ($this->input->post('sale_agent_estimates')) {
                 $agents = $this->input->post('sale_agent_estimates');
                 $_agents = array();
@@ -612,7 +599,7 @@ class Reports extends Admin_controller
                     array_push($where, 'AND sale_agent IN (' . implode(', ', $_agents) . ')');
                 }
             }
-
+            
             $by_currency = $this->input->post('report_currency');
             if ($by_currency) {
                 $currency = $this->currencies_model->get($by_currency);
@@ -621,24 +608,24 @@ class Reports extends Admin_controller
                 $currency = $this->currencies_model->get_base_currency();
             }
             $currency_symbol = $this->currencies_model->get_currency_symbol($currency->id);
-
+            
             $aColumns = $select;
             $sIndexColumn = "id";
             $sTable = 'tblestimates';
             $join = array(
                 'JOIN tblclients ON tblclients.userid = tblestimates.clientid'
             );
-
+            
             $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, array(
                 'userid',
                 'clientid',
                 'tblestimates.id',
                 'discount_percent'
             ));
-
+            
             $output = $result['output'];
             $rResult = $result['rResult'];
-
+            
             $footer_data = array(
                 'total' => 0,
                 'subtotal' => 0,
@@ -646,59 +633,58 @@ class Reports extends Admin_controller
                 'discount_total' => 0,
                 'adjustment' => 0
             );
-
+            
             foreach ($estimateTaxes as $key => $tax) {
                 $footer_data['total_tax_single_' . $key] = 0;
             }
-
+            
             foreach ($rResult as $aRow) {
                 $row = array();
-
+                
                 $row[] = '<a href="' . admin_url('estimates/list_estimates/' . $aRow['id']) . '" target="_blank">' . format_estimate_number($aRow['id']) . '</a>';
-
+                
                 $row[] = '<a href="' . admin_url('clients/client/' . $aRow['userid']) . '" target="_blank">' . $aRow['company'] . '</a>';
-
+                
                 if ($aRow['invoiceid'] === null) {
                     $row[] = '';
                 } else {
                     $row[] = '<a href="' . admin_url('invoices/list_invoices/' . $aRow['invoiceid']) . '" target="_blank">' . format_invoice_number($aRow['invoiceid']) . '</a>';
                 }
-
+                
                 $row[] = $aRow['year'];
-
+                
                 $row[] = _d($aRow['date']);
-
+                
                 $row[] = _d($aRow['expirydate']);
-
+                
                 $row[] = format_money($aRow['subtotal'], $currency_symbol);
                 $footer_data['subtotal'] += $aRow['subtotal'];
-
+                
                 $row[] = format_money($aRow['total'], $currency_symbol);
                 $footer_data['total'] += $aRow['total'];
-
+                
                 $row[] = format_money($aRow['total_tax'], $currency_symbol);
                 $footer_data['total_tax'] += $aRow['total_tax'];
-
+                
                 $t = $totalTaxesColumns - 1;
                 $i = 0;
                 foreach ($estimateTaxes as $tax) {
                     $row[] = format_money(($aRow['total_tax_single_' . $t] == null ? 0 : $aRow['total_tax_single_' . $t]), $currency_symbol);
                     $footer_data['total_tax_single_' . $i] += ($aRow['total_tax_single_' . $t] == null ? 0 : $aRow['total_tax_single_' . $t]);
-                    $t--;
-                    $i++;
+                    $t --;
+                    $i ++;
                 }
-
+                
                 $row[] = format_money($aRow['discount_total'], $currency_symbol);
                 $footer_data['discount_total'] += $aRow['discount_total'];
-
+                
                 $row[] = format_money($aRow['adjustment'], $currency_symbol);
                 $footer_data['adjustment'] += $aRow['adjustment'];
-
-
+                
                 $row[] = $aRow['reference_no'];
-
+                
                 $row[] = format_estimate_status($aRow['status']);
-
+                
                 $output['aaData'][] = $row;
             }
             foreach ($footer_data as $key => $total) {
@@ -711,7 +697,8 @@ class Reports extends Admin_controller
     }
 
     /**
-     * @param string $field
+     *
+     * @param string $field            
      * @return string
      */
     private function get_where_report_period($field = 'date')
@@ -725,8 +712,8 @@ class Reports extends Admin_controller
                     $beginMonth = date('Y-m-01', strtotime("-$months_report MONTH"));
                     $endMonth = date('Y-m-t', strtotime('-1 MONTH'));
                 } else {
-                    $months_report = (int)$months_report;
-                    $months_report--;
+                    $months_report = (int) $months_report;
+                    $months_report --;
                     $beginMonth = date('Y-m-01', strtotime("-$months_report MONTH"));
                     $endMonth = date('Y-m-t');
                 }
@@ -734,15 +721,9 @@ class Reports extends Admin_controller
             } elseif ($months_report == 'this_month') {
                 $custom_date_select = 'AND (' . $field . ' BETWEEN "' . date('Y-m-01') . '" AND "' . date('Y-m-t') . '")';
             } elseif ($months_report == 'this_year') {
-                $custom_date_select = 'AND (' . $field . ' BETWEEN "' .
-                    date('Y-m-d', strtotime(date('Y-01-01'))) .
-                    '" AND "' .
-                    date('Y-m-d', strtotime(date('Y-12-' . date('d', strtotime('last day of this year'))))) . '")';
+                $custom_date_select = 'AND (' . $field . ' BETWEEN "' . date('Y-m-d', strtotime(date('Y-01-01'))) . '" AND "' . date('Y-m-d', strtotime(date('Y-12-' . date('d', strtotime('last day of this year'))))) . '")';
             } elseif ($months_report == 'last_year') {
-                $custom_date_select = 'AND (' . $field . ' BETWEEN "' .
-                    date('Y-m-d', strtotime(date(date('Y', strtotime('last year')) . '-01-01'))) .
-                    '" AND "' .
-                    date('Y-m-d', strtotime(date(date('Y', strtotime('last year')) . '-12-' . date('d', strtotime('last day of last year'))))) . '")';
+                $custom_date_select = 'AND (' . $field . ' BETWEEN "' . date('Y-m-d', strtotime(date(date('Y', strtotime('last year')) . '-01-01'))) . '" AND "' . date('Y-m-d', strtotime(date(date('Y', strtotime('last year')) . '-12-' . date('d', strtotime('last day of last year'))))) . '")';
             } elseif ($months_report == 'custom') {
                 $from_date = to_sql_date($this->input->post('report_from'));
                 $to_date = to_sql_date($this->input->post('report_to'));
@@ -753,47 +734,59 @@ class Reports extends Admin_controller
                 }
             }
         }
-
+        
         return $custom_date_select;
     }
-
-    /**
+    
+    /*
      *
      */
     public function items()
     {
         if ($this->input->is_ajax_request()) {
-
+            
             $this->load->model('currencies_model');
-            $v = $this->db->query('SELECT VERSION() as version')->row();
-            // 5.6 mysql version don't have the ANY_VALUE function implemented.
-
-            if ($v && strpos($v->version, '5.7') !== FALSE) {
-                $aColumns = array(
-                    'ANY_VALUE(description) as description',
-                    'ANY_VALUE((SUM(tblitems_in.qty))) as quantity_sold',
-                    'ANY_VALUE(SUM(rate*qty)) as rate',
-                    'ANY_VALUE(AVG(rate*qty)) as avg_price'
-                );
-            } else {
-                $aColumns = array(
-                    'description as description',
-                    '(SUM(tblitems_in.qty)) as quantity_sold',
-                    'SUM(rate*qty) as rate',
-                    'AVG(rate*qty) as avg_price'
-                );
-            }
-
+            $this->load->model('invoices_model');
+            
+            $aColumns = array(
+                'description as item',
+                'tblitems_in.qty as total',
+                'rate as rate',
+                'rate as avg_price',
+                'tblinvoices.date',
+                'tblinvoices.cleintid',
+                'tblinvoices.addedfrom'
+            );
+            
             $sIndexColumn = "id";
             $sTable = 'tblitems_in';
-            $join = array('JOIN tblinvoices ON tblinvoices.id = tblitems_in.rel_id');
-
-            $where = array('AND rel_type="invoice"', 'AND status != 5', 'AND status=2');
-
+            
+            $join = array(
+                'JOIN tblinvoices           ON tblinvoices.id = tblitems_in.rel_id',
+                'JOIN tblclients            ON tblclients.userid=tblinvoices.clientid',
+                'JOIN tblcustomfieldsvalues ON (tblcustomfieldsvalues.fieldid=1 and tblcustomfieldsvalues.relid=tblinvoices.clientid)'
+            );
+            
+            $additionalColumns = array(
+                'tblitems_in.rel_id',
+                'tblclients.userid',
+                'tblinvoices.id',
+                'tblinvoices.clientid',
+                'tblinvoices.addedfrom',
+                'tblcustomfieldsvalues.relid',
+                'tblcustomfieldsvalues.value'
+            );
+            
+            $where = array(
+                'AND rel_type="invoice"',
+                'AND status != 5'
+            );
+            
             $custom_date_select = $this->get_where_report_period();
             if ($custom_date_select != '') {
                 array_push($where, $custom_date_select);
             }
+            
             $by_currency = $this->input->post('report_currency');
             if ($by_currency) {
                 $currency = $this->currencies_model->get($by_currency);
@@ -801,7 +794,7 @@ class Reports extends Admin_controller
             } else {
                 $currency = $this->currencies_model->get_base_currency();
             }
-
+            
             if ($this->input->post('sale_agent_items')) {
                 $agents = $this->input->post('sale_agent_items');
                 $_agents = array();
@@ -816,50 +809,86 @@ class Reports extends Admin_controller
                     array_push($where, 'AND sale_agent IN (' . implode(', ', $_agents) . ')');
                 }
             }
-
+            
+            if ($this->input->post('i_regions')) {
+                $regions = $this->input->post('i_regions');
+                $s_regions = array();
+                if (is_array($regions)) {
+                    foreach ($regions as $r) {
+                        if ($r != '') {
+                            $clients = $this->invoices_model->get_clientid_by_region(trim($r));
+                            if (count($clients) > 0) {
+                                foreach ($clients as $clientid) {
+                                    array_push($s_regions, $clientid);
+                                } // end if count($clients)>0
+                            } // end if $r != ''
+                        } // end if $r != ''
+                    } // end foreach
+                    if (count($s_regions) > 0) {
+                        array_push($where, 'AND tblinvoices.clientid IN (' . implode(', ', $s_regions) . ')');
+                    } // end if count($s_regions) > 0
+                } // end if is_array($regions)
+            }
+            
+            if ($this->input->post('i_employees')) {
+                $employees = $this->input->post('i_employees');
+                $s_employees = array();
+                if (is_array($employees)) {
+                    foreach ($employees as $e) {
+                        if ($e > 0) {
+                            array_push($s_employees, $e);
+                        }
+                    }
+                }
+                if (count($s_employees) > 0) {
+                    array_push($where, 'AND tblinvoices.addedfrom IN (' . implode(', ', $s_employees) . ')');
+                }
+            }
+            
             $currency_symbol = $this->currencies_model->get_currency_symbol($currency->id);
-            $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, array(), "GROUP by description");
-
+            $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, $additionalColumns);
+            
             $output = $result['output'];
             $rResult = $result['rResult'];
-
+            
             $footer_data = array(
                 'total_amount' => 0,
-                'total_qty' => 0,
+                'total_qty' => 0
             );
-
+            
             foreach ($rResult as $aRow) {
                 $row = array();
-
-                $row[] = $aRow['description'];
-                $row[] = $aRow['quantity_sold'];
-                $row[] = format_money($aRow['rate'], $currency_symbol);
-                $row[] = format_money($aRow['avg_price'], $currency_symbol);
-                $footer_data['total_amount'] += $aRow['rate'];
-                $footer_data['total_qty'] += $aRow['quantity_sold'];
+                $employee = $this->invoices_model->get_staff_name_by_id($aRow['addedfrom']);
+                $row[] = $aRow['item'];
+                $row[] = $aRow['total'];
+                $row[] = $aRow['tblinvoices.date'];
+                $row[] = $aRow['value'];
+                $row[] = $employee;
+                
+               
+                $footer_data['total_qty'] += $aRow['total'];
                 $output['aaData'][] = $row;
             }
-
-            $footer_data['total_amount'] = format_money($footer_data['total_amount'], $currency_symbol);
-
+            
+            $footer_data['total_amount'] = '';
+            
             $output['sums'] = $footer_data;
             echo json_encode($output);
             die();
-        }
+        } // end if $this->input
     }
 
     /**
-     *
      */
     public function invoices_report()
     {
         if ($this->input->is_ajax_request()) {
             $invoice_taxes = $this->distinct_taxes('invoice');
             $totalTaxesColumns = count($invoice_taxes);
-
+            
             $this->load->model('currencies_model');
             $this->load->model('invoices_model');
-
+            
             $select = array(
                 'number',
                 'CASE company WHEN "" THEN (SELECT CONCAT(firstname, " ", lastname) FROM tblcontacts WHERE userid = tblclients.userid and is_primary = 1) ELSE company END as company',
@@ -880,9 +909,9 @@ class Reports extends Admin_controller
             $where = array(
                 'AND status != 5'
             );
-
+            
             $invoiceTaxesSelect = array_reverse($invoice_taxes);
-
+            
             foreach ($invoiceTaxesSelect as $key => $tax) {
                 array_splice($select, 8, 0, '(
                     SELECT CASE
@@ -893,13 +922,12 @@ class Reports extends Admin_controller
                     INNER JOIN tblitemstax ON tblitemstax.itemid=tblitems_in.id
                     WHERE tblitems_in.rel_type="invoice" AND taxname="' . $tax['taxname'] . '" AND taxrate="' . $tax['taxrate'] . '" AND tblitems_in.rel_id=tblinvoices.id) as total_tax_single_' . $key);
             }
-
+            
             $custom_date_select = $this->get_where_report_period();
             if ($custom_date_select != '') {
                 array_push($where, $custom_date_select);
             }
-
-
+            
             if ($this->input->post('regions')) {
                 $regions = $this->input->post('regions');
                 $s_regions = array();
@@ -919,8 +947,7 @@ class Reports extends Admin_controller
                     } // end if count($s_regions) > 0
                 } // end if is_array($regions)
             }
-
-
+            
             if ($this->input->post('employees')) {
                 $employees = $this->input->post('employees');
                 $s_employees = array();
@@ -935,8 +962,7 @@ class Reports extends Admin_controller
                     array_push($where, 'AND addedfrom IN (' . implode(', ', $s_employees) . ')');
                 }
             }
-
-
+            
             if ($this->input->post('sale_agent_invoices')) {
                 $agents = $this->input->post('sale_agent_invoices');
                 $_agents = array();
@@ -951,15 +977,15 @@ class Reports extends Admin_controller
                     array_push($where, 'AND sale_agent IN (' . implode(', ', $_agents) . ')');
                 }
             }
-
+            
             $by_currency = $this->input->post('report_currency');
             $totalPaymentsColumnIndex = (11 + $totalTaxesColumns - 1);
-
+            
             if ($by_currency) {
-                $_temp = substr($select[$totalPaymentsColumnIndex], 0, -1);
+                $_temp = substr($select[$totalPaymentsColumnIndex], 0, - 1);
                 $_temp .= ' AND currency =' . $by_currency . ') as total_payments';
                 $select[$totalPaymentsColumnIndex] = $_temp;
-
+                
                 $currency = $this->currencies_model->get($by_currency);
                 array_push($where, 'AND currency=' . $by_currency);
             } else {
@@ -967,7 +993,7 @@ class Reports extends Admin_controller
                 $select[$totalPaymentsColumnIndex] = $select[$totalPaymentsColumnIndex] .= ' as total_payments';
             }
             $currency_symbol = $this->currencies_model->get_currency_symbol($currency->id);
-
+            
             if ($this->input->post('invoice_status')) {
                 $statuses = $this->input->post('invoice_status');
                 $_statuses = array();
@@ -982,8 +1008,7 @@ class Reports extends Admin_controller
                     array_push($where, 'AND status IN (' . implode(', ', $_statuses) . ')');
                 }
             }
-
-
+            
             $aColumns = $select;
             $sIndexColumn = "id";
             $sTable = 'tblinvoices';
@@ -992,7 +1017,7 @@ class Reports extends Admin_controller
                 'JOIN tblcustomfieldsvalues ON (tblcustomfieldsvalues.fieldid=1 and tblcustomfieldsvalues.relid=tblinvoices.clientid)',
                 'JOIN tblstaff ON tblstaff.staffid=tblinvoices.addedfrom'
             );
-
+            
             $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, array(
                 'userid',
                 'clientid',
@@ -1002,16 +1027,16 @@ class Reports extends Admin_controller
                 'tblcustomfieldsvalues.relid',
                 'discount_percent'
             ));
-
+            
             /*
-              echo "<pre>";
-              print_r($result);
-              echo "</pre>";
+             * echo "<pre>";
+             * print_r($result);
+             * echo "</pre>";
              */
-
+            
             $output = $result['output'];
             $rResult = $result['rResult'];
-
+            
             $footer_data = array(
                 'total' => 0,
                 'subtotal' => 0,
@@ -1020,65 +1045,65 @@ class Reports extends Admin_controller
                 'adjustment' => 0,
                 'amount_open' => 0
             );
-
+            
             foreach ($invoice_taxes as $key => $tax) {
                 $footer_data['total_tax_single_' . $key] = 0;
             }
-
+            
             foreach ($rResult as $aRow) {
                 $row = array();
-
+                
                 $row[] = '<a href="' . admin_url('invoices/list_invoices/' . $aRow['id']) . '" target="_blank">' . format_invoice_number($aRow['id']) . '</a>';
-
+                
                 $row[] = '<a href="' . admin_url('clients/client/' . $aRow['userid']) . '" target="_blank">' . $aRow['company'] . '</a>';
-
+                
                 $row[] = $aRow['value'];
-
+                
                 $row[] = $aRow['firstname'] . ' ' . $aRow['lastname'];
-
+                
                 $row[] = $aRow['year'];
-
+                
                 $row[] = _d($aRow['date']);
-
+                
                 $row[] = _d($aRow['duedate']);
-
+                
                 $row[] = format_money($aRow['subtotal'], $currency_symbol);
                 $footer_data['subtotal'] += $aRow['subtotal'];
-
+                
                 $row[] = format_money($aRow['total'], $currency_symbol);
                 $footer_data['total'] += $aRow['total'];
-
+                
                 $row[] = format_money($aRow['total_tax'], $currency_symbol);
                 $footer_data['total_tax'] += $aRow['total_tax'];
-
+                
                 $t = $totalTaxesColumns - 1;
                 $i = 0;
                 foreach ($invoice_taxes as $tax) {
                     $row[] = format_money(($aRow['total_tax_single_' . $t] == null ? 0 : $aRow['total_tax_single_' . $t]), $currency_symbol);
                     $footer_data['total_tax_single_' . $i] += ($aRow['total_tax_single_' . $t] == null ? 0 : $aRow['total_tax_single_' . $t]);
-                    $t--;
-                    $i++;
+                    $t --;
+                    $i ++;
                 }
-
+                
                 $row[] = format_money($aRow['discount_total'], $currency_symbol);
                 $footer_data['discount_total'] += $aRow['discount_total'];
-
+                
                 $row[] = format_money($aRow['adjustment'], $currency_symbol);
                 $footer_data['adjustment'] += $aRow['adjustment'];
-
+                
                 $amountOpen = $aRow['total'] - $aRow['total_payments'];
                 $row[] = format_money($amountOpen, $currency_symbol);
                 $footer_data['amount_open'] += $amountOpen;
-
+                
                 $row[] = format_invoice_status($aRow['status']);
-
+                
                 $output['aaData'][] = $row;
             }
-
+            
             foreach ($footer_data as $key => $total) {
                 $footer_data[$key] = format_money($total, $currency_symbol);
             }
-
+            
             $output['sums'] = $footer_data;
             echo json_encode($output);
             die();
@@ -1086,20 +1111,21 @@ class Reports extends Admin_controller
     }
 
     /**
-     * @param string $type
+     *
+     * @param string $type            
      */
     public function expenses($type = 'simple_report')
     {
         $this->load->model('currencies_model');
         $data['base_currency'] = $this->currencies_model->get_base_currency();
         $data['currencies'] = $this->currencies_model->get();
-
+        
         $data['title'] = _l('expenses_report');
         if ($type != 'simple_report') {
             $this->load->model('expenses_model');
             $data['categories'] = $this->expenses_model->get_category();
             $data['years'] = $this->expenses_model->get_expenses_years();
-
+            
             if ($this->input->is_ajax_request()) {
                 $aColumns = array(
                     'category',
@@ -1121,11 +1147,11 @@ class Reports extends Admin_controller
                 );
                 $where = array();
                 $filter = array();
-                include_once(APPPATH . 'views/admin/tables/includes/expenses_filter.php');
+                include_once (APPPATH . 'views/admin/tables/includes/expenses_filter.php');
                 if (count($filter) > 0) {
                     array_push($where, 'AND (' . prepare_dt_filter($filter) . ')');
                 }
-
+                
                 $by_currency = $this->input->post('currency');
                 if ($by_currency) {
                     $currency = $this->currencies_model->get($by_currency);
@@ -1134,7 +1160,7 @@ class Reports extends Admin_controller
                     $currency = $this->currencies_model->get_base_currency();
                 }
                 $currency_symbol = $this->currencies_model->get_currency_symbol($currency->id);
-
+                
                 $sIndexColumn = "id";
                 $sTable = 'tblexpenses';
                 $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, array(
@@ -1147,17 +1173,17 @@ class Reports extends Admin_controller
                 $rResult = $result['rResult'];
                 $this->load->model('currencies_model');
                 $this->load->model('payment_modes_model');
-
+                
                 $footer_data = array(
                     'amount' => 0,
                     'total_tax' => 0,
                     'amount_with_tax' => 0
                 );
-
+                
                 foreach ($rResult as $aRow) {
                     $row = array();
-                    for ($i = 0; $i < count($aColumns); $i++) {
-                        if (strpos($aColumns[$i], 'as') !== false && !isset($aRow[$aColumns[$i]])) {
+                    for ($i = 0; $i < count($aColumns); $i ++) {
+                        if (strpos($aColumns[$i], 'as') !== false && ! isset($aRow[$aColumns[$i]])) {
                             $_data = $aRow[strafter($aColumns[$i], 'as ')];
                         } else {
                             $_data = $aRow[$aColumns[$i]];
@@ -1183,13 +1209,13 @@ class Reports extends Admin_controller
                                 }
                                 $footer_data['amount_with_tax'] += $total;
                             }
-
+                            
                             $_data = format_money($total, $currency_symbol);
                         } elseif ($i == 8) {
                             $_data = '<a href="' . admin_url('clients/client/' . $aRow['clientid']) . '">' . $aRow['company'] . '</a>';
                         } elseif ($aColumns[$i] == 'paymentmode') {
                             $_data = '';
-                            if ($aRow['paymentmode'] != '0' && !empty($aRow['paymentmode'])) {
+                            if ($aRow['paymentmode'] != '0' && ! empty($aRow['paymentmode'])) {
                                 $payment_mode = $this->payment_modes_model->get($aRow['paymentmode'], array(), false, true);
                                 if ($payment_mode) {
                                     $_data = $payment_mode->name;
@@ -1239,51 +1265,51 @@ class Reports extends Admin_controller
                     }
                     $output['aaData'][] = $row;
                 }
-
+                
                 foreach ($footer_data as $key => $total) {
                     $footer_data[$key] = format_money($total, $currency_symbol);
                 }
-
+                
                 $output['sums'] = $footer_data;
                 echo json_encode($output);
-                die;
+                die();
             }
             $this->load->view('admin/reports/expenses_detailed', $data);
         } else {
-            if (!$this->input->get('year')) {
+            if (! $this->input->get('year')) {
                 $data['current_year'] = date('Y');
             } else {
                 $data['current_year'] = $this->input->get('year');
             }
-
-
+            
             $data['export_not_supported'] = ($this->agent->browser() == 'Internet Explorer' || $this->agent->browser() == 'Spartan');
-
+            
             $this->load->model('expenses_model');
-
+            
             $data['chart_not_billable'] = json_encode($this->reports_model->get_stats_chart_data(_l('not_billable_expenses_by_categories'), array(
                 'billable' => 0
             ), array(
                 'backgroundColor' => 'rgba(252,45,66,0.4)',
                 'borderColor' => '#fc2d42'
             ), $data['current_year']));
-
+            
             $data['chart_billable'] = json_encode($this->reports_model->get_stats_chart_data(_l('billable_expenses_by_categories'), array(
                 'billable' => 1
             ), array(
                 'backgroundColor' => 'rgba(37,155,35,0.2)',
                 'borderColor' => '#84c529'
             ), $data['current_year']));
-
+            
             $data['expense_years'] = $this->expenses_model->get_expenses_years();
             $data['categories'] = $this->expenses_model->get_category();
-
+            
             $this->load->view('admin/reports/expenses', $data);
         }
     }
 
     /**
-     * @param string $year
+     *
+     * @param string $year            
      */
     public function expenses_vs_income($year = '')
     {
@@ -1304,11 +1330,10 @@ class Reports extends Admin_controller
         $data['title'] = _l('als_expenses_vs_income');
         $this->load->view('admin/reports/expenses_vs_income', $data);
     }
-
+    
     /* Total income report / ajax chart */
-
+    
     /**
-     *
      */
     public function total_income_report()
     {
@@ -1316,7 +1341,6 @@ class Reports extends Admin_controller
     }
 
     /**
-     *
      */
     public function report_by_payment_modes()
     {
@@ -1324,17 +1348,18 @@ class Reports extends Admin_controller
     }
 
     /**
-     *
      */
     public function report_by_customer_groups()
     {
         echo json_encode($this->reports_model->report_by_customer_groups());
     }
-
+    
     /* Leads conversion monthly report / ajax chart */
-
+    
     /**
-     * @param $month
+     *
+     * @param
+     *            $month
      */
     public function leads_monthly_report($month)
     {
@@ -1342,12 +1367,13 @@ class Reports extends Admin_controller
     }
 
     /**
-     * @param $rel_type
+     *
+     * @param
+     *            $rel_type
      * @return mixed
      */
     private function distinct_taxes($rel_type)
     {
         return $this->db->query("SELECT DISTINCT taxname,taxrate FROM tblitemstax WHERE rel_type='" . $rel_type . "' ORDER BY taxname ASC")->result_array();
     }
-
 }

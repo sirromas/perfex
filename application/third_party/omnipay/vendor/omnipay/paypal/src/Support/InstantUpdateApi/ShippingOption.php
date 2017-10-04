@@ -1,44 +1,59 @@
 <?php
-
 namespace Omnipay\PayPal\Support\InstantUpdateApi;
 
 class ShippingOption
 {
-    /** @var string */
+
+    /**
+     * @var string
+     */
     private $name;
 
-    /** @var float */
+    /**
+     * @var float
+     */
     private $amount;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     private $isDefault;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $label;
 
     /**
-     * @param string $name      L_SHIPPINGOPTIONNAME0
-     * @param float  $amount    L_SHIPPINGOPTIONAMOUNT0
-     * @param bool   $isDefault L_SHIPPINGOPTIONISDEFAULT0
-     * @param string $label     L_SHIPPINGOPTIONLABEL0
+     *
+     * @param string $name
+     *            L_SHIPPINGOPTIONNAME0
+     * @param float $amount
+     *            L_SHIPPINGOPTIONAMOUNT0
+     * @param bool $isDefault
+     *            L_SHIPPINGOPTIONISDEFAULT0
+     * @param string $label
+     *            L_SHIPPINGOPTIONLABEL0
      */
     public function __construct($name, $amount, $isDefault = false, $label = null)
     {
-        $this->name      = $name;
-        $this->amount    = $amount;
+        $this->name = $name;
+        $this->amount = $amount;
         $this->isDefault = $isDefault;
-        $this->label     = $label;
+        $this->label = $label;
     }
 
     /**
+     *
      * @return bool
      */
     public function hasLabel()
     {
-        return !is_null($this->label);
+        return ! is_null($this->label);
     }
 
     /**
+     *
      * @return string
      */
     public function getName()
@@ -47,6 +62,7 @@ class ShippingOption
     }
 
     /**
+     *
      * @return float
      */
     public function getAmount()
@@ -55,6 +71,7 @@ class ShippingOption
     }
 
     /**
+     *
      * @return boolean
      */
     public function isDefault()
@@ -63,6 +80,7 @@ class ShippingOption
     }
 
     /**
+     *
      * @return string
      */
     public function getLabel()

@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Service\Command;
 
 /**
@@ -7,11 +6,13 @@ namespace Guzzle\Service\Command;
  */
 interface ResponseClassInterface
 {
+
     /**
      * Create a response model object from a completed command
      *
-     * @param OperationCommand $command That serialized the request
-     *
+     * @param OperationCommand $command
+     *            That serialized the request
+     *            
      * @return self
      */
     public static function fromCommand(OperationCommand $command);

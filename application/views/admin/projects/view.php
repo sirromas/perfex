@@ -1,15 +1,18 @@
 <?php init_head(); ?>
 <style>
-  #ribbon_project_<?php echo $project->id; ?> span::before {
-    border-top: 3px solid <?php echo $project_status['color']; ?>;
-    border-left: 3px solid <?php echo $project_status['color']; ?>;
-  }
+#ribbon_project_ <?php echo  $project->id ;  ?> span::before {
+	border-top: 3px solid<?php echo$project_status['color']; ?>;
+	border-left: 3px solid<?php
+
+echo $project_status['color'];
+?>;
+}
 </style>
 <div id="wrapper">
-  <?php echo form_hidden('project_id',$project->id) ?>
+  <?php echo form_hidden('project_id',$project->id)?>
   <div class="content">
-    <div class="row">
-      <div class="col-md-12">
+		<div class="row">
+			<div class="col-md-12">
         <?php if($this->projects_model->timers_started_for_project($project->id) && (has_permission('projects','','create') || has_permission('projects','','edit')) && $project->status == 1){ ?>
         <div class="alert alert-warning project-no-started-timers-found">
           <?php echo _l('project_not_started_status_tasks_timers_found'); ?>
@@ -26,114 +29,128 @@
         </div>
         <?php } ?>
         <div class="panel_s project-top-panel">
-          <div class="panel-body _buttons">
-            <div class="row">
-              <div class="col-md-8 project-heading">
-                <h3 class="hide project-name"><?php echo $project->name; ?></h3>
-                <div id="project_view_name">
-                 <select class="selectpicker" id="project_top" data-width="fit"<?php if(count($other_projects) > 4){ ?> data-live-search="true" <?php } ?>>
-                   <option value="<?php echo $project->id; ?>" selected><?php echo $project->name; ?></option>
+					<div class="panel-body _buttons">
+						<div class="row">
+							<div class="col-md-8 project-heading">
+								<h3 class="hide project-name"><?php echo $project->name; ?></h3>
+								<div id="project_view_name">
+									<select class="selectpicker" id="project_top" data-width="fit"
+										<?php if(count($other_projects) > 4){ ?>
+										data-live-search="true" <?php } ?>>
+										<option value="<?php echo $project->id; ?>" selected><?php echo $project->name; ?></option>
                    <?php foreach($other_projects as $op){ ?>
-                   <option value="<?php echo $op['id']; ?>" data-subtext="<?php echo get_company_name($op['clientid']); ?>">#<?php echo $op['id']; ?> - <?php echo $op['name']; ?></option>
+                   <option value="<?php echo $op['id']; ?>"
+											data-subtext="<?php echo get_company_name($op['clientid']); ?>">#<?php echo $op['id']; ?> - <?php echo $op['name']; ?></option>
                    <?php } ?>
                  </select>
-               </div>
-             </div>
-             <div class="col-md-4 text-right">
+								</div>
+							</div>
+							<div class="col-md-4 text-right">
               <?php
-              $invoice_func = 'pre_invoice_project';
-              ?>
+            $invoice_func = 'pre_invoice_project';
+            ?>
               <?php if(has_permission('invoices','','create')){ ?>
-              <a href="#" onclick="<?php echo $invoice_func; ?>(<?php echo $project->id; ?>); return false;" class="btn btn-info<?php if($project->client_data->active == 0){echo ' disabled';} ?>"><?php echo _l('invoice_project'); ?></a>
+              <a href="#"
+									onclick="<?php echo $invoice_func; ?>(<?php echo $project->id; ?>); return false;"
+									class="btn btn-info<?php if($project->client_data->active == 0){echo ' disabled';} ?>"><?php echo _l('invoice_project'); ?></a>
               <?php } ?>
               <?php
-              $project_pin_tooltip = _l('pin_project');
-              if(total_rows('tblpinnedprojects',array('staff_id'=>get_staff_user_id(),'project_id'=>$project->id)) > 0){
+            $project_pin_tooltip = _l('pin_project');
+            if (total_rows('tblpinnedprojects', array(
+                'staff_id' => get_staff_user_id(),
+                'project_id' => $project->id
+            )) > 0) {
                 $project_pin_tooltip = _l('unpin_project');
-              }
-              ?>
+            }
+            ?>
               <div class="btn-group mleft5">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<button type="button" class="btn btn-default dropdown-toggle"
+										data-toggle="dropdown" aria-haspopup="true"
+										aria-expanded="false">
                   <?php echo _l('actions'); ?> <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-right width200 project-actions">
-                  <li>
-                   <a href="<?php echo admin_url('projects/pin_action/'.$project->id); ?>">
+									</button>
+									<ul
+										class="dropdown-menu dropdown-menu-right width200 project-actions">
+										<li><a
+											href="<?php echo admin_url('projects/pin_action/'.$project->id); ?>">
                     <?php echo $project_pin_tooltip; ?>
-                  </a>
-                </li>
+                  </a></li>
                 <?php if(has_permission('projects','','edit')){ ?>
-                <li>
-                  <a href="<?php echo admin_url('projects/project/'.$project->id); ?>">
+                <li><a
+											href="<?php echo admin_url('projects/project/'.$project->id); ?>">
                     <?php echo _l('edit_project'); ?>
-                  </a>
-                </li>
+                  </a></li>
                 <?php } ?>
                 <?php if(has_permission('projects','','create')){ ?>
-                <li>
-                  <a href="#" onclick="copy_project(); return false;">
+                <li><a href="#" onclick="copy_project(); return false;">
                     <?php echo _l('copy_project'); ?>
-                  </a>
-                </li>
+                  </a></li>
                 <?php } ?>
                 <?php if(has_permission('projects','','create') || has_permission('projects','','edit')){ ?>
                 <li class="divider"></li>
-                <?php foreach($statuses as $status){
-                  if($status['id'] == $project->status){continue;}
-                  ?>
-                  <li>
-                    <a href="#" onclick="project_mark_as_modal(<?php echo $status['id']; ?>,<?php echo $project->id; ?>); return false;"><?php echo _l('project_mark_as',$status['name']); ?></a>
-                  </li>
+                <?php
+                    
+foreach ($statuses as $status) {
+                        if ($status['id'] == $project->status) {
+                            continue;
+                        }
+                        ?>
+                  <li><a href="#"
+											onclick="project_mark_as_modal(<?php echo $status['id']; ?>,<?php echo $project->id; ?>); return false;"><?php echo _l('project_mark_as',$status['name']); ?></a>
+										</li>
                   <?php } ?>
                   <?php } ?>
                   <li class="divider"></li>
                   <?php if(has_permission('projects','','create')){ ?>
-                  <li>
-                   <a href="<?php echo admin_url('projects/export_project_data/'.$project->id); ?>" target="_blank"><?php echo _l('export_project_data'); ?></a>
-                 </li>
+                  <li><a
+											href="<?php echo admin_url('projects/export_project_data/'.$project->id); ?>"
+											target="_blank"><?php echo _l('export_project_data'); ?></a>
+										</li>
                  <?php } ?>
                  <?php if(is_admin()){ ?>
-                 <li>
-                  <a href="<?php echo admin_url('projects/view_project_as_client/'.$project->id .'/'.$project->clientid); ?>" target="_blank"><?php echo _l('project_view_as_client'); ?></a>
-                </li>
+                 <li><a
+											href="<?php echo admin_url('projects/view_project_as_client/'.$project->id .'/'.$project->clientid); ?>"
+											target="_blank"><?php echo _l('project_view_as_client'); ?></a>
+										</li>
                 <?php } ?>
                   <?php if(has_permission('projects','','delete')){ ?>
-                  <li>
-                    <a href="<?php echo admin_url('projects/delete/'.$project->id); ?>" class="_delete">
-                      <span class="text-danger"><?php echo _l('delete_project'); ?></span>
-                    </a>
-                  </li>
+                  <li><a
+											href="<?php echo admin_url('projects/delete/'.$project->id); ?>"
+											class="_delete"> <span class="text-danger"><?php echo _l('delete_project'); ?></span>
+										</a></li>
                   <?php } ?>
               </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="panel_s project-menu-panel">
-      <div class="panel-body">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="panel_s project-menu-panel">
+					<div class="panel-body">
         <?php do_action('before_render_project_view',$project->id); ?>
         <?php echo '<div class="ribbon project-status-ribbon-'.$project->status.'" id="ribbon_project_'.$project->id.'"><span style="background:'.$project_status['color'].'">'.$project_status['name'].'</span></div>'; ?>
         <?php $this->load->view('admin/projects/project_tabs'); ?>
       </div>
-    </div>
-    <div class="panel_s">
-      <div class="panel-body">
+				</div>
+				<div class="panel_s">
+					<div class="panel-body">
         <?php echo $group_view; ?>
       </div>
-    </div>
-  </div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 </div>
 </div>
-</div>
-</div>
-<?php if(isset($discussion)){
-  echo form_hidden('discussion_id',$discussion->id);
-  echo form_hidden('discussion_user_profile_image_url',$discussion_user_profile_image_url);
-  echo form_hidden('current_user_is_admin',$current_user_is_admin);
+<?php
+
+if (isset($discussion)) {
+    echo form_hidden('discussion_id', $discussion->id);
+    echo form_hidden('discussion_user_profile_image_url', $discussion_user_profile_image_url);
+    echo form_hidden('current_user_is_admin', $current_user_is_admin);
 }
-echo form_hidden('project_percent',$percent);
+echo form_hidden('project_percent', $percent);
 ?>
 <div id="invoice_project"></div>
 <div id="pre_invoice_project"></div>

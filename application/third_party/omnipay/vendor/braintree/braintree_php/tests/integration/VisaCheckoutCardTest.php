@@ -10,14 +10,15 @@ use Braintree;
 
 class VisaCheckoutCardTest extends Setup
 {
+
     public function testCreateWithVisaCheckoutCardNonce()
     {
         $customer = Braintree\Customer::createNoValidate();
         $result = Braintree\PaymentMethod::create([
             'customerId' => $customer->id,
-            'paymentMethodNonce' => Braintree\Test\Nonces::$visaCheckoutDiscover,
+            'paymentMethodNonce' => Braintree\Test\Nonces::$visaCheckoutDiscover
         ]);
-
+        
         $this->assertTrue($result->success);
         $visaCheckoutCard = $result->paymentMethod;
         $this->assertNotNull($visaCheckoutCard->token);
@@ -30,7 +31,7 @@ class VisaCheckoutCardTest extends Setup
         $this->assertSame('abc123', $visaCheckoutCard->callId);
         $this->assertSame($visaCheckoutCard->last4, '1117');
         $this->assertSame($visaCheckoutCard->maskedNumber, '601111******1117');
-
+        
         $this->assertNotNull($visaCheckoutCard->billingAddress);
         $this->assertNotNull($visaCheckoutCard->bin);
         $this->assertNotNull($visaCheckoutCard->callId);
@@ -72,11 +73,11 @@ class VisaCheckoutCardTest extends Setup
                 'verifyCard' => true
             ]
         ]);
-
+        
         $this->assertTrue($result->success);
         $visaCheckoutCard = $result->paymentMethod;
         $verification = $visaCheckoutCard->verification;
-
+        
         $this->assertNotNull($verification);
         $this->assertNotNull($verification->status);
     }
@@ -85,15 +86,14 @@ class VisaCheckoutCardTest extends Setup
     {
         $transaction = Braintree\Transaction::saleNoValidate([
             'amount' => Braintree\Test\TransactionAmounts::$authorize,
-            'paymentMethodNonce' => Braintree\Test\Nonces::$visaCheckoutDiscover,
+            'paymentMethodNonce' => Braintree\Test\Nonces::$visaCheckoutDiscover
         ]);
-
+        
         $collection = Braintree\Transaction::search([
             Braintree\TransactionSearch::id()->is($transaction->id),
             Braintree\TransactionSearch::paymentInstrumentType()->is(Braintree\PaymentInstrumentType::VISA_CHECKOUT_CARD)
         ]);
-
-
+        
         $this->assertEquals($transaction->paymentInstrumentType, Braintree\PaymentInstrumentType::VISA_CHECKOUT_CARD);
         $this->assertEquals($transaction->id, $collection->firstItem()->id);
     }
@@ -119,13 +119,13 @@ class VisaCheckoutCardTest extends Setup
                 'storeInVault' => true
             ]
         ]);
-
+        
         $this->assertTrue($result->success);
         $transaction = $result->transaction;
         $this->assertEquals('47.00', $transaction->amount);
         $visaCheckoutCardDetails = $transaction->visaCheckoutCardDetails;
         $this->assertSame(Braintree\CreditCard::AMEX, $visaCheckoutCardDetails->cardType);
-
+        
         $this->assertNotNull($visaCheckoutCardDetails->bin);
         $this->assertNotNull($visaCheckoutCardDetails->callId);
         $this->assertNotNull($visaCheckoutCardDetails->cardType);

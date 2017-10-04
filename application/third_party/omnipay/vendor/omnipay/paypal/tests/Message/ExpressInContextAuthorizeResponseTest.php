@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal\Message;
 
 use Omnipay\Tests\TestCase;
@@ -7,21 +6,27 @@ use Omnipay\PayPal\Message\ExpressInContextAuthorizeResponse;
 
 class ExpressInContextAuthorizeResponseTest extends TestCase
 {
+
     public function testConstruct()
     {
         // response should decode URL format data
         $response = new ExpressInContextAuthorizeResponse($this->getMockRequest(), 'example=value&foo=bar');
-
-        $this->assertEquals(array('example' => 'value', 'foo' => 'bar'), $response->getData());
+        
+        $this->assertEquals(array(
+            'example' => 'value',
+            'foo' => 'bar'
+        ), $response->getData());
     }
 
     public function testExpressPurchaseSuccess()
     {
         $httpResponse = $this->getMockHttpResponse('ExpressPurchaseSuccess.txt');
         $request = $this->getMockRequest();
-        $request->shouldReceive('getTestMode')->once()->andReturn(true);
+        $request->shouldReceive('getTestMode')
+            ->once()
+            ->andReturn(true);
         $response = new ExpressInContextAuthorizeResponse($request, $httpResponse->getBody());
-
+        
         $this->assertFalse($response->isPending());
         $this->assertFalse($response->isSuccessful());
         $this->assertSame('EC-42721413K79637829', $response->getTransactionReference());
@@ -35,7 +40,7 @@ class ExpressInContextAuthorizeResponseTest extends TestCase
     {
         $httpResponse = $this->getMockHttpResponse('ExpressPurchaseFailure.txt');
         $response = new ExpressInContextAuthorizeResponse($this->getMockRequest(), $httpResponse->getBody());
-
+        
         $this->assertFalse($response->isPending());
         $this->assertFalse($response->isSuccessful());
         $this->assertNull($response->getTransactionReference());

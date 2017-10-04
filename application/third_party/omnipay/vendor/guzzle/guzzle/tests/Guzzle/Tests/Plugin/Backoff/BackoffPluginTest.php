@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Plugin\Backoff;
 
 use Guzzle\Common\Event;
@@ -24,6 +23,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class BackoffPluginTest extends \Guzzle\Tests\GuzzleTestCase implements EventSubscriberInterface
 {
+
     protected $retried;
 
     public function setUp()
@@ -33,7 +33,9 @@ class BackoffPluginTest extends \Guzzle\Tests\GuzzleTestCase implements EventSub
 
     public static function getSubscribedEvents()
     {
-        return array(BackoffPlugin::RETRY_EVENT => 'onRequestRetry');
+        return array(
+            BackoffPlugin::RETRY_EVENT => 'onRequestRetry'
+        );
     }
 
     public function onRequestRetry(Event $event)
@@ -48,17 +50,25 @@ class BackoffPluginTest extends \Guzzle\Tests\GuzzleTestCase implements EventSub
 
     public function testCreatesDefaultExponentialBackoffPlugin()
     {
-        $plugin = BackoffPlugin::getExponentialBackoff(3, array(204), array(10));
+        $plugin = BackoffPlugin::getExponentialBackoff(3, array(
+            204
+        ), array(
+            10
+        ));
         $this->assertInstanceOf('Guzzle\Plugin\Backoff\BackoffPlugin', $plugin);
         $strategy = $this->readAttribute($plugin, 'strategy');
         $this->assertInstanceOf('Guzzle\Plugin\Backoff\TruncatedBackoffStrategy', $strategy);
         $this->assertEquals(3, $this->readAttribute($strategy, 'max'));
         $strategy = $this->readAttribute($strategy, 'next');
         $this->assertInstanceOf('Guzzle\Plugin\Backoff\HttpBackoffStrategy', $strategy);
-        $this->assertEquals(array(204 => true), $this->readAttribute($strategy, 'errorCodes'));
+        $this->assertEquals(array(
+            204 => true
+        ), $this->readAttribute($strategy, 'errorCodes'));
         $strategy = $this->readAttribute($strategy, 'next');
         $this->assertInstanceOf('Guzzle\Plugin\Backoff\CurlBackoffStrategy', $strategy);
-        $this->assertEquals(array(10 => true), $this->readAttribute($strategy, 'errorCodes'));
+        $this->assertEquals(array(
+            10 => true
+        ), $this->readAttribute($strategy, 'errorCodes'));
         $strategy = $this->readAttribute($strategy, 'next');
         $this->assertInstanceOf('Guzzle\Plugin\Backoff\ExponentialBackoffStrategy', $strategy);
     }
@@ -67,18 +77,22 @@ class BackoffPluginTest extends \Guzzle\Tests\GuzzleTestCase implements EventSub
     {
         $request = new Request('GET', 'http://www.example.com');
         $request->setState('transfer');
-
+        
         $mock = $this->getMockBuilder('Guzzle\Plugin\Backoff\BackoffStrategyInterface')
-            ->setMethods(array('getBackoffPeriod'))
+            ->setMethods(array(
+            'getBackoffPeriod'
+        ))
             ->getMockForAbstractClass();
-
+        
         $mock->expects($this->once())
             ->method('getBackoffPeriod')
             ->will($this->returnValue(false));
-
+        
         $plugin = new BackoffPlugin($mock);
         $plugin->addSubscriber($this);
-        $plugin->onRequestSent(new Event(array('request' => $request)));
+        $plugin->onRequestSent(new Event(array(
+            'request' => $request
+        )));
         $this->assertFalse($this->retried);
     }
 
@@ -87,35 +101,37 @@ class BackoffPluginTest extends \Guzzle\Tests\GuzzleTestCase implements EventSub
         $request = new Request('GET', 'http://www.example.com');
         $request->setState('transfer');
         $response = new Response(500);
-        $handle = $this->getMockBuilder('Guzzle\Http\Curl\CurlHandle')->disableOriginalConstructor()->getMock();
+        $handle = $this->getMockBuilder('Guzzle\Http\Curl\CurlHandle')
+            ->disableOriginalConstructor()
+            ->getMock();
         $e = new CurlException();
         $e->setCurlHandle($handle);
-
+        
         $plugin = new BackoffPlugin(new ConstantBackoffStrategy(10));
         $plugin->addSubscriber($this);
-
+        
         $event = new Event(array(
-            'request'   => $request,
-            'response'  => $response,
+            'request' => $request,
+            'response' => $response,
             'exception' => $e
         ));
-
+        
         $plugin->onRequestSent($event);
         $this->assertEquals(array(
-            'request'  => $request,
+            'request' => $request,
             'response' => $response,
-            'handle'   => $handle,
-            'retries'  => 1,
-            'delay'    => 10
+            'handle' => $handle,
+            'retries' => 1,
+            'delay' => 10
         ), $this->readAttribute($this->retried, 'context'));
-
+        
         $plugin->onRequestSent($event);
         $this->assertEquals(array(
-            'request'  => $request,
+            'request' => $request,
             'response' => $response,
-            'handle'   => $handle,
-            'retries'  => 2,
-            'delay'    => 10
+            'handle' => $handle,
+            'retries' => 2,
+            'delay' => 10
         ), $this->readAttribute($this->retried, 'context'));
     }
 
@@ -123,7 +139,9 @@ class BackoffPluginTest extends \Guzzle\Tests\GuzzleTestCase implements EventSub
     {
         $request = new Request('GET', 'http://www.foo.com');
         $plugin = new BackoffPlugin(new ConstantBackoffStrategy(10));
-        $plugin->onRequestPoll(new Event(array('request' => $request)));
+        $plugin->onRequestPoll(new Event(array(
+            'request' => $request
+        )));
     }
 
     public function testRetriesRequests()
@@ -135,29 +153,25 @@ class BackoffPluginTest extends \Guzzle\Tests\GuzzleTestCase implements EventSub
             "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\n\r\n",
             "HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\ndata"
         ));
-
-        $plugin = new BackoffPlugin(
-            new TruncatedBackoffStrategy(3,
-                new HttpBackoffStrategy(null,
-                    new CurlBackoffStrategy(null,
-                        new ConstantBackoffStrategy(0.05)
-                    )
-                )
-            )
-        );
-
+        
+        $plugin = new BackoffPlugin(new TruncatedBackoffStrategy(3, new HttpBackoffStrategy(null, new CurlBackoffStrategy(null, new ConstantBackoffStrategy(0.05)))));
+        
         $client = new Client($this->getServer()->getUrl());
         $client->getEventDispatcher()->addSubscriber($plugin);
         $request = $client->get();
         $request->send();
-
+        
         // Make sure it eventually completed successfully
-        $this->assertEquals(200, $request->getResponse()->getStatusCode());
-        $this->assertEquals('data', $request->getResponse()->getBody(true));
-
+        $this->assertEquals(200, $request->getResponse()
+            ->getStatusCode());
+        $this->assertEquals('data', $request->getResponse()
+            ->getBody(true));
+        
         // Check that three requests were made to retry this request
-        $this->assertEquals(3, count($this->getServer()->getReceivedRequests(false)));
-        $this->assertEquals(2, $request->getParams()->get(BackoffPlugin::RETRY_PARAM));
+        $this->assertEquals(3, count($this->getServer()
+            ->getReceivedRequests(false)));
+        $this->assertEquals(2, $request->getParams()
+            ->get(BackoffPlugin::RETRY_PARAM));
     }
 
     /**
@@ -170,15 +184,9 @@ class BackoffPluginTest extends \Guzzle\Tests\GuzzleTestCase implements EventSub
             "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\n\r\n",
             "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\n\r\n"
         ));
-
-        $plugin = new BackoffPlugin(
-            new TruncatedBackoffStrategy(2,
-                new HttpBackoffStrategy(null,
-                    new ConstantBackoffStrategy(0.05)
-                )
-            )
-        );
-
+        
+        $plugin = new BackoffPlugin(new TruncatedBackoffStrategy(2, new HttpBackoffStrategy(null, new ConstantBackoffStrategy(0.05))));
+        
         $client = new Client($this->getServer()->getUrl());
         $client->addSubscriber($plugin);
         $client->get()->send();
@@ -205,25 +213,18 @@ class BackoffPluginTest extends \Guzzle\Tests\GuzzleTestCase implements EventSub
             "HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\ndata",
             "HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\ndata"
         ));
-
-        $plugin = new BackoffPlugin(
-            new HttpBackoffStrategy(null,
-                new TruncatedBackoffStrategy(3,
-                    new CurlBackoffStrategy(null,
-                        new ConstantBackoffStrategy(0.1)
-                    )
-                )
-            )
-        );
+        
+        $plugin = new BackoffPlugin(new HttpBackoffStrategy(null, new TruncatedBackoffStrategy(3, new CurlBackoffStrategy(null, new ConstantBackoffStrategy(0.1)))));
         $client = new Client($this->getServer()->getUrl());
         $client->getEventDispatcher()->addSubscriber($plugin);
         $requests = array();
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 5; $i ++) {
             $requests[] = $client->get();
         }
         $client->send($requests);
-
-        $this->assertEquals(15, count($this->getServer()->getReceivedRequests(false)));
+        
+        $this->assertEquals(15, count($this->getServer()
+            ->getReceivedRequests(false)));
     }
 
     /**
@@ -238,18 +239,18 @@ class BackoffPluginTest extends \Guzzle\Tests\GuzzleTestCase implements EventSub
             "HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\ndata"
         ));
         // Need to sleep for some time ensure that the polling works correctly in the observer
-        $plugin = new BackoffPlugin(new HttpBackoffStrategy(null,
-            new TruncatedBackoffStrategy(1,
-                new ConstantBackoffStrategy(0.5))));
-
+        $plugin = new BackoffPlugin(new HttpBackoffStrategy(null, new TruncatedBackoffStrategy(1, new ConstantBackoffStrategy(0.5))));
+        
         $client = new Client($this->getServer()->getUrl());
         $client->getEventDispatcher()->addSubscriber($plugin);
         $request = $client->get();
         $request->send();
         // Make sure it eventually completed successfully
-        $this->assertEquals('data', $request->getResponse()->getBody(true));
+        $this->assertEquals('data', $request->getResponse()
+            ->getBody(true));
         // Check that two requests were made to retry this request
-        $this->assertEquals(2, count($this->getServer()->getReceivedRequests(false)));
+        $this->assertEquals(2, count($this->getServer()
+            ->getReceivedRequests(false)));
     }
 
     public function testSeeksToBeginningOfRequestBodyWhenRetrying()
@@ -261,12 +262,14 @@ class BackoffPluginTest extends \Guzzle\Tests\GuzzleTestCase implements EventSub
         $request->getParams()->set(BackoffPlugin::DELAY_PARAM, 2);
         // Seek to the end of the stream
         $request->getBody()->seek(3);
-        $this->assertEquals('', $request->getBody()->read(1));
+        $this->assertEquals('', $request->getBody()
+            ->read(1));
         // Create a plugin that does not delay when retrying
         $plugin = new BackoffPlugin(new ConstantBackoffStrategy(0));
         $plugin->onRequestPoll($this->getMockEvent($request));
         // Ensure that the stream was seeked to 0
-        $this->assertEquals('a', $request->getBody()->read(1));
+        $this->assertEquals('a', $request->getBody()
+            ->read(1));
     }
 
     public function testDoesNotSeekOnRequestsWithNoBodyWhenRetrying()
@@ -282,16 +285,19 @@ class BackoffPluginTest extends \Guzzle\Tests\GuzzleTestCase implements EventSub
     {
         // Create a mock curl multi object
         $multi = $this->getMockBuilder('Guzzle\Http\Curl\CurlMulti')
-            ->setMethods(array('remove', 'add'))
+            ->setMethods(array(
+            'remove',
+            'add'
+        ))
             ->getMock();
-
+        
         // Create an event that is expected for the Poll event
         $event = new Event(array(
-            'request'    => $request,
+            'request' => $request,
             'curl_multi' => $multi
         ));
         $event->setName(CurlMultiInterface::POLLING_REQUEST);
-
+        
         return $event;
     }
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Plugin\Backoff;
 
 use Guzzle\Plugin\Backoff\ConstantBackoffStrategy;
@@ -9,6 +8,7 @@ use Guzzle\Plugin\Backoff\ConstantBackoffStrategy;
  */
 class ConstantBackoffStrategyTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testRetriesWithConstantDelay()
     {
         $strategy = new ConstantBackoffStrategy(3.5);

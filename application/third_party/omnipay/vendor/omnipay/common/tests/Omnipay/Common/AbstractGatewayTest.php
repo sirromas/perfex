@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\Common;
 
 use Mockery as m;
@@ -9,6 +8,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 class AbstractGatewayTest extends TestCase
 {
+
     public function setUp()
     {
         $this->gateway = m::mock('\Omnipay\Common\AbstractGateway')->makePartial();
@@ -17,7 +17,7 @@ class AbstractGatewayTest extends TestCase
 
     public function testConstruct()
     {
-        $this->gateway = new AbstractGatewayTest_MockAbstractGateway;
+        $this->gateway = new AbstractGatewayTest_MockAbstractGateway();
         $this->assertInstanceOf('\Guzzle\Http\Client', $this->gateway->getProtectedHttpClient());
         $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Request', $this->gateway->getProtectedHttpRequest());
         $this->assertSame(array(), $this->gateway->getParameters());
@@ -25,38 +25,48 @@ class AbstractGatewayTest extends TestCase
 
     public function testGetShortName()
     {
-        $this->assertSame('\\'.get_class($this->gateway), $this->gateway->getShortName());
+        $this->assertSame('\\' . get_class($this->gateway), $this->gateway->getShortName());
     }
 
     public function testInitializeDefaults()
     {
         $defaults = array(
             'currency' => 'AUD', // fixed default type
-            'username' => array('joe', 'fred'), // enum default type
-        );
-        $this->gateway->shouldReceive('getDefaultParameters')->once()
+            'username' => array(
+                'joe',
+                'fred'
+            )
+        ) // enum default type
+;
+        $this->gateway->shouldReceive('getDefaultParameters')
+            ->once()
             ->andReturn($defaults);
-
+        
         $this->gateway->initialize();
-
+        
         $expected = array(
             'currency' => 'AUD',
-            'username' => 'joe',
+            'username' => 'joe'
         );
         $this->assertSame($expected, $this->gateway->getParameters());
     }
 
     public function testInitializeParameters()
     {
-        $this->gateway->shouldReceive('getDefaultParameters')->once()
-            ->andReturn(array('currency' => 'AUD'));
-
+        $this->gateway->shouldReceive('getDefaultParameters')
+            ->once()
+            ->andReturn(array(
+            'currency' => 'AUD'
+        ));
+        
         $this->gateway->initialize(array(
             'currency' => 'USD',
-            'unknown' => '42',
+            'unknown' => '42'
         ));
-
-        $this->assertSame(array('currency' => 'USD'), $this->gateway->getParameters());
+        
+        $this->assertSame(array(
+            'currency' => 'USD'
+        ), $this->gateway->getParameters());
     }
 
     public function testGetDefaultParameters()
@@ -67,8 +77,10 @@ class AbstractGatewayTest extends TestCase
     public function testGetParameters()
     {
         $this->gateway->setTestMode(true);
-
-        $this->assertSame(array('testMode' => true), $this->gateway->getParameters());
+        
+        $this->assertSame(array(
+            'testMode' => true
+        ), $this->gateway->getParameters());
     }
 
     public function testTestMode()
@@ -140,18 +152,20 @@ class AbstractGatewayTest extends TestCase
 
     public function testCreateRequest()
     {
-        $this->gateway = new AbstractGatewayTest_MockAbstractGateway;
-        $request = $this->gateway->callCreateRequest(
-            '\Omnipay\Common\AbstractGatewayTest_MockAbstractRequest',
-            array('currency' => 'THB')
-        );
-
-        $this->assertSame(array('currency' => 'THB'), $request->getParameters());
+        $this->gateway = new AbstractGatewayTest_MockAbstractGateway();
+        $request = $this->gateway->callCreateRequest('\Omnipay\Common\AbstractGatewayTest_MockAbstractRequest', array(
+            'currency' => 'THB'
+        ));
+        
+        $this->assertSame(array(
+            'currency' => 'THB'
+        ), $request->getParameters());
     }
 }
 
 class AbstractGatewayTest_MockAbstractGateway extends AbstractGateway
 {
+
     public function getName()
     {
         return 'Mock Gateway Implementation';
@@ -175,6 +189,10 @@ class AbstractGatewayTest_MockAbstractGateway extends AbstractGateway
 
 class AbstractGatewayTest_MockAbstractRequest extends AbstractRequest
 {
-    public function getData() {}
-    public function sendData($data) {}
+
+    public function getData()
+    {}
+
+    public function sendData($data)
+    {}
 }

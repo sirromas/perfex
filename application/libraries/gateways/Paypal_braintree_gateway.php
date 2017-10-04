@@ -3,15 +3,16 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 use Omnipay\Omnipay;
 
-require_once(APPPATH . 'third_party/omnipay/vendor/autoload.php');
+require_once (APPPATH . 'third_party/omnipay/vendor/autoload.php');
 
 class Paypal_braintree_gateway extends App_gateway
 {
+
     public function __construct()
     {
         /**
-        * Call App_gateway __construct function
-        */
+         * Call App_gateway __construct function
+         */
         parent::__construct();
         /**
          * REQUIRED
@@ -19,16 +20,16 @@ class Paypal_braintree_gateway extends App_gateway
          * The ID must be alpha/alphanumeric
          */
         $this->setId('paypal_braintree');
-
+        
         /**
          * REQUIRED
          * Gateway name
          */
         $this->setName('Braintree');
-
+        
         /**
          * Add gateway settings
-        */
+         */
         $this->setSettings(array(
             array(
                 'name' => 'merchant_id',
@@ -56,12 +57,15 @@ class Paypal_braintree_gateway extends App_gateway
                 'label' => 'settings_paymentmethod_testing_mode'
             )
         ));
-
+        
         /**
          * REQUIRED
          * Hook gateway with other online payment modes
          */
-        add_action('before_add_online_payment_modes', array( $this, 'initMode' ));
+        add_action('before_add_online_payment_modes', array(
+            $this,
+            'initMode'
+        ));
     }
 
     public function process_payment($data)
@@ -76,8 +80,10 @@ class Paypal_braintree_gateway extends App_gateway
         $gateway->setPrivateKey($this->decryptSetting('api_private_key'));
         $gateway->setPublicKey($this->getSetting('api_public_key'));
         $gateway->setTestMode($this->getSetting('test_mode_enabled'));
-
-        return $gateway->find(array('transactionReference'=>$transaction_id))->send();
+        
+        return $gateway->find(array(
+            'transactionReference' => $transaction_id
+        ))->send();
     }
 
     public function generate_token()
@@ -87,8 +93,10 @@ class Paypal_braintree_gateway extends App_gateway
         $gateway->setPrivateKey($this->decryptSetting('api_private_key'));
         $gateway->setPublicKey($this->getSetting('api_public_key'));
         $gateway->setTestMode($this->getSetting('test_mode_enabled'));
-
-        return $gateway->clientToken()->send()->getToken();
+        
+        return $gateway->clientToken()
+            ->send()
+            ->getToken();
     }
 
     public function finish_payment($data)
@@ -99,13 +107,13 @@ class Paypal_braintree_gateway extends App_gateway
         $gateway->setPrivateKey($this->decryptSetting('api_private_key'));
         $gateway->setPublicKey($this->getSetting('api_public_key'));
         $gateway->setTestMode($this->getSetting('test_mode_enabled'));
-
+        
         $response = $gateway->purchase(array(
             'amount' => number_format($data['amount'], 2, '.', ''),
             'currency' => $data['currency'],
-            'token' => $data['nonce'],
-            ))->send();
-
+            'token' => $data['nonce']
+        ))->send();
+        
         return $response;
     }
 }

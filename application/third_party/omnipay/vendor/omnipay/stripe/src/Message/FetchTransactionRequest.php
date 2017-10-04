@@ -13,12 +13,12 @@ namespace Omnipay\Stripe\Message;
  * See PurchaseRequest for the first part of this example transaction:
  *
  * <code>
- *   // Fetch the transaction so that details can be found for refund, etc.
- *   $transaction = $gateway->fetchTransaction();
- *   $transaction->setTransactionReference($sale_id);
- *   $response = $transaction->send();
- *   $data = $response->getData();
- *   echo "Gateway fetchTransaction response data == " . print_r($data, true) . "\n";
+ * // Fetch the transaction so that details can be found for refund, etc.
+ * $transaction = $gateway->fetchTransaction();
+ * $transaction->setTransactionReference($sale_id);
+ * $response = $transaction->send();
+ * $data = $response->getData();
+ * echo "Gateway fetchTransaction response data == " . print_r($data, true) . "\n";
  * </code>
  *
  * @see PurchaseRequest
@@ -27,18 +27,19 @@ namespace Omnipay\Stripe\Message;
  */
 class FetchTransactionRequest extends AbstractRequest
 {
+
     public function getData()
     {
         $this->validate('transactionReference');
-
+        
         $data = array();
-
+        
         return $data;
     }
 
     public function getEndpoint()
     {
-        return $this->endpoint.'/charges/'.$this->getTransactionReference();
+        return $this->endpoint . '/charges/' . $this->getTransactionReference();
     }
 
     public function getHttpMethod()

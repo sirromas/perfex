@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Service\Command\LocationVisitor\Request;
 
 use Guzzle\Http\Message\EntityEnclosingRequest;
@@ -12,9 +11,13 @@ use Guzzle\Tests\Service\Mock\MockClient;
 
 abstract class AbstractVisitorTestCase extends \Guzzle\Tests\GuzzleTestCase
 {
+
     protected $command;
+
     protected $request;
+
     protected $param;
+
     protected $validator;
 
     public function setUp()
@@ -28,7 +31,7 @@ abstract class AbstractVisitorTestCase extends \Guzzle\Tests\GuzzleTestCase
     {
         $command = new OperationCommand(array(), $this->getNestedCommand($location));
         $command->setClient(new MockClient());
-
+        
         return $command;
     }
 
@@ -38,43 +41,51 @@ abstract class AbstractVisitorTestCase extends \Guzzle\Tests\GuzzleTestCase
             'httpMethod' => 'POST',
             'parameters' => array(
                 'foo' => new Parameter(array(
-                    'type'         => 'object',
-                    'location'     => $location,
-                    'sentAs'       => 'Foo',
-                    'required'     => true,
-                    'properties'   => array(
+                    'type' => 'object',
+                    'location' => $location,
+                    'sentAs' => 'Foo',
+                    'required' => true,
+                    'properties' => array(
                         'test' => array(
-                            'type'      => 'object',
-                            'required'  => true,
+                            'type' => 'object',
+                            'required' => true,
                             'properties' => array(
                                 'baz' => array(
-                                    'type'    => 'boolean',
+                                    'type' => 'boolean',
                                     'default' => true
                                 ),
                                 'jenga' => array(
-                                    'type'    => 'string',
+                                    'type' => 'string',
                                     'default' => 'hello',
-                                    'sentAs'  => 'Jenga_Yall!',
-                                    'filters' => array('strtoupper')
+                                    'sentAs' => 'Jenga_Yall!',
+                                    'filters' => array(
+                                        'strtoupper'
+                                    )
                                 )
                             )
                         ),
-                        'bar' => array('default' => 123)
+                        'bar' => array(
+                            'default' => 123
+                        )
                     ),
                     'additionalProperties' => array(
                         'type' => 'string',
-                        'filters' => array('strtoupper'),
+                        'filters' => array(
+                            'strtoupper'
+                        ),
                         'location' => $location
                     )
                 )),
                 'arr' => new Parameter(array(
-                    'type'         => 'array',
-                    'location'     => $location,
+                    'type' => 'array',
+                    'location' => $location,
                     'items' => array(
                         'type' => 'string',
-                        'filters' => array('strtoupper')
-                     )
-                )),
+                        'filters' => array(
+                            'strtoupper'
+                        )
+                    )
+                ))
             )
         ));
     }
@@ -90,21 +101,35 @@ abstract class AbstractVisitorTestCase extends \Guzzle\Tests\GuzzleTestCase
                     'sentAs' => 'Foo',
                     'required' => true,
                     'default' => 'bar',
-                    'filters' => array('strtoupper')
+                    'filters' => array(
+                        'strtoupper'
+                    )
                 )),
                 'arr' => new Parameter(array(
                     'type' => 'array',
                     'location' => 'query',
                     'sentAs' => 'Arr',
                     'required' => true,
-                    'default' => array(123, 456, 789),
-                    'filters' => array(array('method' => 'implode', 'args' => array(',', '@value')))
+                    'default' => array(
+                        123,
+                        456,
+                        789
+                    ),
+                    'filters' => array(
+                        array(
+                            'method' => 'implode',
+                            'args' => array(
+                                ',',
+                                '@value'
+                            )
+                        )
+                    )
                 ))
             )
         ));
         $command = new OperationCommand(array(), $operation);
         $command->setClient(new MockClient());
-
+        
         return $command;
     }
 }

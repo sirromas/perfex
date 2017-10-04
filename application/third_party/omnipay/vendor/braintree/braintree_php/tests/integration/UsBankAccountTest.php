@@ -10,18 +10,17 @@ use Braintree;
 class UsBankAccountAccountTest extends Setup
 {
 
-
     public function testReturnUsBankAccount()
     {
         $customer = Braintree\Customer::createNoValidate();
         $http = new HttpClientApi(Braintree\Configuration::$global);
         $nonce = Test\Helper::generateValidUsBankAccountNonce();
-
+        
         $result = Braintree\PaymentMethod::create([
             'customerId' => $customer->id,
             'paymentMethodNonce' => $nonce
         ]);
-
+        
         $foundUsBankAccount = $result->paymentMethod;
         $this->assertInstanceOf('Braintree\UsBankAccount', $foundUsBankAccount);
         $this->assertEquals('021000021', $foundUsBankAccount->routingNumber);
@@ -39,13 +38,13 @@ class UsBankAccountAccountTest extends Setup
         $customer = Braintree\Customer::createNoValidate();
         $http = new HttpClientApi(Braintree\Configuration::$global);
         $nonce = Test\Helper::generateValidUsBankAccountNonce();
-
+        
         $result = Braintree\PaymentMethod::create([
             'customerId' => $customer->id,
             'paymentMethodNonce' => $nonce
         ]);
-
-        $foundUsBankAccount= Braintree\UsBankAccount::find($result->paymentMethod->token);
+        
+        $foundUsBankAccount = Braintree\UsBankAccount::find($result->paymentMethod->token);
         $this->assertInstanceOf('Braintree\UsBankAccount', $foundUsBankAccount);
         $this->assertEquals('021000021', $foundUsBankAccount->routingNumber);
         $this->assertEquals('1234', $foundUsBankAccount->last4);
@@ -68,17 +67,17 @@ class UsBankAccountAccountTest extends Setup
         $customer = Braintree\Customer::createNoValidate();
         $http = new HttpClientApi(Braintree\Configuration::$global);
         $nonce = Test\Helper::generateValidUsBankAccountNonce();
-
+        
         $result = Braintree\PaymentMethod::create([
             'customerId' => $customer->id,
             'paymentMethodNonce' => $nonce
         ]);
-
+        
         $result = Braintree\UsBankAccount::sale($result->paymentMethod->token, [
             'merchantAccountId' => 'us_bank_merchant_account',
             'amount' => '100.00'
         ]);
-
+        
         $this->assertTrue($result->success);
         $transaction = $result->transaction;
         $this->assertEquals(Braintree\Transaction::SETTLEMENT_PENDING, $transaction->status);

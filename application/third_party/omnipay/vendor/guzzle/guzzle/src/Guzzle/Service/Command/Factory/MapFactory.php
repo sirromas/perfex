@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Service\Command\Factory;
 
 /**
@@ -7,10 +6,15 @@ namespace Guzzle\Service\Command\Factory;
  */
 class MapFactory implements FactoryInterface
 {
-    /** @var array Associative array mapping command names to classes */
+
+    /**
+     * @var array Associative array mapping command names to classes
+     */
     protected $map;
 
-    /** @param array $map Associative array mapping command names to classes */
+    /**
+     * @param array $map Associative array mapping command names to classes
+     */
     public function __construct(array $map)
     {
         $this->map = $map;
@@ -20,7 +24,7 @@ class MapFactory implements FactoryInterface
     {
         if (isset($this->map[$name])) {
             $class = $this->map[$name];
-
+            
             return new $class($args);
         }
     }

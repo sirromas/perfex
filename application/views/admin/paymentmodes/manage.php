@@ -6,75 +6,83 @@
 				<div class="panel_s">
 					<div class="panel-body">
 						<div class="_buttons">
-							<a href="#" class="btn btn-info pull-left" data-toggle="modal" data-target="#payment_mode_modal"><?php echo _l('new_payment_mode'); ?></a>
+							<a href="#" class="btn btn-info pull-left" data-toggle="modal"
+								data-target="#payment_mode_modal"><?php echo _l('new_payment_mode'); ?></a>
 						</div>
 						<div class="clearfix"></div>
 						<hr class="hr-panel-heading" />
 						<p class="text-warning mtop5"><?php echo _l('payment_modes_add_edit_announcement'); ?></p>
 						<div class="clearfix"></div>
-						<?php render_datatable(array(
-							_l('payment_modes_dt_name'),
-							_l('payment_modes_dt_description'),
-							_l('payment_modes_dt_active'),
-							_l('options')
-							),'payment-modes'); ?>
+						<?php
+    
+render_datatable(array(
+        _l('payment_modes_dt_name'),
+        _l('payment_modes_dt_description'),
+        _l('payment_modes_dt_active'),
+        _l('options')
+    ), 'payment-modes');
+    ?>
 						</div>
-					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div class="modal fade" id="payment_mode_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-					<h4 class="modal-title" id="myModalLabel">
-						<span class="edit-title"><?php echo _l('payment_mode_edit_heading'); ?></span>
-						<span class="add-title"><?php echo _l('payment_mode_add_heading'); ?></span>
-					</h4>
-				</div>
+</div>
+<div class="modal fade" id="payment_mode_modal" tabindex="-1"
+	role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="myModalLabel">
+					<span class="edit-title"><?php echo _l('payment_mode_edit_heading'); ?></span>
+					<span class="add-title"><?php echo _l('payment_mode_add_heading'); ?></span>
+				</h4>
+			</div>
 				<?php echo form_open('admin/paymentmodes/manage',array('id'=>'payment_modes_form')); ?>
 				<?php echo form_hidden('paymentmodeid'); ?>
 				<div class="modal-body">
-					<div class="row">
-						<div class="col-md-12">
+				<div class="row">
+					<div class="col-md-12">
 							<?php echo render_input('name','payment_mode_add_edit_name'); ?>
 							<?php echo render_textarea('description','payment_mode_add_edit_description','',array('data-toggle'=>'tooltip','title'=>'payment_mode_add_edit_description_tooltip','rows'=>5)); ?>
 							<div class="checkbox checkbox-primary">
-								<input type="checkbox" name="active" id="active">
-								<label for="active"><?php echo _l('payment_mode_add_edit_active'); ?></label>
-							</div>
-							<div class="checkbox checkbox-primary">
-								<input type="checkbox" name="show_on_pdf" id="show_on_pdf">
-								<label for="show_on_pdf"><?php echo _l('show_on_invoice_on_pdf',_l('payment_mode_add_edit_description')); ?></label>
-							</div>
-							<div class="checkbox checkbox-primary">
-								<input type="checkbox" name="selected_by_default" id="selected_by_default">
-								<label for="selected_by_default"><?php echo _l('settings_paymentmethod_default_selected_on_invoice'); ?></label>
-							</div>
-							<hr />
-							<div class="checkbox checkbox-primary pm-available-to">
-								<input type="checkbox" name="invoices_only" id="invoices_only">
-								<label for="invoices_only"><?php echo _l('payment_mode_invoices_only'); ?></label>
-							</div>
-							<div class="checkbox checkbox-primary pm-available-to">
-								<input type="checkbox" name="expenses_only" id="expenses_only">
-								<label for="expenses_only"><?php echo _l('payment_mode_expenses_only'); ?></label>
-							</div>
+							<input type="checkbox" name="active" id="active"> <label
+								for="active"><?php echo _l('payment_mode_add_edit_active'); ?></label>
+						</div>
+						<div class="checkbox checkbox-primary">
+							<input type="checkbox" name="show_on_pdf" id="show_on_pdf"> <label
+								for="show_on_pdf"><?php echo _l('show_on_invoice_on_pdf',_l('payment_mode_add_edit_description')); ?></label>
+						</div>
+						<div class="checkbox checkbox-primary">
+							<input type="checkbox" name="selected_by_default"
+								id="selected_by_default"> <label for="selected_by_default"><?php echo _l('settings_paymentmethod_default_selected_on_invoice'); ?></label>
+						</div>
+						<hr />
+						<div class="checkbox checkbox-primary pm-available-to">
+							<input type="checkbox" name="invoices_only" id="invoices_only"> <label
+								for="invoices_only"><?php echo _l('payment_mode_invoices_only'); ?></label>
+						</div>
+						<div class="checkbox checkbox-primary pm-available-to">
+							<input type="checkbox" name="expenses_only" id="expenses_only"> <label
+								for="expenses_only"><?php echo _l('payment_mode_expenses_only'); ?></label>
 						</div>
 					</div>
 				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
-					<button type="submit" class="btn btn-info"><?php echo _l('submit'); ?></button>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+				<button type="submit" class="btn btn-info"><?php echo _l('submit'); ?></button>
 					<?php echo form_close(); ?>
 				</div>
-			</div>
 		</div>
 	</div>
-	<?php init_tail(); ?>
-	<script>
+</div>
+<?php init_tail(); ?>
+<script>
 		initDataTable('.table-payment-modes', window.location.href, [3], [3]);
 		_validate_form($('form'), {
 			name: 'required'

@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\TwoCheckoutPlus;
 
 use Omnipay\Common\Message\NotificationInterface;
@@ -7,15 +6,17 @@ use Omnipay\Tests\GatewayTestCase;
 
 class GatewayTest extends GatewayTestCase
 {
+
     public $gateway;
+
     public $options;
 
     public function setUp()
     {
         parent::setUp();
-
+        
         $this->gateway = new Gateway($this->getHttpClient(), $this->getHttpRequest());
-
+        
         $this->gateway->setAccountNumber('901290261');
         $this->gateway->setSecretWord('MzBjODg5YTUtNzcwMS00N2NlLWFkODMtNzQ2YzllZWRjMzBj');
         $this->gateway->setTestMode(true);
@@ -34,7 +35,7 @@ class GatewayTest extends GatewayTestCase
                 'product_id' => 12345,
                 'recurrence' => '1 Week',
                 'duration' => '1 Year',
-                'startup_fee' => '5',
+                'startup_fee' => '5'
             ),
             array(
                 'type' => 'product',
@@ -44,7 +45,7 @@ class GatewayTest extends GatewayTestCase
                 'tangible' => 'N'
             )
         ));
-
+        
         $this->options = array(
             'card' => $this->getValidCard(),
             'transactionId' => 1234,
@@ -74,7 +75,7 @@ class GatewayTest extends GatewayTestCase
     public function testPurchase()
     {
         $request = $this->gateway->purchase($this->options)->send();
-
+        
         $this->assertSame(false, $request->isSuccessful());
         $this->assertSame(true, $request->isRedirect());
         $this->assertSame('GET', $request->getRedirectMethod());
@@ -91,7 +92,7 @@ class GatewayTest extends GatewayTestCase
             'comment' => 'Buyer deserved a refund',
             'category' => 13
         ))->send();
-
+        
         $this->assertSame(false, $request->isSuccessful());
         $this->assertSame(false, $request->isRedirect());
         $this->assertSame('[{"code":"UNAUTHORIZED","message":"Authentication failed"}]', $request->getMessage());
@@ -101,15 +102,13 @@ class GatewayTest extends GatewayTestCase
     public function testCompletePurchaseWithGETParameters()
     {
         // mock / set a test MD5 hash, total order amount and order number
-        $this->getHttpRequest()->initialize(
-            array(
-                'order_number' => 1234,
-                'merchant_order_id' => 56789,
-                'total' => 20,
-                'key' => $this->gateway->getTestMode() ? '21937BDC2F33AF28503800677DE7C4F8' : '686C451E66D5766DEC3A1E74379C7BAD',
-            )
-        );
-
+        $this->getHttpRequest()->initialize(array(
+            'order_number' => 1234,
+            'merchant_order_id' => 56789,
+            'total' => 20,
+            'key' => $this->gateway->getTestMode() ? '21937BDC2F33AF28503800677DE7C4F8' : '686C451E66D5766DEC3A1E74379C7BAD'
+        ));
+        
         $request = $this->gateway->completePurchase($this->options)->send();
         $this->assertSame(true, $request->isSuccessful());
         $this->assertSame(1234, $request->getTransactionReference());
@@ -119,16 +118,13 @@ class GatewayTest extends GatewayTestCase
     public function testCompletePurchaseWithPOSTParameters()
     {
         // mock / set a test MD5 hash, total order amount and order number
-        $this->getHttpRequest()->initialize(
-            array(),
-            array(
-                'order_number' => 1234,
-                'merchant_order_id' => 56789,
-                'total' => 20,
-                'key' => $this->gateway->getTestMode() ? '21937BDC2F33AF28503800677DE7C4F8' : '686C451E66D5766DEC3A1E74379C7BAD',
-            )
-        );
-
+        $this->getHttpRequest()->initialize(array(), array(
+            'order_number' => 1234,
+            'merchant_order_id' => 56789,
+            'total' => 20,
+            'key' => $this->gateway->getTestMode() ? '21937BDC2F33AF28503800677DE7C4F8' : '686C451E66D5766DEC3A1E74379C7BAD'
+        ));
+        
         $request = $this->gateway->completePurchase($this->options)->send();
         $this->assertSame(true, $request->isSuccessful());
         $this->assertSame(1234, $request->getTransactionReference());
@@ -141,27 +137,22 @@ class GatewayTest extends GatewayTestCase
     public function testCompletePurchaseInvalidResponseException()
     {
         // mock / set a test MD5 hash, total order amount and order number
-        $this->getHttpRequest()->initialize(
-            array(
-                'order_number' => 1234,
-                'total' => 20,
-                'key' => 'BadMD5harsh',
-            )
-        );
-
+        $this->getHttpRequest()->initialize(array(
+            'order_number' => 1234,
+            'total' => 20,
+            'key' => 'BadMD5harsh'
+        ));
+        
         $this->gateway->completePurchase($this->options)->send();
     }
 
     public function testAcceptNotificationFail()
     {
-
-        $this->getHttpRequest()->initialize(
-            array(),
-            $this->getMockHttpResponse('FraudChangeNotificationFail.txt')->json()
-        );
-
+        $this->getHttpRequest()->initialize(array(), $this->getMockHttpResponse('FraudChangeNotificationFail.txt')
+            ->json());
+        
         $response = $this->gateway->acceptNotification()->send();
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertSame('4742525399', $response->getTransactionReference());
         $this->assertSame('FRAUD_STATUS_CHANGED', $response->getNotificationType());

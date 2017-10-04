@@ -1,16 +1,18 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
 class Taxes extends Admin_controller
 {
+
     public function __construct()
     {
         parent::__construct();
         $this->load->model('taxes_model');
-        if (!is_admin()) {
+        if (! is_admin()) {
             access_denied('Taxes');
         }
     }
-
+    
     /* List all taxes */
     public function index()
     {
@@ -20,7 +22,7 @@ class Taxes extends Admin_controller
         $data['title'] = _l('taxes');
         $this->load->view('admin/taxes/manage', $data);
     }
-
+    
     /* Add or edit tax / ajax */
     public function manage()
     {
@@ -52,11 +54,11 @@ class Taxes extends Admin_controller
             }
         }
     }
-
+    
     /* Delete tax from database */
     public function delete($id)
     {
-        if (!$id) {
+        if (! $id) {
             redirect(admin_url('taxes'));
         }
         $response = $this->taxes_model->delete($id);

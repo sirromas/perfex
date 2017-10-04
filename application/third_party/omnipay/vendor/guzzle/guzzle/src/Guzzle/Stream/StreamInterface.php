@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Stream;
 
 /**
@@ -7,6 +6,7 @@ namespace Guzzle\Stream;
  */
 interface StreamInterface
 {
+
     /**
      * Convert the stream to a string if the stream is readable and the stream is seekable.
      *
@@ -22,8 +22,9 @@ interface StreamInterface
     /**
      * Get stream metadata
      *
-     * @param string $key Specific metadata to retrieve
-     *
+     * @param string $key
+     *            Specific metadata to retrieve
+     *            
      * @return array|mixed|null
      */
     public function getMetaData($key = null);
@@ -38,9 +39,11 @@ interface StreamInterface
     /**
      * Set the stream that is wrapped by the object
      *
-     * @param resource $stream Stream resource to wrap
-     * @param int      $size   Size of the stream in bytes. Only pass if the size cannot be obtained from the stream.
-     *
+     * @param resource $stream
+     *            Stream resource to wrap
+     * @param int $size
+     *            Size of the stream in bytes. Only pass if the size cannot be obtained from the stream.
+     *            
      * @return self
      */
     public function setStream($stream, $size = null);
@@ -139,8 +142,9 @@ interface StreamInterface
     /**
      * Specify the size of the stream in bytes
      *
-     * @param int $size Size of the stream contents in bytes
-     *
+     * @param int $size
+     *            Size of the stream contents in bytes
+     *            
      * @return self
      */
     public function setSize($size);
@@ -148,36 +152,40 @@ interface StreamInterface
     /**
      * Seek to a position in the stream
      *
-     * @param int $offset Stream offset
-     * @param int $whence Where the offset is applied
-     *
+     * @param int $offset
+     *            Stream offset
+     * @param int $whence
+     *            Where the offset is applied
+     *            
      * @return bool Returns TRUE on success or FALSE on failure
-     * @link   http://www.php.net/manual/en/function.fseek.php
+     * @link http://www.php.net/manual/en/function.fseek.php
      */
     public function seek($offset, $whence = SEEK_SET);
 
     /**
      * Read data from the stream
      *
-     * @param int $length Up to length number of bytes read.
-     *
-     * @return string|bool Returns the data read from the stream or FALSE on failure or EOF
+     * @param int $length
+     *            Up to length number of bytes read.
+     *            
+     * @return string|bool the data read from the stream or FALSE on failure or EOF
      */
     public function read($length);
 
     /**
      * Write data to the stream
      *
-     * @param string $string The string that is to be written.
-     *
-     * @return int|bool Returns the number of bytes written to the stream on success or FALSE on failure.
+     * @param string $string
+     *            The string that is to be written.
+     *            
+     * @return int|bool the number of bytes written to the stream on success or FALSE on failure.
      */
     public function write($string);
 
     /**
      * Returns the current position of the file read/write pointer
      *
-     * @return int|bool Returns the position of the file pointer or false on error
+     * @return int|bool the position of the file pointer or false on error
      */
     public function ftell();
 
@@ -191,8 +199,9 @@ interface StreamInterface
     /**
      * Read a line from the stream up to the maximum allowed buffer length
      *
-     * @param int $maxLength Maximum buffer length
-     *
+     * @param int $maxLength
+     *            Maximum buffer length
+     *            
      * @return string|bool
      */
     public function readLine($maxLength = null);
@@ -200,9 +209,11 @@ interface StreamInterface
     /**
      * Set custom data on the stream
      *
-     * @param string $key   Key to set
-     * @param mixed  $value Value to set
-     *
+     * @param string $key
+     *            Key to set
+     * @param mixed $value
+     *            Value to set
+     *            
      * @return self
      */
     public function setCustomData($key, $value);
@@ -210,8 +221,9 @@ interface StreamInterface
     /**
      * Get custom data from the stream
      *
-     * @param string $key Key to retrieve
-     *
+     * @param string $key
+     *            Key to retrieve
+     *            
      * @return null|mixed
      */
     public function getCustomData($key);

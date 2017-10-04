@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\TwoCheckoutPlus\Message;
 
 use Guzzle\Http\Exception\BadResponseException;
@@ -11,7 +10,9 @@ use Guzzle\Http\Exception\BadResponseException;
  */
 class TokenPurchaseRequest extends AbstractRequest
 {
+
     protected $liveEndpoint = 'https://www.2checkout.com/checkout/api/1/';
+
     protected $testEndpoint = 'https://sandbox.2checkout.com/checkout/api/1/';
 
     /**
@@ -22,13 +23,13 @@ class TokenPurchaseRequest extends AbstractRequest
     public function getEndpoint()
     {
         $endpoint = $this->getTestMode() ? $this->testEndpoint : $this->liveEndpoint;
-
+        
         return $endpoint . $this->getAccountNumber() . '/rs/authService';
     }
 
     public function isNotNull($value)
     {
-        return !is_null($value);
+        return ! is_null($value);
     }
 
     /**
@@ -40,11 +41,12 @@ class TokenPurchaseRequest extends AbstractRequest
     {
         return array(
             'Accept' => 'application/json',
-            'Content-Type' => 'application/json',
+            'Content-Type' => 'application/json'
         );
     }
 
     /**
+     *
      * @return array
      *
      * @throws \Omnipay\Common\Exception\InvalidRequestException
@@ -52,7 +54,7 @@ class TokenPurchaseRequest extends AbstractRequest
     public function getData()
     {
         $this->validate('accountNumber', 'privateKey', 'token', 'amount', 'transactionId');
-
+        
         $data = array();
         $data['sellerId'] = $this->getAccountNumber();
         $data['privateKey'] = $this->getPrivateKey();
@@ -60,7 +62,7 @@ class TokenPurchaseRequest extends AbstractRequest
         $data['token'] = $this->getToken();
         $data['currency'] = $this->getCurrency();
         $data['total'] = $this->getAmount();
-
+        
         if ($this->getCard()) {
             $data['billingAddr']['name'] = $this->getCard()->getName();
             $data['billingAddr']['addrLine1'] = $this->getCard()->getAddress1();
@@ -73,41 +75,45 @@ class TokenPurchaseRequest extends AbstractRequest
             $data['billingAddr']['phoneNumber'] = $this->getCard()->getPhone();
             $data['billingAddr']['phoneExt'] = $this->getCard()->getPhoneExtension();
         }
-
+        
         if ($this->getCart()) {
             // remove amount parameter if lineItem attributes / cart is set
             unset($data['total']);
-
+            
             $data['lineItems'] = $this->getCart();
         }
-
+        
         // remove null values item from $data['billingAddr']
-        $data['billingAddr'] = array_filter($data['billingAddr'], array($this, 'isNotNull'));
-
+        $data['billingAddr'] = array_filter($data['billingAddr'], array(
+            $this,
+            'isNotNull'
+        ));
+        
         // remove null values item from $data.
-        $data = array_filter($data, array($this, 'isNotNull'));
-
+        $data = array_filter($data, array(
+            $this,
+            'isNotNull'
+        ));
+        
         return $data;
     }
 
     /**
-     * @param mixed $data
+     *
+     * @param mixed $data            
      *
      * @return TokenPurchaseResponse
      */
     public function sendData($data)
     {
         try {
-            $response = $this->httpClient->post(
-                $this->getEndpoint(),
-                $this->getRequestHeaders(),
-                json_encode($data)
-            )->send();
-
+            $response = $this->httpClient->post($this->getEndpoint(), $this->getRequestHeaders(), json_encode($data))
+                ->send();
+            
             return new TokenPurchaseResponse($this, $response->json());
         } catch (BadResponseException $e) {
             $response = $e->getResponse();
-
+            
             return new TokenPurchaseResponse($this, $response->json());
         }
     }

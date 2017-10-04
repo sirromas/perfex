@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Http\Curl;
 
 use Guzzle\Http\Client;
@@ -12,11 +11,14 @@ use Guzzle\Http\Curl\CurlMultiProxy;
  */
 class CurlMultiProxyTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     const SELECT_TIMEOUT = 23.1;
 
     const MAX_HANDLES = 2;
 
-    /** @var \Guzzle\Http\Curl\CurlMultiProxy */
+    /**
+     * @var \Guzzle\Http\Curl\CurlMultiProxy
+     */
     private $multi;
 
     protected function setUp()
@@ -47,8 +49,10 @@ class CurlMultiProxyTest extends \Guzzle\Tests\GuzzleTestCase
         $r = new Request('GET', 'http://www.foo.com');
         $this->assertSame($this->multi, $this->multi->add($r));
         $this->assertEquals(1, count($this->multi));
-        $this->assertEquals(array($r), $this->multi->all());
-
+        $this->assertEquals(array(
+            $r
+        ), $this->multi->all());
+        
         $this->assertTrue($this->multi->remove($r));
         $this->assertFalse($this->multi->remove($r));
         $this->assertEquals(0, count($this->multi));
@@ -71,21 +75,25 @@ class CurlMultiProxyTest extends \Guzzle\Tests\GuzzleTestCase
         ));
         $client = new Client($this->getServer()->getUrl());
         $events = array();
-        $client->getCurlMulti()->getEventDispatcher()->addListener(
-            CurlMultiProxy::ADD_REQUEST,
-            function ($e) use (&$events) {
-                $events[] = $e;
-            }
-        );
+        $client->getCurlMulti()
+            ->getEventDispatcher()
+            ->addListener(CurlMultiProxy::ADD_REQUEST, function ($e) use(&$events)
+        {
+            $events[] = $e;
+        });
         $request = $client->get();
-        $request->getEventDispatcher()->addListener('request.complete', function () use ($client) {
-            $client->get('/foo')->send();
+        $request->getEventDispatcher()->addListener('request.complete', function () use($client)
+        {
+            $client->get('/foo')
+                ->send();
         });
         $request->send();
         $received = $this->getServer()->getReceivedRequests(true);
         $this->assertEquals(2, count($received));
-        $this->assertEquals($this->getServer()->getUrl(), $received[0]->getUrl());
-        $this->assertEquals($this->getServer()->getUrl() . 'foo', $received[1]->getUrl());
+        $this->assertEquals($this->getServer()
+            ->getUrl(), $received[0]->getUrl());
+        $this->assertEquals($this->getServer()
+            ->getUrl() . 'foo', $received[1]->getUrl());
         $this->assertEquals(2, count($events));
     }
 
@@ -103,7 +111,8 @@ class CurlMultiProxyTest extends \Guzzle\Tests\GuzzleTestCase
         $client->setCurlMulti(new CurlMultiProxy(self::MAX_HANDLES, self::SELECT_TIMEOUT));
         $request = $client->get();
         $request->send();
-        $this->assertEquals(200, $request->getResponse()->getStatusCode());
+        $this->assertEquals(200, $request->getResponse()
+            ->getStatusCode());
         $handles = $this->readAttribute($client->getCurlMulti(), 'handles');
         $this->assertEquals(2, count($handles));
     }

@@ -3,6 +3,7 @@ namespace Braintree;
 
 class Modification extends Base
 {
+
     protected function _initialize($attributes)
     {
         $this->_attributes = $attributes;
@@ -15,7 +16,8 @@ class Modification extends Base
         return $instance;
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         return get_called_class() . '[' . Util::attributesToString($this->_attributes) . ']';
     }
 }

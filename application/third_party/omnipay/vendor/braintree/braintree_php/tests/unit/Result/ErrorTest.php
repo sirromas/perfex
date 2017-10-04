@@ -8,9 +8,14 @@ use Braintree;
 
 class ErrorTest extends Setup
 {
+
     public function testCallingNonExsitingFieldReturnsNull()
     {
-        $result = new Braintree\Result\Error(['errors' => [], 'params' => [], 'message' => 'briefly describe']);
+        $result = new Braintree\Result\Error([
+            'errors' => [],
+            'params' => [],
+            'message' => 'briefly describe'
+        ]);
         $this->assertNull($result->transaction);
     }
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Http;
 
 use Guzzle\Http\QueryString;
@@ -10,6 +9,7 @@ use Guzzle\Http\Url;
  */
 class UrlTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testEmptyUrl()
     {
         $url = Url::factory('');
@@ -36,7 +36,7 @@ class UrlTest extends \Guzzle\Tests\GuzzleTestCase
         $url = Url::factory('/index.php');
         $this->assertEquals('/index.php', (string) $url);
         $this->assertFalse($url->isAbsolute());
-
+        
         $url = 'http://michael:test@test.com:80/path/123?q=abc#test';
         $u = Url::factory($url);
         $this->assertEquals('http://michael:test@test.com/path/123?q=abc#test', (string) $u);
@@ -52,10 +52,10 @@ class UrlTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertEquals('0', (string) $url->getQuery());
         $this->assertSame('0', $url->getFragment());
         $this->assertEquals('http://0:50/0?0#0', (string) $url);
-
+        
         $url = Url::factory('');
         $this->assertSame('', (string) $url);
-
+        
         $url = Url::factory('0');
         $this->assertSame('0', (string) $url);
     }
@@ -63,15 +63,15 @@ class UrlTest extends \Guzzle\Tests\GuzzleTestCase
     public function testBuildsRelativeUrlsWithFalsyParts()
     {
         $url = Url::buildUrl(array(
-                'host' => '0',
-                'path' => '0',
-            ));
-
+            'host' => '0',
+            'path' => '0'
+        ));
+        
         $this->assertSame('//0/0', $url);
-
+        
         $url = Url::buildUrl(array(
-                'path' => '0',
-            ));
+            'path' => '0'
+        ));
         $this->assertSame('0', $url);
     }
 
@@ -86,7 +86,7 @@ class UrlTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertEquals('/path/path2/', $url->getPath());
         $this->assertEquals('fragment', $url->getFragment());
         $this->assertEquals('a=1&b=2', (string) $url->getQuery());
-
+        
         $this->assertEquals(array(
             'fragment' => 'fragment',
             'host' => 'www.test.com',
@@ -105,10 +105,14 @@ class UrlTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertEquals('', $url->getPath());
         $url->setPath('test');
         $this->assertEquals('test', $url->getPath());
-
+        
         $url->setPath('/test/123/abc');
-        $this->assertEquals(array('test', '123', 'abc'), $url->getPathSegments());
-
+        $this->assertEquals(array(
+            'test',
+            '123',
+            'abc'
+        ), $url->getPathSegments());
+        
         $parts = parse_url('http://www.test.com/test');
         $parts['path'] = '';
         $this->assertEquals('http://www.test.com', Url::buildUrl($parts));
@@ -136,7 +140,8 @@ class UrlTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertEquals('http://e.com/base/relative?a=1', (string) Url::factory('http://e.com/base?a=1')->addPath('relative'));
         $this->assertEquals('http://e.com/base/relative?a=1', (string) Url::factory('http://e.com/base?a=1')->addPath('/relative'));
         $this->assertEquals('http://e.com/base/0', (string) Url::factory('http://e.com/base')->addPath('0'));
-        $this->assertEquals('http://e.com/base/0/1', (string) Url::factory('http://e.com/base')->addPath('0')->addPath('1'));
+        $this->assertEquals('http://e.com/base/0/1', (string) Url::factory('http://e.com/base')->addPath('0')
+            ->addPath('1'));
     }
 
     /**
@@ -147,22 +152,86 @@ class UrlTest extends \Guzzle\Tests\GuzzleTestCase
     public function urlCombineDataProvider()
     {
         return array(
-            array('http://www.example.com/', 'http://www.example.com/', 'http://www.example.com/'),
-            array('http://www.example.com/path', '/absolute', 'http://www.example.com/absolute'),
-            array('http://www.example.com/path', '/absolute?q=2', 'http://www.example.com/absolute?q=2'),
-            array('http://www.example.com/path', 'more', 'http://www.example.com/path/more'),
-            array('http://www.example.com/path', 'more?q=1', 'http://www.example.com/path/more?q=1'),
-            array('http://www.example.com/', '?q=1', 'http://www.example.com/?q=1'),
-            array('http://www.example.com/path', 'http://test.com', 'http://test.com'),
-            array('http://www.example.com:8080/path', 'http://test.com', 'http://test.com'),
-            array('http://www.example.com:8080/path', '?q=2#abc', 'http://www.example.com:8080/path?q=2#abc'),
-            array('http://u:a@www.example.com/path', 'test', 'http://u:a@www.example.com/path/test'),
-            array('http://www.example.com/path', 'http://u:a@www.example.com/', 'http://u:a@www.example.com/'),
-            array('/path?q=2', 'http://www.test.com/', 'http://www.test.com/path?q=2'),
-            array('http://api.flickr.com/services/', 'http://www.flickr.com/services/oauth/access_token', 'http://www.flickr.com/services/oauth/access_token'),
-            array('http://www.example.com/?foo=bar', 'some/path', 'http://www.example.com/some/path?foo=bar'),
-            array('http://www.example.com/?foo=bar', 'some/path?boo=moo', 'http://www.example.com/some/path?boo=moo&foo=bar'),
-            array('http://www.example.com/some/', 'path?foo=bar&foo=baz', 'http://www.example.com/some/path?foo=bar&foo=baz'),
+            array(
+                'http://www.example.com/',
+                'http://www.example.com/',
+                'http://www.example.com/'
+            ),
+            array(
+                'http://www.example.com/path',
+                '/absolute',
+                'http://www.example.com/absolute'
+            ),
+            array(
+                'http://www.example.com/path',
+                '/absolute?q=2',
+                'http://www.example.com/absolute?q=2'
+            ),
+            array(
+                'http://www.example.com/path',
+                'more',
+                'http://www.example.com/path/more'
+            ),
+            array(
+                'http://www.example.com/path',
+                'more?q=1',
+                'http://www.example.com/path/more?q=1'
+            ),
+            array(
+                'http://www.example.com/',
+                '?q=1',
+                'http://www.example.com/?q=1'
+            ),
+            array(
+                'http://www.example.com/path',
+                'http://test.com',
+                'http://test.com'
+            ),
+            array(
+                'http://www.example.com:8080/path',
+                'http://test.com',
+                'http://test.com'
+            ),
+            array(
+                'http://www.example.com:8080/path',
+                '?q=2#abc',
+                'http://www.example.com:8080/path?q=2#abc'
+            ),
+            array(
+                'http://u:a@www.example.com/path',
+                'test',
+                'http://u:a@www.example.com/path/test'
+            ),
+            array(
+                'http://www.example.com/path',
+                'http://u:a@www.example.com/',
+                'http://u:a@www.example.com/'
+            ),
+            array(
+                '/path?q=2',
+                'http://www.test.com/',
+                'http://www.test.com/path?q=2'
+            ),
+            array(
+                'http://api.flickr.com/services/',
+                'http://www.flickr.com/services/oauth/access_token',
+                'http://www.flickr.com/services/oauth/access_token'
+            ),
+            array(
+                'http://www.example.com/?foo=bar',
+                'some/path',
+                'http://www.example.com/some/path?foo=bar'
+            ),
+            array(
+                'http://www.example.com/?foo=bar',
+                'some/path?boo=moo',
+                'http://www.example.com/some/path?boo=moo&foo=bar'
+            ),
+            array(
+                'http://www.example.com/some/',
+                'path?foo=bar&foo=baz',
+                'http://www.example.com/some/path?foo=bar&foo=baz'
+            )
         );
     }
 
@@ -177,47 +246,109 @@ class UrlTest extends \Guzzle\Tests\GuzzleTestCase
     public function testHasGettersAndSetters()
     {
         $url = Url::factory('http://www.test.com/');
-        $this->assertEquals('example.com', $url->setHost('example.com')->getHost());
-        $this->assertEquals('8080', $url->setPort(8080)->getPort());
-        $this->assertEquals('/foo/bar', $url->setPath(array('foo', 'bar'))->getPath());
-        $this->assertEquals('a', $url->setPassword('a')->getPassword());
-        $this->assertEquals('b', $url->setUsername('b')->getUsername());
-        $this->assertEquals('abc', $url->setFragment('abc')->getFragment());
-        $this->assertEquals('https', $url->setScheme('https')->getScheme());
-        $this->assertEquals('a=123', (string) $url->setQuery('a=123')->getQuery());
+        $this->assertEquals('example.com', $url->setHost('example.com')
+            ->getHost());
+        $this->assertEquals('8080', $url->setPort(8080)
+            ->getPort());
+        $this->assertEquals('/foo/bar', $url->setPath(array(
+            'foo',
+            'bar'
+        ))
+            ->getPath());
+        $this->assertEquals('a', $url->setPassword('a')
+            ->getPassword());
+        $this->assertEquals('b', $url->setUsername('b')
+            ->getUsername());
+        $this->assertEquals('abc', $url->setFragment('abc')
+            ->getFragment());
+        $this->assertEquals('https', $url->setScheme('https')
+            ->getScheme());
+        $this->assertEquals('a=123', (string) $url->setQuery('a=123')
+            ->getQuery());
         $this->assertEquals('https://b:a@example.com:8080/foo/bar?a=123#abc', (string) $url);
         $this->assertEquals('b=boo', (string) $url->setQuery(new QueryString(array(
             'b' => 'boo'
-        )))->getQuery());
+        )))
+            ->getQuery());
         $this->assertEquals('https://b:a@example.com:8080/foo/bar?b=boo#abc', (string) $url);
     }
 
     public function testSetQueryAcceptsArray()
     {
         $url = Url::factory('http://www.test.com');
-        $url->setQuery(array('a' => 'b'));
+        $url->setQuery(array(
+            'a' => 'b'
+        ));
         $this->assertEquals('http://www.test.com?a=b', (string) $url);
     }
 
     public function urlProvider()
     {
         return array(
-            array('/foo/..', '/'),
-            array('//foo//..', '/'),
-            array('/foo/../..', '/'),
-            array('/foo/../.', '/'),
-            array('/./foo/..', '/'),
-            array('/./foo', '/foo'),
-            array('/./foo/', '/foo/'),
-            array('/./foo/bar/baz/pho/../..', '/foo/bar'),
-            array('*', '*'),
-            array('/foo', '/foo'),
-            array('/abc/123/../foo/', '/abc/foo/'),
-            array('/a/b/c/./../../g', '/a/g'),
-            array('/b/c/./../../g', '/g'),
-            array('/b/c/./../../g', '/g'),
-            array('/c/./../../g', '/g'),
-            array('/./../../g', '/g'),
+            array(
+                '/foo/..',
+                '/'
+            ),
+            array(
+                '//foo//..',
+                '/'
+            ),
+            array(
+                '/foo/../..',
+                '/'
+            ),
+            array(
+                '/foo/../.',
+                '/'
+            ),
+            array(
+                '/./foo/..',
+                '/'
+            ),
+            array(
+                '/./foo',
+                '/foo'
+            ),
+            array(
+                '/./foo/',
+                '/foo/'
+            ),
+            array(
+                '/./foo/bar/baz/pho/../..',
+                '/foo/bar'
+            ),
+            array(
+                '*',
+                '*'
+            ),
+            array(
+                '/foo',
+                '/foo'
+            ),
+            array(
+                '/abc/123/../foo/',
+                '/abc/foo/'
+            ),
+            array(
+                '/a/b/c/./../../g',
+                '/a/g'
+            ),
+            array(
+                '/b/c/./../../g',
+                '/g'
+            ),
+            array(
+                '/b/c/./../../g',
+                '/g'
+            ),
+            array(
+                '/c/./../../g',
+                '/g'
+            ),
+            array(
+                '/./../../g',
+                '/g'
+            )
         );
     }
 
@@ -255,39 +386,106 @@ class UrlTest extends \Guzzle\Tests\GuzzleTestCase
     }
 
     /**
+     *
      * @link http://tools.ietf.org/html/rfc3986#section-5.4.1
      */
     public function rfc3986UrlProvider()
     {
         $result = array(
-            array('g', 'http://a/b/c/g'),
-            array('./g', 'http://a/b/c/g'),
-            array('g/', 'http://a/b/c/g/'),
-            array('/g', 'http://a/g'),
-            array('?y', 'http://a/b/c/d;p?y'),
-            array('g?y', 'http://a/b/c/g?y'),
-            array('#s', 'http://a/b/c/d;p?q#s'),
-            array('g#s', 'http://a/b/c/g#s'),
-            array('g?y#s', 'http://a/b/c/g?y#s'),
-            array(';x', 'http://a/b/c/;x'),
-            array('g;x', 'http://a/b/c/g;x'),
-            array('g;x?y#s', 'http://a/b/c/g;x?y#s'),
-            array('', 'http://a/b/c/d;p?q'),
-            array('.', 'http://a/b/c'),
-            array('./', 'http://a/b/c/'),
-            array('..', 'http://a/b'),
-            array('../', 'http://a/b/'),
-            array('../g', 'http://a/b/g'),
-            array('../..', 'http://a/'),
-            array('../../', 'http://a/'),
-            array('../../g', 'http://a/g')
+            array(
+                'g',
+                'http://a/b/c/g'
+            ),
+            array(
+                './g',
+                'http://a/b/c/g'
+            ),
+            array(
+                'g/',
+                'http://a/b/c/g/'
+            ),
+            array(
+                '/g',
+                'http://a/g'
+            ),
+            array(
+                '?y',
+                'http://a/b/c/d;p?y'
+            ),
+            array(
+                'g?y',
+                'http://a/b/c/g?y'
+            ),
+            array(
+                '#s',
+                'http://a/b/c/d;p?q#s'
+            ),
+            array(
+                'g#s',
+                'http://a/b/c/g#s'
+            ),
+            array(
+                'g?y#s',
+                'http://a/b/c/g?y#s'
+            ),
+            array(
+                ';x',
+                'http://a/b/c/;x'
+            ),
+            array(
+                'g;x',
+                'http://a/b/c/g;x'
+            ),
+            array(
+                'g;x?y#s',
+                'http://a/b/c/g;x?y#s'
+            ),
+            array(
+                '',
+                'http://a/b/c/d;p?q'
+            ),
+            array(
+                '.',
+                'http://a/b/c'
+            ),
+            array(
+                './',
+                'http://a/b/c/'
+            ),
+            array(
+                '..',
+                'http://a/b'
+            ),
+            array(
+                '../',
+                'http://a/b/'
+            ),
+            array(
+                '../g',
+                'http://a/b/g'
+            ),
+            array(
+                '../..',
+                'http://a/'
+            ),
+            array(
+                '../../',
+                'http://a/'
+            ),
+            array(
+                '../../g',
+                'http://a/g'
+            )
         );
-
+        
         // This support was added in PHP 5.4.7: https://bugs.php.net/bug.php?id=62844
         if (version_compare(PHP_VERSION, '5.4.7', '>=')) {
-            $result[] = array('//g', 'http://g');
+            $result[] = array(
+                '//g',
+                'http://g'
+            );
         }
-
+        
         return $result;
     }
 

@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Mock;
 
 use Guzzle\Common\Event;
@@ -7,6 +6,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MockObserver implements \Countable, EventSubscriberInterface
 {
+
     public $events = array();
 
     public static function getSubscribedEvents()
@@ -21,7 +21,7 @@ class MockObserver implements \Countable, EventSubscriberInterface
                 return true;
             }
         }
-
+        
         return false;
     }
 
@@ -39,12 +39,12 @@ class MockObserver implements \Countable, EventSubscriberInterface
     {
         $events = array();
         foreach ($this->events as $event) {
-            if (!isset($events[$event->getName()])) {
+            if (! isset($events[$event->getName()])) {
                 $events[$event->getName()] = array();
             }
             $events[$event->getName()][] = $event;
         }
-
+        
         return $events;
     }
 
@@ -54,7 +54,7 @@ class MockObserver implements \Countable, EventSubscriberInterface
         if (isset($grouped[$event])) {
             return $grouped[$event][$occurrence][$key];
         }
-
+        
         return null;
     }
 

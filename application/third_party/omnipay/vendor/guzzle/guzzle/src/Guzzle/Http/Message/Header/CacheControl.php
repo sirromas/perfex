@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Http\Message\Header;
 
 use Guzzle\Http\Message\Header;
@@ -9,7 +8,10 @@ use Guzzle\Http\Message\Header;
  */
 class CacheControl extends Header
 {
-    /** @var array */
+
+    /**
+     * @var array
+     */
     protected $directives;
 
     public function add($value)
@@ -27,37 +29,41 @@ class CacheControl extends Header
     /**
      * Check if a specific cache control directive exists
      *
-     * @param string $param Directive to retrieve
-     *
+     * @param string $param
+     *            Directive to retrieve
+     *            
      * @return bool
      */
     public function hasDirective($param)
     {
         $directives = $this->getDirectives();
-
+        
         return isset($directives[$param]);
     }
 
     /**
      * Get a specific cache control directive
      *
-     * @param string $param Directive to retrieve
-     *
+     * @param string $param
+     *            Directive to retrieve
+     *            
      * @return string|bool|null
      */
     public function getDirective($param)
     {
         $directives = $this->getDirectives();
-
+        
         return isset($directives[$param]) ? $directives[$param] : null;
     }
 
     /**
      * Add a cache control directive
      *
-     * @param string $param Directive to add
-     * @param string $value Value to set
-     *
+     * @param string $param
+     *            Directive to add
+     * @param string $value
+     *            Value to set
+     *            
      * @return self
      */
     public function addDirective($param, $value)
@@ -65,15 +71,16 @@ class CacheControl extends Header
         $directives = $this->getDirectives();
         $directives[$param] = $value;
         $this->updateFromDirectives($directives);
-
+        
         return $this;
     }
 
     /**
      * Remove a cache control directive by name
      *
-     * @param string $param Directive to remove
-     *
+     * @param string $param
+     *            Directive to remove
+     *            
      * @return self
      */
     public function removeDirective($param)
@@ -81,7 +88,7 @@ class CacheControl extends Header
         $directives = $this->getDirectives();
         unset($directives[$param]);
         $this->updateFromDirectives($directives);
-
+        
         return $this;
     }
 
@@ -100,20 +107,21 @@ class CacheControl extends Header
                 }
             }
         }
-
+        
         return $this->directives;
     }
 
     /**
      * Updates the header value based on the parsed directives
      *
-     * @param array $directives Array of cache control directives
+     * @param array $directives
+     *            Array of cache control directives
      */
     protected function updateFromDirectives(array $directives)
     {
         $this->directives = $directives;
         $this->values = array();
-
+        
         foreach ($directives as $key => $value) {
             $this->values[] = $value === true ? $key : "{$key}={$value}";
         }

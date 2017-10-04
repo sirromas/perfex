@@ -1,23 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
-  <title><?php echo do_action('ticket_form_title',_l('new_ticket')); ?></title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport"
+	content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+<title><?php echo do_action('ticket_form_title',_l('new_ticket')); ?></title>
   <?php app_external_form_header($form); ?>
   <style>
-    .g-recaptcha > div{
-      margin:0 auto;
-    }
-  </style>
+.g-recaptcha>div {
+	margin: 0 auto;
+}
+</style>
   <?php do_action('app_ticket_form_head'); ?>
 </head>
-<body class="ticket_form"<?php if(is_rtl(true)){ echo ' dir="rtl"';} ?>>
-  <div class="container-fluid">
-    <div class="row">
-      <div class="<?php if($this->input->get('col')){echo $this->input->get('col');} else {echo 'col-md-12';} ?>">
-        <div id="response"></div>
+<body class="ticket_form" <?php if(is_rtl(true)){ echo ' dir="rtl"';} ?>>
+	<div class="container-fluid">
+		<div class="row">
+			<div
+				class="<?php if($this->input->get('col')){echo $this->input->get('col');} else {echo 'col-md-12';} ?>">
+				<div id="response"></div>
         <?php echo form_open($this->uri->uri_string(),array('id'=>'ticketForm')); ?>
         <?php do_action('ticket_form_start'); ?>
 
@@ -25,15 +27,15 @@
         <?php do_action('ticket_form_after_subject'); ?>
 
         <div class="row">
-          <div class="col-md-6">
+					<div class="col-md-6">
             <?php echo render_input('name','ticket_form_name','','text',array('required'=>'true')); ?>
             <?php do_action('ticket_form_after_name'); ?>
           </div>
-          <div class="col-md-6">
+					<div class="col-md-6">
            <?php echo render_input('email','ticket_form_email','','email',array('required'=>'true')); ?>
            <?php do_action('ticket_form_after_email'); ?>
          </div>
-       </div>
+				</div>
 
        <?php echo render_select('department',$departments,array('departmentid','name'),'ticket_form_department',(count($departments) == 1 ? $departments[0]['departmentid'] : ''),array('required'=>'true')); ?>
        <?php do_action('ticket_form_after_department'); ?>
@@ -53,41 +55,50 @@
        <?php do_action('ticket_form_after_message'); ?>
 
        <div class="attachments">
-         <div class="row attachment form-group">
-          <div class="col-md-6 col-md-offset-3">
-           <label for="attachment" class="control-label"><?php echo _l('ticket_form_attachments'); ?></label>
-           <div class="input-group">
-            <input type="file" extension="<?php echo str_replace('.','',get_option('ticket_attachments_file_extensions')); ?>" filesize="<?php echo file_upload_max_size(); ?>" class="form-control" name="attachments[]" accept="<?php echo get_ticket_form_accepted_mimes(); ?>">
-            <span class="input-group-btn">
-              <button class="btn btn-info add_more_attachments" type="button"><i class="fa fa-plus"></i></button>
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
+					<div class="row attachment form-group">
+						<div class="col-md-6 col-md-offset-3">
+							<label for="attachment" class="control-label"><?php echo _l('ticket_form_attachments'); ?></label>
+							<div class="input-group">
+								<input type="file"
+									extension="<?php echo str_replace('.','',get_option('ticket_attachments_file_extensions')); ?>"
+									filesize="<?php echo file_upload_max_size(); ?>"
+									class="form-control" name="attachments[]"
+									accept="<?php echo get_ticket_form_accepted_mimes(); ?>"> <span
+									class="input-group-btn">
+									<button class="btn btn-info add_more_attachments" type="button">
+										<i class="fa fa-plus"></i>
+									</button>
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>
     <?php do_action('ticket_form_after_attachments'); ?>
 
     <?php if(get_option('recaptcha_secret_key') != '' && get_option('recaptcha_site_key') != '' && $form->recaptcha == 1){ ?>
     <div class="row">
-      <div class="col-md-12">
-       <div class="form-group"><div class="g-recaptcha" data-sitekey="<?php echo get_option('recaptcha_site_key'); ?>"></div>
-       <div id="recaptcha_response_field" class="text-danger"></div></div>
-     </div>
-   </div>
+					<div class="col-md-12">
+						<div class="form-group">
+							<div class="g-recaptcha"
+								data-sitekey="<?php echo get_option('recaptcha_site_key'); ?>"></div>
+							<div id="recaptcha_response_field" class="text-danger"></div>
+						</div>
+					</div>
+				</div>
    <?php } ?>
 
    <div class="clearfix"></div>
-   <div class="text-center">
-    <button class="btn btn-success" id="form_submit" type="submit"><?php echo _l('ticket_form_submit'); ?></button>
-  </div>
+				<div class="text-center">
+					<button class="btn btn-success" id="form_submit" type="submit"><?php echo _l('ticket_form_submit'); ?></button>
+				</div>
 
   <?php do_action('ticket_form_after_submit_button'); ?>
 
   <?php do_action('ticket_form_end'); ?>
   <?php echo form_close(); ?>
 </div>
-</div>
-</div>
+		</div>
+	</div>
 <?php app_external_form_footer($form); ?>
 <script>
  var form_id = '#ticketForm';

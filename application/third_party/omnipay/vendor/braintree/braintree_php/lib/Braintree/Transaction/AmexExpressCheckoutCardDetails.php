@@ -2,10 +2,11 @@
 namespace Braintree\Transaction;
 
 use Braintree\Instance;
+
 /**
  * Amex Express Checkout card details from a transaction
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Transaction
  */
 
@@ -13,9 +14,9 @@ use Braintree\Instance;
  * creates an instance of AmexExpressCheckoutCardDetails
  *
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Transaction
- *
+ *            
  * @property-read string $cardType
  * @property-read string $bin
  * @property-read string $cardMemberExpiryDate
@@ -30,10 +31,13 @@ use Braintree\Instance;
  */
 class AmexExpressCheckoutCardDetails extends Instance
 {
+
     protected $_attributes = [];
 
     /**
+     *
      * @ignore
+     *
      */
     public function __construct($attributes)
     {

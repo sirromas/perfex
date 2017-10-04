@@ -1,9 +1,11 @@
 <?php
-if (!defined('BASEPATH')) {
+if (! defined('BASEPATH')) {
     exit('No direct script access allowed');
 }
+
 class Perfex_Base
 {
+
     private $options = array();
     // Quick actions aide
     private $quick_actions = array();
@@ -12,7 +14,14 @@ class Perfex_Base
     // Show or hide setup menu
     private $show_setup_menu = true;
     // Currently reminders
-    private $available_reminders = array('customer', 'lead', 'estimate', 'invoice', 'proposal', 'expense');
+    private $available_reminders = array(
+        'customer',
+        'lead',
+        'estimate',
+        'invoice',
+        'proposal',
+        'expense'
+    );
     // Tables where currency id is used
     private $tables_with_currency = array();
     // Media folder
@@ -22,24 +31,25 @@ class Perfex_Base
 
     public function __construct()
     {
-        $this->_instance =& get_instance();
-
+        $this->_instance = & get_instance();
+        
         // Temporary checking for v1.8.0
-        if ($this->_instance->db->field_exists('autoload', 'tbloptions'))
-        {
+        if ($this->_instance->db->field_exists('autoload', 'tbloptions')) {
             $options = $this->_instance->db->select('name, value')
-            ->where('autoload', 1)
-            ->get('tbloptions')->result_array();
+                ->where('autoload', 1)
+                ->get('tbloptions')
+                ->result_array();
         } else {
             $options = $this->_instance->db->select('name, value')
-            ->get('tbloptions')->result_array();
+                ->get('tbloptions')
+                ->result_array();
         }
-
+        
         // Loop the options and store them in a array to prevent fetching again and again from database
         foreach ($options as $option) {
             $this->options[$option['name']] = $option['value'];
         }
-
+        
         $this->tables_with_currency = do_action('tables_with_currency', array(
             array(
                 'table' => 'tblinvoices',
@@ -62,33 +72,37 @@ class Perfex_Base
                 'field' => 'default_currency'
             )
         ));
-
+        
         $this->media_folder = do_action('before_set_media_folder', 'media');
-
+        
         foreach (list_folders(APPPATH . 'language') as $language) {
-            if (is_dir(APPPATH.'language/'.$language)) {
+            if (is_dir(APPPATH . 'language/' . $language)) {
                 array_push($this->available_languages, $language);
             }
         }
-
+        
         do_action('app_base_after_construct_action');
     }
 
     /**
      * Return all available languages in the application/language folder
+     * 
      * @return array
      */
     public function get_available_languages()
     {
         $languages = $this->available_languages;
-
+        
         return do_action('before_get_languages', $languages);
     }
 
     /**
      * Function that will parse table data from the tables folder for amin area
-     * @param  string $table  table filename
-     * @param  array  $params additional params
+     * 
+     * @param string $table
+     *            table filename
+     * @param array $params
+     *            additional params
      * @return void
      */
     public function get_table_data($table, $params = array())
@@ -101,19 +115,20 @@ class Perfex_Base
             $$key = $val;
         }
         $table = $hook_data['table'];
-
+        
         $customFieldsColumns = array();
         if (file_exists(VIEWPATH . 'admin/tables/my_' . $table . '.php')) {
-            include_once(VIEWPATH . 'admin/tables/my_' . $table . '.php');
+            include_once (VIEWPATH . 'admin/tables/my_' . $table . '.php');
         } else {
-            include_once(VIEWPATH . 'admin/tables/' . $table . '.php');
+            include_once (VIEWPATH . 'admin/tables/' . $table . '.php');
         }
         echo json_encode($output);
-        die;
+        die();
     }
 
     /**
      * All available reminders keys for the features
+     * 
      * @return array
      */
     public function get_available_reminders_keys()
@@ -123,6 +138,7 @@ class Perfex_Base
 
     /**
      * Get all db options
+     * 
      * @return array
      */
     public function get_options()
@@ -132,7 +148,8 @@ class Perfex_Base
 
     /**
      * Function that gets option based on passed name
-     * @param  string $name
+     * 
+     * @param string $name            
      * @return string
      */
     public function get_option($name)
@@ -140,11 +157,10 @@ class Perfex_Base
         if ($name == 'number_padding_invoice_and_estimate') {
             $name = 'number_padding_prefixes';
         }
-
-
+        
         $name = trim($name);
-
-        if (!isset($this->options[$name])) {
+        
+        if (! isset($this->options[$name])) {
             // is not auto loaded
             $this->_instance->db->select('value');
             $this->_instance->db->where('name', $name);
@@ -162,7 +178,8 @@ class Perfex_Base
 
     /**
      * Add new quick action data
-     * @param array $item
+     * 
+     * @param array $item            
      */
     public function add_quick_actions_link($item = array())
     {
@@ -171,17 +188,19 @@ class Perfex_Base
 
     /**
      * Quick actions data set from admin_controller.php
+     * 
      * @return array
      */
     public function get_quick_actions_links()
     {
         $this->quick_actions = do_action('before_build_quick_actions_links', $this->quick_actions);
-
+        
         return $this->quick_actions;
     }
 
     /**
      * Predefined contact permission
+     * 
      * @return array
      */
     public function get_contact_permissions()
@@ -218,13 +237,15 @@ class Perfex_Base
                 'short_name' => 'projects'
             )
         );
-
+        
         return do_action('get_contact_permissions', $permissions);
     }
 
     /**
      * Aside.php will set the menu visibility here based on few conditions
-     * @param int $total_setup_menu_items total setup menu items shown to the user
+     * 
+     * @param int $total_setup_menu_items
+     *            total setup menu items shown to the user
      */
     public function set_setup_menu_visibility($total_setup_menu_items)
     {
@@ -237,6 +258,7 @@ class Perfex_Base
 
     /**
      * Check if should the script show the setup menu or not
+     * 
      * @return boolean
      */
     public function show_setup_menu()
@@ -246,6 +268,7 @@ class Perfex_Base
 
     /**
      * Return tables that currency id is used
+     * 
      * @return array
      */
     public function get_tables_with_currency()
@@ -255,6 +278,7 @@ class Perfex_Base
 
     /**
      * Return the media folder name
+     * 
      * @return string
      */
     public function get_media_folder()

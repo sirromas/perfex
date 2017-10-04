@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Common;
 
 use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
@@ -9,11 +8,16 @@ use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
  */
 class Event extends SymfonyEvent implements ToArrayInterface, \ArrayAccess, \IteratorAggregate
 {
-    /** @var array */
+
+    /**
+     * @var array
+     */
     private $context;
 
     /**
-     * @param array $context Contextual information
+     *
+     * @param array $context
+     *            Contextual information
      */
     public function __construct(array $context = array())
     {

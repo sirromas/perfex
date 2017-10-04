@@ -3,7 +3,6 @@
 /**
  * Stripe Refund Request.
  */
-
 namespace Omnipay\Stripe\Message;
 
 /**
@@ -32,17 +31,17 @@ namespace Omnipay\Stripe\Message;
  * See PurchaseRequest for the first part of this example transaction:
  *
  * <code>
- *   // Do a refund transaction on the gateway
- *   $transaction = $gateway->refund(array(
- *       'amount'                   => '10.00',
- *       'transactionReference'     => $sale_id,
- *   ));
- *   $response = $transaction->send();
- *   if ($response->isSuccessful()) {
- *       echo "Refund transaction was successful!\n";
- *       $refund_id = $response->getTransactionReference();
- *       echo "Transaction reference = " . $refund_id . "\n";
- *   }
+ * // Do a refund transaction on the gateway
+ * $transaction = $gateway->refund(array(
+ * 'amount' => '10.00',
+ * 'transactionReference' => $sale_id,
+ * ));
+ * $response = $transaction->send();
+ * if ($response->isSuccessful()) {
+ * echo "Refund transaction was successful!\n";
+ * $refund_id = $response->getTransactionReference();
+ * echo "Transaction reference = " . $refund_id . "\n";
+ * }
  * </code>
  *
  * @see PurchaseRequest
@@ -51,7 +50,9 @@ namespace Omnipay\Stripe\Message;
  */
 class RefundRequest extends AbstractRequest
 {
+
     /**
+     *
      * @return bool Whether the application fee should be refunded
      */
     public function getRefundApplicationFee()
@@ -70,8 +71,9 @@ class RefundRequest extends AbstractRequest
      * charge refunded. An application fee can only be refunded by the
      * application that created the charge.
      *
-     * @param bool $value Whether the application fee should be refunded
-     *
+     * @param bool $value
+     *            Whether the application fee should be refunded
+     *            
      * @return AbstractRequest
      */
     public function setRefundApplicationFee($value)
@@ -80,6 +82,7 @@ class RefundRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return bool Whether the transfer should be reversed
      */
     public function getReverseTransfer()
@@ -99,8 +102,9 @@ class RefundRequest extends AbstractRequest
      * from the connected account to cover the refund, set the
      * `reverse_transfer` parameter to true when creating the refund
      *
-     * @param bool $value Whether the transfer should be refunded
-     *
+     * @param bool $value
+     *            Whether the transfer should be refunded
+     *            
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setReverseTransfer($value)
@@ -111,23 +115,23 @@ class RefundRequest extends AbstractRequest
     public function getData()
     {
         $this->validate('transactionReference', 'amount');
-
+        
         $data = array();
         $data['amount'] = $this->getAmountInteger();
-
+        
         if ($this->getRefundApplicationFee()) {
             $data['refund_application_fee'] = 'true';
         }
-
+        
         if ($this->getReverseTransfer()) {
             $data['reverse_transfer'] = 'true';
         }
-
+        
         return $data;
     }
 
     public function getEndpoint()
     {
-        return $this->endpoint.'/charges/'.$this->getTransactionReference().'/refund';
+        return $this->endpoint . '/charges/' . $this->getTransactionReference() . '/refund';
     }
 }

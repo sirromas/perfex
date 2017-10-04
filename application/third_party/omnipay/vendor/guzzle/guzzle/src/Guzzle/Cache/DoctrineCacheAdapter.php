@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Cache;
 
 use Doctrine\Common\Cache\Cache;
@@ -11,8 +10,11 @@ use Doctrine\Common\Cache\Cache;
  */
 class DoctrineCacheAdapter extends AbstractCacheAdapter
 {
+
     /**
-     * @param Cache $cache Doctrine cache object
+     *
+     * @param Cache $cache
+     *            Doctrine cache object
      */
     public function __construct(Cache $cache)
     {

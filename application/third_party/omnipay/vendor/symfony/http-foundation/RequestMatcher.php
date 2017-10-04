@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation;
 
 /**
@@ -18,43 +17,51 @@ namespace Symfony\Component\HttpFoundation;
  */
 class RequestMatcher implements RequestMatcherInterface
 {
+
     /**
+     *
      * @var string|null
      */
     private $path;
 
     /**
+     *
      * @var string|null
      */
     private $host;
 
     /**
+     *
      * @var string[]
      */
     private $methods = array();
 
     /**
+     *
      * @var string[]
      */
     private $ips = array();
 
     /**
+     *
      * @var array
      */
     private $attributes = array();
 
     /**
+     *
      * @var string[]
      */
     private $schemes = array();
 
     /**
-     * @param string|null          $path
-     * @param string|null          $host
-     * @param string|string[]|null $methods
-     * @param string|string[]|null $ips
-     * @param array                $attributes
-     * @param string|string[]|null $schemes
+     *
+     * @param string|null $path            
+     * @param string|null $host            
+     * @param string|string[]|null $methods            
+     * @param string|string[]|null $ips            
+     * @param array $attributes            
+     * @param string|string[]|null $schemes            
      */
     public function __construct($path = null, $host = null, $methods = null, $ips = null, array $attributes = array(), $schemes = null)
     {
@@ -63,7 +70,7 @@ class RequestMatcher implements RequestMatcherInterface
         $this->matchMethod($methods);
         $this->matchIps($ips);
         $this->matchScheme($schemes);
-
+        
         foreach ($attributes as $k => $v) {
             $this->matchAttribute($k, $v);
         }
@@ -72,7 +79,8 @@ class RequestMatcher implements RequestMatcherInterface
     /**
      * Adds a check for the HTTP scheme.
      *
-     * @param string|string[]|null $scheme An HTTP scheme or an array of HTTP schemes
+     * @param string|string[]|null $scheme
+     *            An HTTP scheme or an array of HTTP schemes
      */
     public function matchScheme($scheme)
     {
@@ -82,7 +90,8 @@ class RequestMatcher implements RequestMatcherInterface
     /**
      * Adds a check for the URL host name.
      *
-     * @param string|null $regexp A Regexp
+     * @param string|null $regexp
+     *            A Regexp
      */
     public function matchHost($regexp)
     {
@@ -92,7 +101,8 @@ class RequestMatcher implements RequestMatcherInterface
     /**
      * Adds a check for the URL path info.
      *
-     * @param string|null $regexp A Regexp
+     * @param string|null $regexp
+     *            A Regexp
      */
     public function matchPath($regexp)
     {
@@ -102,7 +112,8 @@ class RequestMatcher implements RequestMatcherInterface
     /**
      * Adds a check for the client IP.
      *
-     * @param string $ip A specific IP address or a range specified using IP/netmask like 192.168.1.0/24
+     * @param string $ip
+     *            A specific IP address or a range specified using IP/netmask like 192.168.1.0/24
      */
     public function matchIp($ip)
     {
@@ -112,7 +123,8 @@ class RequestMatcher implements RequestMatcherInterface
     /**
      * Adds a check for the client IP.
      *
-     * @param string|string[]|null $ips A specific IP address or a range specified using IP/netmask like 192.168.1.0/24
+     * @param string|string[]|null $ips
+     *            A specific IP address or a range specified using IP/netmask like 192.168.1.0/24
      */
     public function matchIps($ips)
     {
@@ -122,7 +134,8 @@ class RequestMatcher implements RequestMatcherInterface
     /**
      * Adds a check for the HTTP method.
      *
-     * @param string|string[]|null $method An HTTP method or an array of HTTP methods
+     * @param string|string[]|null $method
+     *            An HTTP method or an array of HTTP methods
      */
     public function matchMethod($method)
     {
@@ -132,8 +145,10 @@ class RequestMatcher implements RequestMatcherInterface
     /**
      * Adds a check for request attribute.
      *
-     * @param string $key    The request attribute name
-     * @param string $regexp A Regexp
+     * @param string $key
+     *            The request attribute name
+     * @param string $regexp
+     *            A Regexp
      */
     public function matchAttribute($key, $regexp)
     {
@@ -141,36 +156,38 @@ class RequestMatcher implements RequestMatcherInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function matches(Request $request)
     {
-        if ($this->schemes && !in_array($request->getScheme(), $this->schemes, true)) {
+        if ($this->schemes && ! in_array($request->getScheme(), $this->schemes, true)) {
             return false;
         }
-
-        if ($this->methods && !in_array($request->getMethod(), $this->methods, true)) {
+        
+        if ($this->methods && ! in_array($request->getMethod(), $this->methods, true)) {
             return false;
         }
-
+        
         foreach ($this->attributes as $key => $pattern) {
-            if (!preg_match('{'.$pattern.'}', $request->attributes->get($key))) {
+            if (! preg_match('{' . $pattern . '}', $request->attributes->get($key))) {
                 return false;
             }
         }
-
-        if (null !== $this->path && !preg_match('{'.$this->path.'}', rawurldecode($request->getPathInfo()))) {
+        
+        if (null !== $this->path && ! preg_match('{' . $this->path . '}', rawurldecode($request->getPathInfo()))) {
             return false;
         }
-
-        if (null !== $this->host && !preg_match('{'.$this->host.'}i', $request->getHost())) {
+        
+        if (null !== $this->host && ! preg_match('{' . $this->host . '}i', $request->getHost())) {
             return false;
         }
-
+        
         if (IpUtils::checkIp($request->getClientIp(), $this->ips)) {
             return true;
         }
-
+        
         // Note to future implementors: add additional checks above the
         // foreach above or else your check might not be run!
         return count($this->ips) === 0;

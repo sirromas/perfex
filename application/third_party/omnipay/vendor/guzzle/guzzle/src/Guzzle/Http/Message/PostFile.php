@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Http\Message;
 
 use Guzzle\Common\Version;
@@ -11,29 +10,38 @@ use Guzzle\Http\Mimetypes;
  */
 class PostFile implements PostFileInterface
 {
+
     protected $fieldName;
+
     protected $contentType;
+
     protected $filename;
+
     protected $postname;
 
     /**
-     * @param string $fieldName   Name of the field
-     * @param string $filename    Local path to the file
-     * @param string $postname    Remote post file name
-     * @param string $contentType Content-Type of the upload
+     *
+     * @param string $fieldName
+     *            Name of the field
+     * @param string $filename
+     *            Local path to the file
+     * @param string $postname
+     *            Remote post file name
+     * @param string $contentType
+     *            Content-Type of the upload
      */
     public function __construct($fieldName, $filename, $contentType = null, $postname = null)
     {
         $this->fieldName = $fieldName;
         $this->setFilename($filename);
         $this->postname = $postname ? $postname : basename($filename);
-        $this->contentType = $contentType ?: $this->guessContentType();
+        $this->contentType = $contentType ?  : $this->guessContentType();
     }
 
     public function setFieldName($name)
     {
         $this->fieldName = $name;
-
+        
         return $this;
     }
 
@@ -48,20 +56,20 @@ class PostFile implements PostFileInterface
         if (strpos($filename, '@') === 0) {
             $filename = substr($filename, 1);
         }
-
-        if (!is_readable($filename)) {
+        
+        if (! is_readable($filename)) {
             throw new InvalidArgumentException("Unable to open {$filename} for reading");
         }
-
+        
         $this->filename = $filename;
-
+        
         return $this;
     }
 
     public function setPostname($postname)
     {
         $this->postname = $postname;
-
+        
         return $this;
     }
 
@@ -78,7 +86,7 @@ class PostFile implements PostFileInterface
     public function setContentType($type)
     {
         $this->contentType = $type;
-
+        
         return $this;
     }
 
@@ -94,19 +102,19 @@ class PostFile implements PostFileInterface
         if (function_exists('curl_file_create')) {
             return curl_file_create($this->filename, $this->contentType, $this->postname);
         }
-
+        
         // Use the old style if using an older version of PHP
         $value = "@{$this->filename};filename=" . $this->postname;
         if ($this->contentType) {
             $value .= ';type=' . $this->contentType;
         }
-
+        
         return $value;
     }
 
     /**
-     * @deprecated
-     * @codeCoverageIgnore
+     *
+     * @deprecated @codeCoverageIgnore
      */
     public function getCurlString()
     {
@@ -119,6 +127,6 @@ class PostFile implements PostFileInterface
      */
     protected function guessContentType()
     {
-        return Mimetypes::getInstance()->fromFilename($this->filename) ?: 'application/octet-stream';
+        return Mimetypes::getInstance()->fromFilename($this->filename) ?  : 'application/octet-stream';
     }
 }

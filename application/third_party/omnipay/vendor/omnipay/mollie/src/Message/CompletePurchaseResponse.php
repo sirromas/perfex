@@ -1,11 +1,13 @@
 <?php
-
 namespace Omnipay\Mollie\Message;
 
 class CompletePurchaseResponse extends FetchTransactionResponse
 {
+
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function isSuccessful()
     {

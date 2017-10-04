@@ -10,7 +10,7 @@ if ($tag != '') {
     $pdf->SetTextColor(0);
     $pdf->SetLineWidth(0.75);
     $pdf->StartTransform();
-    $pdf->Rotate(-35, 109, 235);
+    $pdf->Rotate(- 35, 109, 235);
     $pdf->Cell(100, 1, mb_strtoupper($tag, 'UTF-8'), 'TB', 0, 'C', '1');
     $pdf->StopTransform();
     $pdf->SetFont($font_name, '', $font_size);
@@ -19,13 +19,13 @@ if ($tag != '') {
 }
 
 $info_right_column = '';
-$info_left_column  = '';
+$info_left_column = '';
 
 $info_right_column .= '<span style="font-weight:bold;font-size:27px;">' . _l('invoice_pdf_heading') . '</span><br />';
 $info_right_column .= '<b style="color:#4e4e4e;"># ' . $invoice_number . '</b>';
 
-if(get_option('show_status_on_pdf_ei') == 1){
-    $info_right_column .= '<br /><span style="color:rgb('.invoice_status_color_pdf($status).');text-transform:uppercase;">' . format_invoice_status($status,'',false) . '</span>';
+if (get_option('show_status_on_pdf_ei') == 1) {
+    $info_right_column .= '<br /><span style="color:rgb(' . invoice_status_color_pdf($status) . ');text-transform:uppercase;">' . format_invoice_status($status, '', false) . '</span>';
 }
 
 if ($status != 2 && $status != 5 && get_option('show_pay_link_to_invoice_pdf') == 1) {
@@ -39,7 +39,7 @@ $pdf->MultiCell(($dimensions['wk'] / 2) - $dimensions['lm'], 0, $info_left_colum
 $pdf->MultiCell(($dimensions['wk'] / 2) - $dimensions['rm'], 0, $info_right_column, 0, 'R', 0, 1, '', '', true, 0, true, false, 0);
 $pdf->ln(6);
 // Get Y position for the separation
-$y            = $pdf->getY();
+$y = $pdf->getY();
 
 $invoice_info = '<div style="color:#424242;">';
 
@@ -52,7 +52,7 @@ $pdf->writeHTMLCell(($swap == '1' ? ($dimensions['wk']) - ($dimensions['lm'] * 2
 // Bill to
 $client_details = '<b>' . _l('invoice_bill_to') . '</b><br />';
 $client_details .= '<div style="color:#424242;">';
-    $client_details .= format_customer_info($invoice, 'invoice', 'billing');
+$client_details .= format_customer_info($invoice, 'invoice', 'billing');
 $client_details .= '</div>';
 
 $pdf->writeHTMLCell(($dimensions['wk'] / 2) - $dimensions['rm'], '', '', ($swap == '1' ? $y : ''), $client_details, 0, 1, false, true, ($swap == '1' ? 'J' : 'R'), true);
@@ -71,7 +71,7 @@ if ($invoice->include_shipping == 1 && $invoice->show_shipping_on_invoice == 1) 
 // Dates
 $pdf->Cell(0, 0, _l('invoice_data_date') . ' ' . _d($invoice->date), 0, 1, ($swap == '1' ? 'L' : 'R'), 0, '', 0);
 
-if (!empty($invoice->duedate)) {
+if (! empty($invoice->duedate)) {
     $pdf->Cell(0, 0, _l('invoice_data_duedate') . ' ' . _d($invoice->duedate), 0, 1, ($swap == '1' ? 'L' : 'R'), 0, '', 0);
 }
 
@@ -86,7 +86,9 @@ $pdf_custom_fields = get_custom_fields('invoice', array(
 
 foreach ($pdf_custom_fields as $field) {
     $value = get_custom_field_value($invoice->id, $field['id'], 'invoice');
-    if ($value == '') { continue; }
+    if ($value == '') {
+        continue;
+    }
     $pdf->writeHTMLCell(0, '', '', '', $field['name'] . ': ' . $value, 0, 1, false, true, ($swap == '1' ? 'J' : 'R'), true);
 }
 
@@ -94,7 +96,7 @@ foreach ($pdf_custom_fields as $field) {
 $pdf->Ln(7);
 $item_width = 38;
 // If show item taxes is disabled in PDF we should increase the item width table heading
-$item_width = get_option('show_tax_per_item') == 0 ? $item_width+15 : $item_width;
+$item_width = get_option('show_tax_per_item') == 0 ? $item_width + 15 : $item_width;
 
 // Header
 $qty_heading = _l('invoice_table_quantity_heading');
@@ -134,7 +136,7 @@ $pdf->writeHTML($tblhtml, true, false, false, false, '');
 $pdf->Ln(8);
 $tbltotal = '';
 
-$tbltotal .= '<table cellpadding="6" style="font-size:'.($font_size+4).'px">';
+$tbltotal .= '<table cellpadding="6" style="font-size:' . ($font_size + 4) . 'px">';
 $tbltotal .= '
 <tr>
     <td align="right" width="85%"><strong>' . _l('invoice_subtotal') . '</strong></td>
@@ -153,7 +155,7 @@ foreach ($taxes as $tax) {
     $total = array_sum($tax['total']);
     if ($invoice->discount_percent != 0 && $invoice->discount_type == 'before_tax') {
         $total_tax_calculated = ($total * $invoice->discount_percent) / 100;
-        $total                = ($total - $total_tax_calculated);
+        $total = ($total - $total_tax_calculated);
     }
     // The tax is in format TAXNAME|20
     $_tax_name = explode('|', $tax['tax_name']);
@@ -163,7 +165,7 @@ foreach ($taxes as $tax) {
 </tr>';
 }
 
-if ((int)$invoice->adjustment != 0) {
+if ((int) $invoice->adjustment != 0) {
     $tbltotal .= '<tr>
     <td align="right" width="85%"><strong>' . _l('invoice_adjustment') . '</strong></td>
     <td align="right" width="15%">' . format_money($invoice->adjustment, $invoice->symbol) . '</td>
@@ -223,7 +225,7 @@ if (count($invoice->payments) > 0 && get_option('show_transactions_on_invoice_pd
     $tblhtml .= '<tbody>';
     foreach ($invoice->payments as $payment) {
         $payment_name = $payment['name'];
-        if (!empty($payment['paymentmethod'])) {
+        if (! empty($payment['paymentmethod'])) {
             $payment_name .= ' - ' . $payment['paymentmethod'];
         }
         $tblhtml .= '
@@ -247,7 +249,7 @@ if (found_invoice_mode($payment_modes, $invoice->id, true, true)) {
     $pdf->SetFont($font_name, '', 10);
     foreach ($payment_modes as $mode) {
         if (is_numeric($mode['id'])) {
-            if (!is_payment_mode_allowed_for_invoice($mode['id'], $invoice->id)) {
+            if (! is_payment_mode_allowed_for_invoice($mode['id'], $invoice->id)) {
                 continue;
             }
         }
@@ -259,7 +261,7 @@ if (found_invoice_mode($payment_modes, $invoice->id, true, true)) {
     }
 }
 
-if (!empty($invoice->clientnote)) {
+if (! empty($invoice->clientnote)) {
     $pdf->Ln(4);
     $pdf->SetFont($font_name, 'B', $font_size);
     $pdf->Cell(0, 0, _l('invoice_note'), 0, 1, 'L', 0, '', 0);
@@ -268,7 +270,7 @@ if (!empty($invoice->clientnote)) {
     $pdf->writeHTMLCell('', '', '', '', $invoice->clientnote, 0, 1, false, true, 'L', true);
 }
 
-if (!empty($invoice->terms)) {
+if (! empty($invoice->terms)) {
     $pdf->Ln(4);
     $pdf->SetFont($font_name, 'B', $font_size);
     $pdf->Cell(0, 0, _l('terms_and_conditions'), 0, 1, 'L', 0, '', 0);

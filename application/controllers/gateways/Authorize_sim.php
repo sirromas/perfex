@@ -3,6 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Authorize_sim extends CI_Controller
 {
+
     public function __construct()
     {
         parent::__construct();
@@ -12,7 +13,7 @@ class Authorize_sim extends CI_Controller
     {
         if ($this->input->post()) {
             $data = $this->input->post();
-
+            
             $this->db->where('token', $data['omnipay_transaction_id']);
             $invoice = $this->db->get('tblinvoices')->row();
             $success = false;
@@ -20,14 +21,13 @@ class Authorize_sim extends CI_Controller
                 check_invoice_restrictions($invoice->id, $invoice->hash);
                 load_client_language($invoice->clientid);
                 if ($data['x_response_code'] == '1') {
-
-                    $success = $this->authorize_sim_gateway->addPayment(
-                    array(
-                      'amount'=>$data['x_amount'],
-                      'invoiceid'=>$invoice->id,
-                      'transactionid'=>$data['x_trans_id']
+                    
+                    $success = $this->authorize_sim_gateway->addPayment(array(
+                        'amount' => $data['x_amount'],
+                        'invoiceid' => $invoice->id,
+                        'transactionid' => $data['x_trans_id']
                     ));
-
+                    
                     if ($success) {
                         $message = _l('online_payment_recorded_success');
                         $success = true;
@@ -38,7 +38,7 @@ class Authorize_sim extends CI_Controller
                 } else {
                     $message = $data['x_response_reason_text'];
                 }
-
+                
                 $this->db->where('id', $invoice->id);
                 $this->db->update('tblinvoices', array(
                     'token' => ''

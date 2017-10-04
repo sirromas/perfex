@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Service\Command;
 
 /**
@@ -9,37 +8,44 @@ namespace Guzzle\Service\Command;
  */
 class OperationCommand extends AbstractCommand
 {
-    /** @var RequestSerializerInterface */
+
+    /**
+     * @var RequestSerializerInterface
+     */
     protected $requestSerializer;
 
-    /** @var ResponseParserInterface Response parser */
+    /**
+     * @var ResponseParserInterface Response parser
+     */
     protected $responseParser;
 
     /**
      * Set the response parser used with the command
      *
-     * @param ResponseParserInterface $parser Response parser
-     *
+     * @param ResponseParserInterface $parser
+     *            Response parser
+     *            
      * @return self
      */
     public function setResponseParser(ResponseParserInterface $parser)
     {
         $this->responseParser = $parser;
-
+        
         return $this;
     }
 
     /**
      * Set the request serializer used with the command
      *
-     * @param RequestSerializerInterface $serializer Request serializer
-     *
+     * @param RequestSerializerInterface $serializer
+     *            Request serializer
+     *            
      * @return self
      */
     public function setRequestSerializer(RequestSerializerInterface $serializer)
     {
         $this->requestSerializer = $serializer;
-
+        
         return $this;
     }
 
@@ -50,11 +56,11 @@ class OperationCommand extends AbstractCommand
      */
     public function getRequestSerializer()
     {
-        if (!$this->requestSerializer) {
+        if (! $this->requestSerializer) {
             // Use the default request serializer if none was found
             $this->requestSerializer = DefaultRequestSerializer::getInstance();
         }
-
+        
         return $this->requestSerializer;
     }
 
@@ -65,11 +71,11 @@ class OperationCommand extends AbstractCommand
      */
     public function getResponseParser()
     {
-        if (!$this->responseParser) {
+        if (! $this->responseParser) {
             // Use the default response parser if none was found
             $this->responseParser = OperationResponseParser::getInstance();
         }
-
+        
         return $this->responseParser;
     }
 
@@ -82,8 +88,6 @@ class OperationCommand extends AbstractCommand
     protected function process()
     {
         // Do not process the response if 'command.response_processing' is set to 'raw'
-        $this->result = $this[self::RESPONSE_PROCESSING] == self::TYPE_RAW
-            ? $this->request->getResponse()
-            : $this->getResponseParser()->parse($this);
+        $this->result = $this[self::RESPONSE_PROCESSING] == self::TYPE_RAW ? $this->request->getResponse() : $this->getResponseParser()->parse($this);
     }
 }

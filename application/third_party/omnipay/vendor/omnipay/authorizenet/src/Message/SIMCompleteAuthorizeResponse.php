@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\AuthorizeNet\Message;
 
 use Omnipay\Common\Message\AbstractResponse;
@@ -12,11 +11,13 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
 class SIMCompleteAuthorizeResponse extends AbstractResponse implements RedirectResponseInterface
 {
     // Response codes returned by Authorize.Net
+    const RESPONSE_CODE_APPROVED = '1';
 
-    const RESPONSE_CODE_APPROVED    = '1';
-    const RESPONSE_CODE_DECLINED    = '2';
-    const RESPONSE_CODE_ERROR       = '3';
-    const RESPONSE_CODE_REVIEW      = '4';
+    const RESPONSE_CODE_DECLINED = '2';
+
+    const RESPONSE_CODE_ERROR = '3';
+
+    const RESPONSE_CODE_REVIEW = '4';
 
     public function isSuccessful()
     {
@@ -107,12 +108,9 @@ class SIMCompleteAuthorizeResponse extends AbstractResponse implements RedirectR
     </body>
 </html>
 ENDHTML;
-
-        $output = sprintf(
-            $output,
-            htmlentities($this->getRedirectUrl(), ENT_QUOTES, 'UTF-8', false)
-        );
-
+        
+        $output = sprintf($output, htmlentities($this->getRedirectUrl(), ENT_QUOTES, 'UTF-8', false));
+        
         return HttpResponse::create($output);
     }
 }

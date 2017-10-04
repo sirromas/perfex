@@ -8,17 +8,18 @@ namespace Braintree;
  */
 class Xml
 {
-    /**
-     * @ignore
-     */
-    protected function  __construct()
-    {
-
-    }
 
     /**
      *
-     * @param string $xml
+     * @ignore
+     *
+     */
+    protected function __construct()
+    {}
+
+    /**
+     *
+     * @param string $xml            
      * @return array
      */
     public static function buildArrayFromXml($xml)
@@ -28,7 +29,7 @@ class Xml
 
     /**
      *
-     * @param array $array
+     * @param array $array            
      * @return string
      */
     public static function buildXmlFromArray($array)

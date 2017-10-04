@@ -13,6 +13,7 @@ namespace Omnipay\Stripe\Message;
  */
 class CancelSubscriptionRequest extends AbstractRequest
 {
+
     /**
      * Get the subscription reference.
      *
@@ -26,7 +27,7 @@ class CancelSubscriptionRequest extends AbstractRequest
     /**
      * Set the set subscription reference.
      *
-     * @param string $value
+     * @param string $value            
      *
      * @return CancelSubscriptionRequest provides a fluent interface.
      */
@@ -38,7 +39,7 @@ class CancelSubscriptionRequest extends AbstractRequest
     /**
      * Set whether or not to cancel the subscription at period end.
      *
-     * @param bool $value
+     * @param bool $value            
      *
      * @return CancelSubscriptionRequest provides a fluent interface.
      */
@@ -60,24 +61,22 @@ class CancelSubscriptionRequest extends AbstractRequest
     public function getData()
     {
         $this->validate('customerReference', 'subscriptionReference');
-
+        
         $data = array();
-
+        
         // NOTE: Boolean must be passed as string
         // Otherwise it will be converted to numeric 0 or 1
         // Causing an error with the API
         if ($this->getAtPeriodEnd()) {
             $data['at_period_end'] = 'true';
         }
-
+        
         return $data;
     }
 
     public function getEndpoint()
     {
-        return $this->endpoint
-            .'/customers/'.$this->getCustomerReference()
-            .'/subscriptions/'.$this->getSubscriptionReference();
+        return $this->endpoint . '/customers/' . $this->getCustomerReference() . '/subscriptions/' . $this->getSubscriptionReference();
     }
 
     public function getHttpMethod()

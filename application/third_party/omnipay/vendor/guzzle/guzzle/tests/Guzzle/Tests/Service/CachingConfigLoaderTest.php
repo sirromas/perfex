@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Service;
 
 use Guzzle\Cache\DoctrineCacheAdapter;
@@ -11,13 +10,18 @@ use Doctrine\Common\Cache\ArrayCache;
  */
 class CachingConfigLoaderTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testLoadsPhpFileIncludes()
     {
         $cache = new DoctrineCacheAdapter(new ArrayCache());
         $loader = $this->getMockBuilder('Guzzle\Service\ConfigLoaderInterface')
-            ->setMethods(array('load'))
+            ->setMethods(array(
+            'load'
+        ))
             ->getMockForAbstractClass();
-        $data = array('foo' => 'bar');
+        $data = array(
+            'foo' => 'bar'
+        );
         $loader->expects($this->once())
             ->method('load')
             ->will($this->returnValue($data));
@@ -30,9 +34,13 @@ class CachingConfigLoaderTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $cache = new DoctrineCacheAdapter(new ArrayCache());
         $loader = $this->getMockBuilder('Guzzle\Service\ConfigLoaderInterface')
-            ->setMethods(array('load'))
+            ->setMethods(array(
+            'load'
+        ))
             ->getMockForAbstractClass();
-        $data = array('foo' => 'bar');
+        $data = array(
+            'foo' => 'bar'
+        );
         $loader->expects($this->exactly(2))
             ->method('load')
             ->will($this->returnValue($data));

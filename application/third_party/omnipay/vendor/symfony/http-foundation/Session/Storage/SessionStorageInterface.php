@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
@@ -21,11 +20,12 @@ use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
  */
 interface SessionStorageInterface
 {
+
     /**
      * Starts the session.
      *
      * @return bool True if started
-     *
+     *        
      * @throws \RuntimeException If something goes wrong starting the session.
      */
     public function start();
@@ -47,7 +47,7 @@ interface SessionStorageInterface
     /**
      * Sets the session ID.
      *
-     * @param string $id
+     * @param string $id            
      */
     public function setId($id);
 
@@ -61,7 +61,7 @@ interface SessionStorageInterface
     /**
      * Sets the session name.
      *
-     * @param string $name
+     * @param string $name            
      */
     public function setName($name);
 
@@ -84,14 +84,16 @@ interface SessionStorageInterface
      * Otherwise session data could get lost again for concurrent requests with the
      * new ID. One result could be that you get logged out after just logging in.
      *
-     * @param bool $destroy  Destroy session when regenerating?
-     * @param int  $lifetime Sets the cookie lifetime for the session cookie. A null value
-     *                       will leave the system settings unchanged, 0 sets the cookie
-     *                       to expire with browser session. Time is in seconds, and is
-     *                       not a Unix timestamp.
-     *
+     * @param bool $destroy
+     *            Destroy session when regenerating?
+     * @param int $lifetime
+     *            Sets the cookie lifetime for the session cookie. A null value
+     *            will leave the system settings unchanged, 0 sets the cookie
+     *            to expire with browser session. Time is in seconds, and is
+     *            not a Unix timestamp.
+     *            
      * @return bool True if session regenerated, false if error
-     *
+     *        
      * @throws \RuntimeException If an error occurs while regenerating this storage
      */
     public function regenerate($destroy = false, $lifetime = null);
@@ -105,7 +107,7 @@ interface SessionStorageInterface
      * it should actually persist the session data if required.
      *
      * @throws \RuntimeException If the session is saved without being started, or if the session
-     *                           is already closed.
+     *         is already closed.
      */
     public function save();
 
@@ -117,7 +119,7 @@ interface SessionStorageInterface
     /**
      * Gets a SessionBagInterface by name.
      *
-     * @param string $name
+     * @param string $name            
      *
      * @return SessionBagInterface
      *
@@ -128,11 +130,12 @@ interface SessionStorageInterface
     /**
      * Registers a SessionBagInterface for use.
      *
-     * @param SessionBagInterface $bag
+     * @param SessionBagInterface $bag            
      */
     public function registerBag(SessionBagInterface $bag);
 
     /**
+     *
      * @return MetadataBag
      */
     public function getMetadataBag();

@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\File\MimeType;
 
 /**
@@ -18,13 +17,14 @@ namespace Symfony\Component\HttpFoundation\File\MimeType;
  * You can register custom guessers by calling the register()
  * method on the singleton instance:
  *
- *     $guesser = ExtensionGuesser::getInstance();
- *     $guesser->register(new MyCustomExtensionGuesser());
+ * $guesser = ExtensionGuesser::getInstance();
+ * $guesser->register(new MyCustomExtensionGuesser());
  *
  * The last registered guesser is preferred over previously registered ones.
  */
 class ExtensionGuesser implements ExtensionGuesserInterface
 {
+
     /**
      * The singleton instance.
      *
@@ -49,7 +49,7 @@ class ExtensionGuesser implements ExtensionGuesserInterface
         if (null === self::$instance) {
             self::$instance = new self();
         }
-
+        
         return self::$instance;
     }
 
@@ -66,7 +66,7 @@ class ExtensionGuesser implements ExtensionGuesserInterface
      *
      * When guessing, this guesser is preferred over previously registered ones.
      *
-     * @param ExtensionGuesserInterface $guesser
+     * @param ExtensionGuesserInterface $guesser            
      */
     public function register(ExtensionGuesserInterface $guesser)
     {
@@ -81,8 +81,9 @@ class ExtensionGuesser implements ExtensionGuesserInterface
      * returns a value that is not NULL, this method terminates and returns the
      * value.
      *
-     * @param string $mimeType The mime type
-     *
+     * @param string $mimeType
+     *            The mime type
+     *            
      * @return string The guessed extension or NULL, if none could be guessed
      */
     public function guess($mimeType)

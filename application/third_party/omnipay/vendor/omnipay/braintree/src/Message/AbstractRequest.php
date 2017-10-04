@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\Braintree\Message;
 
 use Braintree_Gateway;
@@ -10,11 +9,12 @@ use Omnipay\Common\Message\AbstractRequest as BaseAbstractRequest;
 
 /**
  * Abstract Request
- *
  */
 abstract class AbstractRequest extends BaseAbstractRequest
 {
+
     /**
+     *
      * @var \Braintree_Gateway
      */
     protected $braintree;
@@ -22,14 +22,17 @@ abstract class AbstractRequest extends BaseAbstractRequest
     /**
      * Create a new Request
      *
-     * @param ClientInterface $httpClient  A Guzzle client to make API calls with
-     * @param HttpRequest     $httpRequest A Symfony HTTP request object
-     * @param Braintree_Gateway $braintree The Braintree Gateway
+     * @param ClientInterface $httpClient
+     *            A Guzzle client to make API calls with
+     * @param HttpRequest $httpRequest
+     *            A Symfony HTTP request object
+     * @param Braintree_Gateway $braintree
+     *            The Braintree Gateway
      */
     public function __construct(ClientInterface $httpClient, HttpRequest $httpRequest, Braintree_Gateway $braintree)
     {
         $this->braintree = $braintree;
-
+        
         parent::__construct($httpClient, $httpRequest);
     }
 
@@ -41,7 +44,7 @@ abstract class AbstractRequest extends BaseAbstractRequest
     public function send()
     {
         $this->configure();
-
+        
         return parent::send();
     }
 
@@ -53,7 +56,7 @@ abstract class AbstractRequest extends BaseAbstractRequest
         } else {
             $this->braintree->config->environment('production');
         }
-
+        
         // Set the keys
         $this->braintree->config->merchantId($this->getMerchantId());
         $this->braintree->config->publicKey($this->getPublicKey());
@@ -214,16 +217,10 @@ abstract class AbstractRequest extends BaseAbstractRequest
     {
         $amount = $this->getParameter('serviceFeeAmount');
         if ($amount !== null) {
-            if (!is_float($amount) &&
-                $this->getCurrencyDecimalPlaces() > 0 &&
-                false === strpos((string)$amount, '.')
-            ) {
-                throw new InvalidRequestException(
-                    'Please specify amount as a string or float, ' .
-                    'with decimal places (e.g. \'10.00\' to represent $10.00).'
-                );
+            if (! is_float($amount) && $this->getCurrencyDecimalPlaces() > 0 && false === strpos((string) $amount, '.')) {
+                throw new InvalidRequestException('Please specify amount as a string or float, ' . 'with decimal places (e.g. \'10.00\' to represent $10.00).');
             }
-
+            
             return $this->formatCurrency($amount);
         }
     }
@@ -364,68 +361,73 @@ abstract class AbstractRequest extends BaseAbstractRequest
     }
 
     /**
+     *
      * @return array
      */
     public function getCardData()
     {
         $card = $this->getCard();
-
-        if (!$card) {
+        
+        if (! $card) {
             return array();
         }
-
+        
         return array(
             'billing' => array(
                 'company' => $card->getBillingCompany(),
                 'firstName' => $card->getBillingFirstName(),
                 'lastName' => $card->getBillingLastName(),
                 'streetAddress' => $card->getBillingAddress1(),
-                'extendedAddress' =>  $card->getBillingAddress2(),
+                'extendedAddress' => $card->getBillingAddress2(),
                 'locality' => $card->getBillingCity(),
                 'postalCode' => $card->getBillingPostcode(),
                 'region' => $card->getBillingState(),
-                'countryName' => $card->getBillingCountry(),
+                'countryName' => $card->getBillingCountry()
             ),
             'shipping' => array(
                 'company' => $card->getShippingCompany(),
                 'firstName' => $card->getShippingFirstName(),
                 'lastName' => $card->getShippingLastName(),
                 'streetAddress' => $card->getShippingAddress1(),
-                'extendedAddress' =>  $card->getShippingAddress2(),
+                'extendedAddress' => $card->getShippingAddress2(),
                 'locality' => $card->getShippingCity(),
                 'postalCode' => $card->getShippingPostcode(),
                 'region' => $card->getShippingState(),
-                'countryName' => $card->getShippingCountry(),
+                'countryName' => $card->getShippingCountry()
             )
         );
     }
 
     /**
+     *
      * @return array
      */
     public function getOptionData()
     {
         $data = array(
             'addBillingAddressToPaymentMethod' => $this->getAddBillingAddressToPaymentMethod(),
-            'failOnDuplicatePaymentMethod'     => $this->getFailOnDuplicatePaymentMethod(),
-            'holdInEscrow'                     => $this->getHoldInEscrow(),
-            'makeDefault'                      => $this->getMakeDefault(),
-            'storeInVault'                     => $this->getStoreInVault(),
-            'storeInVaultOnSuccess'            => $this->getStoreInVaultOnSuccess(),
-            'storeShippingAddressInVault'      => $this->getStoreShippingAddressInVault(),
-            'verifyCard'                       => $this->getVerifyCard(),
-            'verificationMerchantAccountId'    => $this->getVerificationMerchantAccountId(),
+            'failOnDuplicatePaymentMethod' => $this->getFailOnDuplicatePaymentMethod(),
+            'holdInEscrow' => $this->getHoldInEscrow(),
+            'makeDefault' => $this->getMakeDefault(),
+            'storeInVault' => $this->getStoreInVault(),
+            'storeInVaultOnSuccess' => $this->getStoreInVaultOnSuccess(),
+            'storeShippingAddressInVault' => $this->getStoreShippingAddressInVault(),
+            'verifyCard' => $this->getVerifyCard(),
+            'verificationMerchantAccountId' => $this->getVerificationMerchantAccountId()
         );
-
+        
         // Remove null values
-        $data = array_filter($data, function($value){
+        $data = array_filter($data, function ($value)
+        {
             return ! is_null($value);
         });
-
+        
         if (empty($data)) {
             return $data;
         } else {
-            return array('options' => $data);
+            return array(
+                'options' => $data
+            );
         }
     }
 

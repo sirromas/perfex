@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Http\Message;
 
 use Guzzle\Http\Client;
@@ -11,6 +10,7 @@ use Guzzle\Http\Message\PostFile;
  */
 class PostFileTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testConstructorConfiguresPostFile()
     {
         $file = new PostFile('foo', __FILE__, 'x-foo', 'boo');

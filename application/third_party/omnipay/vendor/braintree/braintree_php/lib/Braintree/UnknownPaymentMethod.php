@@ -4,8 +4,8 @@ namespace Braintree;
 /**
  * Braintree UnknownPaymentMethod module
  *
- * @package    Braintree
- * @category   Resources
+ * @package Braintree
+ * @category Resources
  */
 
 /**
@@ -14,21 +14,21 @@ namespace Braintree;
  * <b>== More information ==</b>
  *
  *
- * @package    Braintree
- * @category   Resources
- *
+ * @package Braintree
+ * @category Resources
+ *          
  * @property-read string $token
  * @property-read string $imageUrl
  */
 class UnknownPaymentMethod extends Base
 {
 
-
     /**
-     *  factory method: returns an instance of UnknownPaymentMethod
-     *  to the requesting method, with populated properties
+     * factory method: returns an instance of UnknownPaymentMethod
+     * to the requesting method, with populated properties
      *
      * @ignore
+     *
      * @return UnknownPaymentMethod
      */
     public static function factory($attributes)
@@ -38,9 +38,9 @@ class UnknownPaymentMethod extends Base
         $instance->_initialize(array_shift($values));
         return $instance;
     }
-
+    
     /* instance methods */
-
+    
     /**
      * returns false if default is null or false
      *
@@ -55,7 +55,8 @@ class UnknownPaymentMethod extends Base
      * sets instance properties from an array of values
      *
      * @access protected
-     * @param array $unknownPaymentMethodAttribs array of unknownPaymentMethod data
+     * @param array $unknownPaymentMethodAttribs
+     *            array of unknownPaymentMethod data
      * @return void
      */
     protected function _initialize($unknownPaymentMethodAttribs)
@@ -64,6 +65,5 @@ class UnknownPaymentMethod extends Base
         $this->imageUrl = 'https://assets.braintreegateway.com/payment_method_logo/unknown.png';
         $this->_attributes = $unknownPaymentMethodAttribs;
     }
-
 }
 class_alias('Braintree\UnknownPaymentMethod', 'Braintree_UnknownPaymentMethod');

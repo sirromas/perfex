@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\Braintree\Message;
 
 use Omnipay\Common\Message\AbstractResponse;
@@ -9,7 +8,9 @@ use Omnipay\Common\Message\AbstractResponse;
  */
 class Response extends AbstractResponse
 {
+
     /**
+     *
      * @return bool
      */
     public function isSuccessful()
@@ -17,11 +18,12 @@ class Response extends AbstractResponse
         if (isset($this->data->success)) {
             return $this->data->success;
         }
-
+        
         return false;
     }
 
     /**
+     *
      * @return string|null
      */
     public function getMessage()
@@ -29,11 +31,12 @@ class Response extends AbstractResponse
         if (isset($this->data->message) && $this->data->message) {
             return $this->data->message;
         }
-
+        
         return null;
     }
 
     /**
+     *
      * @return string
      */
     public function getCode()
@@ -42,6 +45,7 @@ class Response extends AbstractResponse
     }
 
     /**
+     *
      * @return string
      */
     public function getTransactionReference()
@@ -50,6 +54,7 @@ class Response extends AbstractResponse
     }
 
     /**
+     *
      * @return string|null
      */
     public function getAmount()
@@ -58,6 +63,7 @@ class Response extends AbstractResponse
     }
 
     /**
+     *
      * @return string|null
      */
     public function getTransactionId()
@@ -68,7 +74,7 @@ class Response extends AbstractResponse
     /**
      * Return a value from the transaction object
      *
-     * @param  string  $key
+     * @param string $key            
      * @return mixed
      */
     protected function transactionValue($key)
@@ -76,7 +82,7 @@ class Response extends AbstractResponse
         if (isset($this->data->transaction) && $this->data->transaction && isset($this->data->transaction->$key)) {
             return $this->data->transaction->$key;
         }
-
+        
         return null;
     }
 }

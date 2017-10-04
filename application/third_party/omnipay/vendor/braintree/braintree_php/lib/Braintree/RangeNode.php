@@ -3,6 +3,7 @@ namespace Braintree;
 
 class RangeNode
 {
+
     public function __construct($name)
     {
         $this->name = $name;
@@ -29,7 +30,7 @@ class RangeNode
 
     public function between($min, $max)
     {
-		return $this->greaterThanOrEqualTo($min)->lessThanOrEqualTo($max);
+        return $this->greaterThanOrEqualTo($min)->lessThanOrEqualTo($max);
     }
 
     public function toParam()

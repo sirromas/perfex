@@ -7,20 +7,24 @@ namespace Braintree;
  */
 class Version
 {
+
     /**
      * class constants
      */
     const MAJOR = 3;
+
     const MINOR = 23;
+
     const TINY = 1;
 
     /**
+     *
      * @ignore
+     *
      * @access protected
      */
-    protected function  __construct()
-    {
-    }
+    protected function __construct()
+    {}
 
     /**
      *

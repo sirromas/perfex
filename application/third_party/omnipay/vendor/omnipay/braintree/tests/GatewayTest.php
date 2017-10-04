@@ -1,12 +1,13 @@
 <?php
-
 namespace Omnipay\Braintree;
 
 use Omnipay\Tests\GatewayTestCase;
 
 class GatewayTest extends GatewayTestCase
 {
+
     /**
+     *
      * @var Gateway
      */
     protected $gateway;
@@ -14,12 +15,12 @@ class GatewayTest extends GatewayTestCase
     public function setUp()
     {
         parent::setUp();
-
+        
         $this->gateway = new Gateway($this->getHttpClient(), $this->getHttpRequest());
-
+        
         $this->options = array(
             'amount' => '10.00',
-            'token' => 'abcdef',
+            'token' => 'abcdef'
         );
     }
 
@@ -32,14 +33,18 @@ class GatewayTest extends GatewayTestCase
 
     public function testAuthorize()
     {
-        $request = $this->gateway->authorize(array('amount' => '10.00'));
+        $request = $this->gateway->authorize(array(
+            'amount' => '10.00'
+        ));
         $this->assertInstanceOf('Omnipay\Braintree\Message\AuthorizeRequest', $request);
         $this->assertSame('10.00', $request->getAmount());
     }
 
     public function testCapture()
     {
-        $request = $this->gateway->capture(array('amount' => '10.00'));
+        $request = $this->gateway->capture(array(
+            'amount' => '10.00'
+        ));
         $this->assertInstanceOf('Omnipay\Braintree\Message\CaptureRequest', $request);
         $this->assertSame('10.00', $request->getAmount());
     }
@@ -67,7 +72,7 @@ class GatewayTest extends GatewayTestCase
         $request = $this->gateway->createMerchantAccount();
         $this->assertInstanceOf('Omnipay\Braintree\Message\CreateMerchantAccountRequest', $request);
     }
-    
+
     public function testUpdateMerchantAccount()
     {
         $request = $this->gateway->updateMerchantAccount();
@@ -94,21 +99,27 @@ class GatewayTest extends GatewayTestCase
 
     public function testPurchase()
     {
-        $request = $this->gateway->purchase(array('amount' => '10.00'));
+        $request = $this->gateway->purchase(array(
+            'amount' => '10.00'
+        ));
         $this->assertInstanceOf('Omnipay\Braintree\Message\PurchaseRequest', $request);
         $this->assertSame('10.00', $request->getAmount());
     }
 
     public function testRefund()
     {
-        $request = $this->gateway->refund(array('amount' => '10.00'));
+        $request = $this->gateway->refund(array(
+            'amount' => '10.00'
+        ));
         $this->assertInstanceOf('Omnipay\Braintree\Message\RefundRequest', $request);
         $this->assertSame('10.00', $request->getAmount());
     }
 
     public function testReleaseFromEscrow()
     {
-        $request = $this->gateway->releaseFromEscrow(array('transactionId' => 'abc123'));
+        $request = $this->gateway->releaseFromEscrow(array(
+            'transactionId' => 'abc123'
+        ));
         $this->assertInstanceOf('Omnipay\Braintree\Message\ReleaseFromEscrowRequest', $request);
         $this->assertSame('abc123', $request->getTransactionId());
     }
@@ -145,14 +156,14 @@ class GatewayTest extends GatewayTestCase
 
     public function testParseNotification()
     {
-        if(\Braintree_Version::MAJOR >= 3) {
+        if (\Braintree_Version::MAJOR >= 3) {
             $xml = '<notification></notification>';
             $payload = base64_encode($xml);
             $signature = \Braintree_Digest::hexDigestSha1(\Braintree_Configuration::privateKey(), $payload);
             $gatewayMock = $this->buildGatewayMock($payload);
             $gateway = new Gateway($this->getHttpClient(), $this->getHttpRequest(), $gatewayMock);
             $params = array(
-                'bt_signature' => $payload.'|'.$signature,
+                'bt_signature' => $payload . '|' . $signature,
                 'bt_payload' => $payload
             );
             $request = $gateway->parseNotification($params);
@@ -164,7 +175,7 @@ class GatewayTest extends GatewayTestCase
             $gatewayMock = $this->buildGatewayMock($payload);
             $gateway = new Gateway($this->getHttpClient(), $this->getHttpRequest(), $gatewayMock);
             $params = array(
-                'bt_signature' => $payload.'|'.$signature,
+                'bt_signature' => $payload . '|' . $signature,
                 'bt_payload' => $payload
             );
             $request = $gateway->parseNotification($params);
@@ -173,8 +184,10 @@ class GatewayTest extends GatewayTestCase
     }
 
     /**
-     * @param $payload
      *
+     * @param
+     *            $payload
+     *            
      * @return \Braintree_Gateway
      */
     protected function buildGatewayMock($payload)
@@ -182,17 +195,15 @@ class GatewayTest extends GatewayTestCase
         $configuration = $this->getMockBuilder('\Braintree_Configuration')
             ->disableOriginalConstructor()
             ->setMethods(array(
-                'assertHasAccessTokenOrKeys'
-            ))
+            'assertHasAccessTokenOrKeys'
+        ))
             ->getMock();
         $configuration->expects($this->any())
             ->method('assertHasAccessTokenOrKeys')
             ->will($this->returnValue(null));
-
-
-
+        
         $configuration->setPublicKey($payload);
-
+        
         \Braintree_Configuration::$global = $configuration;
         return \Braintree_Configuration::gateway();
     }

@@ -10,6 +10,7 @@ use Braintree;
 
 class SettlementBatchSummaryTest extends Setup
 {
+
     public function isMasterCard($record)
     {
         return $record['cardType'] == Braintree\CreditCard::MASTER_CARD;
@@ -18,7 +19,7 @@ class SettlementBatchSummaryTest extends Setup
     public function testGenerate_returnsAnEmptyCollectionWhenThereIsNoData()
     {
         $result = Braintree\SettlementBatchSummary::generate('2000-01-01');
-
+        
         $this->assertTrue($result->success);
         $this->assertEquals(0, count($result->settlementBatchSummary->records));
     }
@@ -32,7 +33,7 @@ class SettlementBatchSummaryTest extends Setup
             'privateKey' => 'integration_private_key'
         ]);
         $result = $gateway->settlementBatchSummary()->generate('2000-01-01');
-
+        
         $this->assertTrue($result->success);
         $this->assertEquals(0, count($result->settlementBatchSummary->records));
     }
@@ -40,7 +41,7 @@ class SettlementBatchSummaryTest extends Setup
     public function testGenerate_returnsAnErrorIfTheDateCanNotBeParsed()
     {
         $result = Braintree\SettlementBatchSummary::generate('OMG NOT A DATE');
-
+        
         $this->assertFalse($result->success);
         $errors = $result->errors->forKey('settlementBatchSummary')->onAttribute('settlementDate');
         $this->assertEquals(Braintree\Error\Codes::SETTLEMENT_BATCH_SUMMARY_SETTLEMENT_DATE_IS_INVALID, $errors[0]->code);
@@ -54,13 +55,15 @@ class SettlementBatchSummaryTest extends Setup
                 'number' => '5105105105105100',
                 'expirationDate' => '05/12'
             ],
-            'options' => ['submitForSettlement' => true]
+            'options' => [
+                'submitForSettlement' => true
+            ]
         ]);
         Braintree\Test\Transaction::settle($transaction->id);
-
-        $today = new Datetime;
+        
+        $today = new Datetime();
         $result = Braintree\SettlementBatchSummary::generate(Test\Helper::nowInEastern());
-
+        
         $this->assertTrue($result->success);
         $masterCardRecords = array_filter($result->settlementBatchSummary->records, 'self::isMasterCard');
         $masterCardKeys = array_keys($masterCardRecords);
@@ -80,14 +83,16 @@ class SettlementBatchSummaryTest extends Setup
             'customFields' => [
                 'store_me' => 'custom value'
             ],
-            'options' => ['submitForSettlement' => true]
+            'options' => [
+                'submitForSettlement' => true
+            ]
         ]);
-
+        
         Braintree\Test\Transaction::settle($transaction->id);
-
-        $today = new Datetime;
+        
+        $today = new Datetime();
         $result = Braintree\SettlementBatchSummary::generate(Test\Helper::nowInEastern(), 'store_me');
-
+        
         $this->assertTrue($result->success);
         $this->assertTrue(count($result->settlementBatchSummary->records) > 0);
         $this->assertArrayHasKey('store_me', $result->settlementBatchSummary->records[0]);

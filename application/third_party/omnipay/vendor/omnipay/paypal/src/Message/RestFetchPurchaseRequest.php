@@ -2,7 +2,6 @@
 /**
  * PayPal REST Fetch Purchase Request
  */
-
 namespace Omnipay\PayPal\Message;
 
 /**
@@ -16,12 +15,12 @@ namespace Omnipay\PayPal\Message;
  * See RestPurchaseRequest for the first part of this example transaction:
  *
  * <code>
- *   // Fetch the transaction so that details can be found for refund, etc.
- *   $transaction = $gateway->fetchPurchase();
- *   $transaction->setTransactionReference($sale_id);
- *   $response = $transaction->send();
- *   $data = $response->getData();
- *   echo "Gateway fetchTransaction response data == " . print_r($data, true) . "\n";
+ * // Fetch the transaction so that details can be found for refund, etc.
+ * $transaction = $gateway->fetchPurchase();
+ * $transaction->setTransactionReference($sale_id);
+ * $response = $transaction->send();
+ * $data = $response->getData();
+ * echo "Gateway fetchTransaction response data == " . print_r($data, true) . "\n";
  * </code>
  *
  * @see RestPurchaseRequest
@@ -29,6 +28,7 @@ namespace Omnipay\PayPal\Message;
  */
 class RestFetchPurchaseRequest extends AbstractRestRequest
 {
+
     public function getData()
     {
         $this->validate('transactionReference');

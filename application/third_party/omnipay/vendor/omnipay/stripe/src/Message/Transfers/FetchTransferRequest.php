@@ -3,7 +3,6 @@
 /**
  * Stripe Fetch Transfer Request (Connect only).
  */
-
 namespace Omnipay\Stripe\Message\Transfers;
 
 use Omnipay\Stripe\Message\AbstractRequest;
@@ -12,18 +11,20 @@ use Omnipay\Stripe\Message\AbstractRequest;
  * Stripe Fetch Transfer Request.
  *
  * <code>
- *   // Once the transaction has been authorized, we can capture it for final payment.
- *   $transaction = $gateway->fetchTransfer([
- *       'transferReference'   => '{TRANSFER_ID}',
- *   ]);
- *   $response = $transaction->send();
+ * // Once the transaction has been authorized, we can capture it for final payment.
+ * $transaction = $gateway->fetchTransfer([
+ * 'transferReference' => '{TRANSFER_ID}',
+ * ]);
+ * $response = $transaction->send();
  * </code>
  *
  * @link https://stripe.com/docs/api#retrieve_transfer
  */
 class FetchTransferRequest extends AbstractRequest
 {
+
     /**
+     *
      * @return mixed
      */
     public function getTransferReference()
@@ -32,7 +33,8 @@ class FetchTransferRequest extends AbstractRequest
     }
 
     /**
-     * @param string $value
+     *
+     * @param string $value            
      *
      * @return \Omnipay\Common\Message\AbstractRequest
      */
@@ -42,7 +44,9 @@ class FetchTransferRequest extends AbstractRequest
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getData()
     {
@@ -50,10 +54,12 @@ class FetchTransferRequest extends AbstractRequest
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getEndpoint()
     {
-        return $this->endpoint.'/transfers/'.$this->getTransferReference();
+        return $this->endpoint . '/transfers/' . $this->getTransferReference();
     }
 }

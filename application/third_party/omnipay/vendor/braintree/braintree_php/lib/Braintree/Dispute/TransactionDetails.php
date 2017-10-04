@@ -6,15 +6,15 @@ use Braintree\Instance;
 /**
  * Transaction details for a dispute
  *
- * @package    Braintree
+ * @package Braintree
  */
 
 /**
  * Creates an instance of DisbursementDetails as returned from a transaction
  *
  *
- * @package    Braintree
- *
+ * @package Braintree
+ *         
  * @property-read string $amount
  * @property-read string $id
  */

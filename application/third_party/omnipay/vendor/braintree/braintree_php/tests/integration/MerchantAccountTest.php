@@ -9,57 +9,58 @@ use Braintree;
 
 class MerchantAccountTest extends Setup
 {
+
     private static $deprecatedValidParams = [
-      'applicantDetails' => [
-        'companyName' => "Robot City",
-        'firstName' => "Joe",
-        'lastName' => "Bloggs",
-        'email' => "joe@bloggs.com",
-        'phone' => "555-555-5555",
-        'address' => [
-          'streetAddress' => "123 Credibility St.",
-          'postalCode' => "60606",
-          'locality' => "Chicago",
-          'region' => "IL",
+        'applicantDetails' => [
+            'companyName' => "Robot City",
+            'firstName' => "Joe",
+            'lastName' => "Bloggs",
+            'email' => "joe@bloggs.com",
+            'phone' => "555-555-5555",
+            'address' => [
+                'streetAddress' => "123 Credibility St.",
+                'postalCode' => "60606",
+                'locality' => "Chicago",
+                'region' => "IL"
+            ],
+            'dateOfBirth' => "10/9/1980",
+            'ssn' => "123-00-1234",
+            'taxId' => "123456789",
+            'routingNumber' => "122100024",
+            'accountNumber' => "43759348798"
         ],
-        'dateOfBirth' => "10/9/1980",
-        'ssn' => "123-00-1234",
-        'taxId' => "123456789",
-        'routingNumber' => "122100024",
-        'accountNumber' => "43759348798"
-      ],
-      'tosAccepted' => true,
-      'masterMerchantAccountId' => "sandbox_master_merchant_account"
+        'tosAccepted' => true,
+        'masterMerchantAccountId' => "sandbox_master_merchant_account"
     ];
 
     private static $validParams = [
-      'individual' => [
-        'firstName' => "Joe",
-        'lastName' => "Bloggs",
-        'email' => "joe@bloggs.com",
-        'phone' => "555-555-5555",
-        'address' => [
-          'streetAddress' => "123 Credibility St.",
-          'postalCode' => "60606",
-          'locality' => "Chicago",
-          'region' => "IL",
+        'individual' => [
+            'firstName' => "Joe",
+            'lastName' => "Bloggs",
+            'email' => "joe@bloggs.com",
+            'phone' => "555-555-5555",
+            'address' => [
+                'streetAddress' => "123 Credibility St.",
+                'postalCode' => "60606",
+                'locality' => "Chicago",
+                'region' => "IL"
+            ],
+            'dateOfBirth' => "10/9/1980",
+            'ssn' => "123-00-1234"
         ],
-        'dateOfBirth' => "10/9/1980",
-        'ssn' => "123-00-1234",
-      ],
-      'business' => [
-        'dbaName' => "Robot City",
-        'legalName' => "Robot City INC",
-        'taxId' => "123456789",
-      ],
-      'funding' => [
-        'routingNumber' => "122100024",
-        'accountNumber' => "43759348798",
-        'destination' => Braintree\MerchantAccount::FUNDING_DESTINATION_BANK,
-        'descriptor' => 'Joes Bloggs MI',
-      ],
-      'tosAccepted' => true,
-      'masterMerchantAccountId' => "sandbox_master_merchant_account"
+        'business' => [
+            'dbaName' => "Robot City",
+            'legalName' => "Robot City INC",
+            'taxId' => "123456789"
+        ],
+        'funding' => [
+            'routingNumber' => "122100024",
+            'accountNumber' => "43759348798",
+            'destination' => Braintree\MerchantAccount::FUNDING_DESTINATION_BANK,
+            'descriptor' => 'Joes Bloggs MI'
+        ],
+        'tosAccepted' => true,
+        'masterMerchantAccountId' => "sandbox_master_merchant_account"
     ];
 
     public function testCreate()
@@ -124,13 +125,13 @@ class MerchantAccountTest extends Setup
         $params['funding']['destination'] = Braintree\MerchantAccount::FUNDING_DESTINATION_BANK;
         $result = Braintree\MerchantAccount::create($params);
         $this->assertEquals(true, $result->success);
-
+        
         $params = array_merge([], self::$validParams);
         $params['funding']['destination'] = Braintree\MerchantAccount::FUNDING_DESTINATION_EMAIL;
         $params['funding']['email'] = "billgates@outlook.com";
         $result = Braintree\MerchantAccount::create($params);
         $this->assertEquals(true, $result->success);
-
+        
         $params = array_merge([], self::$validParams);
         $params['funding']['destination'] = Braintree\MerchantAccount::FUNDING_DESTINATION_MOBILE_PHONE;
         $params['funding']['mobilePhone'] = "1112224444";
@@ -144,10 +145,10 @@ class MerchantAccountTest extends Setup
         $result = Braintree\MerchantAccount::create(self::$validParams);
         $this->assertEquals(true, $result->success);
         $this->assertEquals(Braintree\MerchantAccount::STATUS_PENDING, $result->merchantAccount->status);
-
+        
         $id = $result->merchantAccount->id;
         $merchantAccount = Braintree\MerchantAccount::find($id);
-
+        
         $this->assertEquals(Braintree\MerchantAccount::STATUS_ACTIVE, $merchantAccount->status);
         $this->assertEquals($params['individual']['firstName'], $merchantAccount->individualDetails->firstName);
         $this->assertEquals($params['individual']['lastName'], $merchantAccount->individualDetails->lastName);
@@ -156,7 +157,7 @@ class MerchantAccountTest extends Setup
     public function testRetrievesMasterMerchantAccountCurrencyIsoCode()
     {
         $merchantAccount = Braintree\MerchantAccount::find("sandbox_master_merchant_account");
-
+        
         $this->assertEquals("USD", $merchantAccount->currencyIsoCode);
     }
 
@@ -193,10 +194,10 @@ class MerchantAccountTest extends Setup
         $params["funding"]["mobilePhone"] = "1234567890";
         $params["funding"]["destination"] = Braintree\MerchantAccount::FUNDING_DESTINATION_BANK;
         $params["funding"]["descriptor"] = "Joes Bloggs FL";
-
+        
         $result = Braintree\MerchantAccount::update("sandbox_sub_merchant_account", $params);
         $this->assertEquals(true, $result->success);
-
+        
         $updatedMerchantAccount = $result->merchantAccount;
         $this->assertEquals("active", $updatedMerchantAccount->status);
         $this->assertEquals("sandbox_sub_merchant_account", $updatedMerchantAccount->id);
@@ -248,184 +249,259 @@ class MerchantAccountTest extends Setup
                     'streetAddress' => "",
                     'postalCode' => "",
                     'locality' => "",
-                    'region' => "",
+                    'region' => ""
                 ],
                 'dateOfBirth' => "",
-                'ssn' => "",
+                'ssn' => ""
             ],
             'business' => [
                 'dbaName' => "",
                 'legalName' => "",
-                'taxId' => "",
+                'taxId' => ""
             ],
             'funding' => [
                 'routingNumber' => "",
                 'accountNumber' => "",
-                'destination' => "",
-            ],
+                'destination' => ""
+            ]
         ];
-
+        
         $result = Braintree\MerchantAccount::update("sandbox_sub_merchant_account", $params);
         $this->assertEquals(false, $result->success);
-
-        $error = $result->errors->forKey("merchantAccount")->forKey("individual")->onAttribute("firstName");
+        
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("individual")
+            ->onAttribute("firstName");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_INDIVIDUAL_FIRST_NAME_IS_REQUIRED);
-        $error = $result->errors->forKey("merchantAccount")->forKey("individual")->onAttribute("lastName");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("individual")
+            ->onAttribute("lastName");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_INDIVIDUAL_LAST_NAME_IS_REQUIRED);
-        $error = $result->errors->forKey("merchantAccount")->forKey("individual")->onAttribute("dateOfBirth");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("individual")
+            ->onAttribute("dateOfBirth");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_INDIVIDUAL_DATE_OF_BIRTH_IS_REQUIRED);
-        $error = $result->errors->forKey("merchantAccount")->forKey("individual")->onAttribute("email");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("individual")
+            ->onAttribute("email");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_INDIVIDUAL_EMAIL_IS_REQUIRED);
-        $error = $result->errors->forKey("merchantAccount")->forKey("individual")->forKey("address")->onAttribute("streetAddress");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("individual")
+            ->forKey("address")
+            ->onAttribute("streetAddress");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_INDIVIDUAL_ADDRESS_STREET_ADDRESS_IS_REQUIRED);
-        $error = $result->errors->forKey("merchantAccount")->forKey("individual")->forKey("address")->onAttribute("postalCode");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("individual")
+            ->forKey("address")
+            ->onAttribute("postalCode");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_INDIVIDUAL_ADDRESS_POSTAL_CODE_IS_REQUIRED);
-        $error = $result->errors->forKey("merchantAccount")->forKey("individual")->forKey("address")->onAttribute("locality");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("individual")
+            ->forKey("address")
+            ->onAttribute("locality");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_INDIVIDUAL_ADDRESS_LOCALITY_IS_REQUIRED);
-        $error = $result->errors->forKey("merchantAccount")->forKey("individual")->forKey("address")->onAttribute("region");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("individual")
+            ->forKey("address")
+            ->onAttribute("region");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_INDIVIDUAL_ADDRESS_REGION_IS_REQUIRED);
-        $error = $result->errors->forKey("merchantAccount")->forKey("funding")->onAttribute("destination");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("funding")
+            ->onAttribute("destination");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_FUNDING_DESTINATION_IS_REQUIRED);
     }
 
     public function testUpdateWithInvalidFields()
     {
         $params = [
-          "individual" => [
-            "firstName" => "<>",
-            "lastName" => "<>",
-            "email" => "bad",
-            "phone" => "999",
-            "address" => [
-              "streetAddress" => "nope",
-              "postalCode" => "1",
-              "region" => "QQ",
+            "individual" => [
+                "firstName" => "<>",
+                "lastName" => "<>",
+                "email" => "bad",
+                "phone" => "999",
+                "address" => [
+                    "streetAddress" => "nope",
+                    "postalCode" => "1",
+                    "region" => "QQ"
+                ],
+                "dateOfBirth" => "hah",
+                "ssn" => "12345"
             ],
-            "dateOfBirth" => "hah",
-            "ssn" => "12345",
-          ],
-          "business" => [
-            "legalName" => "``{}",
-            "dbaName" => "{}``",
-            "taxId" => "bad",
-            "address" => [
-              "streetAddress" => "nope",
-              "postalCode" => "1",
-              "region" => "QQ",
+            "business" => [
+                "legalName" => "``{}",
+                "dbaName" => "{}``",
+                "taxId" => "bad",
+                "address" => [
+                    "streetAddress" => "nope",
+                    "postalCode" => "1",
+                    "region" => "QQ"
+                ]
             ],
-          ],
-          "funding" => [
-            "destination" => "MY WALLET",
-            "routingNumber" => "LEATHER",
-            "accountNumber" => "BACK POCKET",
-            "email" => "BILLFOLD",
-            "mobilePhone" => "TRIFOLD"
-          ],
+            "funding" => [
+                "destination" => "MY WALLET",
+                "routingNumber" => "LEATHER",
+                "accountNumber" => "BACK POCKET",
+                "email" => "BILLFOLD",
+                "mobilePhone" => "TRIFOLD"
+            ]
         ];
-
-
+        
         $result = Braintree\MerchantAccount::update("sandbox_sub_merchant_account", $params);
         $this->assertEquals(false, $result->success);
-
-        $error = $result->errors->forKey("merchantAccount")->forKey("individual")->onAttribute("firstName");
+        
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("individual")
+            ->onAttribute("firstName");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_INDIVIDUAL_FIRST_NAME_IS_INVALID);
-        $error = $result->errors->forKey("merchantAccount")->forKey("individual")->onAttribute("lastName");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("individual")
+            ->onAttribute("lastName");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_INDIVIDUAL_LAST_NAME_IS_INVALID);
-        $error = $result->errors->forKey("merchantAccount")->forKey("individual")->onAttribute("email");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("individual")
+            ->onAttribute("email");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_INDIVIDUAL_EMAIL_IS_INVALID);
-        $error = $result->errors->forKey("merchantAccount")->forKey("individual")->onAttribute("phone");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("individual")
+            ->onAttribute("phone");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_INDIVIDUAL_PHONE_IS_INVALID);
-        $error = $result->errors->forKey("merchantAccount")->forKey("individual")->forKey("address")->onAttribute("streetAddress");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("individual")
+            ->forKey("address")
+            ->onAttribute("streetAddress");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_INDIVIDUAL_ADDRESS_STREET_ADDRESS_IS_INVALID);
-        $error = $result->errors->forKey("merchantAccount")->forKey("individual")->forKey("address")->onAttribute("postalCode");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("individual")
+            ->forKey("address")
+            ->onAttribute("postalCode");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_INDIVIDUAL_ADDRESS_POSTAL_CODE_IS_INVALID);
-        $error = $result->errors->forKey("merchantAccount")->forKey("individual")->forKey("address")->onAttribute("region");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("individual")
+            ->forKey("address")
+            ->onAttribute("region");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_INDIVIDUAL_ADDRESS_REGION_IS_INVALID);
-        $error = $result->errors->forKey("merchantAccount")->forKey("individual")->onAttribute("ssn");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("individual")
+            ->onAttribute("ssn");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_INDIVIDUAL_SSN_IS_INVALID);
         ;
-        $error = $result->errors->forKey("merchantAccount")->forKey("business")->onAttribute("legalName");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("business")
+            ->onAttribute("legalName");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_BUSINESS_LEGAL_NAME_IS_INVALID);
-        $error = $result->errors->forKey("merchantAccount")->forKey("business")->onAttribute("dbaName");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("business")
+            ->onAttribute("dbaName");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_BUSINESS_DBA_NAME_IS_INVALID);
-        $error = $result->errors->forKey("merchantAccount")->forKey("business")->onAttribute("taxId");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("business")
+            ->onAttribute("taxId");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_BUSINESS_TAX_ID_IS_INVALID);
-        $error = $result->errors->forKey("merchantAccount")->forKey("business")->forKey("address")->onAttribute("streetAddress");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("business")
+            ->forKey("address")
+            ->onAttribute("streetAddress");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_BUSINESS_ADDRESS_STREET_ADDRESS_IS_INVALID);
-        $error = $result->errors->forKey("merchantAccount")->forKey("business")->forKey("address")->onAttribute("postalCode");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("business")
+            ->forKey("address")
+            ->onAttribute("postalCode");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_BUSINESS_ADDRESS_POSTAL_CODE_IS_INVALID);
-        $error = $result->errors->forKey("merchantAccount")->forKey("business")->forKey("address")->onAttribute("region");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("business")
+            ->forKey("address")
+            ->onAttribute("region");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_BUSINESS_ADDRESS_REGION_IS_INVALID);
-
-        $error = $result->errors->forKey("merchantAccount")->forKey("funding")->onAttribute("destination");
+        
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("funding")
+            ->onAttribute("destination");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_FUNDING_DESTINATION_IS_INVALID);
-        $error = $result->errors->forKey("merchantAccount")->forKey("funding")->onAttribute("routingNumber");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("funding")
+            ->onAttribute("routingNumber");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_FUNDING_ROUTING_NUMBER_IS_INVALID);
-        $error = $result->errors->forKey("merchantAccount")->forKey("funding")->onAttribute("accountNumber");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("funding")
+            ->onAttribute("accountNumber");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_FUNDING_ACCOUNT_NUMBER_IS_INVALID);
-        $error = $result->errors->forKey("merchantAccount")->forKey("funding")->onAttribute("email");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("funding")
+            ->onAttribute("email");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_FUNDING_EMAIL_IS_INVALID);
-        $error = $result->errors->forKey("merchantAccount")->forKey("funding")->onAttribute("mobilePhone");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("funding")
+            ->onAttribute("mobilePhone");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_FUNDING_MOBILE_PHONE_IS_INVALID);
     }
 
     public function testUpdateWithInvalidBusinessFields()
     {
         $params = [
-          "business" => [
-            "legalName" => "",
-            "taxId" => "111223333",
-          ]
+            "business" => [
+                "legalName" => "",
+                "taxId" => "111223333"
+            ]
         ];
-
+        
         $result = Braintree\MerchantAccount::update("sandbox_sub_merchant_account", $params);
         $this->assertEquals(false, $result->success);
-
-        $error = $result->errors->forKey("merchantAccount")->forKey("business")->onAttribute("legalName");
+        
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("business")
+            ->onAttribute("legalName");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_BUSINESS_LEGAL_NAME_IS_REQUIRED_WITH_TAX_ID);
-        $error = $result->errors->forKey("merchantAccount")->forKey("business")->onAttribute("taxId");
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("business")
+            ->onAttribute("taxId");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_BUSINESS_TAX_ID_MUST_BE_BLANK);
-
+        
         $params = [
-          "business" => [
-            "legalName" => "legal name",
-            "taxId" => "",
-          ]
+            "business" => [
+                "legalName" => "legal name",
+                "taxId" => ""
+            ]
         ];
-
+        
         $result = Braintree\MerchantAccount::update("sandbox_sub_merchant_account", $params);
         $this->assertEquals(false, $result->success);
-
-        $error = $result->errors->forKey("merchantAccount")->forKey("business")->onAttribute("taxId");
+        
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("business")
+            ->onAttribute("taxId");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_BUSINESS_TAX_ID_IS_REQUIRED_WITH_LEGAL_NAME);
     }
 
     public function testUpdateWithInvalidFundingFields()
     {
         $params = [
-          "funding" => [
-            "destination" => Braintree\MerchantAccount::FUNDING_DESTINATION_EMAIL,
-            "email" => "",
-          ]
+            "funding" => [
+                "destination" => Braintree\MerchantAccount::FUNDING_DESTINATION_EMAIL,
+                "email" => ""
+            ]
         ];
-
+        
         $result = Braintree\MerchantAccount::update("sandbox_sub_merchant_account", $params);
         $this->assertEquals(false, $result->success);
-
-        $error = $result->errors->forKey("merchantAccount")->forKey("funding")->onAttribute("email");
+        
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("funding")
+            ->onAttribute("email");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_FUNDING_EMAIL_IS_REQUIRED);
-
+        
         $params = [
-          "funding" => [
-            "destination" => Braintree\MerchantAccount::FUNDING_DESTINATION_MOBILE_PHONE,
-            "mobilePhone" => "",
-          ]
+            "funding" => [
+                "destination" => Braintree\MerchantAccount::FUNDING_DESTINATION_MOBILE_PHONE,
+                "mobilePhone" => ""
+            ]
         ];
-
+        
         $result = Braintree\MerchantAccount::update("sandbox_sub_merchant_account", $params);
         $this->assertEquals(false, $result->success);
-
-        $error = $result->errors->forKey("merchantAccount")->forKey("funding")->onAttribute("mobilePhone");
+        
+        $error = $result->errors->forKey("merchantAccount")
+            ->forKey("funding")
+            ->onAttribute("mobilePhone");
         $this->assertEquals($error[0]->code, Braintree\Error\Codes::MERCHANT_ACCOUNT_FUNDING_MOBILE_PHONE_IS_REQUIRED);
     }
 
@@ -433,26 +509,29 @@ class MerchantAccountTest extends Setup
     {
         $gateway = new Braintree\Gateway([
             'clientId' => 'client_id$development$signup_client_id',
-            'clientSecret' => 'client_secret$development$signup_client_secret',
+            'clientSecret' => 'client_secret$development$signup_client_secret'
         ]);
         $result = $gateway->merchant()->create([
             'email' => 'name@email.com',
             'countryCodeAlpha3' => 'GBR',
-            'paymentMethods' => ['credit_card', 'paypal'],
+            'paymentMethods' => [
+                'credit_card',
+                'paypal'
+            ]
         ]);
-
+        
         $this->assertEquals(true, $result->success);
-
+        
         $gateway = new Braintree\Gateway([
-            'accessToken' => $result->credentials->accessToken,
+            'accessToken' => $result->credentials->accessToken
         ]);
-
+        
         $result = $gateway->merchantAccount()->createForCurrency([
-            'currency' => "USD",
+            'currency' => "USD"
         ]);
-
+        
         $this->assertEquals(true, $result->success);
-
+        
         $merchantAccount = $result->merchantAccount;
         $this->assertEquals("USD", $merchantAccount->currencyIsoCode);
         $this->assertEquals("USD", $merchantAccount->id);
@@ -462,27 +541,30 @@ class MerchantAccountTest extends Setup
     {
         $gateway = new Braintree\Gateway([
             'clientId' => 'client_id$development$signup_client_id',
-            'clientSecret' => 'client_secret$development$signup_client_secret',
+            'clientSecret' => 'client_secret$development$signup_client_secret'
         ]);
         $result = $gateway->merchant()->create([
             'email' => 'name@email.com',
             'countryCodeAlpha3' => 'GBR',
-            'paymentMethods' => ['credit_card', 'paypal'],
+            'paymentMethods' => [
+                'credit_card',
+                'paypal'
+            ]
         ]);
-
+        
         $this->assertEquals(true, $result->success);
-
+        
         $gateway = new Braintree\Gateway([
-            'accessToken' => $result->credentials->accessToken,
+            'accessToken' => $result->credentials->accessToken
         ]);
-
+        
         $merchantAccount = $result->merchant->merchantAccounts[0];
         $result = $gateway->merchantAccount()->createForCurrency([
-            'currency' => "GBP",
+            'currency' => "GBP"
         ]);
-
+        
         $this->assertEquals(false, $result->success);
-
+        
         $errors = $result->errors->forKey('merchant')->onAttribute('currency');
         $this->assertEquals(Braintree\Error\Codes::MERCHANT_MERCHANT_ACCOUNT_EXISTS_FOR_CURRENCY, $errors[0]->code);
     }
@@ -491,26 +573,29 @@ class MerchantAccountTest extends Setup
     {
         $gateway = new Braintree\Gateway([
             'clientId' => 'client_id$development$signup_client_id',
-            'clientSecret' => 'client_secret$development$signup_client_secret',
+            'clientSecret' => 'client_secret$development$signup_client_secret'
         ]);
         $result = $gateway->merchant()->create([
             'email' => 'name@email.com',
             'countryCodeAlpha3' => 'GBR',
-            'paymentMethods' => ['credit_card', 'paypal'],
+            'paymentMethods' => [
+                'credit_card',
+                'paypal'
+            ]
         ]);
-
+        
         $this->assertEquals(true, $result->success);
-
+        
         $gateway = new Braintree\Gateway([
-            'accessToken' => $result->credentials->accessToken,
+            'accessToken' => $result->credentials->accessToken
         ]);
-
+        
         $result = $gateway->merchantAccount()->createForCurrency([
-            'currency' => "FAKE_CURRENCY",
+            'currency' => "FAKE_CURRENCY"
         ]);
-
+        
         $this->assertEquals(false, $result->success);
-
+        
         $errors = $result->errors->forKey('merchant')->onAttribute('currency');
         $this->assertEquals(Braintree\Error\Codes::MERCHANT_CURRENCY_IS_INVALID, $errors[0]->code);
     }
@@ -519,24 +604,27 @@ class MerchantAccountTest extends Setup
     {
         $gateway = new Braintree\Gateway([
             'clientId' => 'client_id$development$signup_client_id',
-            'clientSecret' => 'client_secret$development$signup_client_secret',
+            'clientSecret' => 'client_secret$development$signup_client_secret'
         ]);
         $result = $gateway->merchant()->create([
             'email' => 'name@email.com',
             'countryCodeAlpha3' => 'GBR',
-            'paymentMethods' => ['credit_card', 'paypal'],
+            'paymentMethods' => [
+                'credit_card',
+                'paypal'
+            ]
         ]);
-
+        
         $this->assertEquals(true, $result->success);
-
+        
         $gateway = new Braintree\Gateway([
-            'accessToken' => $result->credentials->accessToken,
+            'accessToken' => $result->credentials->accessToken
         ]);
-
+        
         $result = $gateway->merchantAccount()->createForCurrency([]);
-
+        
         $this->assertEquals(false, $result->success);
-
+        
         $errors = $result->errors->forKey('merchant')->onAttribute('currency');
         $this->assertEquals(Braintree\Error\Codes::MERCHANT_CURRENCY_IS_REQUIRED, $errors[0]->code);
     }
@@ -545,28 +633,31 @@ class MerchantAccountTest extends Setup
     {
         $gateway = new Braintree\Gateway([
             'clientId' => 'client_id$development$signup_client_id',
-            'clientSecret' => 'client_secret$development$signup_client_secret',
+            'clientSecret' => 'client_secret$development$signup_client_secret'
         ]);
         $result = $gateway->merchant()->create([
             'email' => 'name@email.com',
             'countryCodeAlpha3' => 'GBR',
-            'paymentMethods' => ['credit_card', 'paypal'],
+            'paymentMethods' => [
+                'credit_card',
+                'paypal'
+            ]
         ]);
-
+        
         $this->assertEquals(true, $result->success);
-
+        
         $gateway = new Braintree\Gateway([
-            'accessToken' => $result->credentials->accessToken,
+            'accessToken' => $result->credentials->accessToken
         ]);
-
+        
         $merchantAccount = $result->merchant->merchantAccounts[0];
         $result = $gateway->merchantAccount()->createForCurrency([
             'currency' => "USD",
-            'id' => $merchantAccount->id,
+            'id' => $merchantAccount->id
         ]);
-
+        
         $this->assertEquals(false, $result->success);
-
+        
         $errors = $result->errors->forKey('merchant')->onAttribute('id');
         $this->assertEquals(Braintree\Error\Codes::MERCHANT_MERCHANT_ACCOUNT_EXISTS_FOR_ID, $errors[0]->code);
     }
@@ -575,25 +666,25 @@ class MerchantAccountTest extends Setup
     {
         $gateway = new Braintree\Gateway([
             'clientId' => 'client_id$development$integration_client_id',
-            'clientSecret' => 'client_secret$development$integration_client_secret',
+            'clientSecret' => 'client_secret$development$integration_client_secret'
         ]);
-
+        
         $code = Test\Braintree\OAuthTestHelper::createGrant($gateway, [
             'merchant_public_id' => 'integration_merchant_id',
             'scope' => 'read_write'
         ]);
-
+        
         $credentials = $gateway->oauth()->createTokenFromCode([
-            'code' => $code,
+            'code' => $code
         ]);
-
+        
         $gateway = new Braintree\Gateway([
             'accessToken' => $credentials->accessToken
         ]);
-
+        
         $result = $gateway->merchantAccount()->all();
         $merchantAccounts = [];
-        foreach($result as $ma) {
+        foreach ($result as $ma) {
             array_push($merchantAccounts, $ma);
         }
         $this->assertEquals(true, count($merchantAccounts) > 20);
@@ -603,25 +694,28 @@ class MerchantAccountTest extends Setup
     {
         $gateway = new Braintree\Gateway([
             'clientId' => 'client_id$development$integration_client_id',
-            'clientSecret' => 'client_secret$development$integration_client_secret',
+            'clientSecret' => 'client_secret$development$integration_client_secret'
         ]);
-
+        
         $result = $gateway->merchant()->create([
             'email' => 'name@email.com',
             'countryCodeAlpha3' => 'USA',
-            'paymentMethods' => ['credit_card', 'paypal'],
+            'paymentMethods' => [
+                'credit_card',
+                'paypal'
+            ]
         ]);
-
+        
         $gateway = new Braintree\Gateway([
-            'accessToken' => $result->credentials->accessToken,
+            'accessToken' => $result->credentials->accessToken
         ]);
-
+        
         $result = $gateway->merchantAccount()->all();
         $merchantAccounts = [];
-        foreach($result as $ma) {
+        foreach ($result as $ma) {
             array_push($merchantAccounts, $ma);
         }
-
+        
         $this->assertEquals(1, count($merchantAccounts));
         $merchantAccount = $merchantAccounts[0];
         $this->assertEquals("USD", $merchantAccount->currencyIsoCode);

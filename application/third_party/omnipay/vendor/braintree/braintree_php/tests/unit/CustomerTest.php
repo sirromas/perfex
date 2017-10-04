@@ -8,6 +8,7 @@ use Braintree;
 
 class CustomerTest extends Setup
 {
+
     public function testGet_givesErrorIfInvalidProperty()
     {
         $this->setExpectedException('PHPUnit_Framework_Error', 'Undefined property on Braintree\Customer: foo');
@@ -19,14 +20,14 @@ class CustomerTest extends Setup
     {
         Braintree\CustomerGateway::updateSignature();
         foreach (Braintree\CreditCardGateway::updateSignature() as $key => $value) {
-            if(is_array($value) and array_key_exists('options', $value)) {
+            if (is_array($value) and array_key_exists('options', $value)) {
                 $this->assertEquals([
                     'makeDefault',
                     'verificationMerchantAccountId',
                     'verifyCard',
                     'verificationAmount',
                     'venmoSdkSession',
-                    'failOnDuplicatePaymentMethod',
+                    'failOnDuplicatePaymentMethod'
                 ], $value['options']);
             }
         }
@@ -37,7 +38,7 @@ class CustomerTest extends Setup
         $signature = Braintree\CustomerGateway::createSignature();
         $creditCardSignatures = array_filter($signature, 'Test\Unit\CustomerTest::findCreditCardArray');
         $creditCardSignature = array_shift($creditCardSignatures)['creditCard'];
-
+        
         $this->assertNotContains('customerId', $creditCardSignature);
     }
 

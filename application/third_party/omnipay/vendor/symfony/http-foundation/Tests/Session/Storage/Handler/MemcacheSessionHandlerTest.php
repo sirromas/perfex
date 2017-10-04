@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
 use PHPUnit\Framework\TestCase;
@@ -20,9 +19,13 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHand
  */
 class MemcacheSessionHandlerTest extends TestCase
 {
+
     const PREFIX = 'prefix_';
+
     const TTL = 1000;
+
     /**
+     *
      * @var MemcacheSessionHandler
      */
     protected $storage;
@@ -34,13 +37,13 @@ class MemcacheSessionHandlerTest extends TestCase
         if (defined('HHVM_VERSION')) {
             $this->markTestSkipped('PHPUnit_MockObject cannot mock the Memcache class on HHVM. See https://github.com/sebastianbergmann/phpunit-mock-objects/pull/289');
         }
-
+        
         parent::setUp();
         $this->memcache = $this->getMockBuilder('Memcache')->getMock();
-        $this->storage = new MemcacheSessionHandler(
-            $this->memcache,
-            array('prefix' => self::PREFIX, 'expiretime' => self::TTL)
-        );
+        $this->storage = new MemcacheSessionHandler($this->memcache, array(
+            'prefix' => self::PREFIX,
+            'expiretime' => self::TTL
+        ));
     }
 
     protected function tearDown()
@@ -62,36 +65,30 @@ class MemcacheSessionHandlerTest extends TestCase
 
     public function testReadSession()
     {
-        $this->memcache
-            ->expects($this->once())
+        $this->memcache->expects($this->once())
             ->method('get')
-            ->with(self::PREFIX.'id')
-        ;
-
+            ->with(self::PREFIX . 'id');
+        
         $this->assertEquals('', $this->storage->read('id'));
     }
 
     public function testWriteSession()
     {
-        $this->memcache
-            ->expects($this->once())
+        $this->memcache->expects($this->once())
             ->method('set')
-            ->with(self::PREFIX.'id', 'data', 0, $this->equalTo(time() + self::TTL, 2))
-            ->will($this->returnValue(true))
-        ;
-
+            ->with(self::PREFIX . 'id', 'data', 0, $this->equalTo(time() + self::TTL, 2))
+            ->will($this->returnValue(true));
+        
         $this->assertTrue($this->storage->write('id', 'data'));
     }
 
     public function testDestroySession()
     {
-        $this->memcache
-            ->expects($this->once())
+        $this->memcache->expects($this->once())
             ->method('delete')
-            ->with(self::PREFIX.'id')
-            ->will($this->returnValue(true))
-        ;
-
+            ->with(self::PREFIX . 'id')
+            ->will($this->returnValue(true));
+        
         $this->assertTrue($this->storage->destroy('id'));
     }
 
@@ -116,10 +113,32 @@ class MemcacheSessionHandlerTest extends TestCase
     public function getOptionFixtures()
     {
         return array(
-            array(array('prefix' => 'session'), true),
-            array(array('expiretime' => 100), true),
-            array(array('prefix' => 'session', 'expiretime' => 200), true),
-            array(array('expiretime' => 100, 'foo' => 'bar'), false),
+            array(
+                array(
+                    'prefix' => 'session'
+                ),
+                true
+            ),
+            array(
+                array(
+                    'expiretime' => 100
+                ),
+                true
+            ),
+            array(
+                array(
+                    'prefix' => 'session',
+                    'expiretime' => 200
+                ),
+                true
+            ),
+            array(
+                array(
+                    'expiretime' => 100,
+                    'foo' => 'bar'
+                ),
+                false
+            )
         );
     }
 
@@ -127,7 +146,7 @@ class MemcacheSessionHandlerTest extends TestCase
     {
         $method = new \ReflectionMethod($this->storage, 'getMemcache');
         $method->setAccessible(true);
-
+        
         $this->assertInstanceOf('\Memcache', $method->invoke($this->storage));
     }
 }

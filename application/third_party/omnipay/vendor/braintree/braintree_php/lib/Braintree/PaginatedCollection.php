@@ -14,20 +14,26 @@ use Iterator;
  * $result = MerchantAccount::all();
  *
  * foreach($result as $merchantAccount) {
- *   print_r($merchantAccount->status);
+ * print_r($merchantAccount->status);
  * }
  * </code>
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Utility
  */
 class PaginatedCollection implements Iterator
 {
+
     private $_pager;
+
     private $_pageSize;
+
     private $_currentPage;
+
     private $_index;
+
     private $_totalItems;
+
     private $_items;
 
     /**
@@ -35,9 +41,9 @@ class PaginatedCollection implements Iterator
      *
      * expects an array of an object and method to call on it
      *
-     * @param array $pager
+     * @param array $pager            
      */
-    public function  __construct($pager)
+    public function __construct($pager)
     {
         $this->_pager = $pager;
         $this->_pageSize = 0;
@@ -64,7 +70,7 @@ class PaginatedCollection implements Iterator
      */
     public function next()
     {
-        ++$this->_index;
+        ++ $this->_index;
     }
 
     /**
@@ -84,25 +90,24 @@ class PaginatedCollection implements Iterator
      */
     public function valid()
     {
-        if ($this->_currentPage == 0 || $this->_index % $this->_pageSize == 0 && $this->_index < $this->_totalItems)
-        {
+        if ($this->_currentPage == 0 || $this->_index % $this->_pageSize == 0 && $this->_index < $this->_totalItems) {
             $this->_getNextPage();
         }
-
+        
         return $this->_index < $this->_totalItems;
     }
 
     private function _getNextPage()
     {
-        $this->_currentPage++;
+        $this->_currentPage ++;
         $object = $this->_pager['object'];
         $method = $this->_pager['method'];
-        $result = call_user_func(
-            [$object, $method],
-            $this->_currentPage
-        );
-
-        $this->_totalItems= $result->getTotalItems();
+        $result = call_user_func([
+            $object,
+            $method
+        ], $this->_currentPage);
+        
+        $this->_totalItems = $result->getTotalItems();
         $this->_pageSize = $result->getPageSize();
         $this->_items = $result->getCurrentPage();
     }

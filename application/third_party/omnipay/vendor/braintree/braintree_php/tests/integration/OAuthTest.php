@@ -9,6 +9,7 @@ use Braintree;
 
 class OAuthTest extends Setup
 {
+
     public function testCreateTokenFromCode()
     {
         $gateway = new Braintree\Gateway([
@@ -21,9 +22,9 @@ class OAuthTest extends Setup
         ]);
         $result = $gateway->oauth()->createTokenFromCode([
             'code' => $code,
-            'scope' => 'read_write',
+            'scope' => 'read_write'
         ]);
-
+        
         $this->assertEquals(true, $result->success);
         $credentials = $result->credentials;
         $this->assertNotNull($credentials->accessToken);
@@ -33,16 +34,16 @@ class OAuthTest extends Setup
     }
 
     /**
-    * @expectedException Braintree\Exception\Configuration
-    * @expectedExceptionMessage clientSecret needs to be passed to Braintree\Gateway.
-    */
+     * @expectedException Braintree\Exception\Configuration
+     * @expectedExceptionMessage clientSecret needs to be passed to Braintree\Gateway.
+     */
     public function testAssertsHasCredentials()
     {
         $gateway = new Braintree\Gateway([
             'clientId' => 'client_id$development$integration_client_id'
         ]);
         $gateway->oauth()->createTokenFromCode([
-            'code' => 'integration_oauth_auth_code_' . rand(0,299)
+            'code' => 'integration_oauth_auth_code_' . rand(0, 299)
         ]);
     }
 
@@ -51,7 +52,7 @@ class OAuthTest extends Setup
         $gateway = new Braintree\Gateway([
             'clientId' => 'client_id$development$integration_client_id',
             'clientSecret' => 'client_secret$development$integration_client_secret',
-            'accessToken' => 'access_token$development$integration_merchant_id$f9ac33b3dd',
+            'accessToken' => 'access_token$development$integration_merchant_id$f9ac33b3dd'
         ]);
         $code = Test\Braintree\OAuthTestHelper::createGrant($gateway, [
             'merchant_public_id' => 'integration_merchant_id',
@@ -59,9 +60,9 @@ class OAuthTest extends Setup
         ]);
         $result = $gateway->oauth()->createTokenFromCode([
             'code' => $code,
-            'scope' => 'read_write',
+            'scope' => 'read_write'
         ]);
-
+        
         $this->assertEquals(true, $result->success);
         $credentials = $result->credentials;
         $this->assertNotNull($credentials->accessToken);
@@ -82,9 +83,9 @@ class OAuthTest extends Setup
         ]);
         $result = $gateway->oauth()->createTokenFromCode([
             'code' => $code,
-            'scope' => 'read_write',
+            'scope' => 'read_write'
         ]);
-
+        
         $this->assertEquals(true, $result->success);
         $this->assertNotNull($result->accessToken);
         $this->assertNotNull($result->refreshToken);
@@ -96,7 +97,7 @@ class OAuthTest extends Setup
     {
         $gateway = new Braintree\Gateway([
             'clientId' => 'client_id$development$integration_client_id',
-            'clientSecret' => 'client_secret$development$integration_client_secret',
+            'clientSecret' => 'client_secret$development$integration_client_secret'
         ]);
         $code = Test\Braintree\OAuthTestHelper::createGrant($gateway, [
             'merchant_public_id' => 'integration_merchant_id',
@@ -104,15 +105,17 @@ class OAuthTest extends Setup
         ]);
         $result = $gateway->oauth()->createTokenFromCode([
             'code' => $code,
-            'scope' => 'read_write',
+            'scope' => 'read_write'
         ]);
-
+        
         $revokeAccessTokenResult = $gateway->oauth()->revokeAccessToken($result->accessToken);
-
+        
         $this->assertTrue($revokeAccessTokenResult->success);
         $this->assertTrue($revokeAccessTokenResult->result->success);
-
-        $gateway = new Braintree\Gateway(['accessToken' => $result->accessToken]);
+        
+        $gateway = new Braintree\Gateway([
+            'accessToken' => $result->accessToken
+        ]);
         $this->setExpectedException('Braintree\Exception\Authentication');
         $gateway->customer()->create();
     }
@@ -125,9 +128,9 @@ class OAuthTest extends Setup
         ]);
         $result = $gateway->oauth()->createTokenFromCode([
             'code' => 'bad_code',
-            'scope' => 'read_write',
+            'scope' => 'read_write'
         ]);
-
+        
         $this->assertEquals(false, $result->success);
         $errors = $result->errors->forKey('credentials')->onAttribute('code');
         $this->assertEquals(Braintree\Error\Codes::OAUTH_INVALID_GRANT, $errors[0]->code);
@@ -142,9 +145,9 @@ class OAuthTest extends Setup
         ]);
         $result = $gateway->oauth()->createTokenFromCode([
             'code' => 'bad_code',
-            'scope' => 'read_write',
+            'scope' => 'read_write'
         ]);
-
+        
         $this->assertEquals(false, $result->success);
         $this->assertEquals('invalid_grant', $result->error);
         $this->assertEquals('code not found', $result->errorDescription);
@@ -162,14 +165,14 @@ class OAuthTest extends Setup
         ]);
         $refreshToken = $gateway->oauth()->createTokenFromCode([
             'code' => $code,
-            'scope' => 'read_write',
+            'scope' => 'read_write'
         ])->credentials->refreshToken;
-
+        
         $result = $gateway->oauth()->createTokenFromRefreshToken([
             'refreshToken' => $refreshToken,
-            'scope' => 'read_write',
+            'scope' => 'read_write'
         ]);
-
+        
         $this->assertEquals(true, $result->success);
         $credentials = $result->credentials;
         $this->assertNotNull($credentials->accessToken);
@@ -177,7 +180,6 @@ class OAuthTest extends Setup
         $this->assertEquals('bearer', $credentials->tokenType);
         $this->assertNotNull($credentials->expiresAt);
     }
-
 
     public function testBuildConnectUrl()
     {
@@ -203,7 +205,7 @@ class OAuthTest extends Setup
                 'streetAddress' => '222 W Merchandise Mart',
                 'locality' => 'Chicago',
                 'region' => 'IL',
-                'postalCode' => '60606',
+                'postalCode' => '60606'
             ],
             'business' => [
                 'name' => '14 Ladders',
@@ -221,15 +223,17 @@ class OAuthTest extends Setup
                 'shipPhysicalGoods' => true,
                 'fulfillmentCompletedIn' => 7,
                 'currency' => 'USD',
-                'website' => 'http://example.com',
+                'website' => 'http://example.com'
             ],
-            'paymentMethods' => ['credit_card'],
+            'paymentMethods' => [
+                'credit_card'
+            ]
         ]);
-
+        
         $components = parse_url($url);
         $queryString = $components['query'];
         parse_str($queryString, $query);
-
+        
         $this->assertEquals('localhost', $components['host']);
         $this->assertEquals('/oauth/connect', $components['path']);
         $this->assertEquals('integration_merchant_id', $query['merchant_id']);
@@ -238,7 +242,7 @@ class OAuthTest extends Setup
         $this->assertEquals('read_write', $query['scope']);
         $this->assertEquals('baz_state', $query['state']);
         $this->assertEquals('login', $query['landing_page']);
-
+        
         $this->assertEquals('USA', $query['user']['country']);
         $this->assertEquals('foo@example.com', $query['user']['email']);
         $this->assertEquals('Bob', $query['user']['first_name']);
@@ -251,7 +255,7 @@ class OAuthTest extends Setup
         $this->assertEquals('Chicago', $query['user']['locality']);
         $this->assertEquals('IL', $query['user']['region']);
         $this->assertEquals('60606', $query['user']['postal_code']);
-
+        
         $this->assertEquals('14 Ladders', $query['business']['name']);
         $this->assertEquals('14.0 Ladders', $query['business']['registered_as']);
         $this->assertEquals('Ladders', $query['business']['industry']);
@@ -268,10 +272,10 @@ class OAuthTest extends Setup
         $this->assertEquals(7, $query['business']['fulfillment_completed_in']);
         $this->assertEquals('USD', $query['business']['currency']);
         $this->assertEquals('http://example.com', $query['business']['website']);
-
+        
         $this->assertCount(1, $query['payment_methods']);
         $this->assertEquals('credit_card', $query['payment_methods'][0]);
-
+        
         $this->assertEquals(64, strlen($query['signature']));
         $this->assertEquals('SHA256', $query['algorithm']);
     }
@@ -283,10 +287,10 @@ class OAuthTest extends Setup
             'clientSecret' => 'client_secret$development$integration_client_secret'
         ]);
         $url = $gateway->oauth()->connectUrl();
-
+        
         $queryString = parse_url($url)['query'];
         parse_str($queryString, $query);
-
+        
         $this->assertEquals('client_id$development$integration_client_id', $query['client_id']);
         $this->assertArrayNotHasKey('merchant_id', $query);
         $this->assertArrayNotHasKey('redirect_uri', $query);
@@ -300,13 +304,19 @@ class OAuthTest extends Setup
             'clientSecret' => 'client_secret$development$integration_client_secret'
         ]);
         $url = $gateway->oauth()->connectUrl([
-            'paymentMethods' => ['credit_card', 'paypal']
+            'paymentMethods' => [
+                'credit_card',
+                'paypal'
+            ]
         ]);
-
+        
         $queryString = parse_url($url)['query'];
         parse_str($queryString, $query);
-
-        $this->assertEquals(['credit_card', 'paypal'], $query['payment_methods']);
+        
+        $this->assertEquals([
+            'credit_card',
+            'paypal'
+        ], $query['payment_methods']);
     }
 
     public function testComputeSignature()
@@ -316,9 +326,9 @@ class OAuthTest extends Setup
             'clientSecret' => 'client_secret$development$integration_client_secret'
         ]);
         $urlToSign = 'http://localhost:3000/oauth/connect?business%5Bname%5D=We+Like+Spaces&client_id=client_id%24development%24integration_client_id';
-
+        
         $signature = $gateway->oauth()->computeSignature($urlToSign);
-
+        
         $this->assertEquals("a36bcf10dd982e2e47e0d6a2cb930aea47ade73f954b7d59c58dae6167894d41", $signature);
     }
 }

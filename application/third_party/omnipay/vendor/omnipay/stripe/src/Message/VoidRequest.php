@@ -18,16 +18,16 @@ namespace Omnipay\Stripe\Message;
  * See PurchaseRequest for the first part of this example transaction:
  *
  * <code>
- *   // Do a void transaction on the gateway
- *   $transaction = $gateway->void(array(
- *       'transactionReference' => $sale_id,
- *   ));
- *   $response = $transaction->send();
- *   if ($response->isSuccessful()) {
- *       echo "Void transaction was successful!\n";
- *       $void_id = $response->getTransactionReference();
- *       echo "Transaction reference = " . $void_id . "\n";
- *   }
+ * // Do a void transaction on the gateway
+ * $transaction = $gateway->void(array(
+ * 'transactionReference' => $sale_id,
+ * ));
+ * $response = $transaction->send();
+ * if ($response->isSuccessful()) {
+ * echo "Void transaction was successful!\n";
+ * $void_id = $response->getTransactionReference();
+ * echo "Transaction reference = " . $void_id . "\n";
+ * }
  * </code>
  *
  * @see RefundRequest
@@ -36,15 +36,16 @@ namespace Omnipay\Stripe\Message;
  */
 class VoidRequest extends RefundRequest
 {
+
     public function getData()
     {
         $this->validate('transactionReference');
-
+        
         $data = array();
         if ($this->getRefundApplicationFee()) {
             $data['refund_application_fee'] = 'true';
         }
-
+        
         return $data;
     }
 }

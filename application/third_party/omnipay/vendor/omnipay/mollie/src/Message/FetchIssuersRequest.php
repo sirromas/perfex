@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\Mollie\Message;
 
 /**
@@ -9,7 +8,9 @@ namespace Omnipay\Mollie\Message;
  */
 class FetchIssuersRequest extends AbstractRequest
 {
+
     /**
+     *
      * @return null
      */
     public function getData()
@@ -20,7 +21,7 @@ class FetchIssuersRequest extends AbstractRequest
     public function sendData($data)
     {
         $httpResponse = $this->sendRequest('GET', '/issuers');
-
+        
         return $this->response = new FetchIssuersResponse($this, $httpResponse->json());
     }
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Stream;
 
 use Guzzle\Common\Exception\InvalidArgumentException;
@@ -9,43 +8,89 @@ use Guzzle\Common\Exception\InvalidArgumentException;
  */
 class Stream implements StreamInterface
 {
+
     const STREAM_TYPE = 'stream_type';
+
     const WRAPPER_TYPE = 'wrapper_type';
+
     const IS_LOCAL = 'is_local';
+
     const IS_READABLE = 'is_readable';
+
     const IS_WRITABLE = 'is_writable';
+
     const SEEKABLE = 'seekable';
 
-    /** @var resource Stream resource */
+    /**
+     * @var resource Stream resource
+     */
     protected $stream;
 
-    /** @var int Size of the stream contents in bytes */
+    /**
+     * @var int Size of the stream contents in bytes
+     */
     protected $size;
 
-    /** @var array Stream cached data */
+    /**
+     * @var array Stream cached data
+     */
     protected $cache = array();
 
-    /** @var array Custom stream data */
+    /**
+     * @var array Custom stream data
+     */
     protected $customData = array();
 
-    /** @var array Hash table of readable and writeable stream types for fast lookups */
+    /**
+     * @var array Hash table of readable and writeable stream types for fast lookups
+     */
     protected static $readWriteHash = array(
         'read' => array(
-            'r' => true, 'w+' => true, 'r+' => true, 'x+' => true, 'c+' => true,
-            'rb' => true, 'w+b' => true, 'r+b' => true, 'x+b' => true, 'c+b' => true,
-            'rt' => true, 'w+t' => true, 'r+t' => true, 'x+t' => true, 'c+t' => true, 'a+' => true
+            'r' => true,
+            'w+' => true,
+            'r+' => true,
+            'x+' => true,
+            'c+' => true,
+            'rb' => true,
+            'w+b' => true,
+            'r+b' => true,
+            'x+b' => true,
+            'c+b' => true,
+            'rt' => true,
+            'w+t' => true,
+            'r+t' => true,
+            'x+t' => true,
+            'c+t' => true,
+            'a+' => true
         ),
         'write' => array(
-            'w' => true, 'w+' => true, 'rw' => true, 'r+' => true, 'x+' => true, 'c+' => true,
-            'wb' => true, 'w+b' => true, 'r+b' => true, 'x+b' => true, 'c+b' => true,
-            'w+t' => true, 'r+t' => true, 'x+t' => true, 'c+t' => true, 'a' => true, 'a+' => true
+            'w' => true,
+            'w+' => true,
+            'rw' => true,
+            'r+' => true,
+            'x+' => true,
+            'c+' => true,
+            'wb' => true,
+            'w+b' => true,
+            'r+b' => true,
+            'x+b' => true,
+            'c+b' => true,
+            'w+t' => true,
+            'r+t' => true,
+            'x+t' => true,
+            'c+t' => true,
+            'a' => true,
+            'a+' => true
         )
     );
 
     /**
-     * @param resource $stream Stream resource to wrap
-     * @param int      $size   Size of the stream in bytes. Only pass if the size cannot be obtained from the stream.
      *
+     * @param resource $stream
+     *            Stream resource to wrap
+     * @param int $size
+     *            Size of the stream in bytes. Only pass if the size cannot be obtained from the stream.
+     *            
      * @throws InvalidArgumentException if the stream is not a stream resource
      */
     public function __construct($stream, $size = null)
@@ -63,14 +108,14 @@ class Stream implements StreamInterface
 
     public function __toString()
     {
-        if (!$this->isReadable() || (!$this->isSeekable() && $this->isConsumed())) {
+        if (! $this->isReadable() || (! $this->isSeekable() && $this->isConsumed())) {
             return '';
         }
-
+        
         $originalPos = $this->ftell();
-        $body = stream_get_contents($this->stream, -1, 0);
+        $body = stream_get_contents($this->stream, - 1, 0);
         $this->seek($originalPos);
-
+        
         return $body;
     }
 
@@ -86,35 +131,38 @@ class Stream implements StreamInterface
     /**
      * Calculate a hash of a Stream
      *
-     * @param StreamInterface $stream    Stream to calculate the hash for
-     * @param string          $algo      Hash algorithm (e.g. md5, crc32, etc)
-     * @param bool            $rawOutput Whether or not to use raw output
-     *
-     * @return bool|string Returns false on failure or a hash string on success
+     * @param StreamInterface $stream
+     *            Stream to calculate the hash for
+     * @param string $algo
+     *            Hash algorithm (e.g. md5, crc32, etc)
+     * @param bool $rawOutput
+     *            Whether or not to use raw output
+     *            
+     * @return bool|string false on failure or a hash string on success
      */
     public static function getHash(StreamInterface $stream, $algo, $rawOutput = false)
     {
         $pos = $stream->ftell();
-        if (!$stream->seek(0)) {
+        if (! $stream->seek(0)) {
             return false;
         }
-
+        
         $ctx = hash_init($algo);
-        while (!$stream->feof()) {
+        while (! $stream->feof()) {
             hash_update($ctx, $stream->read(8192));
         }
-
+        
         $out = hash_final($ctx, (bool) $rawOutput);
         $stream->seek($pos);
-
+        
         return $out;
     }
 
     public function getMetaData($key = null)
     {
         $meta = stream_get_meta_data($this->stream);
-
-        return !$key ? $meta : (array_key_exists($key, $meta) ? $meta[$key] : null);
+        
+        return ! $key ? $meta : (array_key_exists($key, $meta) ? $meta[$key] : null);
     }
 
     public function getStream()
@@ -124,21 +172,21 @@ class Stream implements StreamInterface
 
     public function setStream($stream, $size = null)
     {
-        if (!is_resource($stream)) {
+        if (! is_resource($stream)) {
             throw new InvalidArgumentException('Stream must be a resource');
         }
-
+        
         $this->size = $size;
         $this->stream = $stream;
         $this->rebuildCache();
-
+        
         return $this;
     }
 
     public function detachStream()
     {
         $this->stream = null;
-
+        
         return $this;
     }
 
@@ -149,7 +197,7 @@ class Stream implements StreamInterface
 
     public function getWrapperData()
     {
-        return $this->getMetaData('wrapper_data') ?: array();
+        return $this->getMetaData('wrapper_data') ?  : array();
     }
 
     public function getStreamType()
@@ -167,7 +215,7 @@ class Stream implements StreamInterface
         if ($this->size !== null) {
             return $this->size;
         }
-
+        
         // If the stream is a file based stream and local, then use fstat
         clearstatcache(true, $this->cache['uri']);
         $stats = fstat($this->stream);
@@ -181,7 +229,7 @@ class Stream implements StreamInterface
             $this->seek($pos);
             return $this->size;
         }
-
+        
         return false;
     }
 
@@ -223,7 +271,7 @@ class Stream implements StreamInterface
     public function setSize($size)
     {
         $this->size = $size;
-
+        
         return $this;
     }
 
@@ -241,7 +289,7 @@ class Stream implements StreamInterface
     {
         // We can't know the size after writing anything
         $this->size = null;
-
+        
         return fwrite($this->stream, $string);
     }
 
@@ -257,7 +305,7 @@ class Stream implements StreamInterface
 
     public function readLine($maxLength = null)
     {
-        if (!$this->cache[self::IS_READABLE]) {
+        if (! $this->cache[self::IS_READABLE]) {
             return false;
         } else {
             return $maxLength ? fgets($this->getStream(), $maxLength) : fgets($this->getStream());
@@ -267,7 +315,7 @@ class Stream implements StreamInterface
     public function setCustomData($key, $value)
     {
         $this->customData[$key] = $value;
-
+        
         return $this;
     }
 

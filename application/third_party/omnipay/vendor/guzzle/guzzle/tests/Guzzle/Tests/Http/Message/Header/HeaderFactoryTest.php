@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Http\Message\Header;
 
 use Guzzle\Http\Message\Header\HeaderFactory;
@@ -9,6 +8,7 @@ use Guzzle\Http\Message\Header\HeaderFactory;
  */
 class HeaderFactoryTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testCreatesBasicHeaders()
     {
         $f = new HeaderFactory();

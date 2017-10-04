@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal\Message;
 
 /**
@@ -7,11 +6,12 @@ namespace Omnipay\PayPal\Message;
  */
 class ProPurchaseRequest extends ProAuthorizeRequest
 {
+
     public function getData()
     {
         $data = parent::getData();
         $data['PAYMENTACTION'] = 'Sale';
-
+        
         return $data;
     }
 }

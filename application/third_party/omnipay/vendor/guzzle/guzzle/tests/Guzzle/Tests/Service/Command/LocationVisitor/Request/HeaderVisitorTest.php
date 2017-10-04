@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Service\Command\LocationVisitor\Request;
 
 use Guzzle\Service\Description\Parameter;
@@ -10,13 +9,16 @@ use Guzzle\Service\Command\LocationVisitor\Request\HeaderVisitor as Visitor;
  */
 class HeaderVisitorTest extends AbstractVisitorTestCase
 {
+
     /**
      * @expectedException \Guzzle\Common\Exception\InvalidArgumentException
      */
     public function testValidatesHeaderMapsAreArrays()
     {
         $visitor = new Visitor();
-        $param = $this->getNestedCommand('header')->getParam('foo')->setSentAs('test');
+        $param = $this->getNestedCommand('header')
+            ->getParam('foo')
+            ->setSentAs('test');
         $param->setAdditionalProperties(new Parameter(array()));
         $visitor->visit($this->command, $this->request, $param, 'test');
     }
@@ -24,7 +26,9 @@ class HeaderVisitorTest extends AbstractVisitorTestCase
     public function testVisitsLocation()
     {
         $visitor = new Visitor();
-        $param = $this->getNestedCommand('header')->getParam('foo')->setSentAs('test');
+        $param = $this->getNestedCommand('header')
+            ->getParam('foo')
+            ->setSentAs('test');
         $param->setAdditionalProperties(false);
         $visitor->visit($this->command, $this->request, $param, '123');
         $this->assertEquals('123', (string) $this->request->getHeader('test'));
@@ -33,7 +37,9 @@ class HeaderVisitorTest extends AbstractVisitorTestCase
     public function testVisitsMappedPrefixHeaders()
     {
         $visitor = new Visitor();
-        $param = $this->getNestedCommand('header')->getParam('foo')->setSentAs('test');
+        $param = $this->getNestedCommand('header')
+            ->getParam('foo')
+            ->setSentAs('test');
         $param->setSentAs('x-foo-');
         $param->setAdditionalProperties(new Parameter(array(
             'type' => 'string'

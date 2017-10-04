@@ -7,7 +7,9 @@ namespace Braintree;
  */
 class Http
 {
+
     protected $_config;
+
     private $_useClientCredentials = false;
 
     public function __construct($config)
@@ -66,7 +68,7 @@ class Http
     {
         return [
             'Accept: application/xml',
-            'Content-Type: application/xml',
+            'Content-Type: application/xml'
         ];
     }
 
@@ -75,18 +77,19 @@ class Http
         if ($this->_useClientCredentials) {
             return [
                 'user' => $this->_config->getClientId(),
-                'password' => $this->_config->getClientSecret(),
+                'password' => $this->_config->getClientSecret()
             ];
-        } else if ($this->_config->isAccessToken()) {
-            return [
-                'token' => $this->_config->getAccessToken(),
-            ];
-        } else {
-            return [
-                'user' => $this->_config->getPublicKey(),
-                'password' => $this->_config->getPrivateKey(),
-            ];
-        }
+        } else 
+            if ($this->_config->isAccessToken()) {
+                return [
+                    'token' => $this->_config->getAccessToken()
+                ];
+            } else {
+                return [
+                    'user' => $this->_config->getPublicKey(),
+                    'password' => $this->_config->getPrivateKey()
+                ];
+            }
     }
 
     public function useClientCredentials()
@@ -105,96 +108,101 @@ class Http
         curl_setopt($curl, CURLOPT_TIMEOUT, $this->_config->timeout());
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $httpVerb);
         curl_setopt($curl, CURLOPT_URL, $url);
-
+        
         if ($this->_config->acceptGzipEncoding()) {
             curl_setopt($curl, CURLOPT_ENCODING, 'gzip');
         }
         if ($this->_config->sslVersion()) {
             curl_setopt($curl, CURLOPT_SSLVERSION, $this->_config->sslVersion());
         }
-
+        
         $headers = $this->_getHeaders($curl);
         $headers[] = 'User-Agent: Braintree PHP Library ' . Version::get();
         $headers[] = 'X-ApiVersion: ' . Configuration::API_VERSION;
-
+        
         $authorization = $this->_getAuthorization();
         if (isset($authorization['user'])) {
             curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
             curl_setopt($curl, CURLOPT_USERPWD, $authorization['user'] . ':' . $authorization['password']);
-        } else if (isset($authorization['token'])) {
-            $headers[] = 'Authorization: Bearer ' . $authorization['token'];
-        }
+        } else 
+            if (isset($authorization['token'])) {
+                $headers[] = 'Authorization: Bearer ' . $authorization['token'];
+            }
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-
+        
         // curl_setopt($curl, CURLOPT_VERBOSE, true);
         if ($this->_config->sslOn()) {
             curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
             curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
             curl_setopt($curl, CURLOPT_CAINFO, $this->getCaFile());
         }
-
-        if (!empty($requestBody)) {
+        
+        if (! empty($requestBody)) {
             curl_setopt($curl, CURLOPT_POSTFIELDS, $requestBody);
         }
-
+        
         if ($this->_config->isUsingProxy()) {
             $proxyHost = $this->_config->getProxyHost();
             $proxyPort = $this->_config->getProxyPort();
             $proxyType = $this->_config->getProxyType();
             $proxyUser = $this->_config->getProxyUser();
-            $proxyPwd= $this->_config->getProxyPassword();
+            $proxyPwd = $this->_config->getProxyPassword();
             curl_setopt($curl, CURLOPT_PROXY, $proxyHost . ':' . $proxyPort);
-            if (!empty($proxyType)) {
+            if (! empty($proxyType)) {
                 curl_setopt($curl, CURLOPT_PROXYTYPE, $proxyType);
             }
             if ($this->_config->isAuthenticatedProxy()) {
                 curl_setopt($curl, CURLOPT_PROXYUSERPWD, $proxyUser . ':' . $proxyPwd);
             }
         }
-
+        
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($curl);
         $httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         $error_code = curl_errno($curl);
         $error = curl_error($curl);
-
+        
         if ($error_code == 28 && $httpStatus == 0) {
             throw new Exception\Timeout();
         }
-
+        
         curl_close($curl);
         if ($this->_config->sslOn()) {
             if ($httpStatus == 0) {
                 throw new Exception\SSLCertificate($error, $error_code);
             }
-        } else if ($error_code) {
-            throw new Exception\Connection($error, $error_code);
-        }
-
-        return ['status' => $httpStatus, 'body' => $response];
+        } else 
+            if ($error_code) {
+                throw new Exception\Connection($error, $error_code);
+            }
+        
+        return [
+            'status' => $httpStatus,
+            'body' => $response
+        ];
     }
 
     private function getCaFile()
     {
         static $memo;
-
+        
         if ($memo === null) {
             $caFile = $this->_config->caFile();
-
+            
             if (substr($caFile, 0, 7) !== 'phar://') {
                 return $caFile;
             }
-
+            
             $extractedCaFile = sys_get_temp_dir() . '/api_braintreegateway_com.ca.crt';
-
-            if (!file_exists($extractedCaFile) || sha1_file($extractedCaFile) != sha1_file($caFile)) {
-                if (!copy($caFile, $extractedCaFile)) {
+            
+            if (! file_exists($extractedCaFile) || sha1_file($extractedCaFile) != sha1_file($caFile)) {
+                if (! copy($caFile, $extractedCaFile)) {
                     throw new Exception\SSLCaFileNotFound();
                 }
             }
             $memo = $extractedCaFile;
         }
-
+        
         return $memo;
     }
 }

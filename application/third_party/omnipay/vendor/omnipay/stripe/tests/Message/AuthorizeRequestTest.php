@@ -1,37 +1,37 @@
 <?php
-
 namespace Omnipay\Stripe\Message;
 
 use Omnipay\Tests\TestCase;
 
 class AuthorizeRequestTest extends TestCase
 {
+
     public function setUp()
     {
         $this->request = new AuthorizeRequest($this->getHttpClient(), $this->getHttpRequest());
-        $this->request->initialize(
-            array(
-                'amount' => '12.00',
-                'currency' => 'USD',
-                'card' => $this->getValidCard(),
-                'description' => 'Order #42',
-                'metadata' => array(
-                    'foo' => 'bar',
-                ),
-                'applicationFee' => '1.00'
-            )
-        );
+        $this->request->initialize(array(
+            'amount' => '12.00',
+            'currency' => 'USD',
+            'card' => $this->getValidCard(),
+            'description' => 'Order #42',
+            'metadata' => array(
+                'foo' => 'bar'
+            ),
+            'applicationFee' => '1.00'
+        ));
     }
 
     public function testGetData()
     {
         $data = $this->request->getData();
-
+        
         $this->assertSame(1200, $data['amount']);
         $this->assertSame('usd', $data['currency']);
         $this->assertSame('Order #42', $data['description']);
         $this->assertSame('false', $data['capture']);
-        $this->assertSame(array('foo' => 'bar'), $data['metadata']);
+        $this->assertSame(array(
+            'foo' => 'bar'
+        ), $data['metadata']);
         $this->assertSame(100, $data['application_fee']);
     }
 
@@ -50,7 +50,7 @@ class AuthorizeRequestTest extends TestCase
         $this->request->setCard(null);
         $this->request->setCustomerReference('abc');
         $data = $this->request->getData();
-
+        
         $this->assertSame('abc', $data['customer']);
     }
 
@@ -59,7 +59,7 @@ class AuthorizeRequestTest extends TestCase
         $this->request->setCustomerReference('abc');
         $this->request->setCardReference('xyz');
         $data = $this->request->getData();
-
+        
         $this->assertSame('abc', $data['customer']);
         $this->assertSame('xyz', $data['source']);
     }
@@ -68,7 +68,7 @@ class AuthorizeRequestTest extends TestCase
     {
         $this->request->setStatementDescriptor('OMNIPAY');
         $data = $this->request->getData();
-
+        
         $this->assertSame('OMNIPAY', $data['statement_descriptor']);
     }
 
@@ -77,7 +77,7 @@ class AuthorizeRequestTest extends TestCase
         $this->request->setSource('abc');
         $this->request->setDestination('xyz');
         $data = $this->request->getData();
-
+        
         $this->assertSame('abc', $data['source']);
         $this->assertSame('xyz', $data['destination']);
     }
@@ -87,7 +87,7 @@ class AuthorizeRequestTest extends TestCase
         $this->request->setCustomerReference('abc');
         $this->request->setToken('xyz');
         $data = $this->request->getData();
-
+        
         $this->assertSame('abc', $data['customer']);
         $this->assertSame('xyz', $data['source']);
     }
@@ -97,7 +97,7 @@ class AuthorizeRequestTest extends TestCase
         $card = $this->getValidCard();
         $this->request->setCard($card);
         $data = $this->request->getData();
-
+        
         $this->assertSame($card['number'], $data['source']['number']);
     }
 
@@ -105,7 +105,7 @@ class AuthorizeRequestTest extends TestCase
     {
         $this->setMockHttpResponse('PurchaseSuccess.txt');
         $response = $this->request->send();
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertSame('ch_1IU9gcUiNASROd', $response->getTransactionReference());
@@ -118,7 +118,7 @@ class AuthorizeRequestTest extends TestCase
     {
         $this->setMockHttpResponse('PurchaseFailure.txt');
         $response = $this->request->send();
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertSame('ch_1IUAZQWFYrPooM', $response->getTransactionReference());

@@ -1,11 +1,11 @@
 <?php
-
 namespace Omnipay\Stripe\Message;
 
 use Omnipay\Tests\TestCase;
 
 class CreateCardRequestTest extends TestCase
 {
+
     public function setUp()
     {
         $this->request = new CreateCardRequest($this->getHttpClient(), $this->getHttpRequest());
@@ -34,7 +34,7 @@ class CreateCardRequestTest extends TestCase
     {
         $this->request->setToken('xyz');
         $data = $this->request->getData();
-
+        
         $this->assertSame('xyz', $data['source']);
     }
 
@@ -43,7 +43,7 @@ class CreateCardRequestTest extends TestCase
         $this->request->setCard(null);
         $this->request->setCardReference('xyz');
         $data = $this->request->getData();
-
+        
         $this->assertSame('xyz', $data['source']);
     }
 
@@ -52,7 +52,7 @@ class CreateCardRequestTest extends TestCase
         $this->request->setCard(null);
         $this->request->setSource('xyz');
         $data = $this->request->getData();
-
+        
         $this->assertSame('xyz', $data['source']);
     }
 
@@ -61,7 +61,7 @@ class CreateCardRequestTest extends TestCase
         $card = $this->getValidCard();
         $this->request->setCard($card);
         $data = $this->request->getData();
-
+        
         $this->assertSame($card['number'], $data['source']['number']);
     }
 
@@ -69,7 +69,7 @@ class CreateCardRequestTest extends TestCase
     {
         $this->setMockHttpResponse('CreateCardSuccess.txt');
         $response = $this->request->send();
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());
@@ -82,7 +82,7 @@ class CreateCardRequestTest extends TestCase
     {
         $this->setMockHttpResponse('CreateCardFailure.txt');
         $response = $this->request->send();
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());
@@ -95,7 +95,7 @@ class CreateCardRequestTest extends TestCase
         $card = $this->getValidCard();
         $this->request->setCard($card);
         $data = $this->request->getData();
-
+        
         $this->assertArrayNotHasKey('email', $card);
     }
 }

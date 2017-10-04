@@ -8,6 +8,7 @@ namespace Omnipay\Braintree\Message;
  */
 class FindCustomerRequest extends AbstractRequest
 {
+
     public function getData()
     {
         return $this->getCustomerData();
@@ -16,13 +17,14 @@ class FindCustomerRequest extends AbstractRequest
     /**
      * Send the request with specified data
      *
-     * @param  mixed $data The data to send
+     * @param mixed $data
+     *            The data to send
      * @return CustomerResponse
      */
     public function sendData($data)
     {
         $response = $this->braintree->customer()->find($this->getCustomerId());
-
+        
         return $this->response = new CustomerResponse($this, $response);
     }
 }

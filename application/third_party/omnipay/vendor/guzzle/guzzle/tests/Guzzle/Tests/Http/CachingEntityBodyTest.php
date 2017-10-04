@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Http;
 
 use Guzzle\Http\EntityBody;
@@ -10,10 +9,15 @@ use Guzzle\Http\CachingEntityBody;
  */
 class CachingEntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
 {
-    /** @var CachingEntityBody */
+
+    /**
+     * @var CachingEntityBody
+     */
     protected $body;
 
-    /** @var EntityBody */
+    /**
+     * @var EntityBody
+     */
     protected $decorated;
 
     public function setUp()
@@ -72,8 +76,12 @@ class CachingEntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $a = EntityBody::factory('foo');
         $d = $this->getMockBuilder('Guzzle\Http\CachingEntityBody')
-            ->setMethods(array('seek'))
-            ->setConstructorArgs(array($a))
+            ->setMethods(array(
+            'seek'
+        ))
+            ->setConstructorArgs(array(
+            $a
+        ))
             ->getMock();
         $d->expects($this->once())
             ->method('seek')
@@ -119,14 +127,13 @@ class CachingEntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
 
     public function testSkipsOverwrittenBytes()
     {
-        $decorated = EntityBody::factory(
-            implode("\n", array_map(function ($n) {
-                return str_pad($n, 4, '0', STR_PAD_LEFT);
-            }, range(0, 25)))
-        );
-
+        $decorated = EntityBody::factory(implode("\n", array_map(function ($n)
+        {
+            return str_pad($n, 4, '0', STR_PAD_LEFT);
+        }, range(0, 25))));
+        
         $body = new CachingEntityBody($decorated);
-
+        
         $this->assertEquals("0000\n", $body->readLine());
         $this->assertEquals("0001\n", $body->readLine());
         // Write over part of the body yet to be read, so skip some bytes
@@ -137,7 +144,7 @@ class CachingEntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertEquals(0, $this->readAttribute($body, 'skipReadBytes'));
         $this->assertEquals("0004\n", $body->readLine());
         $this->assertEquals("0005\n", $body->readLine());
-
+        
         // Overwrite part of the cached body (so don't skip any bytes)
         $body->seek(5);
         $this->assertEquals(5, $body->write("ABCD\n"));
@@ -149,11 +156,11 @@ class CachingEntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertEquals("0006\n", $body->readLine());
         $this->assertEquals(5, $body->write("1234\n"));
         $this->assertEquals(5, $this->readAttribute($body, 'skipReadBytes'));
-
+        
         // Seek to 0 and ensure the overwritten bit is replaced
         $body->rewind();
         $this->assertEquals("0000\nABCD\nTEST\n0003\n0004\n0005\n0006\n1234\n0008\n0009\n", $body->read(50));
-
+        
         // Ensure that casting it to a string does not include the bit that was overwritten
         $this->assertContains("0000\nABCD\nTEST\n0003\n0004\n0005\n0006\n1234\n0008\n0009\n", (string) $body);
     }
@@ -161,8 +168,12 @@ class CachingEntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
     public function testWrapsContentType()
     {
         $a = $this->getMockBuilder('Guzzle\Http\EntityBody')
-            ->setMethods(array('getContentType'))
-            ->setConstructorArgs(array(fopen(__FILE__, 'r')))
+            ->setMethods(array(
+            'getContentType'
+        ))
+            ->setConstructorArgs(array(
+            fopen(__FILE__, 'r')
+        ))
             ->getMock();
         $a->expects($this->once())
             ->method('getContentType')
@@ -174,8 +185,12 @@ class CachingEntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
     public function testWrapsContentEncoding()
     {
         $a = $this->getMockBuilder('Guzzle\Http\EntityBody')
-            ->setMethods(array('getContentEncoding'))
-            ->setConstructorArgs(array(fopen(__FILE__, 'r')))
+            ->setMethods(array(
+            'getContentEncoding'
+        ))
+            ->setConstructorArgs(array(
+            fopen(__FILE__, 'r')
+        ))
             ->getMock();
         $a->expects($this->once())
             ->method('getContentEncoding')
@@ -187,10 +202,18 @@ class CachingEntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
     public function testWrapsMetadata()
     {
         $a = $this->getMockBuilder('Guzzle\Http\EntityBody')
-            ->setMethods(array('getMetadata', 'getWrapper', 'getWrapperData', 'getStreamType', 'getUri'))
-            ->setConstructorArgs(array(fopen(__FILE__, 'r')))
+            ->setMethods(array(
+            'getMetadata',
+            'getWrapper',
+            'getWrapperData',
+            'getStreamType',
+            'getUri'
+        ))
+            ->setConstructorArgs(array(
+            fopen(__FILE__, 'r')
+        ))
             ->getMock();
-
+        
         $a->expects($this->once())
             ->method('getMetadata')
             ->will($this->returnValue(array()));
@@ -207,7 +230,7 @@ class CachingEntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
         $a->expects($this->once())
             ->method('getUri')
             ->will($this->returnValue('path/to/foo'));
-
+        
         $d = new CachingEntityBody($a);
         $this->assertEquals(array(), $d->getMetaData());
         $this->assertEquals('wrapper', $d->getWrapper());
@@ -219,20 +242,25 @@ class CachingEntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
     public function testWrapsCustomData()
     {
         $a = $this->getMockBuilder('Guzzle\Http\EntityBody')
-            ->setMethods(array('getCustomData', 'setCustomData'))
-            ->setConstructorArgs(array(fopen(__FILE__, 'r')))
+            ->setMethods(array(
+            'getCustomData',
+            'setCustomData'
+        ))
+            ->setConstructorArgs(array(
+            fopen(__FILE__, 'r')
+        ))
             ->getMock();
-
+        
         $a->expects($this->exactly(1))
             ->method('getCustomData')
             ->with('foo')
             ->will($this->returnValue('bar'));
-
+        
         $a->expects($this->exactly(1))
             ->method('setCustomData')
             ->with('foo', 'bar')
             ->will($this->returnSelf());
-
+        
         $d = new CachingEntityBody($a);
         $this->assertSame($d, $d->setCustomData('foo', 'bar'));
         $this->assertEquals('bar', $d->getCustomData('foo'));

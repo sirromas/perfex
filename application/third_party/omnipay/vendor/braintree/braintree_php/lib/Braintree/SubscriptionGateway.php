@@ -12,12 +12,15 @@ use InvalidArgumentException;
  *
  * PHP Version 5
  *
- * @package   Braintree
+ * @package Braintree
  */
 class SubscriptionGateway
 {
+
     private $_gateway;
+
     private $_config;
+
     private $_http;
 
     public function __construct($gateway)
@@ -32,14 +35,16 @@ class SubscriptionGateway
     {
         Util::verifyKeys(self::_createSignature(), $attributes);
         $path = $this->_config->merchantPath() . '/subscriptions';
-        $response = $this->_http->post($path, ['subscription' => $attributes]);
+        $response = $this->_http->post($path, [
+            'subscription' => $attributes
+        ]);
         return $this->_verifyGatewayResponse($response);
     }
 
     public function find($id)
     {
         $this->_validateId($id);
-
+        
         try {
             $path = $this->_config->merchantPath() . '/subscriptions/' . $id;
             $response = $this->_http->get($path);
@@ -47,7 +52,6 @@ class SubscriptionGateway
         } catch (Exception\NotFound $e) {
             throw new Exception\NotFound('subscription with id ' . $id . ' not found');
         }
-
     }
 
     public function search($query)
@@ -56,16 +60,19 @@ class SubscriptionGateway
         foreach ($query as $term) {
             $criteria[$term->name] = $term->toparam();
         }
-
-
+        
         $path = $this->_config->merchantPath() . '/subscriptions/advanced_search_ids';
-        $response = $this->_http->post($path, ['search' => $criteria]);
+        $response = $this->_http->post($path, [
+            'search' => $criteria
+        ]);
         $pager = [
             'object' => $this,
             'method' => 'fetch',
-            'methodArgs' => [$query]
-            ];
-
+            'methodArgs' => [
+                $query
+            ]
+        ];
+        
         return new ResourceCollection($response, $pager);
     }
 
@@ -77,32 +84,37 @@ class SubscriptionGateway
         }
         $criteria["ids"] = SubscriptionSearch::ids()->in($ids)->toparam();
         $path = $this->_config->merchantPath() . '/subscriptions/advanced_search';
-        $response = $this->_http->post($path, ['search' => $criteria]);
-
-        return Util::extractAttributeAsArray(
-            $response['subscriptions'],
-            'subscription'
-        );
+        $response = $this->_http->post($path, [
+            'search' => $criteria
+        ]);
+        
+        return Util::extractAttributeAsArray($response['subscriptions'], 'subscription');
     }
 
     public function update($subscriptionId, $attributes)
     {
         Util::verifyKeys(self::_updateSignature(), $attributes);
         $path = $this->_config->merchantPath() . '/subscriptions/' . $subscriptionId;
-        $response = $this->_http->put($path, ['subscription' => $attributes]);
+        $response = $this->_http->put($path, [
+            'subscription' => $attributes
+        ]);
         return $this->_verifyGatewayResponse($response);
     }
 
     public function retryCharge($subscriptionId, $amount = null)
     {
-        $transaction_params = ['type' => Transaction::SALE,
-            'subscriptionId' => $subscriptionId];
+        $transaction_params = [
+            'type' => Transaction::SALE,
+            'subscriptionId' => $subscriptionId
+        ];
         if (isset($amount)) {
             $transaction_params['amount'] = $amount;
         }
-
+        
         $path = $this->_config->merchantPath() . '/transactions';
-        $response = $this->_http->post($path, ['transaction' => $transaction_params]);
+        $response = $this->_http->post($path, [
+            'transaction' => $transaction_params
+        ]);
         return $this->_verifyGatewayResponse($response);
     }
 
@@ -115,41 +127,64 @@ class SubscriptionGateway
 
     private static function _createSignature()
     {
-        return array_merge(
+        return array_merge([
+            'billingDayOfMonth',
+            'firstBillingDate',
+            'createdAt',
+            'updatedAt',
+            'id',
+            'merchantAccountId',
+            'neverExpires',
+            'numberOfBillingCycles',
+            'paymentMethodToken',
+            'paymentMethodNonce',
+            'planId',
+            'price',
+            'trialDuration',
+            'trialDurationUnit',
+            'trialPeriod',
             [
-                'billingDayOfMonth',
-                'firstBillingDate',
-                'createdAt',
-                'updatedAt',
-                'id',
-                'merchantAccountId',
-                'neverExpires',
-                'numberOfBillingCycles',
-                'paymentMethodToken',
-                'paymentMethodNonce',
-                'planId',
-                'price',
-                'trialDuration',
-                'trialDurationUnit',
-                'trialPeriod',
-                ['descriptor' => ['name', 'phone', 'url']],
-                ['options' => ['doNotInheritAddOnsOrDiscounts', 'startImmediately']],
+                'descriptor' => [
+                    'name',
+                    'phone',
+                    'url'
+                ]
             ],
-            self::_addOnDiscountSignature()
-        );
+            [
+                'options' => [
+                    'doNotInheritAddOnsOrDiscounts',
+                    'startImmediately'
+                ]
+            ]
+        ], self::_addOnDiscountSignature());
     }
 
     private static function _updateSignature()
     {
-        return array_merge(
+        return array_merge([
+            'merchantAccountId',
+            'numberOfBillingCycles',
+            'paymentMethodToken',
+            'planId',
+            'paymentMethodNonce',
+            'id',
+            'neverExpires',
+            'price',
             [
-                'merchantAccountId', 'numberOfBillingCycles', 'paymentMethodToken', 'planId',
-                'paymentMethodNonce', 'id', 'neverExpires', 'price',
-                ['descriptor' => ['name', 'phone', 'url']],
-                ['options' => ['prorateCharges', 'replaceAllAddOnsAndDiscounts', 'revertSubscriptionOnProrationFailure']],
+                'descriptor' => [
+                    'name',
+                    'phone',
+                    'url'
+                ]
             ],
-            self::_addOnDiscountSignature()
-        );
+            [
+                'options' => [
+                    'prorateCharges',
+                    'replaceAllAddOnsAndDiscounts',
+                    'revertSubscriptionOnProrationFailure'
+                ]
+            ]
+        ], self::_addOnDiscountSignature());
     }
 
     private static function _addOnDiscountSignature()
@@ -157,58 +192,95 @@ class SubscriptionGateway
         return [
             [
                 'addOns' => [
-                    ['add' => ['amount', 'inheritedFromId', 'neverExpires', 'numberOfBillingCycles', 'quantity']],
-                    ['update' => ['amount', 'existingId', 'neverExpires', 'numberOfBillingCycles', 'quantity']],
-                    ['remove' => ['_anyKey_']],
+                    [
+                        'add' => [
+                            'amount',
+                            'inheritedFromId',
+                            'neverExpires',
+                            'numberOfBillingCycles',
+                            'quantity'
+                        ]
+                    ],
+                    [
+                        'update' => [
+                            'amount',
+                            'existingId',
+                            'neverExpires',
+                            'numberOfBillingCycles',
+                            'quantity'
+                        ]
+                    ],
+                    [
+                        'remove' => [
+                            '_anyKey_'
+                        ]
+                    ]
                 ]
             ],
             [
                 'discounts' => [
-                    ['add' => ['amount', 'inheritedFromId', 'neverExpires', 'numberOfBillingCycles', 'quantity']],
-                    ['update' => ['amount', 'existingId', 'neverExpires', 'numberOfBillingCycles', 'quantity']],
-                    ['remove' => ['_anyKey_']],
+                    [
+                        'add' => [
+                            'amount',
+                            'inheritedFromId',
+                            'neverExpires',
+                            'numberOfBillingCycles',
+                            'quantity'
+                        ]
+                    ],
+                    [
+                        'update' => [
+                            'amount',
+                            'existingId',
+                            'neverExpires',
+                            'numberOfBillingCycles',
+                            'quantity'
+                        ]
+                    ],
+                    [
+                        'remove' => [
+                            '_anyKey_'
+                        ]
+                    ]
                 ]
             ]
         ];
     }
 
     /**
+     *
      * @ignore
+     *
      */
-    private function _validateId($id = null) {
+    private function _validateId($id = null)
+    {
         if (empty($id)) {
-           throw new InvalidArgumentException(
-                   'expected subscription id to be set'
-                   );
+            throw new InvalidArgumentException('expected subscription id to be set');
         }
-        if (!preg_match('/^[0-9A-Za-z_-]+$/', $id)) {
-            throw new InvalidArgumentException(
-                    $id . ' is an invalid subscription id.'
-                    );
+        if (! preg_match('/^[0-9A-Za-z_-]+$/', $id)) {
+            throw new InvalidArgumentException($id . ' is an invalid subscription id.');
         }
     }
 
     /**
+     *
      * @ignore
+     *
      */
     private function _verifyGatewayResponse($response)
     {
         if (isset($response['subscription'])) {
-            return new Result\Successful(
-                Subscription::factory($response['subscription'])
-            );
-        } else if (isset($response['transaction'])) {
-            // return a populated instance of Transaction, for subscription retryCharge
-            return new Result\Successful(
-                Transaction::factory($response['transaction'])
-            );
-        } else if (isset($response['apiErrorResponse'])) {
-            return new Result\Error($response['apiErrorResponse']);
-        } else {
-            throw new Exception\Unexpected(
-            "Expected subscription, transaction, or apiErrorResponse"
-            );
-        }
+            return new Result\Successful(Subscription::factory($response['subscription']));
+        } else 
+            if (isset($response['transaction'])) {
+                // return a populated instance of Transaction, for subscription retryCharge
+                return new Result\Successful(Transaction::factory($response['transaction']));
+            } else 
+                if (isset($response['apiErrorResponse'])) {
+                    return new Result\Error($response['apiErrorResponse']);
+                } else {
+                    throw new Exception\Unexpected("Expected subscription, transaction, or apiErrorResponse");
+                }
     }
 }
 class_alias('Braintree\SubscriptionGateway', 'Braintree_SubscriptionGateway');

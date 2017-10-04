@@ -10,6 +10,7 @@ use Braintree;
 
 class CreditCardTest extends Setup
 {
+
     public function testCreate()
     {
         $customer = Braintree\Customer::createNoValidate();
@@ -33,7 +34,7 @@ class CreditCardTest extends Setup
     public function testGatewayCreate()
     {
         $customer = Braintree\Customer::createNoValidate();
-
+        
         $gateway = new Braintree\Gateway([
             'environment' => 'development',
             'merchantId' => 'integration_merchant_id',
@@ -46,7 +47,7 @@ class CreditCardTest extends Setup
             'number' => '5105105105105100',
             'expirationDate' => '05/12'
         ]);
-
+        
         $this->assertTrue($result->success);
         $this->assertEquals($customer->id, $result->creditCard->customerId);
         $this->assertEquals('510510', $result->creditCard->bin);
@@ -65,7 +66,7 @@ class CreditCardTest extends Setup
             'expirationDate' => '05/12'
         ])->creditCard;
         $this->assertTrue($card1->isDefault());
-
+        
         $card2 = Braintree\CreditCard::create([
             'customerId' => $customer->id,
             'cardholderName' => 'Cardholder',
@@ -75,7 +76,7 @@ class CreditCardTest extends Setup
                 'makeDefault' => true
             ]
         ])->creditCard;
-
+        
         $card1 = Braintree\CreditCard::find($card1->token);
         $this->assertFalse($card1->isDefault());
         $this->assertTrue($card2->isDefault());
@@ -117,12 +118,12 @@ class CreditCardTest extends Setup
             ],
             "share" => true
         ]);
-
+        
         $result = Braintree\CreditCard::create([
             'customerId' => $customer->id,
             'paymentMethodNonce' => $nonce
         ]);
-
+        
         $this->assertSame("411111", $result->creditCard->bin);
         $this->assertSame("1111", $result->creditCard->last4);
     }
@@ -138,7 +139,7 @@ class CreditCardTest extends Setup
             'number' => '5105105105105100',
             'expirationDate' => '05/12'
         ]);
-
+        
         $this->assertTrue($result->success);
     }
 
@@ -178,15 +179,17 @@ class CreditCardTest extends Setup
     public function testCreate_withDuplicateCardCheck()
     {
         $customer = Braintree\Customer::createNoValidate();
-
+        
         $attributes = [
             'customerId' => $customer->id,
             'number' => '5105105105105100',
             'expirationDate' => '05/2011',
-            'options' => ['failOnDuplicatePaymentMethod' => true]
+            'options' => [
+                'failOnDuplicatePaymentMethod' => true
+            ]
         ];
         Braintree\CreditCard::create($attributes);
-
+        
         $result = Braintree\CreditCard::create($attributes);
         $this->assertFalse($result->success);
         $errors = $result->errors->forKey('creditCard')->onAttribute('number');
@@ -201,7 +204,9 @@ class CreditCardTest extends Setup
             'customerId' => $customer->id,
             'number' => '5105105105105100',
             'expirationDate' => '05/2011',
-            'options' => ['verifyCard' => true]
+            'options' => [
+                'verifyCard' => true
+            ]
         ]);
         $this->assertFalse($result->success);
         $this->assertEquals(Braintree\Result\CreditCardVerification::PROCESSOR_DECLINED, $result->creditCardVerification->status);
@@ -221,7 +226,9 @@ class CreditCardTest extends Setup
             'customerId' => $customer->id,
             'number' => '4111111111111111',
             'expirationDate' => '05/2011',
-            'options' => ['verifyCard' => true]
+            'options' => [
+                'verifyCard' => true
+            ]
         ]);
         $this->assertTrue($result->success);
         $this->assertNotNull($result->creditCard->verification->riskData);
@@ -235,7 +242,10 @@ class CreditCardTest extends Setup
             'customerId' => $customer->id,
             'number' => '5105105105105100',
             'expirationDate' => '05/2011',
-            'options' => ['verifyCard' => true, 'verificationAmount' => '1.02']
+            'options' => [
+                'verifyCard' => true,
+                'verificationAmount' => '1.02'
+            ]
         ]);
         $this->assertFalse($result->success);
         $this->assertEquals(Braintree\Result\CreditCardVerification::PROCESSOR_DECLINED, $result->creditCardVerification->status);
@@ -257,7 +267,10 @@ class CreditCardTest extends Setup
             'customerId' => $customer->id,
             'number' => '5105105105105100',
             'expirationDate' => '05/2011',
-            'options' => ['verificationMerchantAccountId' => Test\Helper::nonDefaultMerchantAccountId(), 'verifyCard' => true],
+            'options' => [
+                'verificationMerchantAccountId' => Test\Helper::nonDefaultMerchantAccountId(),
+                'verifyCard' => true
+            ]
         ]);
         $this->assertFalse($result->success);
         $this->assertEquals(Braintree\Result\CreditCardVerification::PROCESSOR_DECLINED, $result->creditCardVerification->status);
@@ -348,8 +361,10 @@ class CreditCardTest extends Setup
         $this->assertEquals(1, preg_match('/Credit card number is required\./', $result->message));
         $this->assertEquals(1, preg_match('/Customer ID is required\./', $result->message));
         $this->assertEquals(1, preg_match('/Expiration date is invalid\./', $result->message));
-
-        $errors = $result->errors->forKey('creditCard')->forKey('billingAddress')->onAttribute('base');
+        
+        $errors = $result->errors->forKey('creditCard')
+            ->forKey('billingAddress')
+            ->onAttribute('base');
         $this->assertEquals(Braintree\Error\Codes::ADDRESS_INCONSISTENT_COUNTRY, $errors[0]->code);
     }
 
@@ -369,12 +384,11 @@ class CreditCardTest extends Setup
         $customer = Braintree\Customer::createNoValidate();
         $result = Braintree\CreditCard::create([
             'customerId' => $customer->id,
-            'venmoSdkPaymentMethodCode' => Braintree\Test\VenmoSdk::getInvalidPaymentMethodCode(),
+            'venmoSdkPaymentMethodCode' => Braintree\Test\VenmoSdk::getInvalidPaymentMethodCode()
         ]);
         $this->assertFalse($result->success);
         $errors = $result->errors->forKey('creditCard')->onAttribute('venmoSdkPaymentMethodCode');
         $this->assertEquals($errors[0]->code, Braintree\Error\Codes::CREDIT_CARD_INVALID_VENMO_SDK_PAYMENT_METHOD_CODE);
-
     }
 
     public function testCreate_with_venmoSdkSession()
@@ -400,7 +414,7 @@ class CreditCardTest extends Setup
             'number' => '5105105105105100',
             'expirationDate' => '05/12',
             'options' => [
-                'venmoSdkSession' => Braintree\Test\VenmoSdk::getInvalidTestSession(),
+                'venmoSdkSession' => Braintree\Test\VenmoSdk::getInvalidTestSession()
             ]
         ]);
         $this->assertTrue($result->success);
@@ -409,11 +423,10 @@ class CreditCardTest extends Setup
 
     public function testCreateNoValidate_throwsIfValidationsFail()
     {
-
         $this->setExpectedException('Braintree\Exception\ValidationsFailed');
         $customer = Braintree\Customer::createNoValidate();
         Braintree\CreditCard::createNoValidate([
-            'expirationDate' => 'invalid',
+            'expirationDate' => 'invalid'
         ]);
     }
 
@@ -437,19 +450,16 @@ class CreditCardTest extends Setup
     {
         Test\Helper::suppressDeprecationWarnings();
         $customer = Braintree\Customer::createNoValidate();
-        $queryString = $this->createCreditCardViaTr(
-            [
-                'credit_card' => [
-                    'number' => '5105105105105100',
-                    'expiration_date' => '05/12'
-                ]
-            ],
-            [
-                'creditCard' => [
-                    'customerId' => $customer->id
-                ]
+        $queryString = $this->createCreditCardViaTr([
+            'credit_card' => [
+                'number' => '5105105105105100',
+                'expiration_date' => '05/12'
             ]
-        );
+        ], [
+            'creditCard' => [
+                'customerId' => $customer->id
+            ]
+        ]);
         $result = Braintree\CreditCard::createFromTransparentRedirect($queryString);
         $this->assertTrue($result->success);
         $this->assertEquals('510510', $result->creditCard->bin);
@@ -461,20 +471,19 @@ class CreditCardTest extends Setup
     {
         Test\Helper::suppressDeprecationWarnings();
         $customer = Braintree\Customer::createNoValidate();
-        $queryString = $this->createCreditCardViaTr(
-            [
-                'credit_card' => [
-                    'number' => '5105105105105100',
-                    'expiration_date' => '05/12',
-                    'options' => ['make_default' => true]
-                ]
-            ],
-            [
-                'creditCard' => [
-                    'customerId' => $customer->id
+        $queryString = $this->createCreditCardViaTr([
+            'credit_card' => [
+                'number' => '5105105105105100',
+                'expiration_date' => '05/12',
+                'options' => [
+                    'make_default' => true
                 ]
             ]
-        );
+        ], [
+            'creditCard' => [
+                'customerId' => $customer->id
+            ]
+        ]);
         $result = Braintree\CreditCard::createFromTransparentRedirect($queryString);
         $this->assertTrue($result->creditCard->isDefault());
     }
@@ -487,15 +496,14 @@ class CreditCardTest extends Setup
             'number' => '5105105105105100',
             'expirationDate' => '05/12'
         ]);
-        $queryString = $this->updateCreditCardViaTr(
-            [
-                'credit_card' => [
-                    'number' => '4111111111111111',
-                    'expiration_date' => '01/11'
-                ]
-            ],
-            ['paymentMethodToken' => $creditCard->token]
-        );
+        $queryString = $this->updateCreditCardViaTr([
+            'credit_card' => [
+                'number' => '4111111111111111',
+                'expiration_date' => '01/11'
+            ]
+        ], [
+            'paymentMethodToken' => $creditCard->token
+        ]);
         $result = Braintree\CreditCard::updateFromTransparentRedirect($queryString);
         $this->assertTrue($result->success);
         $this->assertEquals('411111', $result->creditCard->bin);
@@ -517,17 +525,16 @@ class CreditCardTest extends Setup
             'expirationDate' => '05/12'
         ]);
         $this->assertFalse($card2->isDefault());
-
-        $queryString = $this->updateCreditCardViaTr(
-            [
-                'credit_card' => [
-                    'options' => [
-                        'make_default' => true
-                    ]
+        
+        $queryString = $this->updateCreditCardViaTr([
+            'credit_card' => [
+                'options' => [
+                    'make_default' => true
                 ]
-            ],
-            ['paymentMethodToken' => $card2->token]
-        );
+            ]
+        ], [
+            'paymentMethodToken' => $card2->token
+        ]);
         $result = Braintree\CreditCard::updateFromTransparentRedirect($queryString);
         $this->assertFalse(Braintree\CreditCard::find($card1->token)->isDefault());
         $this->assertTrue(Braintree\CreditCard::find($card2->token)->isDefault());
@@ -552,24 +559,21 @@ class CreditCardTest extends Setup
                 'countryName' => 'United States of America'
             ]
         ]);
-
-        $queryString = $this->updateCreditCardViaTr(
-            [],
-            [
-                'paymentMethodToken' => $card->token,
-                'creditCard' => [
-                    'billingAddress' => [
-                        'streetAddress' => '123 New St',
-                        'locality' => 'St. Louis',
-                        'region' => 'MO',
-                        'postalCode' => '63119',
-                        'options' => [
-                            'updateExisting' => True
-                        ]
+        
+        $queryString = $this->updateCreditCardViaTr([], [
+            'paymentMethodToken' => $card->token,
+            'creditCard' => [
+                'billingAddress' => [
+                    'streetAddress' => '123 New St',
+                    'locality' => 'St. Louis',
+                    'region' => 'MO',
+                    'postalCode' => '63119',
+                    'options' => [
+                        'updateExisting' => True
                     ]
                 ]
             ]
-        );
+        ]);
         $result = Braintree\CreditCard::updateFromTransparentRedirect($queryString);
         $this->assertTrue($result->success);
         $card = $result->creditCard;
@@ -707,9 +711,9 @@ class CreditCardTest extends Setup
     {
         $collection = Braintree\CreditCard::expired();
         $this->assertTrue($collection->maximumCount() > 1);
-
+        
         $arr = [];
-        foreach($collection as $creditCard) {
+        foreach ($collection as $creditCard) {
             $this->assertTrue($creditCard->isExpired());
             array_push($arr, $creditCard->token);
         }
@@ -717,17 +721,13 @@ class CreditCardTest extends Setup
         $this->assertEquals($collection->maximumCount(), count($uniqueCreditCardTokens));
     }
 
-
     public function testExpiringBetween()
     {
-        $collection = Braintree\CreditCard::expiringBetween(
-            mktime(0, 0, 0, 1, 1, 2010),
-            mktime(23, 59, 59, 12, 31, 2010)
-        );
+        $collection = Braintree\CreditCard::expiringBetween(mktime(0, 0, 0, 1, 1, 2010), mktime(23, 59, 59, 12, 31, 2010));
         $this->assertTrue($collection->maximumCount() > 1);
-
+        
         $arr = [];
-        foreach($collection as $creditCard) {
+        foreach ($collection as $creditCard) {
             $this->assertEquals('2010', $creditCard->expirationYear);
             array_push($arr, $creditCard->token);
         }
@@ -737,15 +737,12 @@ class CreditCardTest extends Setup
 
     public function testExpiringBetween_parsesCreditCardDetailsUnderTransactionsCorrectly()
     {
-        $collection = Braintree\CreditCard::expiringBetween(
-            mktime(0, 0, 0, 1, 1, 2010),
-            mktime(23, 59, 59, 12, 31, 2010)
-        );
+        $collection = Braintree\CreditCard::expiringBetween(mktime(0, 0, 0, 1, 1, 2010), mktime(23, 59, 59, 12, 31, 2010));
         $this->assertTrue($collection->maximumCount() > 1);
-
-        foreach($collection as $creditCard) {
-            foreach($creditCard->subscriptions as $subscription) {
-                foreach($subscription->transactions as $transaction) {
+        
+        foreach ($collection as $creditCard) {
+            foreach ($creditCard->subscriptions as $subscription) {
+                foreach ($subscription->transactions as $transaction) {
                     $this->assertNotNull($transaction->creditCardDetails->expirationMonth);
                 }
             }
@@ -834,9 +831,9 @@ class CreditCardTest extends Setup
             ],
             "customerId" => $customer->id
         ]);
-
+        
         $creditCard = Braintree\CreditCard::fromNonce($nonce);
-
+        
         $customer = Braintree\Customer::find($customer->id);
         $this->assertEquals($customer->creditCards[0], $creditCard);
     }
@@ -852,7 +849,7 @@ class CreditCardTest extends Setup
             ],
             "share" => true
         ]);
-
+        
         $this->setExpectedException('Braintree\Exception\NotFound', "not found");
         Braintree\CreditCard::fromNonce($nonce);
     }
@@ -869,7 +866,7 @@ class CreditCardTest extends Setup
             ],
             "customerId" => $customer->id
         ]);
-
+        
         Braintree\CreditCard::fromNonce($nonce);
         $this->setExpectedException('Braintree\Exception\NotFound', "consumed");
         Braintree\CreditCard::fromNonce($nonce);
@@ -905,12 +902,14 @@ class CreditCardTest extends Setup
             'number' => '5105105105105100',
             'expirationDate' => '05/12'
         ])->creditCard;
-
+        
         $result = Braintree\CreditCard::update($initialCreditCard->token, [
             'billingAddress' => [
                 'region' => 'IL'
             ],
-            'options' => ['verifyCard' => true]
+            'options' => [
+                'verifyCard' => true
+            ]
         ]);
         $this->assertFalse($result->success);
         $this->assertEquals(Braintree\Result\CreditCardVerification::PROCESSOR_DECLINED, $result->creditCardVerification->status);
@@ -931,7 +930,7 @@ class CreditCardTest extends Setup
             'number' => '5105105105105100',
             'expirationDate' => '05/12'
         ])->creditCard;
-
+        
         $result = Braintree\CreditCard::update($initialCreditCard->token, [
             'billingAddress' => [
                 'region' => 'IL'
@@ -957,7 +956,7 @@ class CreditCardTest extends Setup
                 'streetAddress' => '123 Nigeria Ave'
             ]
         ])->creditCard;
-
+        
         $updatedCreditCard = Braintree\CreditCard::update($initialCreditCard->token, [
             'billingAddress' => [
                 'region' => 'IL'
@@ -979,10 +978,10 @@ class CreditCardTest extends Setup
                 'countryName' => 'Turkey',
                 'countryCodeAlpha2' => 'TR',
                 'countryCodeAlpha3' => 'TUR',
-                'countryCodeNumeric' => '792',
+                'countryCodeNumeric' => '792'
             ]
         ])->creditCard;
-
+        
         $updatedCreditCard = Braintree\CreditCard::update($initialCreditCard->token, [
             'billingAddress' => [
                 'countryName' => 'Thailand',
@@ -1005,7 +1004,7 @@ class CreditCardTest extends Setup
     {
         $oldToken = strval(rand());
         $newToken = strval(rand());
-
+        
         $customer = Braintree\Customer::createNoValidate();
         $createResult = Braintree\CreditCard::create([
             'customerId' => $customer->id,
@@ -1054,7 +1053,7 @@ class CreditCardTest extends Setup
         ]);
         $this->setExpectedException('Braintree\Exception\ValidationsFailed');
         Braintree\CreditCard::updateNoValidate($creditCard->token, [
-            'number' => 'invalid',
+            'number' => 'invalid'
         ]);
     }
 
@@ -1073,14 +1072,16 @@ class CreditCardTest extends Setup
             'number' => '5105105105105100',
             'expirationDate' => '05/12'
         ])->creditCard;
-
+        
         $this->assertTrue($card1->isDefault());
         $this->assertFalse($card2->isDefault());
-
+        
         Braintree\CreditCard::update($card2->token, [
-            'options' => ['makeDefault' => true]
+            'options' => [
+                'makeDefault' => true
+            ]
         ])->creditCard;
-
+        
         $this->assertFalse(Braintree\CreditCard::find($card1->token)->isDefault());
         $this->assertTrue(Braintree\CreditCard::find($card2->token)->isDefault());
     }
@@ -1104,24 +1105,26 @@ class CreditCardTest extends Setup
         $old_merchant_id = Braintree\Configuration::merchantId();
         $old_public_key = Braintree\Configuration::publicKey();
         $old_private_key = Braintree\Configuration::privateKey();
-
+        
         Braintree\Configuration::merchantId('processing_rules_merchant_id');
         Braintree\Configuration::publicKey('processing_rules_public_key');
         Braintree\Configuration::privateKey('processing_rules_private_key');
-
+        
         $customer = Braintree\Customer::createNoValidate();
         $result = Braintree\CreditCard::create([
             'customerId' => $customer->id,
             'number' => '4111111111111111',
             'expirationDate' => '05/2011',
             'cvv' => '200',
-            'options' => ['verifyCard' => true]
+            'options' => [
+                'verifyCard' => true
+            ]
         ]);
-
+        
         Braintree\Configuration::merchantId($old_merchant_id);
         Braintree\Configuration::publicKey($old_public_key);
         Braintree\Configuration::privateKey($old_private_key);
-
+        
         $this->assertFalse($result->success);
         $this->assertEquals(Braintree\Transaction::CVV, $result->creditCardVerification->gatewayRejectionReason);
     }
@@ -1131,50 +1134,44 @@ class CreditCardTest extends Setup
         $old_merchant_id = Braintree\Configuration::merchantId();
         $old_public_key = Braintree\Configuration::publicKey();
         $old_private_key = Braintree\Configuration::privateKey();
-
+        
         Braintree\Configuration::merchantId('processing_rules_merchant_id');
         Braintree\Configuration::publicKey('processing_rules_public_key');
         Braintree\Configuration::privateKey('processing_rules_private_key');
-
+        
         $customer = Braintree\Customer::createNoValidate();
         $result = Braintree\CreditCard::create([
             'customerId' => $customer->id,
             'number' => '5105105105105100',
             'expirationDate' => '05/2011',
             'cvv' => '200',
-            'options' => ['verifyCard' => true]
+            'options' => [
+                'verifyCard' => true
+            ]
         ]);
-
+        
         Braintree\Configuration::merchantId($old_merchant_id);
         Braintree\Configuration::publicKey($old_public_key);
         Braintree\Configuration::privateKey($old_private_key);
-
+        
         $this->assertFalse($result->success);
         $this->assertNull($result->creditCardVerification->gatewayRejectionReason);
     }
 
     public function createCreditCardViaTr($regularParams, $trParams)
     {
-        $trData = Braintree\TransparentRedirect::createCreditCardData(
-            array_merge($trParams, ["redirectUrl" => "http://www.example.com"])
-        );
-        return Test\Helper::submitTrRequest(
-            Braintree\CreditCard::createCreditCardUrl(),
-            $regularParams,
-            $trData
-        );
+        $trData = Braintree\TransparentRedirect::createCreditCardData(array_merge($trParams, [
+            "redirectUrl" => "http://www.example.com"
+        ]));
+        return Test\Helper::submitTrRequest(Braintree\CreditCard::createCreditCardUrl(), $regularParams, $trData);
     }
 
     public function updateCreditCardViaTr($regularParams, $trParams)
     {
-        $trData = Braintree\TransparentRedirect::updateCreditCardData(
-            array_merge($trParams, ["redirectUrl" => "http://www.example.com"])
-        );
-        return Test\Helper::submitTrRequest(
-            Braintree\CreditCard::updateCreditCardUrl(),
-            $regularParams,
-            $trData
-        );
+        $trData = Braintree\TransparentRedirect::updateCreditCardData(array_merge($trParams, [
+            "redirectUrl" => "http://www.example.com"
+        ]));
+        return Test\Helper::submitTrRequest(Braintree\CreditCard::updateCreditCardUrl(), $regularParams, $trData);
     }
 
     public function testPrepaidCard()
@@ -1185,7 +1182,9 @@ class CreditCardTest extends Setup
             'cardholderName' => 'Cardholder',
             'number' => CardTypeIndicators::PREPAID,
             'expirationDate' => '05/12',
-            'options' => ['verifyCard' => true]
+            'options' => [
+                'verifyCard' => true
+            ]
         ]);
         $this->assertEquals(Braintree\CreditCard::PREPAID_YES, $result->creditCard->prepaid);
     }
@@ -1198,7 +1197,9 @@ class CreditCardTest extends Setup
             'cardholderName' => 'Cardholder',
             'number' => CardTypeIndicators::COMMERCIAL,
             'expirationDate' => '05/12',
-            'options' => ['verifyCard' => true]
+            'options' => [
+                'verifyCard' => true
+            ]
         ]);
         $this->assertEquals(Braintree\CreditCard::COMMERCIAL_YES, $result->creditCard->commercial);
     }
@@ -1211,7 +1212,9 @@ class CreditCardTest extends Setup
             'cardholderName' => 'Cardholder',
             'number' => CardTypeIndicators::DEBIT,
             'expirationDate' => '05/12',
-            'options' => ['verifyCard' => true]
+            'options' => [
+                'verifyCard' => true
+            ]
         ]);
         $this->assertEquals(Braintree\CreditCard::DEBIT_YES, $result->creditCard->debit);
     }
@@ -1224,7 +1227,9 @@ class CreditCardTest extends Setup
             'cardholderName' => 'Cardholder',
             'number' => CardTypeIndicators::PAYROLL,
             'expirationDate' => '05/12',
-            'options' => ['verifyCard' => true]
+            'options' => [
+                'verifyCard' => true
+            ]
         ]);
         $this->assertEquals(Braintree\CreditCard::PAYROLL_YES, $result->creditCard->payroll);
         $this->assertEquals('MSA', $result->creditCard->productId);
@@ -1238,7 +1243,9 @@ class CreditCardTest extends Setup
             'cardholderName' => 'Cardholder',
             'number' => CardTypeIndicators::HEALTHCARE,
             'expirationDate' => '05/12',
-            'options' => ['verifyCard' => true]
+            'options' => [
+                'verifyCard' => true
+            ]
         ]);
         $this->assertEquals(Braintree\CreditCard::HEALTHCARE_YES, $result->creditCard->healthcare);
         $this->assertEquals('J3', $result->creditCard->productId);
@@ -1252,7 +1259,9 @@ class CreditCardTest extends Setup
             'cardholderName' => 'Cardholder',
             'number' => CardTypeIndicators::DURBIN_REGULATED,
             'expirationDate' => '05/12',
-            'options' => ['verifyCard' => true]
+            'options' => [
+                'verifyCard' => true
+            ]
         ]);
         $this->assertEquals(Braintree\CreditCard::DURBIN_REGULATED_YES, $result->creditCard->durbinRegulated);
     }
@@ -1265,7 +1274,9 @@ class CreditCardTest extends Setup
             'cardholderName' => 'Cardholder',
             'number' => CardTypeIndicators::COUNTRY_OF_ISSUANCE,
             'expirationDate' => '05/12',
-            'options' => ['verifyCard' => true]
+            'options' => [
+                'verifyCard' => true
+            ]
         ]);
         $this->assertEquals("USA", $result->creditCard->countryOfIssuance);
     }
@@ -1278,7 +1289,9 @@ class CreditCardTest extends Setup
             'cardholderName' => 'Cardholder',
             'number' => CardTypeIndicators::ISSUING_BANK,
             'expirationDate' => '05/12',
-            'options' => ['verifyCard' => true]
+            'options' => [
+                'verifyCard' => true
+            ]
         ]);
         $this->assertEquals("NETWORK ONLY", $result->creditCard->issuingBank);
     }
@@ -1291,7 +1304,9 @@ class CreditCardTest extends Setup
             'cardholderName' => 'Cardholder',
             'number' => CardTypeIndicators::NO,
             'expirationDate' => '05/12',
-            'options' => ['verifyCard' => true]
+            'options' => [
+                'verifyCard' => true
+            ]
         ]);
         $this->assertEquals(Braintree\CreditCard::PREPAID_NO, $result->creditCard->prepaid);
         $this->assertEquals(Braintree\CreditCard::DURBIN_REGULATED_NO, $result->creditCard->durbinRegulated);
@@ -1310,7 +1325,9 @@ class CreditCardTest extends Setup
             'cardholderName' => 'Cardholder',
             'number' => CardTypeIndicators::UNKNOWN,
             'expirationDate' => '05/12',
-            'options' => ['verifyCard' => true]
+            'options' => [
+                'verifyCard' => true
+            ]
         ]);
         $this->assertEquals(Braintree\CreditCard::PREPAID_UNKNOWN, $result->creditCard->prepaid);
         $this->assertEquals(Braintree\CreditCard::DURBIN_REGULATED_UNKNOWN, $result->creditCard->durbinRegulated);

@@ -14,9 +14,9 @@ namespace Braintree;
  * user the action is complete.
  *
  * <code>
- *   $trData = TransparentRedirect::createCustomerData(array(
- *     'redirectUrl => 'http://example.com/redirect_back_to_merchant_site',
- *      ));
+ * $trData = TransparentRedirect::createCustomerData(array(
+ * 'redirectUrl => 'http://example.com/redirect_back_to_merchant_site',
+ * ));
  * </code>
  *
  * In addition to the redirectUrl, any data that needs to be protected
@@ -25,38 +25,38 @@ namespace Braintree;
  * amount, include the amount in the trData.
  *
  * <code>
- *   $trData = TransparentRedirect::transactionData(array(
- *     'redirectUrl' => 'http://example.com/complete_transaction',
- *     'transaction' => array('amount' => '100.00'),
- *   ));
+ * $trData = TransparentRedirect::transactionData(array(
+ * 'redirectUrl' => 'http://example.com/complete_transaction',
+ * 'transaction' => array('amount' => '100.00'),
+ * ));
  *
- *  </code>
+ * </code>
  *
- * @package    Braintree
- * @category   Resources
+ * @package Braintree
+ * @category Resources
  */
 class TransparentRedirect
 {
     // Request Kinds
     const CREATE_TRANSACTION = 'create_transaction';
+
     const CREATE_PAYMENT_METHOD = 'create_payment_method';
+
     const UPDATE_PAYMENT_METHOD = 'update_payment_method';
+
     const CREATE_CUSTOMER = 'create_customer';
+
     const UPDATE_CUSTOMER = 'update_customer';
 
     /**
-     * @ignore
-     * don't permit an explicit call of the constructor!
-     * (like $t = new TransparentRedirect())
+     *
+     * @ignore don't permit an explicit call of the constructor!
+     *         (like $t = new TransparentRedirect())
      */
     protected function __construct()
-    {
-
-    }
-
-
+    {}
+    
     // static methods redirecting to gateway
-
     public static function confirm($queryString)
     {
         return Configuration::gateway()->transparentRedirect()->confirm($queryString);

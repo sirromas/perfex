@@ -3,7 +3,6 @@
 /**
  * Stripe Abstract Request.
  */
-
 namespace Omnipay\Stripe\Message;
 
 use Omnipay\Common\Message\ResponseInterface;
@@ -24,7 +23,7 @@ use Omnipay\Common\Message\ResponseInterface;
  * to the live mode endpoint, the Stripe API endpoint is the same
  * for test and for live.
  *
- * Setting the testMode flag on this gateway has no effect.  To
+ * Setting the testMode flag on this gateway has no effect. To
  * use test mode just use your test mode API key.
  *
  * You can use any of the cards listed at https://stripe.com/docs/testing
@@ -35,6 +34,7 @@ use Omnipay\Common\Message\ResponseInterface;
  */
 abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 {
+
     /**
      * Live or Test Endpoint URL.
      *
@@ -63,7 +63,9 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     }
 
     /**
+     *
      * @deprecated
+     *
      */
     public function getCardToken()
     {
@@ -71,7 +73,9 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     }
 
     /**
+     *
      * @deprecated
+     *
      */
     public function setCardToken($value)
     {
@@ -91,7 +95,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     /**
      * Set the customer reference.
      *
-     * Used when calling CreateCard on an existing customer.  If this
+     * Used when calling CreateCard on an existing customer. If this
      * parameter is not set then a new customer is created.
      *
      * @return AbstractRequest provides a fluent interface.
@@ -122,7 +126,8 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     }
 
     /**
-     * @param string $value
+     *
+     * @param string $value            
      *
      * @return \Omnipay\Common\Message\AbstractRequest
      */
@@ -142,7 +147,8 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     }
 
     /**
-     * @param string $value
+     *
+     * @param string $value            
      *
      * @return \Omnipay\Common\Message\AbstractRequest
      */
@@ -166,20 +172,21 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     }
 
     /**
+     *
      * @return array
      */
     public function getHeaders()
     {
         $headers = array();
-
+        
         if ($this->getConnectedStripeAccountHeader()) {
             $headers['Stripe-Account'] = $this->getConnectedStripeAccountHeader();
         }
-
+        
         if ($this->getIdempotencyKeyHeader()) {
             $headers['Idempotency-Key'] = $this->getIdempotencyKeyHeader();
         }
-
+        
         return $headers;
     }
 
@@ -190,65 +197,60 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
      */
     public function send()
     {
-        $data    = $this->getData();
-        $headers = array_merge(
-            $this->getHeaders(),
-            array('Authorization' => 'Basic ' . base64_encode($this->getApiKey() . ':'))
-        );
-
+        $data = $this->getData();
+        $headers = array_merge($this->getHeaders(), array(
+            'Authorization' => 'Basic ' . base64_encode($this->getApiKey() . ':')
+        ));
+        
         return $this->sendData($data, $headers);
     }
 
     /**
-     * @param       $data
-     * @param array $headers
+     *
+     * @param
+     *            $data
+     * @param array $headers            
      *
      * @return \Guzzle\Http\Message\RequestInterface
      */
     protected function createClientRequest($data, array $headers = null)
     {
         // Stripe only accepts TLS >= v1.2, so make sure Curl is told
-        $config                          = $this->httpClient->getConfig();
-        $curlOptions                     = $config->get('curl.options');
+        $config = $this->httpClient->getConfig();
+        $curlOptions = $config->get('curl.options');
         $curlOptions[CURLOPT_SSLVERSION] = 6;
         $config->set('curl.options', $curlOptions);
         $this->httpClient->setConfig($config);
-
+        
         // don't throw exceptions for 4xx errors
-        $this->httpClient->getEventDispatcher()->addListener(
-            'request.error',
-            function ($event) {
-                if ($event['response']->isClientError()) {
-                    $event->stopPropagation();
-                }
+        $this->httpClient->getEventDispatcher()->addListener('request.error', function ($event)
+        {
+            if ($event['response']->isClientError()) {
+                $event->stopPropagation();
             }
-        );
-
-        $httpRequest = $this->httpClient->createRequest(
-            $this->getHttpMethod(),
-            $this->getEndpoint(),
-            $headers,
-            $data
-        );
-
+        });
+        
+        $httpRequest = $this->httpClient->createRequest($this->getHttpMethod(), $this->getEndpoint(), $headers, $data);
+        
         return $httpRequest;
     }
 
     public function sendData($data, array $headers = null)
     {
-        $httpRequest  = $this->createClientRequest($data, $headers);
+        $httpRequest = $this->createClientRequest($data, $headers);
         $httpResponse = $httpRequest->send();
-
+        
         $this->response = new Response($this, $httpResponse->json());
-
+        
         if ($httpResponse->hasHeader('Request-Id')) {
             $this->response->setRequestId((string) $httpResponse->getHeader('Request-Id'));
         }
-
+        
         return $this->response;
     }
 
     /**
+     *
      * @return mixed
      */
     public function getSource()
@@ -257,8 +259,10 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     }
 
     /**
-     * @param $value
      *
+     * @param
+     *            $value
+     *            
      * @return AbstractRequest provides a fluent interface.
      */
     public function setSource($value)
@@ -280,7 +284,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     {
         $card = $this->getCard();
         $card->validate();
-
+        
         $data = array();
         $data['object'] = 'card';
         $data['number'] = $card->getNumber();
@@ -296,8 +300,8 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         $data['address_zip'] = $card->getPostcode();
         $data['address_state'] = $card->getState();
         $data['address_country'] = $card->getCountry();
-        $data['email']           = $card->getEmail();
-
+        $data['email'] = $card->getEmail();
+        
         return $data;
     }
 }

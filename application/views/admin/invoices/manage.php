@@ -3,9 +3,9 @@
 	<div class="content">
 		<div class="row">
 			<?php
-			include_once(APPPATH.'views/admin/invoices/filter_params.php');
-			$this->load->view('admin/invoices/list_template');
-			?>
+include_once (APPPATH . 'views/admin/invoices/filter_params.php');
+$this->load->view('admin/invoices/list_template');
+?>
 		</div>
 	</div>
 </div>

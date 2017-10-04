@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Parser\Message;
 
 use Guzzle\Parser\Message\MessageParser;
@@ -10,6 +9,7 @@ use Guzzle\Parser\Message\MessageParser;
  */
 class MessageParserTest extends MessageParserProvider
 {
+
     /**
      * @dataProvider requestProvider
      */

@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Service\Command;
 
 use Guzzle\Http\Message\Response;
@@ -13,6 +12,7 @@ use Guzzle\Service\Description\Operation;
  */
 class DefaultResponseParserTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testParsesXmlResponses()
     {
         $op = new OperationCommand(array(), new Operation());
@@ -32,7 +32,9 @@ class DefaultResponseParserTest extends \Guzzle\Tests\GuzzleTestCase
         $request->setResponse(new Response(200, array(
             'Content-Type' => 'application/json'
         ), '{"Baz":"Bar"}'), true);
-        $this->assertEquals(array('Baz' => 'Bar'), $op->execute());
+        $this->assertEquals(array(
+            'Baz' => 'Bar'
+        ), $op->execute());
     }
 
     /**
@@ -43,7 +45,9 @@ class DefaultResponseParserTest extends \Guzzle\Tests\GuzzleTestCase
         $op = new OperationCommand(array(), new Operation());
         $op->setClient(new Client());
         $request = $op->prepare();
-        $request->setResponse(new Response(200, array('Content-Type' => 'application/json'), '{"Baz":ddw}'), true);
+        $request->setResponse(new Response(200, array(
+            'Content-Type' => 'application/json'
+        ), '{"Baz":ddw}'), true);
         $op->execute();
     }
 
@@ -54,6 +58,8 @@ class DefaultResponseParserTest extends \Guzzle\Tests\GuzzleTestCase
         $op->setClient(new Client());
         $request = $op->prepare();
         $request->setResponse(new Response(200, null, '{"Baz":"Bar"}'), true);
-        $this->assertEquals(array('Baz' => 'Bar'), $op->execute());
+        $this->assertEquals(array(
+            'Baz' => 'Bar'
+        ), $op->execute());
     }
 }

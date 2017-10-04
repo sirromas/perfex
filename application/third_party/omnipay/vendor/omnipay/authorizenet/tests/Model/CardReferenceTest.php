@@ -1,11 +1,14 @@
 <?php
-
 namespace Omnipay\AuthorizeNet\Model;
 
 class CardReferenceTest extends \PHPUnit_Framework_TestCase
 {
+
     private $data;
-    /** @var CardReference */
+
+    /**
+     * @var CardReference
+     */
     private $cardReference;
 
     public function setUp()
@@ -23,7 +26,7 @@ class CardReferenceTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldSerializeModel()
     {
-        $actual = (string)$this->cardReference;
+        $actual = (string) $this->cardReference;
         $this->assertEquals($this->data, $actual);
     }
 }

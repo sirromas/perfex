@@ -2,7 +2,6 @@
 /**
  * PayPal REST Authorize Request
  */
-
 namespace Omnipay\PayPal\Message;
 
 /**
@@ -20,16 +19,16 @@ namespace Omnipay\PayPal\Message;
  * #### Initialize Gateway
  *
  * <code>
- *   // Create a gateway for the PayPal RestGateway
- *   // (routes to GatewayFactory::create)
- *   $gateway = Omnipay::create('PayPal_Rest');
+ * // Create a gateway for the PayPal RestGateway
+ * // (routes to GatewayFactory::create)
+ * $gateway = Omnipay::create('PayPal_Rest');
  *
- *   // Initialise the gateway
- *   $gateway->initialize(array(
- *       'clientId' => 'MyPayPalClientId',
- *       'secret'   => 'MyPayPalSecret',
- *       'testMode' => true, // Or false when you are ready for live transactions
- *   ));
+ * // Initialise the gateway
+ * $gateway->initialize(array(
+ * 'clientId' => 'MyPayPalClientId',
+ * 'secret' => 'MyPayPalSecret',
+ * 'testMode' => true, // Or false when you are ready for live transactions
+ * ));
  * </code>
  *
  * #### Direct Credit Card Authorize
@@ -41,36 +40,36 @@ namespace Omnipay\PayPal\Message;
  * This does not require the customer to have a PayPal account.
  *
  * </code>
- *   // Create a credit card object
- *   // DO NOT USE THESE CARD VALUES -- substitute your own
- *   // see the documentation in the class header.
- *   $card = new CreditCard(array(
- *               'firstName' => 'Example',
- *               'lastName' => 'User',
- *               'number' => '4111111111111111',
- *               'expiryMonth'           => '01',
- *               'expiryYear'            => '2020',
- *               'cvv'                   => '123',
- *               'billingAddress1'       => '1 Scrubby Creek Road',
- *               'billingCountry'        => 'AU',
- *               'billingCity'           => 'Scrubby Creek',
- *               'billingPostcode'       => '4999',
- *               'billingState'          => 'QLD',
- *   ));
+ * // Create a credit card object
+ * // DO NOT USE THESE CARD VALUES -- substitute your own
+ * // see the documentation in the class header.
+ * $card = new CreditCard(array(
+ * 'firstName' => 'Example',
+ * 'lastName' => 'User',
+ * 'number' => '4111111111111111',
+ * 'expiryMonth' => '01',
+ * 'expiryYear' => '2020',
+ * 'cvv' => '123',
+ * 'billingAddress1' => '1 Scrubby Creek Road',
+ * 'billingCountry' => 'AU',
+ * 'billingCity' => 'Scrubby Creek',
+ * 'billingPostcode' => '4999',
+ * 'billingState' => 'QLD',
+ * ));
  *
- *   // Do an authorisation transaction on the gateway
- *   $transaction = $gateway->authorize(array(
- *       'amount'        => '10.00',
- *       'currency'      => 'AUD',
- *       'description'   => 'This is a test authorize transaction.',
- *       'card'          => $card,
- *   ));
- *   $response = $transaction->send();
- *   if ($response->isSuccessful()) {
- *       echo "Authorize transaction was successful!\n";
- *       // Find the authorization ID
- *       $auth_id = $response->getTransactionReference();
- *   }
+ * // Do an authorisation transaction on the gateway
+ * $transaction = $gateway->authorize(array(
+ * 'amount' => '10.00',
+ * 'currency' => 'AUD',
+ * 'description' => 'This is a test authorize transaction.',
+ * 'card' => $card,
+ * ));
+ * $response = $transaction->send();
+ * if ($response->isSuccessful()) {
+ * echo "Authorize transaction was successful!\n";
+ * // Find the authorization ID
+ * $auth_id = $response->getTransactionReference();
+ * }
  * </code>
  *
  * Direct credit card payment and related features are restricted in
@@ -81,7 +80,7 @@ namespace Omnipay\PayPal\Message;
  * #### PayPal Account Authorization
  *
  * This is for the use case where the customer intends to pay using their
- * PayPal account.  Note that no credit card details are provided, instead
+ * PayPal account. Note that no credit card details are provided, instead
  * both a return URL and a cancel URL are required.
  *
  * The optimal solution here is to provide a unique return URL and cancel
@@ -89,65 +88,65 @@ namespace Omnipay\PayPal\Message;
  * being returned or cancelled by PayPal.
  *
  * So step 1 is to store some transaction data somewhere on your system so
- * that you have an ID when your transaction returns.  How you do this of
+ * that you have an ID when your transaction returns. How you do this of
  * course depends on what framework, database layer, etc, you are using but
  * for this step let's assume that you have a class set up that can save
  * a transaction and return the object, and that you can retrieve the ID
- * of that saved object using some call like getId() on the object.  Most
+ * of that saved object using some call like getId() on the object. Most
  * ORMs such as Doctrine ORM, Propel or Eloquent will have some methods
  * that will allow you to do this or something similar.
  *
  * <code>
- *   $transaction = MyClass::saveTransaction($some_data);
- *   $txn_id = $transaction->getId();
+ * $transaction = MyClass::saveTransaction($some_data);
+ * $txn_id = $transaction->getId();
  * </code>
  *
  * Step 2 is to send the purchase request.
  *
  * </code>
- *   // Do a purchase transaction on the gateway
- *   try {
- *       $transaction = $gateway->authorize(array(
- *           'amount'        => '10.00',
- *           'currency'      => 'AUD',
- *           'description'   => 'This is a test authorize transaction.',
- *           'returnUrl'     => 'http://mysite.com/paypal/return/?txn_id=' . $txn_id,
- *           'cancelUrl'     => 'http://mysite.com/paypal/return/?txn_id=' . $txn_id,
- *       ));
- *       $response = $transaction->send();
- *       $data = $response->getData();
- *       echo "Gateway purchase response data == " . print_r($data, true) . "\n";
+ * // Do a purchase transaction on the gateway
+ * try {
+ * $transaction = $gateway->authorize(array(
+ * 'amount' => '10.00',
+ * 'currency' => 'AUD',
+ * 'description' => 'This is a test authorize transaction.',
+ * 'returnUrl' => 'http://mysite.com/paypal/return/?txn_id=' . $txn_id,
+ * 'cancelUrl' => 'http://mysite.com/paypal/return/?txn_id=' . $txn_id,
+ * ));
+ * $response = $transaction->send();
+ * $data = $response->getData();
+ * echo "Gateway purchase response data == " . print_r($data, true) . "\n";
  *
- *       if ($response->isSuccessful()) {
- *           echo "Step 2 was successful!\n";
- *       }
+ * if ($response->isSuccessful()) {
+ * echo "Step 2 was successful!\n";
+ * }
  *
- *   } catch (\Exception $e) {
- *       echo "Exception caught while attempting authorize.\n";
- *       echo "Exception type == " . get_class($e) . "\n";
- *       echo "Message == " . $e->getMessage() . "\n";
- *   }
+ * } catch (\Exception $e) {
+ * echo "Exception caught while attempting authorize.\n";
+ * echo "Exception type == " . get_class($e) . "\n";
+ * echo "Message == " . $e->getMessage() . "\n";
+ * }
  * </code>
  *
  * Step 3 is where your code needs to redirect the customer to the PayPal
  * gateway so that the customer can sign in to their PayPal account and
- * agree to authorize the payment.  The response will implement an interface
+ * agree to authorize the payment. The response will implement an interface
  * called RedirectResponseInterface from which the redirect URL can be obtained.
  *
  * How you do this redirect is up to your platform, code or framework at
- * this point.  For the below example I will assume that there is a
+ * this point. For the below example I will assume that there is a
  * function called redirectTo() which can handle it for you.
  *
  * </code>
- *   if ($response->isRedirect()) {
- *       // Redirect the customer to PayPal so that they can sign in and
- *       // authorize the payment.
- *       echo "The transaction is a redirect";
- *       redirectTo($response->getRedirectUrl());
- *   }
+ * if ($response->isRedirect()) {
+ * // Redirect the customer to PayPal so that they can sign in and
+ * // authorize the payment.
+ * echo "The transaction is a redirect";
+ * redirectTo($response->getRedirectUrl());
+ * }
  * </code>
  *
- * Step 4 is where the customer returns to your site.  This will happen on
+ * Step 4 is where the customer returns to your site. This will happen on
  * either the returnUrl or the cancelUrl, that you provided in the purchase()
  * call.
  *
@@ -164,36 +163,36 @@ namespace Omnipay\PayPal\Message;
  * respectively.
  *
  * <code>
- *   $paymentId = $_GET['paymentId'];
- *   $payerId = $_GET['payerId'];
+ * $paymentId = $_GET['paymentId'];
+ * $payerId = $_GET['payerId'];
  *
- *   // Once the transaction has been approved, we need to complete it.
- *   $transaction = $gateway->completePurchase(array(
- *       'payer_id'             => $payer_id,
- *       'transactionReference' => $sale_id,
- *   ));
- *   $response = $transaction->send();
- *   if ($response->isSuccessful()) {
- *       // The customer has successfully paid.
- *       echo "Step 4 was successful!\n";
- *   } else {
- *       // There was an error returned by completePurchase().  You should
- *       // check the error code and message from PayPal, which may be something
- *       // like "card declined", etc.
- *   }
+ * // Once the transaction has been approved, we need to complete it.
+ * $transaction = $gateway->completePurchase(array(
+ * 'payer_id' => $payer_id,
+ * 'transactionReference' => $sale_id,
+ * ));
+ * $response = $transaction->send();
+ * if ($response->isSuccessful()) {
+ * // The customer has successfully paid.
+ * echo "Step 4 was successful!\n";
+ * } else {
+ * // There was an error returned by completePurchase(). You should
+ * // check the error code and message from PayPal, which may be something
+ * // like "card declined", etc.
+ * }
  * </code>
  *
  * #### Note on Handling Error Messages
  *
- * PayPal account payments are a 2 step process.  Firstly the customer needs to
- * authorize the payment from PayPal to your application.  Secondly, assuming that
+ * PayPal account payments are a 2 step process. Firstly the customer needs to
+ * authorize the payment from PayPal to your application. Secondly, assuming that
  * the customer does not have enough balance to pay the invoice from their PayPal
  * balance, PayPal needs to transfer the funds from the customer's credit card to
- * their PayPal account.  This transaction is between PayPal and the customer, and
+ * their PayPal account. This transaction is between PayPal and the customer, and
  * not between the customer and you.
  *
  * If the second transaction fails then a call to completePurchase() will return
- * an error.  However this error message will be fairly generic.  For privacy
+ * an error. However this error message will be fairly generic. For privacy
  * reasons, PayPal will not disclose to the merchant the full reason for the
  * failure, they will only disclose this to the customer.
  *
@@ -215,6 +214,7 @@ namespace Omnipay\PayPal\Message;
  */
 class RestAuthorizeRequest extends AbstractRestRequest
 {
+
     public function getData()
     {
         $data = array(
@@ -228,13 +228,13 @@ class RestAuthorizeRequest extends AbstractRestRequest
                     'description' => $this->getDescription(),
                     'amount' => array(
                         'total' => $this->getAmount(),
-                        'currency' => $this->getCurrency(),
-                    ),
+                        'currency' => $this->getCurrency()
+                    )
                 )
             ),
             'experience_profile_id' => $this->getExperienceProfileId()
         );
-
+        
         $items = $this->getItems();
         if ($items) {
             $itemList = array();
@@ -249,19 +249,19 @@ class RestAuthorizeRequest extends AbstractRestRequest
             }
             $data['transactions'][0]['item_list']["items"] = $itemList;
         }
-
+        
         if ($this->getCardReference()) {
             $this->validate('amount');
-
+            
             $data['payer']['funding_instruments'][] = array(
                 'credit_card_token' => array(
-                    'credit_card_id' => $this->getCardReference(),
-                ),
+                    'credit_card_id' => $this->getCardReference()
+                )
             );
         } elseif ($this->getCard()) {
             $this->validate('amount', 'card');
             $this->getCard()->validate();
-
+            
             $data['payer']['funding_instruments'][] = array(
                 'credit_card' => array(
                     'number' => $this->getCard()->getNumber(),
@@ -273,33 +273,34 @@ class RestAuthorizeRequest extends AbstractRestRequest
                     'last_name' => $this->getCard()->getLastName(),
                     'billing_address' => array(
                         'line1' => $this->getCard()->getAddress1(),
-                        //'line2' => $this->getCard()->getAddress2(),
+                        
+                        // 'line2' => $this->getCard()->getAddress2(),
                         'city' => $this->getCard()->getCity(),
                         'state' => $this->getCard()->getState(),
                         'postal_code' => $this->getCard()->getPostcode(),
-                        'country_code' => strtoupper($this->getCard()->getCountry()),
+                        'country_code' => strtoupper($this->getCard()->getCountry())
                     )
                 )
             );
-
+            
             // There's currently a quirk with the REST API that requires line2 to be
             // non-empty if it's present. Jul 14, 2014
             $line2 = $this->getCard()->getAddress2();
-            if (!empty($line2)) {
+            if (! empty($line2)) {
                 $data['payer']['funding_instruments'][0]['credit_card']['billing_address']['line2'] = $line2;
             }
         } else {
             $this->validate('amount', 'returnUrl', 'cancelUrl');
-
+            
             unset($data['payer']['funding_instruments']);
-
+            
             $data['payer']['payment_method'] = 'paypal';
             $data['redirect_urls'] = array(
                 'return_url' => $this->getReturnUrl(),
-                'cancel_url' => $this->getCancelUrl(),
+                'cancel_url' => $this->getCancelUrl()
             );
         }
-
+        
         return $data;
     }
 
@@ -316,7 +317,7 @@ class RestAuthorizeRequest extends AbstractRestRequest
     /**
      * Set the experience profile id
      *
-     * @param string $value
+     * @param string $value            
      * @return RestAuthorizeRequest provides a fluent interface.
      */
     public function setExperienceProfileId($value)
@@ -336,7 +337,7 @@ class RestAuthorizeRequest extends AbstractRestRequest
     {
         $id = $this->getTransactionId();
         $desc = parent::getDescription();
-
+        
         if (empty($id)) {
             return $desc;
         } elseif (empty($desc)) {

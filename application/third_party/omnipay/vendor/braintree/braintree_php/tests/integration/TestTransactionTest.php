@@ -10,6 +10,7 @@ use Braintree;
 
 class TestTransactionTest extends Setup
 {
+
     public function setUp()
     {
         Braintree\Configuration::environment('development');
@@ -29,9 +30,9 @@ class TestTransactionTest extends Setup
     public function testThrowingExceptionWhenProduction()
     {
         Braintree\Configuration::environment('production');
-
+        
         $this->setExpectedException('Braintree\Exception\TestOperationPerformedInProduction');
-
+        
         $transaction = Braintree\Test\Transaction::settle('foo');
     }
 
@@ -43,11 +44,13 @@ class TestTransactionTest extends Setup
                 'number' => '5105105105105100',
                 'expirationDate' => '05/12'
             ],
-            'options' => ['submitForSettlement' => true]
+            'options' => [
+                'submitForSettlement' => true
+            ]
         ]);
-
+        
         $transaction = Braintree\Test\Transaction::settle($transaction->id);
-
+        
         $this->assertEquals('settled', $transaction->status);
     }
 
@@ -59,11 +62,13 @@ class TestTransactionTest extends Setup
                 'number' => '5105105105105100',
                 'expirationDate' => '05/12'
             ],
-            'options' => ['submitForSettlement' => true]
+            'options' => [
+                'submitForSettlement' => true
+            ]
         ]);
-
+        
         $transaction = Braintree\Test\Transaction::settlementConfirm($transaction->id);
-
+        
         $this->assertEquals('settlement_confirmed', $transaction->status);
     }
 
@@ -75,11 +80,13 @@ class TestTransactionTest extends Setup
                 'number' => '5105105105105100',
                 'expirationDate' => '05/12'
             ],
-            'options' => ['submitForSettlement' => true]
+            'options' => [
+                'submitForSettlement' => true
+            ]
         ]);
-
+        
         $transaction = Braintree\Test\Transaction::settlementDecline($transaction->id);
-
+        
         $this->assertEquals('settlement_declined', $transaction->status);
     }
 
@@ -91,11 +98,13 @@ class TestTransactionTest extends Setup
                 'number' => '5105105105105100',
                 'expirationDate' => '05/12'
             ],
-            'options' => ['submitForSettlement' => true]
+            'options' => [
+                'submitForSettlement' => true
+            ]
         ]);
-
+        
         $transaction = Braintree\Test\Transaction::settlementPending($transaction->id);
-
+        
         $this->assertEquals('settlement_pending', $transaction->status);
     }
 }

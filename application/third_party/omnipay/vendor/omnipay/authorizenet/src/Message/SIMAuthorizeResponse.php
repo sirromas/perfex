@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\AuthorizeNet\Message;
 
 use Omnipay\Common\Message\AbstractResponse;
@@ -11,6 +10,7 @@ use Omnipay\Common\Message\RedirectResponseInterface;
  */
 class SIMAuthorizeResponse extends AbstractResponse implements RedirectResponseInterface
 {
+
     protected $redirectUrl;
 
     public function __construct(RequestInterface $request, $data, $redirectUrl)

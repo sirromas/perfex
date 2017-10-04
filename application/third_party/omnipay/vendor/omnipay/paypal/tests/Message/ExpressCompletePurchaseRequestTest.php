@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal\Message;
 
 use Omnipay\PayPal\Message\ExpressCompletePurchaseRequest;
@@ -7,7 +6,9 @@ use Omnipay\Tests\TestCase;
 
 class ExpressCompletePurchaseRequestTest extends TestCase
 {
+
     /**
+     *
      * @var \Omnipay\PayPal\Message\ExpressCompletePurchaseRequest
      */
     private $request;
@@ -15,11 +16,11 @@ class ExpressCompletePurchaseRequestTest extends TestCase
     public function setUp()
     {
         $client = $this->getHttpClient();
-
+        
         $request = $this->getHttpRequest();
         $request->query->set('PayerID', 'Payer-1234');
         $request->query->set('token', 'TOKEN1234');
-
+        
         $this->request = new ExpressCompletePurchaseRequest($client, $request);
     }
 
@@ -40,7 +41,7 @@ class ExpressCompletePurchaseRequestTest extends TestCase
         $this->request->setHandlingAmount('0.00');
         $this->request->setShippingDiscount('0.00');
         $this->request->setInsuranceAmount('0.00');
-
+        
         $expected = array();
         $expected['METHOD'] = 'DoExpressCheckoutPayment';
         $expected['PAYMENTREQUEST_0_PAYMENTACTION'] = 'Sale';
@@ -62,7 +63,7 @@ class ExpressCompletePurchaseRequestTest extends TestCase
         $expected['PAYMENTREQUEST_0_HANDLINGAMT'] = '0.00';
         $expected['PAYMENTREQUEST_0_SHIPDISCAMT'] = '0.00';
         $expected['PAYMENTREQUEST_0_INSURANCEAMT'] = '0.00';
-
+        
         $this->assertEquals($expected, $this->request->getData());
     }
 
@@ -76,18 +77,28 @@ class ExpressCompletePurchaseRequestTest extends TestCase
         $this->request->setSignature('SIG');
         $this->request->setSubject('SUB');
         $this->request->setDescription('DESC');
-
+        
         $this->request->setItems(array(
-            array('name' => 'Floppy Disk', 'description' => 'MS-DOS', 'quantity' => 2, 'price' => 10),
-            array('name' => 'CD-ROM', 'description' => 'Windows 95', 'quantity' => 1, 'price' => 40),
+            array(
+                'name' => 'Floppy Disk',
+                'description' => 'MS-DOS',
+                'quantity' => 2,
+                'price' => 10
+            ),
+            array(
+                'name' => 'CD-ROM',
+                'description' => 'Windows 95',
+                'quantity' => 1,
+                'price' => 40
+            )
         ));
-
+        
         $data = $this->request->getData();
         $this->assertSame('Floppy Disk', $data['L_PAYMENTREQUEST_0_NAME0']);
         $this->assertSame('MS-DOS', $data['L_PAYMENTREQUEST_0_DESC0']);
         $this->assertSame(2, $data['L_PAYMENTREQUEST_0_QTY0']);
         $this->assertSame('10.00', $data['L_PAYMENTREQUEST_0_AMT0']);
-
+        
         $this->assertSame('CD-ROM', $data['L_PAYMENTREQUEST_0_NAME1']);
         $this->assertSame('Windows 95', $data['L_PAYMENTREQUEST_0_DESC1']);
         $this->assertSame(1, $data['L_PAYMENTREQUEST_0_QTY1']);

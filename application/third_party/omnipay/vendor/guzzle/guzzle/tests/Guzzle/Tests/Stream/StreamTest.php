@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Stream;
 
 use Guzzle\Stream\Stream;
@@ -10,6 +9,7 @@ use Guzzle\Stream\Stream;
  */
 class StreamTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     /**
      * @expectedException \InvalidArgumentException
      */
@@ -63,7 +63,7 @@ class StreamTest extends \Guzzle\Tests\GuzzleTestCase
         $stream = new Stream($handle);
         $this->assertEquals('data', (string) $stream);
         unset($stream);
-
+        
         $handle = fopen(__DIR__ . '/../TestData/FileBody.txt', 'r');
         $stream = new Stream($handle);
         $this->assertEquals('', (string) $stream);
@@ -126,7 +126,7 @@ class StreamTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertEquals($size, $stream->getSize());
         $this->assertEquals($size, $stream->getSize());
         unset($stream);
-
+        
         // Make sure that false is returned when the size cannot be determined
         $this->getServer()->enqueue("HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n");
         $handle = fopen('http://127.0.0.1:' . $this->getServer()->getPort(), 'r');

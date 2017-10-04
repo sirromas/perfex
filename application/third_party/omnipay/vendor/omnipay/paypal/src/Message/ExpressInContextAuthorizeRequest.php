@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal\Message;
 
 /**
@@ -7,6 +6,7 @@ namespace Omnipay\PayPal\Message;
  */
 class ExpressInContextAuthorizeRequest extends ExpressAuthorizeRequest
 {
+
     protected function createResponse($data)
     {
         return $this->response = new ExpressInContextAuthorizeResponse($this, $data);

@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\AuthorizeNet;
 
 use Omnipay\AuthorizeNet\Message\AIMAuthorizeRequest;
@@ -14,6 +13,7 @@ use Omnipay\Common\AbstractGateway;
  */
 class AIMGateway extends AbstractGateway
 {
+
     public function getName()
     {
         return 'Authorize.Net AIM';
@@ -22,12 +22,12 @@ class AIMGateway extends AbstractGateway
     public function getDefaultParameters()
     {
         return array(
-            'apiLoginId'        => '',
-            'transactionKey'    => '',
-            'testMode'          => false,
-            'developerMode'     => false,
-            'liveEndpoint'      => 'https://api2.authorize.net/xml/v1/request.api',
-            'developerEndpoint' => 'https://apitest.authorize.net/xml/v1/request.api',
+            'apiLoginId' => '',
+            'transactionKey' => '',
+            'testMode' => false,
+            'developerMode' => false,
+            'liveEndpoint' => 'https://api2.authorize.net/xml/v1/request.api',
+            'developerEndpoint' => 'https://apitest.authorize.net/xml/v1/request.api'
         );
     }
 
@@ -98,7 +98,8 @@ class AIMGateway extends AbstractGateway
     }
 
     /**
-     * @param array $parameters
+     *
+     * @param array $parameters            
      * @return AIMAuthorizeRequest
      */
     public function authorize(array $parameters = array())
@@ -107,7 +108,8 @@ class AIMGateway extends AbstractGateway
     }
 
     /**
-     * @param array $parameters
+     *
+     * @param array $parameters            
      * @return AIMCaptureRequest
      */
     public function capture(array $parameters = array())
@@ -116,7 +118,8 @@ class AIMGateway extends AbstractGateway
     }
 
     /**
-     * @param array $parameters
+     *
+     * @param array $parameters            
      * @return AIMPurchaseRequest
      */
     public function purchase(array $parameters = array())
@@ -125,7 +128,8 @@ class AIMGateway extends AbstractGateway
     }
 
     /**
-     * @param array $parameters
+     *
+     * @param array $parameters            
      * @return AIMVoidRequest
      */
     public function void(array $parameters = array())
@@ -134,7 +138,8 @@ class AIMGateway extends AbstractGateway
     }
 
     /**
-     * @param array $parameters
+     *
+     * @param array $parameters            
      * @return AIMRefundRequest
      */
     public function refund(array $parameters = array())

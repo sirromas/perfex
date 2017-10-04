@@ -5,12 +5,13 @@
 			<div class="col-md-8 col-md-offset-2">
 				<div class="panel_s">
 					<div class="panel-body">
-					<h4 class="no-margin">
+						<h4 class="no-margin">
 					<?php echo $title; ?>
 					</h4>
-					  <hr class="hr-panel-heading" />
+						<hr class="hr-panel-heading" />
 						<?php if(isset($predefined_reply)){ ?>
-						<a href="<?php echo admin_url('tickets/predefined_reply'); ?>" class="btn btn-success pull-left mbot20 display-block"><?php echo _l('new_predefined_reply'); ?></a>
+						<a href="<?php echo admin_url('tickets/predefined_reply'); ?>"
+							class="btn btn-success pull-left mbot20 display-block"><?php echo _l('new_predefined_reply'); ?></a>
 						<div class="clearfix"></div>
 						<?php } ?>
 						<?php echo form_open($this->uri->uri_string()); ?>

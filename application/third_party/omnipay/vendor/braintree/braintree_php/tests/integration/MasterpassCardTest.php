@@ -10,14 +10,15 @@ use Braintree;
 
 class MasterpassCardTest extends Setup
 {
+
     public function testCreateWithMasterpassCardNonce()
     {
         $customer = Braintree\Customer::createNoValidate();
         $result = Braintree\PaymentMethod::create([
             'customerId' => $customer->id,
-            'paymentMethodNonce' => Braintree\Test\Nonces::$masterpassDiscover,
+            'paymentMethodNonce' => Braintree\Test\Nonces::$masterpassDiscover
         ]);
-
+        
         $this->assertTrue($result->success);
         $masterpassCard = $result->paymentMethod;
         $this->assertSame(Braintree\CreditCard::DISCOVER, $masterpassCard->cardType);
@@ -28,7 +29,7 @@ class MasterpassCardTest extends Setup
         $this->assertSame($customer->id, $masterpassCard->customerId);
         $this->assertSame($masterpassCard->last4, '1117');
         $this->assertSame($masterpassCard->maskedNumber, '601111******1117');
-
+        
         $this->assertNotNull($masterpassCard->billingAddress);
         $this->assertNotNull($masterpassCard->bin);
         $this->assertNotNull($masterpassCard->cardType);
@@ -63,15 +64,14 @@ class MasterpassCardTest extends Setup
     {
         $transaction = Braintree\Transaction::saleNoValidate([
             'amount' => Braintree\Test\TransactionAmounts::$authorize,
-            'paymentMethodNonce' => Braintree\Test\Nonces::$masterpassDiscover,
+            'paymentMethodNonce' => Braintree\Test\Nonces::$masterpassDiscover
         ]);
-
+        
         $collection = Braintree\Transaction::search([
             Braintree\TransactionSearch::id()->is($transaction->id),
             Braintree\TransactionSearch::paymentInstrumentType()->is(Braintree\PaymentInstrumentType::MASTERPASS_CARD)
         ]);
-
-
+        
         $this->assertEquals($transaction->paymentInstrumentType, Braintree\PaymentInstrumentType::MASTERPASS_CARD);
         $this->assertEquals($transaction->id, $collection->firstItem()->id);
     }
@@ -97,13 +97,13 @@ class MasterpassCardTest extends Setup
                 'storeInVault' => true
             ]
         ]);
-
+        
         $this->assertTrue($result->success);
         $transaction = $result->transaction;
         $this->assertEquals('47.00', $transaction->amount);
         $masterpassCardDetails = $transaction->masterpassCardDetails;
         $this->assertSame(Braintree\CreditCard::AMEX, $masterpassCardDetails->cardType);
-
+        
         $this->assertNotNull($masterpassCardDetails->bin);
         $this->assertNotNull($masterpassCardDetails->cardType);
         $this->assertNotNull($masterpassCardDetails->cardholderName);

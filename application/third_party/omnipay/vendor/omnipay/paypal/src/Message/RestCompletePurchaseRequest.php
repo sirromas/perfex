@@ -2,7 +2,6 @@
 /**
  * PayPal REST Complete Purchase Request
  */
-
 namespace Omnipay\PayPal\Message;
 
 /**
@@ -24,22 +23,22 @@ namespace Omnipay\PayPal\Message;
  * See RestPurchaseRequest for the first part of this example transaction:
  *
  * <code>
- *   $paymentId = $_GET['paymentId'];
- *   $payerId = $_GET['payerId'];
+ * $paymentId = $_GET['paymentId'];
+ * $payerId = $_GET['payerId'];
  *
- *   // Once the transaction has been approved, we need to complete it.
- *   $transaction = $gateway->completePurchase(array(
- *       'payer_id'             => $payer_id,
- *       'transactionReference' => $sale_id,
- *   ));
- *   $response = $transaction->send();
- *   if ($response->isSuccessful()) {
- *       // The customer has successfully paid.
- *   } else {
- *       // There was an error returned by completePurchase().  You should
- *       // check the error code and message from PayPal, which may be something
- *       // like "card declined", etc.
- *   }
+ * // Once the transaction has been approved, we need to complete it.
+ * $transaction = $gateway->completePurchase(array(
+ * 'payer_id' => $payer_id,
+ * 'transactionReference' => $sale_id,
+ * ));
+ * $response = $transaction->send();
+ * if ($response->isSuccessful()) {
+ * // The customer has successfully paid.
+ * } else {
+ * // There was an error returned by completePurchase(). You should
+ * // check the error code and message from PayPal, which may be something
+ * // like "card declined", etc.
+ * }
  * </code>
  *
  * @see RestPurchaseRequest
@@ -47,8 +46,10 @@ namespace Omnipay\PayPal\Message;
  */
 class RestCompletePurchaseRequest extends AbstractRestRequest
 {
+
     /**
-     * Get the raw data array for this message. The format of this varies from gateway to
+     * Get the raw data array for this message.
+     * The format of this varies from gateway to
      * gateway, but will usually be either an associative array, or a SimpleXMLElement.
      *
      * @return mixed
@@ -56,11 +57,11 @@ class RestCompletePurchaseRequest extends AbstractRestRequest
     public function getData()
     {
         $this->validate('transactionReference', 'payerId');
-
+        
         $data = array(
             'payer_id' => $this->getPayerId()
         );
-
+        
         return $data;
     }
 

@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\AuthorizeNet\Message;
 
 use Omnipay\Common\Message\AbstractResponse;
@@ -8,11 +7,13 @@ use Omnipay\Common\Message\RedirectResponseInterface;
 
 /**
  * Authorize.Net DPM Authorize and Purchase Response
- * We want the application to present a POST form to the user. This object will
+ * We want the application to present a POST form to the user.
+ * This object will
  * provide the helper methods for doing so.
  */
 class DPMResponse extends AbstractResponse implements RedirectResponseInterface
 {
+
     protected $postUrl;
 
     /**
@@ -20,19 +21,20 @@ class DPMResponse extends AbstractResponse implements RedirectResponseInterface
      * Not all are required
      */
     protected $hiddenFields = array(
+        
         // Merchant
         'x_login',
-
+        
         // Fingerprint
         'x_fp_hash',
         'x_fp_sequence',
         'x_fp_timestamp',
-
+        
         // Transaction
         'x_type',
         'x_version',
         'x_method',
-
+        
         // Payment
         'x_amount',
         'x_currency_code',
@@ -40,35 +42,34 @@ class DPMResponse extends AbstractResponse implements RedirectResponseInterface
         'x_freight',
         'x_duty',
         'x_tax_exempt',
-
+        
         // Relay response
         'x_relay_response',
         'x_relay_url',
         'x_relay_always',
         'x_cancel_url',
-
+        
         // AFDS
         'x_customer_ip',
-
+        
         // Testing
         'x_test_request',
-
+        
         'x_invoice_num',
         'x_description',
         'x_cust_id',
         'x_email_customer',
-
+        
         'x_delim_data',
-
+        
         // Custom omnipay field.
-        'omnipay_transaction_id',
+        'omnipay_transaction_id'
     );
 
     /**
      * Maps OmniPay field names to Authorize.Net field names.
      */
-    protected $fieldMapping = array(
-    );
+    protected $fieldMapping = array();
 
     public function __construct(RequestInterface $request, $data, $postUrl)
     {
@@ -99,9 +100,9 @@ class DPMResponse extends AbstractResponse implements RedirectResponseInterface
     {
         return true;
     }
-
+    
     // Helpers to build the form.
-
+    
     /**
      * The URL the form will POST to.
      */
@@ -130,7 +131,7 @@ class DPMResponse extends AbstractResponse implements RedirectResponseInterface
      */
     public function hideField($field_name)
     {
-        if (!in_array($field_name, $this->hiddenFields)) {
+        if (! in_array($field_name, $this->hiddenFields)) {
             $this->hiddenFields[] = $field_name;
         }
     }

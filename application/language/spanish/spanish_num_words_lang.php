@@ -1,5 +1,4 @@
 <?php
-
 $lang["num_word_1"] = "Uno";
 $lang["num_word_2"] = "Dos";
 $lang["num_word_3"] = "Tres";
@@ -114,17 +113,17 @@ $lang["num_word_billion"] = "Mil Millones";
 $lang["num_word_trillion"] = "Billones";
 $lang["num_word_zillion"] = "Infinitos";
 $lang["num_word_cents"] = "Centimos";
-$lang["number_word_and"] ="y";
+$lang["number_word_and"] = "y";
 
 // Show in invoices and estimates
-$lang["num_word"] ="Con Palabras";
+$lang["num_word"] = "Con Palabras";
 
 $currencies = array(
-    'USD'=>'Dolares',
-    'EUR'=>'Euros',
+    'USD' => 'Dolares',
+    'EUR' => 'Euros'
 );
 
-$currencies = do_action('before_number_format_render_languge_currencies',$currencies);
-foreach($currencies as $key =>$val){
-    $lang['num_word_'.strtoupper($key)] = $val;
+$currencies = do_action('before_number_format_render_languge_currencies', $currencies);
+foreach ($currencies as $key => $val) {
+    $lang['num_word_' . strtoupper($key)] = $val;
 }

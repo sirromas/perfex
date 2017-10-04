@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\Session\Storage\Proxy;
 
 /**
@@ -18,6 +17,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Proxy;
  */
 abstract class AbstractProxy
 {
+
     /**
      * Flag if handler wraps an internal PHP session handler (using \SessionHandler).
      *
@@ -26,6 +26,7 @@ abstract class AbstractProxy
     protected $wrapper = false;
 
     /**
+     *
      * @var string
      */
     protected $saveHandlerName;
@@ -67,7 +68,7 @@ abstract class AbstractProxy
      */
     public function isActive()
     {
-        return \PHP_SESSION_ACTIVE === session_status();
+        return\PHP_SESSION_ACTIVE === session_status();
     }
 
     /**
@@ -83,7 +84,7 @@ abstract class AbstractProxy
     /**
      * Sets the session ID.
      *
-     * @param string $id
+     * @param string $id            
      *
      * @throws \LogicException
      */
@@ -92,7 +93,7 @@ abstract class AbstractProxy
         if ($this->isActive()) {
             throw new \LogicException('Cannot change the ID of an active session');
         }
-
+        
         session_id($id);
     }
 
@@ -109,7 +110,7 @@ abstract class AbstractProxy
     /**
      * Sets the session name.
      *
-     * @param string $name
+     * @param string $name            
      *
      * @throws \LogicException
      */
@@ -118,7 +119,7 @@ abstract class AbstractProxy
         if ($this->isActive()) {
             throw new \LogicException('Cannot change the name of an active session');
         }
-
+        
         session_name($name);
     }
 }

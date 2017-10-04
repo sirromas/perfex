@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\TwoCheckoutPlus\Message;
 
 use Omnipay\Common\Message\AbstractResponse;
@@ -10,20 +9,23 @@ use Omnipay\Common\Message\ResponseInterface;
  */
 class TokenPurchaseResponse extends AbstractResponse implements ResponseInterface
 {
+
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
      *
      * @return bool
      */
     public function isSuccessful()
     {
         $responseCode = $this->data['response']['responseCode'];
-
+        
         return isset($responseCode) ? $responseCode == 'APPROVED' : false;
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
      *
      * @return bool
      */
@@ -33,7 +35,8 @@ class TokenPurchaseResponse extends AbstractResponse implements ResponseInterfac
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
      *
      * @return int|null
      */
@@ -43,7 +46,9 @@ class TokenPurchaseResponse extends AbstractResponse implements ResponseInterfac
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getMessage()
     {
@@ -51,7 +56,9 @@ class TokenPurchaseResponse extends AbstractResponse implements ResponseInterfac
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getTransactionReference()
     {
@@ -59,7 +66,9 @@ class TokenPurchaseResponse extends AbstractResponse implements ResponseInterfac
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getTransactionId()
     {

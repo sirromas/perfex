@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Plugin\Async;
 
 use Guzzle\Plugin\Async\AsyncPlugin;
@@ -15,6 +14,7 @@ use Guzzle\Http\Client;
  */
 class AsyncPluginTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testSubscribesToEvents()
     {
         $events = AsyncPlugin::getSubscribedEvents();
@@ -31,7 +31,8 @@ class AsyncPluginTest extends \Guzzle\Tests\GuzzleTestCase
             'request' => $request
         ));
         $p->onBeforeSend($event);
-        $this->assertEquals(true, $request->getCurlOptions()->get('progress'));
+        $this->assertEquals(true, $request->getCurlOptions()
+            ->get('progress'));
     }
 
     public function testAddsTimesOutAfterSending()
@@ -40,11 +41,11 @@ class AsyncPluginTest extends \Guzzle\Tests\GuzzleTestCase
         $request = RequestFactory::getInstance()->create('PUT', 'http://www.example.com');
         $handle = CurlHandle::factory($request);
         $event = new Event(array(
-            'request'     => $request,
-            'handle'      => $handle->getHandle(),
-            'uploaded'    => 10,
+            'request' => $request,
+            'handle' => $handle->getHandle(),
+            'uploaded' => 10,
             'upload_size' => 10,
-            'downloaded'  => 0
+            'downloaded' => 0
         ));
         $p->onCurlProgress($event);
     }
@@ -53,9 +54,9 @@ class AsyncPluginTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $p = new AsyncPlugin();
         $event = new Event(array(
-            'uploaded'    => 10,
+            'uploaded' => 10,
             'upload_size' => 10,
-            'downloaded'  => 0
+            'downloaded' => 0
         ));
         $p->onCurlProgress($event);
     }
@@ -66,13 +67,15 @@ class AsyncPluginTest extends \Guzzle\Tests\GuzzleTestCase
         $request = RequestFactory::getInstance()->create('PUT', 'http://www.example.com');
         $e = new CurlException('Error');
         $event = new Event(array(
-            'request'   => $request,
+            'request' => $request,
             'exception' => $e
         ));
         $p->onRequestTimeout($event);
         $this->assertEquals(RequestInterface::STATE_COMPLETE, $request->getState());
-        $this->assertEquals(200, $request->getResponse()->getStatusCode());
-        $this->assertTrue($request->getResponse()->hasHeader('X-Guzzle-Async'));
+        $this->assertEquals(200, $request->getResponse()
+            ->getStatusCode());
+        $this->assertTrue($request->getResponse()
+            ->hasHeader('X-Guzzle-Async'));
     }
 
     public function testEnsuresIntegration()
@@ -85,8 +88,10 @@ class AsyncPluginTest extends \Guzzle\Tests\GuzzleTestCase
         ));
         $request->getEventDispatcher()->addSubscriber(new AsyncPlugin());
         $request->send();
-        $this->assertEquals('', $request->getResponse()->getBody(true));
-        $this->assertTrue($request->getResponse()->hasHeader('X-Guzzle-Async'));
+        $this->assertEquals('', $request->getResponse()
+            ->getBody(true));
+        $this->assertTrue($request->getResponse()
+            ->hasHeader('X-Guzzle-Async'));
         $received = $this->getServer()->getReceivedRequests(true);
         $this->assertEquals('POST', $received[0]->getMethod());
     }

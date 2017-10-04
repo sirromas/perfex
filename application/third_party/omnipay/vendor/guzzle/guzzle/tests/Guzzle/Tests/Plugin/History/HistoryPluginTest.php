@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Plugin\History;
 
 use Guzzle\Http\Client;
@@ -13,25 +12,28 @@ use Guzzle\Plugin\Mock\MockPlugin;
  */
 class HistoryPluginTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     /**
      * Adds multiple requests to a plugin
      *
-     * @param HistoryPlugin $h Plugin
-     * @param int $num Number of requests to add
-     *
+     * @param HistoryPlugin $h
+     *            Plugin
+     * @param int $num
+     *            Number of requests to add
+     *            
      * @return array
      */
     protected function addRequests(HistoryPlugin $h, $num)
     {
         $requests = array();
         $client = new Client('http://127.0.0.1/');
-        for ($i = 0; $i < $num; $i++) {
+        for ($i = 0; $i < $num; $i ++) {
             $requests[$i] = $client->get();
             $requests[$i]->setResponse(new Response(200), true);
             $requests[$i]->send();
             $h->add($requests[$i]);
         }
-
+        
         return $requests;
     }
 
@@ -105,11 +107,11 @@ class HistoryPluginTest extends \Guzzle\Tests\GuzzleTestCase
         $h = new HistoryPlugin();
         $client = new Client('http://127.0.0.1/');
         $client->getEventDispatcher()->addSubscriber($h);
-
+        
         $request = $client->get();
         $request->setResponse(new Response(200), true);
         $request->send();
-
+        
         $this->assertSame($request, $h->getLastRequest());
     }
 
@@ -118,19 +120,27 @@ class HistoryPluginTest extends \Guzzle\Tests\GuzzleTestCase
         $client = new Client('http://127.0.0.1/');
         $h = new HistoryPlugin();
         $client->getEventDispatcher()->addSubscriber($h);
-
+        
         $mock = new MockPlugin(array(
-            new Response(301, array('Location' => '/redirect1', 'Content-Length' => 0)),
-            new Response(307, array('Location' => '/redirect2', 'Content-Length' => 0)),
-            new Response(200, array('Content-Length' => '2'), 'HI')
+            new Response(301, array(
+                'Location' => '/redirect1',
+                'Content-Length' => 0
+            )),
+            new Response(307, array(
+                'Location' => '/redirect2',
+                'Content-Length' => 0
+            )),
+            new Response(200, array(
+                'Content-Length' => '2'
+            ), 'HI')
         ));
-
+        
         $client->getEventDispatcher()->addSubscriber($mock);
         $request = $client->get();
         $request->send();
         $this->assertEquals(3, count($h));
         $this->assertEquals(3, count($mock->getReceivedRequests()));
-
+        
         $h = str_replace("\r", '', $h);
         $this->assertContains("> GET / HTTP/1.1\nHost: 127.0.0.1\nUser-Agent:", $h);
         $this->assertContains("< HTTP/1.1 301 Moved Permanently\nLocation: /redirect1", $h);

@@ -2,19 +2,19 @@
 /**
  * Response interface
  */
-
 namespace Omnipay\Common\Message;
 
 /**
  * Response Interface
  *
  * This interface class defines the standard functions that any Omnipay response
- * interface needs to be able to provide.  It is an extension of MessageInterface.
+ * interface needs to be able to provide. It is an extension of MessageInterface.
  *
  * @see MessageInterface
  */
 interface ResponseInterface extends MessageInterface
 {
+
     /**
      * Get the original request which generated this response
      *
@@ -46,21 +46,21 @@ interface ResponseInterface extends MessageInterface
     /**
      * Response Message
      *
-     * @return null|string A response message from the payment gateway
+     * @return null|string response message from the payment gateway
      */
     public function getMessage();
 
     /**
      * Response code
      *
-     * @return null|string A response code from the payment gateway
+     * @return null|string response code from the payment gateway
      */
     public function getCode();
 
     /**
      * Gateway Reference
      *
-     * @return null|string A reference provided by the gateway to represent this transaction
+     * @return null|string reference provided by the gateway to represent this transaction
      */
     public function getTransactionReference();
 }

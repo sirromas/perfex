@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Service\Command;
 
 use Guzzle\Http\Message\EntityEnclosingRequest;
@@ -17,6 +16,7 @@ use Guzzle\Service\Command\LocationVisitor\VisitorFlyweight;
  */
 class OperationCommandTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testHasRequestSerializer()
     {
         $operation = new OperationCommand();
@@ -31,7 +31,9 @@ class OperationCommandTest extends \Guzzle\Tests\GuzzleTestCase
         $op = new OperationCommand(array(), new Operation());
         $op->setClient(new Client());
         $s = $this->getMockBuilder('Guzzle\Service\Command\RequestSerializerInterface')
-            ->setMethods(array('prepare'))
+            ->setMethods(array(
+            'prepare'
+        ))
             ->getMockForAbstractClass();
         $s->expects($this->once())
             ->method('prepare')
@@ -44,34 +46,46 @@ class OperationCommandTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $op = new OperationCommand(array(), new Operation());
         $p = $this->getMockBuilder('Guzzle\Service\Command\ResponseParserInterface')
-            ->setMethods(array('parse'))
+            ->setMethods(array(
+            'parse'
+        ))
             ->getMockForAbstractClass();
         $p->expects($this->once())
             ->method('parse')
-            ->will($this->returnValue(array('foo' => 'bar')));
+            ->will($this->returnValue(array(
+            'foo' => 'bar'
+        )));
         $op->setResponseParser($p);
         $op->setClient(new Client());
         $request = $op->prepare();
         $request->setResponse(new Response(200), true);
-        $this->assertEquals(array('foo' => 'bar'), $op->execute());
+        $this->assertEquals(array(
+            'foo' => 'bar'
+        ), $op->execute());
     }
 
     public function testParsesResponsesUsingModelParserWhenMatchingModelIsFound()
     {
         $description = ServiceDescription::factory(array(
             'operations' => array(
-                'foo' => array('responseClass' => 'bar', 'responseType' => 'model')
+                'foo' => array(
+                    'responseClass' => 'bar',
+                    'responseType' => 'model'
+                )
             ),
             'models' => array(
                 'bar' => array(
                     'type' => 'object',
                     'properties' => array(
-                        'Baz' => array('type' => 'string', 'location' => 'xml')
+                        'Baz' => array(
+                            'type' => 'string',
+                            'location' => 'xml'
+                        )
                     )
                 )
             )
         ));
-
+        
         $op = new OperationCommand(array(), $description->getOperation('foo'));
         $op->setClient(new Client());
         $request = $op->prepare();
@@ -79,14 +93,23 @@ class OperationCommandTest extends \Guzzle\Tests\GuzzleTestCase
             'Content-Type' => 'application/xml'
         ), '<Foo><Baz>Bar</Baz></Foo>'), true);
         $result = $op->execute();
-        $this->assertEquals(new Model(array('Baz' => 'Bar')), $result);
+        $this->assertEquals(new Model(array(
+            'Baz' => 'Bar'
+        )), $result);
     }
 
     public function testAllowsRawResponses()
     {
         $description = new ServiceDescription(array(
-            'operations' => array('foo' => array('responseClass' => 'bar', 'responseType' => 'model')),
-            'models'     => array('bar' => array())
+            'operations' => array(
+                'foo' => array(
+                    'responseClass' => 'bar',
+                    'responseType' => 'model'
+                )
+            ),
+            'models' => array(
+                'bar' => array()
+            )
         ));
         $op = new OperationCommand(array(
             OperationCommand::RESPONSE_PROCESSING => OperationCommand::TYPE_RAW

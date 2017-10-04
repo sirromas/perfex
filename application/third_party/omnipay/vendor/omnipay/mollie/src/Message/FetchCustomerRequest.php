@@ -9,7 +9,9 @@ namespace Omnipay\Mollie\Message;
 
 class FetchCustomerRequest extends AbstractRequest
 {
+
     /**
+     *
      * @return string
      */
     public function getCustomerReference()
@@ -18,7 +20,9 @@ class FetchCustomerRequest extends AbstractRequest
     }
 
     /**
-     * @param $value
+     *
+     * @param
+     *            $value
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setCustomerReference($value)
@@ -27,31 +31,34 @@ class FetchCustomerRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return array
      */
     public function getData()
     {
         $this->validate('apiKey', 'customerReference');
-
+        
         return array();
     }
 
     /**
-     * @param mixed $data
+     *
+     * @param mixed $data            
      * @return FetchCustomerResponse
      */
     public function sendData($data)
     {
         $httpResponse = $this->sendRequest('GET', '/customers/' . $this->getCustomerReference(), $data);
-
+        
         return $this->response = new FetchCustomerResponse($this, $httpResponse->json());
     }
 
     /**
+     *
      * @return string
      */
     public function getEndpoint()
     {
-        return $this->endpoint.'/customers';
+        return $this->endpoint . '/customers';
     }
 }

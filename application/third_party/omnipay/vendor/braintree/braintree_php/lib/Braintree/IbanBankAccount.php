@@ -5,8 +5,8 @@ namespace Braintree;
  * Braintree IbanBankAccount module
  * PHP Version 5
  *
- * @package   Braintree
- *
+ * @package Braintree
+ *         
  * @property-read string $maskedIban
  * @property-read string $bic
  * @property-read string $ibanCountry
@@ -15,24 +15,28 @@ namespace Braintree;
  */
 class IbanBankAccount extends Base
 {
+
     /**
      * create a printable representation of the object as:
      * ClassName[property=value, property=value]
+     * 
      * @ignore
+     *
      * @return string
      */
-    public function  __toString()
+    public function __toString()
     {
-        return __CLASS__ . '[' .
-                Util::attributesToString($this->_attributes) . ']';
+        return __CLASS__ . '[' . Util::attributesToString($this->_attributes) . ']';
     }
 
     /**
      * sets instance properties from an array of values
      *
      * @ignore
+     *
      * @access protected
-     * @param array $ibanAttribs array of ibanBankAccount data
+     * @param array $ibanAttribs
+     *            array of ibanBankAccount data
      * @return void
      */
     protected function _initialize($ibanAttribs)
@@ -42,9 +46,11 @@ class IbanBankAccount extends Base
     }
 
     /**
-     *  factory method: returns an instance of IbanBankAccount
-     *  to the requesting method, with populated properties
+     * factory method: returns an instance of IbanBankAccount
+     * to the requesting method, with populated properties
+     * 
      * @ignore
+     *
      * @return IbanBankAccount
      */
     public static function factory($attributes)

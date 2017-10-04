@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Plugin\Md5;
 
 use Guzzle\Common\Event;
@@ -12,6 +11,7 @@ use Guzzle\Service\Client;
  */
 class CommandContentMd5PluginTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     protected function getClient()
     {
         $description = new ServiceDescription(array(
@@ -20,17 +20,17 @@ class CommandContentMd5PluginTest extends \Guzzle\Tests\GuzzleTestCase
                     'httpMethod' => 'PUT',
                     'parameters' => array(
                         'ContentMD5' => array(),
-                        'Body'       => array(
+                        'Body' => array(
                             'location' => 'body'
                         )
                     )
                 )
             )
         ));
-
+        
         $client = new Client();
         $client->setDescription($description);
-
+        
         return $client;
     }
 
@@ -43,10 +43,12 @@ class CommandContentMd5PluginTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $client = $this->getClient();
         $command = $client->getCommand('test', array(
-            'Body'       => 'Foo',
+            'Body' => 'Foo',
             'ContentMD5' => true
         ));
-        $event = new Event(array('command' => $command));
+        $event = new Event(array(
+            'command' => $command
+        ));
         $request = $command->prepare();
         $plugin = new CommandContentMd5Plugin();
         $plugin->onCommandBeforeSend($event);
@@ -56,9 +58,13 @@ class CommandContentMd5PluginTest extends \Guzzle\Tests\GuzzleTestCase
     public function testDoesNothingWhenNoPayloadExists()
     {
         $client = $this->getClient();
-        $client->getDescription()->getOperation('test')->setHttpMethod('GET');
+        $client->getDescription()
+            ->getOperation('test')
+            ->setHttpMethod('GET');
         $command = $client->getCommand('test');
-        $event = new Event(array('command' => $command));
+        $event = new Event(array(
+            'command' => $command
+        ));
         $request = $command->prepare();
         $plugin = new CommandContentMd5Plugin();
         $plugin->onCommandBeforeSend($event);
@@ -68,11 +74,15 @@ class CommandContentMd5PluginTest extends \Guzzle\Tests\GuzzleTestCase
     public function testAddsValidationToResponsesOfContentMd5()
     {
         $client = $this->getClient();
-        $client->getDescription()->getOperation('test')->setHttpMethod('GET');
+        $client->getDescription()
+            ->getOperation('test')
+            ->setHttpMethod('GET');
         $command = $client->getCommand('test', array(
             'ValidateMD5' => true
         ));
-        $event = new Event(array('command' => $command));
+        $event = new Event(array(
+            'command' => $command
+        ));
         $request = $command->prepare();
         $plugin = new CommandContentMd5Plugin();
         $plugin->onCommandBeforeSend($event);
@@ -83,11 +93,15 @@ class CommandContentMd5PluginTest extends \Guzzle\Tests\GuzzleTestCase
     public function testIgnoresValidationWhenDisabled()
     {
         $client = $this->getClient();
-        $client->getDescription()->getOperation('test')->setHttpMethod('GET');
+        $client->getDescription()
+            ->getOperation('test')
+            ->setHttpMethod('GET');
         $command = $client->getCommand('test', array(
             'ValidateMD5' => false
         ));
-        $event = new Event(array('command' => $command));
+        $event = new Event(array(
+            'command' => $command
+        ));
         $request = $command->prepare();
         $plugin = new CommandContentMd5Plugin();
         $plugin->onCommandBeforeSend($event);

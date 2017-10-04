@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Plugin\Backoff;
 
 use Guzzle\Plugin\Backoff\ReasonPhraseBackoffStrategy;
@@ -11,10 +10,14 @@ use Guzzle\Http\Message\Response;
  */
 class ReasonPhraseBackoffStrategyTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testRetriesWhenCodeMatches()
     {
         $this->assertEmpty(ReasonPhraseBackoffStrategy::getDefaultFailureCodes());
-        $strategy = new ReasonPhraseBackoffStrategy(array('Foo', 'Internal Server Error'));
+        $strategy = new ReasonPhraseBackoffStrategy(array(
+            'Foo',
+            'Internal Server Error'
+        ));
         $this->assertTrue($strategy->makesDecision());
         $request = $this->getMock('Guzzle\Http\Message\Request', array(), array(), '', false);
         $response = new Response(200);

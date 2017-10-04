@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Common;
 
 use Guzzle\Common\Event;
@@ -11,6 +10,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
  */
 class AbstractHasAdapterTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testDoesNotRequireRegisteredEvents()
     {
         $this->assertEquals(array(), AbstractHasDispatcher::getAllEvents());
@@ -34,14 +34,16 @@ class AbstractHasAdapterTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $data = array();
         $mock = $this->getMockForAbstractClass('Guzzle\Common\AbstractHasDispatcher');
-        $mock->getEventDispatcher()->addListener('test', function(Event $e) use (&$data) {
-            $data = $e->getIterator()->getArrayCopy();
+        $mock->getEventDispatcher()->addListener('test', function (Event $e) use(&$data)
+        {
+            $data = $e->getIterator()
+                ->getArrayCopy();
         });
         $mock->dispatch('test', array(
             'param' => 'abc'
         ));
         $this->assertEquals(array(
-            'param' => 'abc',
+            'param' => 'abc'
         ), $data);
     }
 
@@ -49,14 +51,16 @@ class AbstractHasAdapterTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $mock = $this->getMockForAbstractClass('Guzzle\Common\AbstractHasDispatcher');
         $subscriber = $this->getMockForAbstractClass('Symfony\Component\EventDispatcher\EventSubscriberInterface');
-
+        
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->setMethods(array('addSubscriber'))
+            ->setMethods(array(
+            'addSubscriber'
+        ))
             ->getMock();
-
+        
         $dispatcher->expects($this->once())
             ->method('addSubscriber');
-
+        
         $mock->setEventDispatcher($dispatcher);
         $mock->addSubscriber($subscriber);
     }

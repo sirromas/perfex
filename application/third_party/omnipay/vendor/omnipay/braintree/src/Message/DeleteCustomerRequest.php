@@ -10,6 +10,7 @@ use Omnipay\Common\Message\ResponseInterface;
  */
 class DeleteCustomerRequest extends AbstractRequest
 {
+
     public function getData()
     {
         return $this->getCustomerId();
@@ -18,13 +19,14 @@ class DeleteCustomerRequest extends AbstractRequest
     /**
      * Send the request with specified data
      *
-     * @param  mixed $data The data to send
+     * @param mixed $data
+     *            The data to send
      * @return ResponseInterface
      */
     public function sendData($data)
     {
         $response = $this->braintree->customer()->delete($data);
-
+        
         return $this->createResponse($response);
     }
 }

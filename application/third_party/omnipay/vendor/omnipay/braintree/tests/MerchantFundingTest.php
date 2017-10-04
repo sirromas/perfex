@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\Braintree;
 
 use Braintree_MerchantAccount;
@@ -7,21 +6,26 @@ use Omnipay\Tests\TestCase;
 
 class MerchantFundingTest extends TestCase
 {
+
     public function setUp()
     {
         $this->funding = new MerchantFunding();
     }
-    
+
     public function testConstructWithParams()
     {
-        $funding = new MerchantFunding(array('descriptor' => 'Millsburg National Bank'));
+        $funding = new MerchantFunding(array(
+            'descriptor' => 'Millsburg National Bank'
+        ));
         $this->assertSame('Millsburg National Bank', $funding->getDescriptor());
     }
 
     public function testInitializeWithParams()
     {
-        $funding = new MerchantFunding;
-        $funding->initialize(array('descriptor' => 'Millsburg National Bank'));
+        $funding = new MerchantFunding();
+        $funding->initialize(array(
+            'descriptor' => 'Millsburg National Bank'
+        ));
         $this->assertSame('Millsburg National Bank', $funding->getDescriptor());
     }
 
@@ -35,7 +39,7 @@ class MerchantFundingTest extends TestCase
             'accountNumber' => '1123581321',
             'routingNumber' => '071101307'
         ));
-
+        
         $parameters = $card->getParameters();
         $this->assertSame('Millsburg National Bank', $parameters['descriptor']);
         $this->assertSame(Braintree_MerchantAccount::FUNDING_DESTINATION_BANK, $parameters['destination']);

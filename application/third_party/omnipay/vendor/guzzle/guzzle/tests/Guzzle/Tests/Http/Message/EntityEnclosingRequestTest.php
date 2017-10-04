@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Http\Message;
 
 use Guzzle\Http\Client;
@@ -17,6 +16,7 @@ use Guzzle\Http\QueryString;
  */
 class EntityEnclosingRequestTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     protected $client;
 
     public function setUp()
@@ -41,19 +41,17 @@ class EntityEnclosingRequestTest extends \Guzzle\Tests\GuzzleTestCase
 
     public function testCanSetBodyWithoutOverridingContentType()
     {
-        $request = new EntityEnclosingRequest('PUT', 'http://test.com', array('Content-Type' => 'foooooo'));
+        $request = new EntityEnclosingRequest('PUT', 'http://test.com', array(
+            'Content-Type' => 'foooooo'
+        ));
         $request->setBody('{"a":"b"}');
         $this->assertEquals('foooooo', $request->getHeader('Content-Type'));
     }
 
     public function testRequestIncludesBodyInMessage()
     {
-
         $request = RequestFactory::getInstance()->create('PUT', 'http://www.guzzle-project.com/', null, 'data');
-        $this->assertEquals("PUT / HTTP/1.1\r\n"
-            . "Host: www.guzzle-project.com\r\n"
-            . "Content-Length: 4\r\n\r\n"
-            . "data", (string) $request);
+        $this->assertEquals("PUT / HTTP/1.1\r\n" . "Host: www.guzzle-project.com\r\n" . "Content-Length: 4\r\n\r\n" . "data", (string) $request);
     }
 
     public function testRequestIncludesPostBodyInMessageOnlyWhenNoPostFiles()
@@ -61,18 +59,12 @@ class EntityEnclosingRequestTest extends \Guzzle\Tests\GuzzleTestCase
         $request = RequestFactory::getInstance()->create('POST', 'http://www.guzzle-project.com/', null, array(
             'foo' => 'bar'
         ));
-        $this->assertEquals("POST / HTTP/1.1\r\n"
-            . "Host: www.guzzle-project.com\r\n"
-            . "Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n\r\n"
-            . "foo=bar", (string) $request);
-
+        $this->assertEquals("POST / HTTP/1.1\r\n" . "Host: www.guzzle-project.com\r\n" . "Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n\r\n" . "foo=bar", (string) $request);
+        
         $request = RequestFactory::getInstance()->create('POST', 'http://www.guzzle-project.com/', null, array(
             'foo' => '@' . __FILE__
         ));
-        $this->assertEquals("POST / HTTP/1.1\r\n"
-            . "Host: www.guzzle-project.com\r\n"
-            . "Content-Type: multipart/form-data\r\n"
-            . "Expect: 100-Continue\r\n\r\n", (string) $request);
+        $this->assertEquals("POST / HTTP/1.1\r\n" . "Host: www.guzzle-project.com\r\n" . "Content-Type: multipart/form-data\r\n" . "Expect: 100-Continue\r\n\r\n", (string) $request);
     }
 
     public function testAddsPostFieldsAndSetsContentLength()
@@ -80,20 +72,18 @@ class EntityEnclosingRequestTest extends \Guzzle\Tests\GuzzleTestCase
         $request = RequestFactory::getInstance()->create('POST', 'http://www.guzzle-project.com/', null, array(
             'data' => '123'
         ));
-        $this->assertEquals("POST / HTTP/1.1\r\n"
-            . "Host: www.guzzle-project.com\r\n"
-            . "Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n\r\n"
-            . "data=123", (string) $request);
+        $this->assertEquals("POST / HTTP/1.1\r\n" . "Host: www.guzzle-project.com\r\n" . "Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n\r\n" . "data=123", (string) $request);
     }
 
     public function testAddsPostFilesAndSetsContentType()
     {
         $request = RequestFactory::getInstance()->create('POST', 'http://www.test.com/')
             ->addPostFiles(array(
-                'file' => __FILE__
-            ))->addPostFields(array(
-                'a' => 'b'
-            ));
+            'file' => __FILE__
+        ))
+            ->addPostFields(array(
+            'a' => 'b'
+        ));
         $message = (string) $request;
         $this->assertEquals('multipart/form-data', $request->getHeader('Content-Type'));
         $this->assertEquals('100-Continue', $request->getHeader('Expect'));
@@ -131,7 +121,7 @@ class EntityEnclosingRequestTest extends \Guzzle\Tests\GuzzleTestCase
         $body = $request->getBody();
         $this->assertInstanceOf('Guzzle\\Http\\EntityBody', $body);
         $this->assertSame($body, $request->getBody());
-
+        
         $newBody = EntityBody::factory('foobar');
         $request->setBody($newBody);
         $this->assertEquals('foobar', (string) $request->getBody());
@@ -142,39 +132,44 @@ class EntityEnclosingRequestTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $request = RequestFactory::getInstance()->create('POST', 'http://www.guzzle-project.com/');
         $this->assertInstanceOf('Guzzle\\Http\\QueryString', $request->getPostFields());
-
+        
         $fields = new QueryString(array(
             'a' => 'b'
         ));
         $request->addPostFields($fields);
-        $this->assertEquals($fields->getAll(), $request->getPostFields()->getAll());
+        $this->assertEquals($fields->getAll(), $request->getPostFields()
+            ->getAll());
         $this->assertEquals(array(), $request->getPostFiles());
     }
 
     public function testSetPostFiles()
     {
-        $request = RequestFactory::getInstance()->create('POST', $this->getServer()->getUrl())
+        $request = RequestFactory::getInstance()->create('POST', $this->getServer()
+            ->getUrl())
             ->setClient(new Client())
-            ->addPostFiles(array(__FILE__))
+            ->addPostFiles(array(
+            __FILE__
+        ))
             ->addPostFields(array(
-                'test' => 'abc'
-            ));
-
+            'test' => 'abc'
+        ));
+        
         $request->getCurlOptions()->set('debug', true);
-
+        
         $this->assertEquals(array(
             'test' => 'abc'
-        ), $request->getPostFields()->getAll());
-
+        ), $request->getPostFields()
+            ->getAll());
+        
         $files = $request->getPostFiles();
         $post = $files['file'][0];
         $this->assertEquals('file', $post->getFieldName());
         $this->assertContains('text/x-', $post->getContentType());
         $this->assertEquals(__FILE__, $post->getFilename());
-
+        
         $this->getServer()->enqueue("HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n");
         $request->send();
-
+        
         $this->assertNotNull($request->getHeader('Content-Length'));
         $this->assertContains('multipart/form-data; boundary=', (string) $request->getHeader('Content-Type'), '-> cURL must add the boundary');
     }
@@ -184,10 +179,9 @@ class EntityEnclosingRequestTest extends \Guzzle\Tests\GuzzleTestCase
      */
     public function testSetPostFilesThrowsExceptionWhenFileIsNotFound()
     {
-        $request = RequestFactory::getInstance()->create('POST', 'http://www.guzzle-project.com/')
-            ->addPostFiles(array(
-                'file' => 'filenotfound.ini'
-            ));
+        $request = RequestFactory::getInstance()->create('POST', 'http://www.guzzle-project.com/')->addPostFiles(array(
+            'file' => 'filenotfound.ini'
+        ));
     }
 
     /**
@@ -195,15 +189,13 @@ class EntityEnclosingRequestTest extends \Guzzle\Tests\GuzzleTestCase
      */
     public function testThrowsExceptionWhenNonStringsAreAddedToPost()
     {
-        $request = RequestFactory::getInstance()->create('POST', 'http://www.guzzle-project.com/')
-            ->addPostFile('foo', new \stdClass());
+        $request = RequestFactory::getInstance()->create('POST', 'http://www.guzzle-project.com/')->addPostFile('foo', new \stdClass());
     }
 
     public function testAllowsContentTypeInPostUploads()
     {
-        $request = RequestFactory::getInstance()->create('POST', 'http://www.guzzle-project.com/')
-            ->addPostFile('foo', __FILE__, 'text/plain');
-
+        $request = RequestFactory::getInstance()->create('POST', 'http://www.guzzle-project.com/')->addPostFile('foo', __FILE__, 'text/plain');
+        
         $this->assertEquals(array(
             new PostFile('foo', __FILE__, 'text/plain')
         ), $request->getPostFile('foo'));
@@ -211,8 +203,7 @@ class EntityEnclosingRequestTest extends \Guzzle\Tests\GuzzleTestCase
 
     public function testGuessesContentTypeOfPostUpload()
     {
-        $request = RequestFactory::getInstance()->create('POST', 'http://www.guzzle-project.com/')
-            ->addPostFile('foo', __FILE__);
+        $request = RequestFactory::getInstance()->create('POST', 'http://www.guzzle-project.com/')->addPostFile('foo', __FILE__);
         $file = $request->getPostFile('foo');
         $this->assertContains('text/x-', $file[0]->getContentType());
     }
@@ -220,10 +211,13 @@ class EntityEnclosingRequestTest extends \Guzzle\Tests\GuzzleTestCase
     public function testAllowsContentDispositionFieldsInPostUploadsWhenSettingInBulk()
     {
         $postFile = new PostFile('foo', __FILE__, 'text/x-php');
-        $request = RequestFactory::getInstance()->create('POST', 'http://www.guzzle-project.com/')
-            ->addPostFiles(array('foo' => $postFile));
-
-        $this->assertEquals(array($postFile), $request->getPostFile('foo'));
+        $request = RequestFactory::getInstance()->create('POST', 'http://www.guzzle-project.com/')->addPostFiles(array(
+            'foo' => $postFile
+        ));
+        
+        $this->assertEquals(array(
+            $postFile
+        ), $request->getPostFile('foo'));
     }
 
     public function testPostRequestsUseApplicationXwwwForUrlEncodedForArrays()
@@ -244,7 +238,9 @@ class EntityEnclosingRequestTest extends \Guzzle\Tests\GuzzleTestCase
     public function testPostRequestsUseMultipartFormDataWithFiles()
     {
         $request = RequestFactory::getInstance()->create('POST', 'http://www.guzzle-project.com/');
-        $request->addPostFiles(array('file' => __FILE__));
+        $request->addPostFiles(array(
+            'file' => __FILE__
+        ));
         $this->assertEquals('multipart/form-data', $request->getHeader('Content-Type'));
     }
 
@@ -253,21 +249,24 @@ class EntityEnclosingRequestTest extends \Guzzle\Tests\GuzzleTestCase
         $this->getServer()->flush();
         $this->getServer()->enqueue(array(
             "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n",
-            "HTTP/1.1 201 Created\r\nContent-Length: 0\r\n\r\n",
+            "HTTP/1.1 201 Created\r\nContent-Length: 0\r\n\r\n"
         ));
-
+        
         // Send the first request
-        $request = RequestFactory::getInstance()->create('PUT', $this->getServer()->getUrl())
+        $request = RequestFactory::getInstance()->create('PUT', $this->getServer()
+            ->getUrl())
             ->setBody('test')
             ->setClient(new Client());
         $request->send();
-        $this->assertEquals(200, $request->getResponse()->getStatusCode());
-
+        $this->assertEquals(200, $request->getResponse()
+            ->getStatusCode());
+        
         // Send the second request
         $request->setBody('abcdefg', 'application/json', false);
         $request->send();
-        $this->assertEquals(201, $request->getResponse()->getStatusCode());
-
+        $this->assertEquals(201, $request->getResponse()
+            ->getStatusCode());
+        
         // Ensure that the same request was sent twice with different bodies
         $requests = $this->getServer()->getReceivedRequests(true);
         $this->assertEquals(2, count($requests));
@@ -287,7 +286,8 @@ class EntityEnclosingRequestTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $this->getServer()->enqueue("HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n");
         $request = new EntityEnclosingRequest('PUT', 'http://test.com/');
-        $request->setBody(fopen($this->getServer()->getUrl(), 'r'));
+        $request->setBody(fopen($this->getServer()
+            ->getUrl(), 'r'));
         $this->assertEquals('chunked', $request->getHeader('Transfer-Encoding'));
         $this->assertFalse($request->hasHeader('Content-Length'));
     }
@@ -300,18 +300,26 @@ class EntityEnclosingRequestTest extends \Guzzle\Tests\GuzzleTestCase
         $request = new EntityEnclosingRequest('PUT', 'http://test.com/');
         $this->getServer()->enqueue("HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n");
         $request->setProtocolVersion('1.0');
-        $request->setBody(fopen($this->getServer()->getUrl(), 'r'));
+        $request->setBody(fopen($this->getServer()
+            ->getUrl(), 'r'));
     }
 
     public function testAllowsNestedPostData()
     {
         $request = new EntityEnclosingRequest('POST', 'http://test.com/');
         $request->addPostFields(array(
-            'a' => array('b', 'c')
+            'a' => array(
+                'b',
+                'c'
+            )
         ));
         $this->assertEquals(array(
-            'a' => array('b', 'c')
-        ), $request->getPostFields()->getAll());
+            'a' => array(
+                'b',
+                'c'
+            )
+        ), $request->getPostFields()
+            ->getAll());
     }
 
     public function testAllowsEmptyFields()
@@ -322,7 +330,8 @@ class EntityEnclosingRequestTest extends \Guzzle\Tests\GuzzleTestCase
         ));
         $this->assertEquals(array(
             'a' => ''
-        ), $request->getPostFields()->getAll());
+        ), $request->getPostFields()
+            ->getAll());
     }
 
     /**
@@ -348,7 +357,8 @@ class EntityEnclosingRequestTest extends \Guzzle\Tests\GuzzleTestCase
             'a' => '',
             'b' => null,
             'c' => 'Foo'
-        ), $request->getPostFields()->getAll());
+        ), $request->getPostFields()
+            ->getAll());
     }
 
     public function testHoldsPostFiles()
@@ -356,13 +366,13 @@ class EntityEnclosingRequestTest extends \Guzzle\Tests\GuzzleTestCase
         $request = new EntityEnclosingRequest('POST', 'http://test.com/');
         $request->addPostFile('foo', __FILE__);
         $request->addPostFile(new PostFile('foo', __FILE__));
-
+        
         $this->assertArrayHasKey('foo', $request->getPostFiles());
         $foo = $request->getPostFile('foo');
         $this->assertEquals(2, count($foo));
         $this->assertEquals(__FILE__, $foo[0]->getFilename());
         $this->assertEquals(__FILE__, $foo[1]->getFilename());
-
+        
         $request->removePostFile('foo');
         $this->assertEquals(array(), $request->getPostFiles());
     }
@@ -406,14 +416,16 @@ class EntityEnclosingRequestTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $request = new EntityEnclosingRequest('PUT', 'http://test.com/');
         $request->configureRedirects(true);
-        $this->assertTrue($request->getParams()->get(RedirectPlugin::STRICT_REDIRECTS));
+        $this->assertTrue($request->getParams()
+            ->get(RedirectPlugin::STRICT_REDIRECTS));
     }
 
     public function testCanDisableRedirects()
     {
         $request = new EntityEnclosingRequest('PUT', 'http://test.com/');
         $request->configureRedirects(false, false);
-        $this->assertTrue($request->getParams()->get(RedirectPlugin::DISABLE));
+        $this->assertTrue($request->getParams()
+            ->get(RedirectPlugin::DISABLE));
     }
 
     public function testSetsContentTypeWhenSettingBodyByGuessingFromEntityBody()

@@ -3,10 +3,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 use Omnipay\Omnipay;
 
-require_once(APPPATH . 'third_party/omnipay/vendor/autoload.php');
+require_once (APPPATH . 'third_party/omnipay/vendor/autoload.php');
 
 class Two_checkout_gateway extends App_gateway
 {
+
     private $required_address_line_2_country_codes = 'CHN, JPN, RUS';
 
     private $required_state_country_codes = ' ARG, AUS, BGR, CAN, CHN, CYP, EGY, FRA, IND, IDN, ITA, JPN, MYS, MEX, NLD, PAN, PHL, POL, ROU, RUS, SRB, SGP, ZAF, ESP, SWE, THA, TUR, GBR, USA';
@@ -16,8 +17,8 @@ class Two_checkout_gateway extends App_gateway
     public function __construct()
     {
         /**
-        * Call App_gateway __construct function
-        */
+         * Call App_gateway __construct function
+         */
         parent::__construct();
         /**
          * REQUIRED
@@ -25,16 +26,16 @@ class Two_checkout_gateway extends App_gateway
          * The ID must be alpha/alphanumeric
          */
         $this->setId('two_checkout');
-
+        
         /**
          * REQUIRED
          * Gateway name
          */
         $this->setName('2Checkout');
-
+        
         /**
          * Add gateway settings
-        */
+         */
         $this->setSettings(array(
             array(
                 'name' => 'account_number',
@@ -61,29 +62,32 @@ class Two_checkout_gateway extends App_gateway
                 'default_value' => 1
             )
         ));
-
+        
         /**
-        * REQUIRED
-        * Hook gateway with other online payment modes
-        */
-        add_action('before_add_online_payment_modes', array( $this, 'initMode' ));
-
+         * REQUIRED
+         * Hook gateway with other online payment modes
+         */
+        add_action('before_add_online_payment_modes', array(
+            $this,
+            'initMode'
+        ));
+        
         /**
          * Add ssl notice
          */
         add_action('before_render_payment_gateway_settings', 'two_checkout_ssl_notice');
-
-        $line_address_2_required                     = $this->required_address_line_2_country_codes;
+        
+        $line_address_2_required = $this->required_address_line_2_country_codes;
         $this->required_address_line_2_country_codes = array();
         foreach (explode(', ', $line_address_2_required) as $cn_code) {
             array_push($this->required_address_line_2_country_codes, $cn_code);
         }
-        $state_country_codes_required       = $this->required_state_country_codes;
+        $state_country_codes_required = $this->required_state_country_codes;
         $this->required_state_country_codes = array();
         foreach (explode(', ', $state_country_codes_required) as $cn_code) {
             array_push($this->required_state_country_codes, $cn_code);
         }
-        $zip_code_country_codes_required       = $this->required_zip_code_country_codes;
+        $zip_code_country_codes_required = $this->required_zip_code_country_codes;
         $this->required_zip_code_country_codes = array();
         foreach (explode(', ', $zip_code_country_codes_required) as $cn_code) {
             array_push($this->required_zip_code_country_codes, $cn_code);
@@ -104,16 +108,16 @@ class Two_checkout_gateway extends App_gateway
         $gateway->setAccountNumber($this->getSetting('account_number'));
         $gateway->setPrivateKey($this->decryptSetting('private_key'));
         $gateway->setTestMode($this->getSetting('test_mode_enabled'));
-
-        $billing_data                    = array();
-        $billing_data['billingName']     = $this->ci->input->post('billingName');
+        
+        $billing_data = array();
+        $billing_data['billingName'] = $this->ci->input->post('billingName');
         $billing_data['billingAddress1'] = $this->ci->input->post('billingAddress1');
-
+        
         if ($this->ci->input->post('billingAddress2')) {
             $billing_data['billingAddress2'] = $this->ci->input->post('billingAddress2');
         }
         $billing_data['billingCity'] = $this->ci->input->post('billingCity');
-
+        
         if ($this->ci->input->post('billingState')) {
             $billing_data['billingState'] = $this->ci->input->post('billingState');
         }
@@ -121,16 +125,17 @@ class Two_checkout_gateway extends App_gateway
             $billing_data['billingPostcode'] = $this->ci->input->post('billingPostcode');
         }
         $billing_data['billingCountry'] = $this->ci->input->post('billingCountry');
-        $billing_data['email']          = $this->ci->input->post('email');
-
+        $billing_data['email'] = $this->ci->input->post('email');
+        
         $oResponse = $gateway->purchase(array(
             'amount' => number_format($data['amount'], 2, '.', ''),
             'currency' => $data['currency'],
             'token' => $this->ci->input->post('token'),
             'transactionId' => $data['invoice']->id,
             'card' => $billing_data
-        ))->send();
-
+        ))
+            ->send();
+        
         return $oResponse;
     }
 

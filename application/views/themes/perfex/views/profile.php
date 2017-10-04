@@ -15,48 +15,65 @@
 							<?php if($contact->profile_image == NULL){ ?>
 							<div class="form-group">
 								<label for="profile_image" class="profile-image"><?php echo _l('client_profile_image'); ?></label>
-								<input type="file" name="profile_image" class="form-control" id="profile_image">
+								<input type="file" name="profile_image" class="form-control"
+									id="profile_image">
 							</div>
 							<?php } ?>
 							<?php if($contact->profile_image != NULL){ ?>
 							<div class="form-group">
 								<div class="row">
 									<div class="col-md-9">
-										<img src="<?php echo contact_profile_image_url($contact->id,'thumb'); ?>" class="client-profile-image-thumb">
+										<img
+											src="<?php echo contact_profile_image_url($contact->id,'thumb'); ?>"
+											class="client-profile-image-thumb">
 									</div>
 									<div class="col-md-3 text-right">
-										<a href="<?php echo site_url('clients/remove_profile_image'); ?>"><i class="fa fa-remove text-danger"></i></a>
+										<a
+											href="<?php echo site_url('clients/remove_profile_image'); ?>"><i
+											class="fa fa-remove text-danger"></i></a>
 									</div>
 								</div>
 							</div>
 							<?php } ?>
 							<label for="firstname"><?php echo _l('clients_firstname'); ?></label>
-							<input type="text" class="form-control" name="firstname" id="firstname" value="<?php echo set_value('firstname',$contact->firstname); ?>">
+							<input type="text" class="form-control" name="firstname"
+								id="firstname"
+								value="<?php echo set_value('firstname',$contact->firstname); ?>">
 							<?php echo form_error('firstname'); ?>
 						</div>
 						<div class="form-group">
 							<label for="lastname"><?php echo _l('clients_lastname'); ?></label>
-							<input type="text" class="form-control" name="lastname" id="lastname" value="<?php echo set_value('lastname',$contact->lastname); ?>">
+							<input type="text" class="form-control" name="lastname"
+								id="lastname"
+								value="<?php echo set_value('lastname',$contact->lastname); ?>">
 							<?php echo form_error('lastname'); ?>
 						</div>
 						<div class="form-group">
 							<label for="title"><?php echo _l('contact_position'); ?></label>
-							<input type="text" class="form-control" name="title" id="title" value="<?php echo $contact->title; ?>">
+							<input type="text" class="form-control" name="title" id="title"
+								value="<?php echo $contact->title; ?>">
 						</div>
 						<div class="form-group">
-							<label for="email"><?php echo _l('clients_email'); ?></label>
-							<input type="text" class="form-control" disabled="true" id="email" value="<?php echo $contact->email; ?>">
+							<label for="email"><?php echo _l('clients_email'); ?></label> <input
+								type="text" class="form-control" disabled="true" id="email"
+								value="<?php echo $contact->email; ?>">
 						</div>
 						<div class="form-group">
 							<label for="phonenumber"><?php echo _l('clients_phone'); ?></label>
-							<input type="text" class="form-control" name="phonenumber" id="phonenumber" value="<?php echo $contact->phonenumber; ?>">
+							<input type="text" class="form-control" name="phonenumber"
+								id="phonenumber" value="<?php echo $contact->phonenumber; ?>">
 						</div>
 						<div class="form-group contact-direction-option">
 							<label for="direction"><?php echo _l('document_direction'); ?></label>
-							<select data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>" class="form-control" name="direction" id="direction">
-								<option value="" <?php if(empty($contact->direction)){echo 'selected';} ?>><?php echo _l('system_default_string'); ?></option>
-								<option value="ltr" <?php if($contact->direction == 'ltr'){echo 'selected';} ?>>LTR</option>
-								<option value="rtl" <?php if($contact->direction == 'rtl'){echo 'selected';} ?>>RTL</option>
+							<select
+								data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>"
+								class="form-control" name="direction" id="direction">
+								<option value=""
+									<?php if(empty($contact->direction)){echo 'selected';} ?>><?php echo _l('system_default_string'); ?></option>
+								<option value="ltr"
+									<?php if($contact->direction == 'ltr'){echo 'selected';} ?>>LTR</option>
+								<option value="rtl"
+									<?php if($contact->direction == 'rtl'){echo 'selected';} ?>>RTL</option>
 							</select>
 						</div>
 						<?php echo render_custom_fields( 'contacts',get_contact_user_id(),array('show_on_client_portal'=>1)); ?>
@@ -85,17 +102,20 @@
 				<?php echo form_hidden('change_password',true); ?>
 				<div class="form-group">
 					<label for="oldpassword"><?php echo _l('clients_edit_profile_old_password'); ?></label>
-					<input type="password" class="form-control" name="oldpassword" id="oldpassword">
+					<input type="password" class="form-control" name="oldpassword"
+						id="oldpassword">
 					<?php echo form_error('oldpassword'); ?>
 				</div>
 				<div class="form-group">
 					<label for="newpassword"><?php echo _l('clients_edit_profile_new_password'); ?></label>
-					<input type="password" class="form-control" name="newpassword" id="newpassword">
+					<input type="password" class="form-control" name="newpassword"
+						id="newpassword">
 					<?php echo form_error('newpassword'); ?>
 				</div>
 				<div class="form-group">
 					<label for="newpasswordr"><?php echo _l('clients_edit_profile_new_password_repeat'); ?></label>
-					<input type="password" class="form-control" name="newpasswordr" id="newpasswordr">
+					<input type="password" class="form-control" name="newpasswordr"
+						id="newpasswordr">
 					<?php echo form_error('newpasswordr'); ?>
 				</div>
 				<div class="form-group">

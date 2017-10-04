@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Batch;
 
 use Guzzle\Batch\BatchClosureDivisor;
@@ -9,6 +8,7 @@ use Guzzle\Batch\BatchClosureDivisor;
  */
 class BatchClosureDivisorTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     /**
      * @expectedException Guzzle\Common\Exception\InvalidArgumentException
      */
@@ -22,15 +22,27 @@ class BatchClosureDivisorTest extends \Guzzle\Tests\GuzzleTestCase
         $queue = new \SplQueue();
         $queue[] = 'foo';
         $queue[] = 'baz';
-
-        $d = new BatchClosureDivisor(function (\SplQueue $queue, $context) {
+        
+        $d = new BatchClosureDivisor(function (\SplQueue $queue, $context)
+        {
             return array(
-                array('foo'),
-                array('baz')
+                array(
+                    'foo'
+                ),
+                array(
+                    'baz'
+                )
             );
         }, 'Bar!');
-
+        
         $batches = $d->createBatches($queue);
-        $this->assertEquals(array(array('foo'), array('baz')), $batches);
+        $this->assertEquals(array(
+            array(
+                'foo'
+            ),
+            array(
+                'baz'
+            )
+        ), $batches);
     }
 }

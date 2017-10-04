@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\Common;
 
 use Mockery as m;
@@ -7,6 +6,7 @@ use Omnipay\Tests\TestCase;
 
 class GatewayFactoryTest extends TestCase
 {
+
     public static function setUpBeforeClass()
     {
         m::mock('alias:Omnipay\\SpareChange\\TestGateway');
@@ -14,22 +14,26 @@ class GatewayFactoryTest extends TestCase
 
     public function setUp()
     {
-        $this->factory = new GatewayFactory;
+        $this->factory = new GatewayFactory();
     }
 
     public function testReplace()
     {
-        $gateways = array('Foo');
+        $gateways = array(
+            'Foo'
+        );
         $this->factory->replace($gateways);
-
+        
         $this->assertSame($gateways, $this->factory->all());
     }
 
     public function testRegister()
     {
         $this->factory->register('Bar');
-
-        $this->assertSame(array('Bar'), $this->factory->all());
+        
+        $this->assertSame(array(
+            'Bar'
+        ), $this->factory->all());
     }
 
     public function testRegisterExistingGateway()
@@ -37,18 +41,24 @@ class GatewayFactoryTest extends TestCase
         $this->factory->register('Milky');
         $this->factory->register('Bar');
         $this->factory->register('Bar');
-
-        $this->assertSame(array('Milky', 'Bar'), $this->factory->all());
+        
+        $this->assertSame(array(
+            'Milky',
+            'Bar'
+        ), $this->factory->all());
     }
 
     public function testFindRegistersAvailableGateways()
     {
         $this->factory = m::mock('Omnipay\Common\GatewayFactory[getSupportedGateways]');
-        $this->factory->shouldReceive('getSupportedGateways')->once()
-            ->andReturn(array('SpareChange_Test'));
-
+        $this->factory->shouldReceive('getSupportedGateways')
+            ->once()
+            ->andReturn(array(
+            'SpareChange_Test'
+        ));
+        
         $gateways = $this->factory->find();
-
+        
         $this->assertContains('SpareChange_Test', $gateways);
         $this->assertContains('SpareChange_Test', $this->factory->all());
     }
@@ -56,11 +66,14 @@ class GatewayFactoryTest extends TestCase
     public function testFindIgnoresUnavailableGateways()
     {
         $this->factory = m::mock('Omnipay\Common\GatewayFactory[getSupportedGateways]');
-        $this->factory->shouldReceive('getSupportedGateways')->once()
-            ->andReturn(array('SpareChange_Gone'));
-
+        $this->factory->shouldReceive('getSupportedGateways')
+            ->once()
+            ->andReturn(array(
+            'SpareChange_Gone'
+        ));
+        
         $gateways = $this->factory->find();
-
+        
         $this->assertEmpty($gateways);
         $this->assertEmpty($this->factory->all());
     }
@@ -89,7 +102,7 @@ class GatewayFactoryTest extends TestCase
     public function testGetSupportedGateways()
     {
         $gateways = $this->factory->getSupportedGateways();
-
+        
         $this->assertContains('Stripe', $gateways);
     }
 }

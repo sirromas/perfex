@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\TwoCheckoutPlus;
 
 use Omnipay\Common\AbstractGateway;
@@ -9,6 +8,7 @@ use Omnipay\Common\AbstractGateway;
  */
 class TokenGateway extends AbstractGateway
 {
+
     public function getName()
     {
         return 'TwoCheckoutPlus_Token';
@@ -19,7 +19,7 @@ class TokenGateway extends AbstractGateway
         return array(
             'accountNumber' => '',
             'privateKey' => '',
-            'testMode' => false,
+            'testMode' => false
         );
     }
 
@@ -38,7 +38,7 @@ class TokenGateway extends AbstractGateway
      *
      * @see https://www.2checkout.com/documentation/payment-api/create-sale
      *
-     * @param array $value
+     * @param array $value            
      *
      * @return $this
      */
@@ -60,7 +60,7 @@ class TokenGateway extends AbstractGateway
     /**
      * Setter: 2Checkout account number.
      *
-     * @param string $value
+     * @param string $value            
      *
      * @return $this
      */
@@ -82,8 +82,9 @@ class TokenGateway extends AbstractGateway
     /**
      * Setter: 2Checkout private key.
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return $this
      */
     public function setPrivateKey($value)
@@ -92,7 +93,8 @@ class TokenGateway extends AbstractGateway
     }
 
     /**
-     * @param array $parameters
+     *
+     * @param array $parameters            
      *
      * @return \Omnipay\Common\Message\AbstractRequest
      */

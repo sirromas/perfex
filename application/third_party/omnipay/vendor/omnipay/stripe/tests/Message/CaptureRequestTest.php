@@ -1,11 +1,11 @@
 <?php
-
 namespace Omnipay\Stripe\Message;
 
 use Omnipay\Tests\TestCase;
 
 class CaptureRequestTest extends TestCase
 {
+
     public function setUp()
     {
         $this->request = new CaptureRequest($this->getHttpClient(), $this->getHttpRequest());
@@ -21,9 +21,9 @@ class CaptureRequestTest extends TestCase
     {
         // default is no amount
         $this->assertArrayNotHasKey('amount', $this->request->getData());
-
+        
         $this->request->setAmount('10.00');
-
+        
         $data = $this->request->getData();
         $this->assertSame(1000, $data['amount']);
     }
@@ -32,7 +32,7 @@ class CaptureRequestTest extends TestCase
     {
         $this->setMockHttpResponse('CaptureSuccess.txt');
         $response = $this->request->send();
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertSame('ch_1lvgjcQgrNWUuZ', $response->getTransactionReference());
@@ -44,7 +44,7 @@ class CaptureRequestTest extends TestCase
     {
         $this->setMockHttpResponse('CaptureFailure.txt');
         $response = $this->request->send();
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());

@@ -2,7 +2,6 @@
 /**
  * PayPal REST Void an authorization
  */
-
 namespace Omnipay\PayPal\Message;
 
 /**
@@ -16,6 +15,7 @@ namespace Omnipay\PayPal\Message;
  */
 class RestVoidRequest extends AbstractRestRequest
 {
+
     public function getData()
     {
         $this->validate('transactionReference');

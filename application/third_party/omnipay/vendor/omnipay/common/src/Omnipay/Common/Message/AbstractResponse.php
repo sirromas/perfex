@@ -2,7 +2,6 @@
 /**
  * Abstract Response
  */
-
 namespace Omnipay\Common\Message;
 
 use Omnipay\Common\Exception\RuntimeException;
@@ -22,8 +21,8 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
  * Example -- validating and sending a request:
  *
  * <code>
- *   $myResponse = $myRequest->send();
- *   // now do something with the $myResponse object, test for success, etc.
+ * $myResponse = $myRequest->send();
+ * // now do something with the $myResponse object, test for success, etc.
  * </code>
  *
  * @see ResponseInterface
@@ -48,8 +47,9 @@ abstract class AbstractResponse implements ResponseInterface
     /**
      * Constructor
      *
-     * @param RequestInterface $request the initiating request.
-     * @param mixed $data
+     * @param RequestInterface $request
+     *            the initiating request.
+     * @param mixed $data            
      */
     public function __construct(RequestInterface $request, $data)
     {
@@ -120,7 +120,7 @@ abstract class AbstractResponse implements ResponseInterface
     /**
      * Response Message
      *
-     * @return null|string A response message from the payment gateway
+     * @return null|string response message from the payment gateway
      */
     public function getMessage()
     {
@@ -130,7 +130,7 @@ abstract class AbstractResponse implements ResponseInterface
     /**
      * Response code
      *
-     * @return null|string A response code from the payment gateway
+     * @return null|string response code from the payment gateway
      */
     public function getCode()
     {
@@ -140,7 +140,7 @@ abstract class AbstractResponse implements ResponseInterface
     /**
      * Gateway Reference
      *
-     * @return null|string A reference provided by the gateway to represent this transaction
+     * @return null|string reference provided by the gateway to represent this transaction
      */
     public function getTransactionReference()
     {
@@ -170,30 +170,27 @@ abstract class AbstractResponse implements ResponseInterface
     public function redirect()
     {
         $this->getRedirectResponse()->send();
-        exit;
+        exit();
     }
 
     /**
+     *
      * @return HttpRedirectResponse
      */
     public function getRedirectResponse()
     {
-        if (!$this instanceof RedirectResponseInterface || !$this->isRedirect()) {
+        if (! $this instanceof RedirectResponseInterface || ! $this->isRedirect()) {
             throw new RuntimeException('This response does not support redirection.');
         }
-
+        
         if ('GET' === $this->getRedirectMethod()) {
             return HttpRedirectResponse::create($this->getRedirectUrl());
         } elseif ('POST' === $this->getRedirectMethod()) {
             $hiddenFields = '';
             foreach ($this->getRedirectData() as $key => $value) {
-                $hiddenFields .= sprintf(
-                    '<input type="hidden" name="%1$s" value="%2$s" />',
-                    htmlentities($key, ENT_QUOTES, 'UTF-8', false),
-                    htmlentities($value, ENT_QUOTES, 'UTF-8', false)
-                )."\n";
+                $hiddenFields .= sprintf('<input type="hidden" name="%1$s" value="%2$s" />', htmlentities($key, ENT_QUOTES, 'UTF-8', false), htmlentities($value, ENT_QUOTES, 'UTF-8', false)) . "\n";
             }
-
+            
             $output = '<!DOCTYPE html>
 <html>
     <head>
@@ -210,15 +207,11 @@ abstract class AbstractResponse implements ResponseInterface
         </form>
     </body>
 </html>';
-            $output = sprintf(
-                $output,
-                htmlentities($this->getRedirectUrl(), ENT_QUOTES, 'UTF-8', false),
-                $hiddenFields
-            );
-
+            $output = sprintf($output, htmlentities($this->getRedirectUrl(), ENT_QUOTES, 'UTF-8', false), $hiddenFields);
+            
             return HttpResponse::create($output);
         }
-
-        throw new RuntimeException('Invalid redirect method "'.$this->getRedirectMethod().'".');
+        
+        throw new RuntimeException('Invalid redirect method "' . $this->getRedirectMethod() . '".');
     }
 }

@@ -10,8 +10,8 @@ namespace Braintree;
  * CreditCard as the billing address. It can also be used
  * as the shipping address when creating a Transaction.
  *
- * @package   Braintree
- *
+ * @package Braintree
+ *         
  * @property-read string $company
  * @property-read string $countryName
  * @property-read string $createdAt
@@ -28,38 +28,41 @@ namespace Braintree;
  */
 class Address extends Base
 {
+
     /**
      * returns false if comparing object is not a Address,
      * or is a Address with a different id
      *
-     * @param object $other address to compare against
+     * @param object $other
+     *            address to compare against
      * @return boolean
      */
     public function isEqual($other)
     {
-        return !($other instanceof self) ?
-            false :
-            ($this->id === $other->id && $this->customerId === $other->customerId);
+        return ! ($other instanceof self) ? false : ($this->id === $other->id && $this->customerId === $other->customerId);
     }
 
     /**
      * create a printable representation of the object as:
      * ClassName[property=value, property=value]
+     * 
      * @ignore
+     *
      * @return string
      */
-    public function  __toString()
+    public function __toString()
     {
-        return __CLASS__ . '[' .
-                Util::attributesToString($this->_attributes) . ']';
+        return __CLASS__ . '[' . Util::attributesToString($this->_attributes) . ']';
     }
 
     /**
      * sets instance properties from an array of values
      *
      * @ignore
+     *
      * @access protected
-     * @param array $addressAttribs array of address data
+     * @param array $addressAttribs
+     *            array of address data
      * @return void
      */
     protected function _initialize($addressAttribs)
@@ -69,9 +72,11 @@ class Address extends Base
     }
 
     /**
-     *  factory method: returns an instance of Address
-     *  to the requesting method, with populated properties
+     * factory method: returns an instance of Address
+     * to the requesting method, with populated properties
+     * 
      * @ignore
+     *
      * @return Address
      */
     public static function factory($attributes)
@@ -79,15 +84,13 @@ class Address extends Base
         $instance = new self();
         $instance->_initialize($attributes);
         return $instance;
-
     }
-
-
+    
     // static methods redirecting to gateway
-
+    
     /**
      *
-     * @param array $attribs
+     * @param array $attribs            
      * @return Address
      */
     public static function create($attribs)
@@ -97,7 +100,7 @@ class Address extends Base
 
     /**
      *
-     * @param array $attribs
+     * @param array $attribs            
      * @return Address
      */
     public static function createNoValidate($attribs)
@@ -107,8 +110,8 @@ class Address extends Base
 
     /**
      *
-     * @param Customer|int $customerOrId
-     * @param int $addressId
+     * @param Customer|int $customerOrId            
+     * @param int $addressId            
      * @throws InvalidArgumentException
      * @return Result\Successful
      */
@@ -119,8 +122,8 @@ class Address extends Base
 
     /**
      *
-     * @param Customer|int $customerOrId
-     * @param int $addressId
+     * @param Customer|int $customerOrId            
+     * @param int $addressId            
      * @throws Exception\NotFound
      * @return Address
      */
@@ -131,9 +134,9 @@ class Address extends Base
 
     /**
      *
-     * @param Customer|int $customerOrId
-     * @param int $addressId
-     * @param array $attributes
+     * @param Customer|int $customerOrId            
+     * @param int $addressId            
+     * @param array $attributes            
      * @throws Exception\Unexpected
      * @return Result\Successful|Result\Error
      */

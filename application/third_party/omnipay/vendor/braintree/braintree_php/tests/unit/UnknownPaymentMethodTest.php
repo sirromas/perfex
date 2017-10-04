@@ -8,6 +8,7 @@ use Braintree;
 
 class UnknownPaymentMethodTest extends Setup
 {
+
     public function testHandlesUnknownPaymentMethodResponses()
     {
         $response = [

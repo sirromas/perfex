@@ -2,7 +2,6 @@
 /**
  * PayPal REST Create Plan Request
  */
-
 namespace Omnipay\PayPal\Message;
 
 /**
@@ -33,39 +32,39 @@ namespace Omnipay\PayPal\Message;
  * ### Example
  *
  * <code>
- *   // Create a gateway for the PayPal REST Gateway
- *   // (routes to GatewayFactory::create)
- *   $gateway = Omnipay::create('Paypal_Rest');
+ * // Create a gateway for the PayPal REST Gateway
+ * // (routes to GatewayFactory::create)
+ * $gateway = Omnipay::create('Paypal_Rest');
  *
- *   // Initialise the gateway
- *   $gateway->initialize(array(
- *       'clientId' => 'MyPayPalClientId',
- *       'secret'   => 'MyPayPalSecret',
- *       'testMode' => true, // Or false when you are ready for live transactions
- *   ));
+ * // Initialise the gateway
+ * $gateway->initialize(array(
+ * 'clientId' => 'MyPayPalClientId',
+ * 'secret' => 'MyPayPalSecret',
+ * 'testMode' => true, // Or false when you are ready for live transactions
+ * ));
  *
- *   // Do a create plan transaction on the gateway
- *   $transaction = $gateway->createPlan(array(
- *       'name'                     => 'Test Plan',
- *       'description'              => 'A plan created for testing',
- *       'type'                     => $gateway::BILLING_PLAN_TYPE_FIXED,
- *       'paymentDefinitions'       => [
- *           [
- *               'name'                 => 'Monthly Payments for 12 months',
- *               'type'                 => $gateway::PAYMENT_TRIAL,
- *               'frequency'            => $gateway::BILLING_PLAN_FREQUENCY_MONTH,
- *               'frequency_interval'   => 1,
- *               'cycles'               => 12,
- *               'amount'               => ['value' => 10.00, 'currency' => 'USD'],
- *           ],
- *       ],
- *   ));
- *   $response = $transaction->send();
- *   if ($response->isSuccessful()) {
- *       echo "Create Plan transaction was successful!\n";
- *       $plan_id = $response->getTransactionReference();
- *       echo "Plan reference = " . $plan_id . "\n";
- *   }
+ * // Do a create plan transaction on the gateway
+ * $transaction = $gateway->createPlan(array(
+ * 'name' => 'Test Plan',
+ * 'description' => 'A plan created for testing',
+ * 'type' => $gateway::BILLING_PLAN_TYPE_FIXED,
+ * 'paymentDefinitions' => [
+ * [
+ * 'name' => 'Monthly Payments for 12 months',
+ * 'type' => $gateway::PAYMENT_TRIAL,
+ * 'frequency' => $gateway::BILLING_PLAN_FREQUENCY_MONTH,
+ * 'frequency_interval' => 1,
+ * 'cycles' => 12,
+ * 'amount' => ['value' => 10.00, 'currency' => 'USD'],
+ * ],
+ * ],
+ * ));
+ * $response = $transaction->send();
+ * if ($response->isSuccessful()) {
+ * echo "Create Plan transaction was successful!\n";
+ * $plan_id = $response->getTransactionReference();
+ * echo "Plan reference = " . $plan_id . "\n";
+ * }
  * </code>
  *
  * ### Request Sample
@@ -77,49 +76,49 @@ namespace Omnipay\PayPal\Message;
  * -H 'Content-Type:application/json' \
  * -H 'Authorization: Bearer <Access-Token>' \
  * -d '{
- *     "name": "T-Shirt of the Month Club Plan",
- *     "description": "Template creation.",
- *     "type": "fixed",
- *     "payment_definitions": [
- *         {
- *             "name": "Regular Payments",
- *             "type": "REGULAR",
- *             "frequency": "MONTH",
- *             "frequency_interval": "2",
- *             "amount": {
- *                 "value": "100",
- *                 "currency": "USD"
- *             },
- *             "cycles": "12",
- *             "charge_models": [
- *                 {
- *                     "type": "SHIPPING",
- *                     "amount": {
- *                         "value": "10",
- *                         "currency": "USD"
- *                     }
- *                 },
- *                 {
- *                     "type": "TAX",
- *                     "amount": {
- *                         "value": "12",
- *                         "currency": "USD"
- *                     }
- *                 }
- *             ]
- *         }
- *     ],
- *     "merchant_preferences": {
- *         "setup_fee": {
- *             "value": "1",
- *             "currency": "USD"
- *         },
- *         "return_url": "http://www.return.com",
- *         "cancel_url": "http://www.cancel.com",
- *         "auto_bill_amount": "YES",
- *         "initial_fail_amount_action": "CONTINUE",
- *         "max_fail_attempts": "0"
- *     }
+ * "name": "T-Shirt of the Month Club Plan",
+ * "description": "Template creation.",
+ * "type": "fixed",
+ * "payment_definitions": [
+ * {
+ * "name": "Regular Payments",
+ * "type": "REGULAR",
+ * "frequency": "MONTH",
+ * "frequency_interval": "2",
+ * "amount": {
+ * "value": "100",
+ * "currency": "USD"
+ * },
+ * "cycles": "12",
+ * "charge_models": [
+ * {
+ * "type": "SHIPPING",
+ * "amount": {
+ * "value": "10",
+ * "currency": "USD"
+ * }
+ * },
+ * {
+ * "type": "TAX",
+ * "amount": {
+ * "value": "12",
+ * "currency": "USD"
+ * }
+ * }
+ * ]
+ * }
+ * ],
+ * "merchant_preferences": {
+ * "setup_fee": {
+ * "value": "1",
+ * "currency": "USD"
+ * },
+ * "return_url": "http://www.return.com",
+ * "cancel_url": "http://www.cancel.com",
+ * "auto_bill_amount": "YES",
+ * "initial_fail_amount_action": "CONTINUE",
+ * "max_fail_attempts": "0"
+ * }
  * }'
  * </code>
  *
@@ -129,63 +128,63 @@ namespace Omnipay\PayPal\Message;
  *
  * <code>
  * {
- *     "id": "P-94458432VR012762KRWBZEUA",
- *     "state": "CREATED",
- *     "name": "T-Shirt of the Month Club Plan",
- *     "description": "Template creation.",
- *     "type": "FIXED",
- *     "payment_definitions": [
- *         {
- *             "id": "PD-50606817NF8063316RWBZEUA",
- *             "name": "Regular Payments",
- *             "type": "REGULAR",
- *             "frequency": "Month",
- *             "amount": {
- *                 "currency": "USD",
- *                 "value": "100"
- *             },
- *             "charge_models": [
- *                 {
- *                     "id": "CHM-55M5618301871492MRWBZEUA",
- *                     "type": "SHIPPING",
- *                     "amount": {
- *                         "currency": "USD",
- *                         "value": "10"
- *                     }
- *                 },
- *                 {
- *                     "id": "CHM-92S85978TN737850VRWBZEUA",
- *                     "type": "TAX",
- *                     "amount": {
- *                         "currency": "USD",
- *                         "value": "12"
- *                     }
- *                 }
- *             ],
- *             "cycles": "12",
- *             "frequency_interval": "2"
- *         }
- *     ],
- *     "merchant_preferences": {
- *         "setup_fee": {
- *             "currency": "USD",
- *             "value": "1"
- *         },
- *         "max_fail_attempts": "0",
- *         "return_url": "http://www.return.com",
- *         "cancel_url": "http://www.cancel.com",
- *         "auto_bill_amount": "YES",
- *         "initial_fail_amount_action": "CONTINUE"
- *     },
- *     "create_time": "2014-07-31T17:41:55.920Z",
- *     "update_time": "2014-07-31T17:41:55.920Z",
- *     "links": [
- *         {
- *             "href": "https://api.sandbox.paypal.com/v1/payments/billing-plans/P-94458432VR012762KRWBZEUA",
- *             "rel": "self",
- *             "method": "GET"
- *         }
- *     ]
+ * "id": "P-94458432VR012762KRWBZEUA",
+ * "state": "CREATED",
+ * "name": "T-Shirt of the Month Club Plan",
+ * "description": "Template creation.",
+ * "type": "FIXED",
+ * "payment_definitions": [
+ * {
+ * "id": "PD-50606817NF8063316RWBZEUA",
+ * "name": "Regular Payments",
+ * "type": "REGULAR",
+ * "frequency": "Month",
+ * "amount": {
+ * "currency": "USD",
+ * "value": "100"
+ * },
+ * "charge_models": [
+ * {
+ * "id": "CHM-55M5618301871492MRWBZEUA",
+ * "type": "SHIPPING",
+ * "amount": {
+ * "currency": "USD",
+ * "value": "10"
+ * }
+ * },
+ * {
+ * "id": "CHM-92S85978TN737850VRWBZEUA",
+ * "type": "TAX",
+ * "amount": {
+ * "currency": "USD",
+ * "value": "12"
+ * }
+ * }
+ * ],
+ * "cycles": "12",
+ * "frequency_interval": "2"
+ * }
+ * ],
+ * "merchant_preferences": {
+ * "setup_fee": {
+ * "currency": "USD",
+ * "value": "1"
+ * },
+ * "max_fail_attempts": "0",
+ * "return_url": "http://www.return.com",
+ * "cancel_url": "http://www.cancel.com",
+ * "auto_bill_amount": "YES",
+ * "initial_fail_amount_action": "CONTINUE"
+ * },
+ * "create_time": "2014-07-31T17:41:55.920Z",
+ * "update_time": "2014-07-31T17:41:55.920Z",
+ * "links": [
+ * {
+ * "href": "https://api.sandbox.paypal.com/v1/payments/billing-plans/P-94458432VR012762KRWBZEUA",
+ * "rel": "self",
+ * "method": "GET"
+ * }
+ * ]
  * }
  * </code>
  *
@@ -194,6 +193,7 @@ namespace Omnipay\PayPal\Message;
  */
 class RestCreatePlanRequest extends AbstractRestRequest
 {
+
     /**
      * Get the plan name
      *
@@ -207,7 +207,7 @@ class RestCreatePlanRequest extends AbstractRestRequest
     /**
      * Set the plan name
      *
-     * @param string $value
+     * @param string $value            
      * @return RestCreatePlanRequest provides a fluent interface.
      */
     public function setName($value)
@@ -228,8 +228,9 @@ class RestCreatePlanRequest extends AbstractRestRequest
     /**
      * Set the plan type
      *
-     * @param string $value either RestGateway::BILLING_PLAN_TYPE_FIXED
-     *                      or RestGateway::BILLING_PLAN_TYPE_INFINITE
+     * @param string $value
+     *            either RestGateway::BILLING_PLAN_TYPE_FIXED
+     *            or RestGateway::BILLING_PLAN_TYPE_INFINITE
      * @return RestCreatePlanRequest provides a fluent interface.
      */
     public function setType($value)
@@ -257,7 +258,7 @@ class RestCreatePlanRequest extends AbstractRestRequest
      * See the class documentation and the PayPal REST API documentation for
      * a description of the array elements.
      *
-     * @param array $value
+     * @param array $value            
      * @return RestCreatePlanRequest provides a fluent interface.
      * @link https://developer.paypal.com/docs/api/#paymentdefinition-object
      */
@@ -286,7 +287,7 @@ class RestCreatePlanRequest extends AbstractRestRequest
      * See the class documentation and the PayPal REST API documentation for
      * a description of the array elements.
      *
-     * @param array $value
+     * @param array $value            
      * @return RestCreatePlanRequest provides a fluent interface.
      * @link https://developer.paypal.com/docs/api/#merchantpreferences-object
      */
@@ -299,13 +300,13 @@ class RestCreatePlanRequest extends AbstractRestRequest
     {
         $this->validate('name', 'description', 'type');
         $data = array(
-            'name'                  => $this->getName(),
-            'description'           => $this->getDescription(),
-            'type'                  => $this->getType(),
-            'payment_definitions'   => $this->getPaymentDefinitions(),
-            'merchant_preferences'  => $this->getMerchantPreferences(),
+            'name' => $this->getName(),
+            'description' => $this->getDescription(),
+            'type' => $this->getType(),
+            'payment_definitions' => $this->getPaymentDefinitions(),
+            'merchant_preferences' => $this->getMerchantPreferences()
         );
-
+        
         return $data;
     }
 

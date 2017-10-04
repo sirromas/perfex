@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\Tests\Session\Flash;
 
 use PHPUnit\Framework\TestCase;
@@ -21,12 +20,15 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
  */
 class FlashBagTest extends TestCase
 {
+
     /**
+     *
      * @var \Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface
      */
     private $bag;
 
     /**
+     *
      * @var array
      */
     protected $array = array();
@@ -35,7 +37,11 @@ class FlashBagTest extends TestCase
     {
         parent::setUp();
         $this->bag = new FlashBag();
-        $this->array = array('notice' => array('A previous flash message'));
+        $this->array = array(
+            'notice' => array(
+                'A previous flash message'
+            )
+        );
         $this->bag->initialize($this->array);
     }
 
@@ -50,7 +56,11 @@ class FlashBagTest extends TestCase
         $bag = new FlashBag();
         $bag->initialize($this->array);
         $this->assertEquals($this->array, $bag->peekAll());
-        $array = array('should' => array('change'));
+        $array = array(
+            'should' => array(
+                'change'
+            )
+        );
         $bag->initialize($array);
         $this->assertEquals($array, $bag->peekAll());
     }
@@ -72,16 +82,30 @@ class FlashBagTest extends TestCase
     public function testPeek()
     {
         $this->assertEquals(array(), $this->bag->peek('non_existing'));
-        $this->assertEquals(array('default'), $this->bag->peek('not_existing', array('default')));
-        $this->assertEquals(array('A previous flash message'), $this->bag->peek('notice'));
-        $this->assertEquals(array('A previous flash message'), $this->bag->peek('notice'));
+        $this->assertEquals(array(
+            'default'
+        ), $this->bag->peek('not_existing', array(
+            'default'
+        )));
+        $this->assertEquals(array(
+            'A previous flash message'
+        ), $this->bag->peek('notice'));
+        $this->assertEquals(array(
+            'A previous flash message'
+        ), $this->bag->peek('notice'));
     }
 
     public function testGet()
     {
         $this->assertEquals(array(), $this->bag->get('non_existing'));
-        $this->assertEquals(array('default'), $this->bag->get('not_existing', array('default')));
-        $this->assertEquals(array('A previous flash message'), $this->bag->get('notice'));
+        $this->assertEquals(array(
+            'default'
+        ), $this->bag->get('not_existing', array(
+            'default'
+        )));
+        $this->assertEquals(array(
+            'A previous flash message'
+        ), $this->bag->get('notice'));
         $this->assertEquals(array(), $this->bag->get('notice'));
     }
 
@@ -90,10 +114,14 @@ class FlashBagTest extends TestCase
         $this->bag->set('notice', 'Foo');
         $this->bag->set('error', 'Bar');
         $this->assertEquals(array(
-            'notice' => array('Foo'),
-            'error' => array('Bar'), ), $this->bag->all()
-        );
-
+            'notice' => array(
+                'Foo'
+            ),
+            'error' => array(
+                'Bar'
+            )
+        ), $this->bag->all());
+        
         $this->assertEquals(array(), $this->bag->all());
     }
 
@@ -101,7 +129,9 @@ class FlashBagTest extends TestCase
     {
         $this->bag->set('notice', 'Foo');
         $this->bag->set('notice', 'Bar');
-        $this->assertEquals(array('Bar'), $this->bag->peek('notice'));
+        $this->assertEquals(array(
+            'Bar'
+        ), $this->bag->peek('notice'));
     }
 
     public function testHas()
@@ -112,7 +142,9 @@ class FlashBagTest extends TestCase
 
     public function testKeys()
     {
-        $this->assertEquals(array('notice'), $this->bag->keys());
+        $this->assertEquals(array(
+            'notice'
+        ), $this->bag->keys());
     }
 
     public function testPeekAll()
@@ -120,16 +152,22 @@ class FlashBagTest extends TestCase
         $this->bag->set('notice', 'Foo');
         $this->bag->set('error', 'Bar');
         $this->assertEquals(array(
-            'notice' => array('Foo'),
-            'error' => array('Bar'),
-            ), $this->bag->peekAll()
-        );
+            'notice' => array(
+                'Foo'
+            ),
+            'error' => array(
+                'Bar'
+            )
+        ), $this->bag->peekAll());
         $this->assertTrue($this->bag->has('notice'));
         $this->assertTrue($this->bag->has('error'));
         $this->assertEquals(array(
-            'notice' => array('Foo'),
-            'error' => array('Bar'),
-            ), $this->bag->peekAll()
-        );
+            'notice' => array(
+                'Foo'
+            ),
+            'error' => array(
+                'Bar'
+            )
+        ), $this->bag->peekAll());
     }
 }

@@ -8,6 +8,7 @@ use Braintree;
 
 class HttpTest extends Setup
 {
+
     public function testProductionSSL()
     {
         try {
@@ -97,11 +98,11 @@ class HttpTest extends Setup
                 'phone' => '419.555.1234',
                 'fax' => '419.555.1235',
                 'website' => 'http://example.com'
-                ]);
+            ]);
             $this->assertEquals(true, $result->success);
             $customer = $result->customer;
             $this->assertEquals('Mike', $customer->firstName);
-        } catch(Braintree\Exception $e) {
+        } catch (Braintree\Exception $e) {
             Braintree\Configuration::acceptGzipEncoding($originalGzipEncoding);
             throw $e;
         }
@@ -121,11 +122,11 @@ class HttpTest extends Setup
                 'phone' => '419.555.1234',
                 'fax' => '419.555.1235',
                 'website' => 'http://example.com'
-                ]);
+            ]);
             $this->assertEquals(true, $result->success);
             $customer = $result->customer;
             $this->assertEquals('Mike', $customer->firstName);
-        } catch(Braintree\Exception $e) {
+        } catch (Braintree\Exception $e) {
             Braintree\Configuration::acceptGzipEncoding($originalGzipEncoding);
             throw $e;
         }
@@ -140,7 +141,7 @@ class HttpTest extends Setup
             'publicKey' => 'badPublicKey',
             'privateKey' => 'badPrivateKey'
         ]);
-
+        
         $http = new Braintree\Http($config);
         $result = $http->_doUrlRequest('GET', $config->baseUrl() . '/merchants/integration_merchant_id/customers');
         $this->assertEquals(401, $result['status']);

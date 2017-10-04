@@ -2,7 +2,6 @@
 /**
  * Credit Card class
  */
-
 namespace Omnipay\Common;
 
 use DateTime;
@@ -19,19 +18,19 @@ use Symfony\Component\HttpFoundation\ParameterBag;
  * Example:
  *
  * <code>
- *   // Define credit card parameters, which should look like this
- *   $parameters = [
- *       'firstName' => 'Bobby',
- *       'lastName' => 'Tables',
- *       'number' => '4444333322221111',
- *       'cvv' => '123',
- *       'expiryMonth' => '12',
- *       'expiryYear' => '2017',
- *       'email' => 'testcard@gmail.com',
- *   ];
+ * // Define credit card parameters, which should look like this
+ * $parameters = [
+ * 'firstName' => 'Bobby',
+ * 'lastName' => 'Tables',
+ * 'number' => '4444333322221111',
+ * 'cvv' => '123',
+ * 'expiryMonth' => '12',
+ * 'expiryYear' => '2017',
+ * 'email' => 'testcard@gmail.com',
+ * ];
  *
- *   // Create a credit card object
- *   $card = new CreditCard($parameters);
+ * // Create a credit card object
+ * $card = new CreditCard($parameters);
  * </code>
  *
  * The full list of card attributes that may be set via the parameter to
@@ -89,21 +88,33 @@ use Symfony\Component\HttpFoundation\ParameterBag;
  * * birthday
  * * gender
  *
- * If any unknown parameters are passed in, they will be ignored.  No error is thrown.
+ * If any unknown parameters are passed in, they will be ignored. No error is thrown.
  */
 class CreditCard
 {
+
     const BRAND_VISA = 'visa';
+
     const BRAND_MASTERCARD = 'mastercard';
+
     const BRAND_DISCOVER = 'discover';
+
     const BRAND_AMEX = 'amex';
+
     const BRAND_DINERS_CLUB = 'diners_club';
+
     const BRAND_JCB = 'jcb';
+
     const BRAND_SWITCH = 'switch';
+
     const BRAND_SOLO = 'solo';
+
     const BRAND_DANKORT = 'dankort';
+
     const BRAND_MAESTRO = 'maestro';
+
     const BRAND_FORBRUGSFORENINGEN = 'forbrugsforeningen';
+
     const BRAND_LASER = 'laser';
 
     /**
@@ -118,6 +129,7 @@ class CreditCard
      * @var array
      */
     const REGEX_MASTERCARD = '/^(5[1-5]\d{4}|677189)\d{10}$|^2(?:2(?:2[1-9]|[3-9]\d)|[3-6]\d\d|7(?:[01]\d|20))\d{12}$/';
+
     protected $supported_cards = array(
         self::BRAND_VISA => '/^4\d{12}(\d{3})?$/',
         self::BRAND_MASTERCARD => self::REGEX_MASTERCARD,
@@ -130,7 +142,7 @@ class CreditCard
         self::BRAND_DANKORT => '/^5019\d{12}$/',
         self::BRAND_MAESTRO => '/^(5[06-8]|6\d)\d{10,17}$/',
         self::BRAND_FORBRUGSFORENINGEN => '/^600722\d{10}$/',
-        self::BRAND_LASER => '/^(6304|6706|6709|6771(?!89))\d{8}(\d{4}|\d{6,7})?$/',
+        self::BRAND_LASER => '/^(6304|6706|6709|6771(?!89))\d{8}(\d{4}|\d{6,7})?$/'
     );
 
     /**
@@ -143,7 +155,8 @@ class CreditCard
     /**
      * Create a new CreditCard object using the specified parameters
      *
-     * @param array $parameters An array of parameters to set on the new object
+     * @param array $parameters
+     *            An array of parameters to set on the new object
      */
     public function __construct($parameters = null)
     {
@@ -172,18 +185,20 @@ class CreditCard
      *
      * Set $add_to_front to true if the key should be added to the front of the array
      *
-     * @param  string  $name The name of the new supported brand.
-     * @param  string  $expression The regular expression to check if a card is supported.
+     * @param string $name
+     *            The name of the new supported brand.
+     * @param string $expression
+     *            The regular expression to check if a card is supported.
      * @return boolean success
      */
     public function addSupportedBrand($name, $expression)
     {
         $known_brands = array_keys($this->supported_cards);
-
+        
         if (in_array($name, $known_brands)) {
             return false;
         }
-
+        
         $this->supported_cards[$name] = $expression;
         return true;
     }
@@ -193,15 +208,16 @@ class CreditCard
      *
      * If any unknown parameters passed, they will be ignored.
      *
-     * @param array $parameters An associative array of parameters
+     * @param array $parameters
+     *            An associative array of parameters
      * @return CreditCard provides a fluent interface.
      */
     public function initialize($parameters = null)
     {
-        $this->parameters = new ParameterBag;
-
+        $this->parameters = new ParameterBag();
+        
         Helper::initialize($this, $parameters);
-
+        
         return $this;
     }
 
@@ -228,14 +244,16 @@ class CreditCard
     /**
      * Set one parameter.
      *
-     * @param string $key Parameter key
-     * @param mixed $value Parameter value
+     * @param string $key
+     *            Parameter key
+     * @param mixed $value
+     *            Parameter value
      * @return CreditCard provides a fluent interface.
      */
     protected function setParameter($key, $value)
     {
         $this->parameters->set($key, $value);
-
+        
         return $this;
     }
 
@@ -244,8 +262,10 @@ class CreditCard
      *
      * The input value is normalised to a 4 digit number.
      *
-     * @param string $key Parameter key, e.g. 'expiryYear'
-     * @param mixed $value Parameter value
+     * @param string $key
+     *            Parameter key, e.g. 'expiryYear'
+     * @param mixed $value
+     *            Parameter value
      * @return CreditCard provides a fluent interface.
      */
     protected function setYearParameter($key, $value)
@@ -256,12 +276,13 @@ class CreditCard
         } else {
             $value = (int) gmdate('Y', gmmktime(0, 0, 0, 1, 1, (int) $value));
         }
-
+        
         return $this->setParameter($key, $value);
     }
 
     /**
-     * Validate this credit card. If the card is invalid, InvalidCreditCardException is thrown.
+     * Validate this credit card.
+     * If the card is invalid, InvalidCreditCardException is thrown.
      *
      * This method is called internally by gateways to avoid wasting time with an API call
      * when the credit card is clearly invalid.
@@ -274,21 +295,25 @@ class CreditCard
      */
     public function validate()
     {
-        foreach (array('number', 'expiryMonth', 'expiryYear') as $key) {
-            if (!$this->getParameter($key)) {
+        foreach (array(
+            'number',
+            'expiryMonth',
+            'expiryYear'
+        ) as $key) {
+            if (! $this->getParameter($key)) {
                 throw new InvalidCreditCardException("The $key parameter is required");
             }
         }
-
+        
         if ($this->getExpiryDate('Ym') < gmdate('Ym')) {
             throw new InvalidCreditCardException('Card has expired');
         }
-
-        if (!Helper::validateLuhn($this->getNumber())) {
+        
+        if (! Helper::validateLuhn($this->getNumber())) {
             throw new InvalidCreditCardException('Card number is invalid');
         }
-
-        if (!is_null($this->getNumber()) && !preg_match('/^\d{12,19}$/i', $this->getNumber())) {
+        
+        if (! is_null($this->getNumber()) && ! preg_match('/^\d{12,19}$/i', $this->getNumber())) {
             throw new InvalidCreditCardException('Card number should have 12 to 19 digits');
         }
     }
@@ -306,14 +331,15 @@ class CreditCard
     /**
      * Set Card Title.
      *
-     * @param string $value Parameter value
+     * @param string $value
+     *            Parameter value
      * @return CreditCard provides a fluent interface.
      */
     public function setTitle($value)
     {
         $this->setBillingTitle($value);
         $this->setShippingTitle($value);
-
+        
         return $this;
     }
 
@@ -330,14 +356,15 @@ class CreditCard
     /**
      * Set Card First Name (Billing and Shipping).
      *
-     * @param string $value Parameter value
+     * @param string $value
+     *            Parameter value
      * @return CreditCard provides a fluent interface.
      */
     public function setFirstName($value)
     {
         $this->setBillingFirstName($value);
         $this->setShippingFirstName($value);
-
+        
         return $this;
     }
 
@@ -354,14 +381,15 @@ class CreditCard
     /**
      * Set Card Last Name (Billing and Shipping).
      *
-     * @param string $value Parameter value
+     * @param string $value
+     *            Parameter value
      * @return CreditCard provides a fluent interface.
      */
     public function setLastName($value)
     {
         $this->setBillingLastName($value);
         $this->setShippingLastName($value);
-
+        
         return $this;
     }
 
@@ -378,14 +406,15 @@ class CreditCard
     /**
      * Set Card Name (Billing and Shipping).
      *
-     * @param string $value Parameter value
+     * @param string $value
+     *            Parameter value
      * @return CreditCard provides a fluent interface.
      */
     public function setName($value)
     {
         $this->setBillingName($value);
         $this->setShippingName($value);
-
+        
         return $this;
     }
 
@@ -405,7 +434,8 @@ class CreditCard
      * Non-numeric characters are stripped out of the card number, so
      * it's safe to pass in strings such as "4444-3333 2222 1111" etc.
      *
-     * @param string $value Parameter value
+     * @param string $value
+     *            Parameter value
      * @return CreditCard provides a fluent interface.
      */
     public function setNumber($value)
@@ -421,19 +451,20 @@ class CreditCard
      */
     public function getNumberLastFour()
     {
-        return substr($this->getNumber(), -4, 4) ?: null;
+        return substr($this->getNumber(), - 4, 4) ?  : null;
     }
 
     /**
      * Returns a masked credit card number with only the last 4 chars visible
      *
-     * @param string $mask Character to use in place of numbers
+     * @param string $mask
+     *            Character to use in place of numbers
      * @return string
      */
     public function getNumberMasked($mask = 'X')
     {
         $maskLength = strlen($this->getNumber()) - 4;
-
+        
         return str_repeat($mask, $maskLength) . $this->getNumberLastFour();
     }
 
@@ -466,7 +497,7 @@ class CreditCard
     /**
      * Sets the card expiry month.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setExpiryMonth($value)
@@ -487,7 +518,7 @@ class CreditCard
     /**
      * Sets the card expiry year.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setExpiryYear($value)
@@ -498,7 +529,7 @@ class CreditCard
     /**
      * Get the card expiry date, using the specified date format string.
      *
-     * @param string $format
+     * @param string $format            
      *
      * @return string
      */
@@ -520,7 +551,7 @@ class CreditCard
     /**
      * Sets the card start month.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setStartMonth($value)
@@ -541,7 +572,7 @@ class CreditCard
     /**
      * Sets the card start year.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setStartYear($value)
@@ -552,7 +583,7 @@ class CreditCard
     /**
      * Get the card start date, using the specified date format string
      *
-     * @param string $format
+     * @param string $format            
      *
      * @return string
      */
@@ -574,7 +605,7 @@ class CreditCard
     /**
      * Sets the card CVV.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setCvv($value)
@@ -627,10 +658,12 @@ class CreditCard
     }
 
     /**
-     * Sets raw data from all tracks on the credit card magnetic strip. Used by gateways that support card-present
+     * Sets raw data from all tracks on the credit card magnetic strip.
+     * Used by gateways that support card-present
      * transactions.
      *
-     * @param $value
+     * @param
+     *            $value
      * @return CreditCard
      */
     public function setTracks($value)
@@ -651,7 +684,7 @@ class CreditCard
     /**
      * Sets the card issue number.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setIssueNumber($value)
@@ -672,7 +705,7 @@ class CreditCard
     /**
      * Sets the card billing title.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setBillingTitle($value)
@@ -693,7 +726,7 @@ class CreditCard
     /**
      * Sets the card billing name.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setBillingName($value)
@@ -701,7 +734,7 @@ class CreditCard
         $names = explode(' ', $value, 2);
         $this->setBillingFirstName($names[0]);
         $this->setBillingLastName(isset($names[1]) ? $names[1] : null);
-
+        
         return $this;
     }
 
@@ -718,7 +751,7 @@ class CreditCard
     /**
      * Sets the first part of the card billing name.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setBillingFirstName($value)
@@ -739,7 +772,7 @@ class CreditCard
     /**
      * Sets the last part of the card billing name.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setBillingLastName($value)
@@ -760,7 +793,7 @@ class CreditCard
     /**
      * Sets the billing company name.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setBillingCompany($value)
@@ -781,7 +814,7 @@ class CreditCard
     /**
      * Sets the billing address, line 1.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setBillingAddress1($value)
@@ -802,7 +835,7 @@ class CreditCard
     /**
      * Sets the billing address, line 2.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setBillingAddress2($value)
@@ -823,7 +856,7 @@ class CreditCard
     /**
      * Sets billing city.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setBillingCity($value)
@@ -844,7 +877,7 @@ class CreditCard
     /**
      * Sets the billing postcode.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setBillingPostcode($value)
@@ -865,7 +898,7 @@ class CreditCard
     /**
      * Sets the billing state.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setBillingState($value)
@@ -886,7 +919,7 @@ class CreditCard
     /**
      * Sets the billing country name.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setBillingCountry($value)
@@ -907,7 +940,7 @@ class CreditCard
     /**
      * Sets the billing phone number.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setBillingPhone($value)
@@ -928,7 +961,7 @@ class CreditCard
     /**
      * Sets the billing phone number extension.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setBillingPhoneExtension($value)
@@ -949,7 +982,7 @@ class CreditCard
     /**
      * Sets the billing fax number.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setBillingFax($value)
@@ -970,7 +1003,7 @@ class CreditCard
     /**
      * Sets the title of the card shipping name.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setShippingTitle($value)
@@ -991,7 +1024,7 @@ class CreditCard
     /**
      * Sets the card shipping name.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setShippingName($value)
@@ -999,7 +1032,7 @@ class CreditCard
         $names = explode(' ', $value, 2);
         $this->setShippingFirstName($names[0]);
         $this->setShippingLastName(isset($names[1]) ? $names[1] : null);
-
+        
         return $this;
     }
 
@@ -1016,7 +1049,7 @@ class CreditCard
     /**
      * Sets the first part of the card shipping name.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setShippingFirstName($value)
@@ -1037,7 +1070,7 @@ class CreditCard
     /**
      * Sets the last part of the card shipping name.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setShippingLastName($value)
@@ -1058,7 +1091,7 @@ class CreditCard
     /**
      * Sets the shipping company name.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setShippingCompany($value)
@@ -1079,7 +1112,7 @@ class CreditCard
     /**
      * Sets the shipping address, line 1.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setShippingAddress1($value)
@@ -1100,7 +1133,7 @@ class CreditCard
     /**
      * Sets the shipping address, line 2.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setShippingAddress2($value)
@@ -1121,7 +1154,7 @@ class CreditCard
     /**
      * Sets the shipping city.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setShippingCity($value)
@@ -1142,7 +1175,7 @@ class CreditCard
     /**
      * Sets the shipping postcode.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setShippingPostcode($value)
@@ -1163,7 +1196,7 @@ class CreditCard
     /**
      * Sets the shipping state.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setShippingState($value)
@@ -1184,7 +1217,7 @@ class CreditCard
     /**
      * Sets the shipping country.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setShippingCountry($value)
@@ -1205,7 +1238,7 @@ class CreditCard
     /**
      * Sets the shipping phone number.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setShippingPhone($value)
@@ -1226,7 +1259,7 @@ class CreditCard
     /**
      * Sets the shipping phone number extension.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setShippingPhoneExtension($value)
@@ -1247,7 +1280,7 @@ class CreditCard
     /**
      * Sets the shipping fax number.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setShippingFax($value)
@@ -1268,14 +1301,14 @@ class CreditCard
     /**
      * Sets the billing and shipping address, line 1.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setAddress1($value)
     {
         $this->setParameter('billingAddress1', $value);
         $this->setParameter('shippingAddress1', $value);
-
+        
         return $this;
     }
 
@@ -1292,14 +1325,14 @@ class CreditCard
     /**
      * Sets the billing and shipping address, line 2.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setAddress2($value)
     {
         $this->setParameter('billingAddress2', $value);
         $this->setParameter('shippingAddress2', $value);
-
+        
         return $this;
     }
 
@@ -1316,14 +1349,14 @@ class CreditCard
     /**
      * Sets the billing and shipping city.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setCity($value)
     {
         $this->setParameter('billingCity', $value);
         $this->setParameter('shippingCity', $value);
-
+        
         return $this;
     }
 
@@ -1340,14 +1373,14 @@ class CreditCard
     /**
      * Sets the billing and shipping postcode.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setPostcode($value)
     {
         $this->setParameter('billingPostcode', $value);
         $this->setParameter('shippingPostcode', $value);
-
+        
         return $this;
     }
 
@@ -1364,14 +1397,14 @@ class CreditCard
     /**
      * Sets the billing and shipping state.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setState($value)
     {
         $this->setParameter('billingState', $value);
         $this->setParameter('shippingState', $value);
-
+        
         return $this;
     }
 
@@ -1388,14 +1421,14 @@ class CreditCard
     /**
      * Sets the billing and shipping country.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setCountry($value)
     {
         $this->setParameter('billingCountry', $value);
         $this->setParameter('shippingCountry', $value);
-
+        
         return $this;
     }
 
@@ -1412,14 +1445,14 @@ class CreditCard
     /**
      * Sets the billing and shipping phone number.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setPhone($value)
     {
         $this->setParameter('billingPhone', $value);
         $this->setParameter('shippingPhone', $value);
-
+        
         return $this;
     }
 
@@ -1436,14 +1469,14 @@ class CreditCard
     /**
      * Sets the billing and shipping phone number extension.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setPhoneExtension($value)
     {
         $this->setParameter('billingPhoneExtension', $value);
         $this->setParameter('shippingPhoneExtension', $value);
-
+        
         return $this;
     }
 
@@ -1460,14 +1493,14 @@ class CreditCard
     /**
      * Sets the billing and shipping fax number.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setFax($value)
     {
         $this->setParameter('billingFax', $value);
         $this->setParameter('shippingFax', $value);
-
+        
         return $this;
     }
 
@@ -1484,14 +1517,14 @@ class CreditCard
     /**
      * Sets the billing and shipping company name.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setCompany($value)
     {
         $this->setParameter('billingCompany', $value);
         $this->setParameter('shippingCompany', $value);
-
+        
         return $this;
     }
 
@@ -1508,7 +1541,7 @@ class CreditCard
     /**
      * Sets the cardholder's email address.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setEmail($value)
@@ -1524,14 +1557,14 @@ class CreditCard
     public function getBirthday($format = 'Y-m-d')
     {
         $value = $this->getParameter('birthday');
-
+        
         return $value ? $value->format($format) : null;
     }
 
     /**
      * Sets the cardholder's birthday.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setBirthday($value)
@@ -1541,7 +1574,7 @@ class CreditCard
         } else {
             $value = null;
         }
-
+        
         return $this->setParameter('birthday', $value);
     }
 
@@ -1558,7 +1591,7 @@ class CreditCard
     /**
      * Sets the cardholder's gender.
      *
-     * @param string $value
+     * @param string $value            
      * @return CreditCard provides a fluent interface.
      */
     public function setGender($value)

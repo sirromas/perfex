@@ -1,7 +1,9 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
 class Surveys_model extends CRM_Model
 {
+
     public function __construct()
     {
         parent::__construct();
@@ -9,25 +11,27 @@ class Surveys_model extends CRM_Model
 
     /**
      * Get survey and all questions by id
-     * @param  mixed $id survey id
+     * 
+     * @param mixed $id
+     *            survey id
      * @return object
      */
     public function get($id = '')
     {
         $this->db->where('surveyid', $id);
         $survey = $this->db->get('tblsurveys')->row();
-        if (!$survey) {
+        if (! $survey) {
             return false;
         }
         $this->db->where('rel_id', $survey->surveyid);
         $this->db->where('rel_type', 'survey');
         $this->db->order_by('question_order', 'asc');
         $questions = $this->db->get('tblformquestions')->result_array();
-        $i         = 0;
+        $i = 0;
         foreach ($questions as $question) {
             $this->db->where('questionid', $question['questionid']);
-            $box                      = $this->db->get('tblformquestionboxes')->row();
-            $questions[$i]['boxid']   = $box->boxid;
+            $box = $this->db->get('tblformquestionboxes')->row();
+            $questions[$i]['boxid'] = $box->boxid;
             $questions[$i]['boxtype'] = $box->boxtype;
             if ($box->boxtype == 'checkbox' || $box->boxtype == 'radio') {
                 $this->db->order_by('questionboxdescriptionid', 'asc');
@@ -40,17 +44,20 @@ class Surveys_model extends CRM_Model
                     }
                 }
             }
-            $i++;
+            $i ++;
         }
         $survey->questions = $questions;
-
+        
         return $survey;
     }
 
     /**
      * Update survey
-     * @param  array $data     survey $_POST data
-     * @param  mixed $surveyid survey id
+     * 
+     * @param array $data
+     *            survey $_POST data
+     * @param mixed $surveyid
+     *            survey id
      * @return boolean
      */
     public function update($data, $surveyid)
@@ -85,16 +92,18 @@ class Surveys_model extends CRM_Model
         ));
         if ($this->db->affected_rows() > 0) {
             logActivity('Survey Updated [ID: ' . $surveyid . ', Subject: ' . $data['subject'] . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * Add new survey
-     * @param array $data survey $_POST data
+     * 
+     * @param array $data
+     *            survey $_POST data
      * @return mixed
      */
     public function add($data)
@@ -130,17 +139,19 @@ class Surveys_model extends CRM_Model
             'fromname' => $data['fromname']
         ));
         $surveyid = $this->db->insert_id();
-        if (!$surveyid) {
+        if (! $surveyid) {
             // return false;
         }
         logActivity('New Survey Added [ID: ' . $surveyid . ', Subject: ' . $data['subject'] . ']');
-
+        
         return $surveyid;
     }
 
     /**
      * Delete survey and all connections
-     * @param  mixed $surveyid survey id
+     * 
+     * @param mixed $surveyid
+     *            survey id
      * @return boolean
      */
     public function delete($surveyid)
@@ -149,7 +160,7 @@ class Surveys_model extends CRM_Model
         $this->db->where('surveyid', $surveyid);
         $this->db->delete('tblsurveys');
         if ($this->db->affected_rows() > 0) {
-            $affectedRows++;
+            $affectedRows ++;
             // get all questions from the survey
             $this->db->where('rel_id', $surveyid);
             $this->db->where('rel_type', 'survey');
@@ -164,40 +175,46 @@ class Surveys_model extends CRM_Model
             $this->db->where('rel_id', $surveyid);
             $this->db->where('rel_type', 'survey');
             $this->db->delete('tblformquestions');
-
+            
             $this->db->where('rel_id', $surveyid);
             $this->db->where('rel_type', 'survey');
             $this->db->delete('tblformresults');
-
+            
             $this->db->where('surveyid', $surveyid);
             $this->db->delete('tblsurveyresultsets');
         }
         if ($affectedRows > 0) {
             logActivity('Survey Deleted [ID: ' . $surveyid . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * Get survey send log
-     * @param  mixed $surveyid surveyid
+     * 
+     * @param mixed $surveyid
+     *            surveyid
      * @return array
      */
     public function get_survey_send_log($surveyid)
     {
         $this->db->where('surveyid', $surveyid);
-
+        
         return $this->db->get('tblsurveysendlog')->result_array();
     }
 
     /**
      * Add new survey send log
-     * @param mixed $surveyid surveyid
-     * @param integer @iscronfinished always to 0
-     * @param integer $lists array of lists which survey has been send
+     * 
+     * @param mixed $surveyid
+     *            surveyid
+     * @param
+     *            integer @iscronfinished always to 0
+     * @param integer $lists
+     *            array of lists which survey has been send
      */
     public function init_survey_send_log($surveyid, $iscronfinished = 0, $lists = array())
     {
@@ -210,7 +227,7 @@ class Surveys_model extends CRM_Model
         ));
         $log_id = $this->db->insert_id();
         logActivity('Survey Email Lists Send Setup [ID: ' . $surveyid . ', Lists: ' . implode(' ', $lists) . ']');
-
+        
         return $log_id;
     }
 
@@ -220,24 +237,27 @@ class Surveys_model extends CRM_Model
         $this->db->where('id', $id);
         $this->db->delete('tblsurveysendlog');
         if ($this->db->affected_rows() > 0) {
-            $affectedRows++;
+            $affectedRows ++;
         }
         $this->db->where('log_id', $id);
         $this->db->delete('tblsurveysemailsendcron');
         if ($this->db->affected_rows() > 0) {
-            $affectedRows++;
+            $affectedRows ++;
         }
         if ($affectedRows > 0) {
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * Add survey result by user
-     * @param mixed $id     surveyid
-     * @param mixed $result $_POST results/questions answers
+     * 
+     * @param mixed $id
+     *            surveyid
+     * @param mixed $result
+     *            $_POST results/questions answers
      */
     public function add_survey_result($id, $result)
     {
@@ -253,7 +273,7 @@ class Surveys_model extends CRM_Model
                 foreach ($result['selectable'] as $boxid => $question_answers) {
                     foreach ($question_answers as $questionid => $answer) {
                         $count = count($answer);
-                        for ($i = 0; $i < $count; $i++) {
+                        for ($i = 0; $i < $count; $i ++) {
                             $this->db->insert('tblformresults', array(
                                 'boxid' => $boxid,
                                 'boxdescriptionid' => $answer[$i],
@@ -278,16 +298,18 @@ class Surveys_model extends CRM_Model
                     'resultsetid' => $resultsetid
                 ));
             }
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * Remove survey question
-     * @param  mixed $questionid questionid
+     * 
+     * @param mixed $questionid
+     *            questionid
      * @return boolean
      */
     public function remove_question($questionid)
@@ -296,30 +318,32 @@ class Surveys_model extends CRM_Model
         $this->db->where('questionid', $questionid);
         $this->db->delete('tblformquestionboxesdescription');
         if ($this->db->affected_rows() > 0) {
-            $affectedRows++;
+            $affectedRows ++;
         }
         $this->db->where('questionid', $questionid);
         $this->db->delete('tblformquestionboxes');
         if ($this->db->affected_rows() > 0) {
-            $affectedRows++;
+            $affectedRows ++;
         }
         $this->db->where('questionid', $questionid);
         $this->db->delete('tblformquestions');
         if ($this->db->affected_rows() > 0) {
-            $affectedRows++;
+            $affectedRows ++;
         }
         if ($affectedRows > 0) {
             logActivity('Survey Question Deleted [' . $questionid . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * Remove survey question box description / radio/checkbox
-     * @param  mixed $questionboxdescriptionid question box description id
+     * 
+     * @param mixed $questionboxdescriptionid
+     *            question box description id
      * @return boolean
      */
     public function remove_box_description($questionboxdescriptionid)
@@ -329,15 +353,19 @@ class Surveys_model extends CRM_Model
         if ($this->db->affected_rows() > 0) {
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * Add survey box description radio/checkbox
-     * @param mixed $questionid  question id
-     * @param mixed $boxid       main box id
-     * @param string $description box question
+     * 
+     * @param mixed $questionid
+     *            question id
+     * @param mixed $boxid
+     *            main box id
+     * @param string $description
+     *            box question
      */
     public function add_box_description($questionid, $boxid, $description = '')
     {
@@ -346,14 +374,17 @@ class Surveys_model extends CRM_Model
             'boxid' => $boxid,
             'description' => $description
         ));
-
+        
         return $this->db->insert_id();
     }
 
     /**
      * Private functino for insert question
-     * @param  mixed $surveyid survey id
-     * @param  string $question question
+     * 
+     * @param mixed $surveyid
+     *            survey id
+     * @param string $question
+     *            question
      * @return mixed
      */
     private function insert_survey_question($surveyid, $question = '')
@@ -367,14 +398,17 @@ class Surveys_model extends CRM_Model
         if ($insert_id) {
             logActivity('New Survey Question Added [SurveyID: ' . $surveyid . ']');
         }
-
+        
         return $insert_id;
     }
 
     /**
      * Add new question type
-     * @param  string $type       checkbox/textarea/radio/input
-     * @param  mixed $questionid question id
+     * 
+     * @param string $type
+     *            checkbox/textarea/radio/input
+     * @param mixed $questionid
+     *            question id
      * @return mixed
      */
     private function insert_question_type($type, $questionid)
@@ -383,19 +417,21 @@ class Surveys_model extends CRM_Model
             'boxtype' => $type,
             'questionid' => $questionid
         ));
-
+        
         return $this->db->insert_id();
     }
 
     /**
      * Add new question ti survey / ajax
-     * @param array $data $_POST question data
+     * 
+     * @param array $data
+     *            $_POST question data
      */
     public function add_survey_question($data)
     {
         $questionid = $this->insert_survey_question($data['surveyid']);
         if ($questionid) {
-            $boxid    = $this->insert_question_type($data['type'], $questionid);
+            $boxid = $this->insert_question_type($data['type'], $questionid);
             $response = array(
                 'questionid' => $questionid,
                 'boxid' => $boxid
@@ -406,7 +442,7 @@ class Surveys_model extends CRM_Model
                     'questionboxdescriptionid' => $questionboxdescriptionid
                 ));
             }
-
+            
             return $response;
         } else {
             return false;
@@ -415,7 +451,9 @@ class Surveys_model extends CRM_Model
 
     /**
      * Update question / ajax
-     * @param  array $data $_POST question data
+     * 
+     * @param array $data
+     *            $_POST question data
      * @return boolean
      */
     public function update_question($data)
@@ -431,7 +469,7 @@ class Surveys_model extends CRM_Model
             'required' => $_required
         ));
         if ($this->db->affected_rows() > 0) {
-            $affectedRows++;
+            $affectedRows ++;
         }
         if (isset($data['boxes_description'])) {
             foreach ($data['boxes_description'] as $box_description) {
@@ -440,22 +478,24 @@ class Surveys_model extends CRM_Model
                     'description' => $box_description[1]
                 ));
                 if ($this->db->affected_rows() > 0) {
-                    $affectedRows++;
+                    $affectedRows ++;
                 }
             }
         }
         if ($affectedRows > 0) {
             logActivity('Survey Question Updated [QuestionID: ' . $data['questionid'] . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * Reorder survey quesions / ajax
-     * @param  mixed $data surveys order and question id
+     * 
+     * @param mixed $data
+     *            surveys order and question id
      */
     public function update_survey_questions_orders($data)
     {
@@ -469,7 +509,9 @@ class Surveys_model extends CRM_Model
 
     /**
      * Get quesion box id
-     * @param  mixed $questionid questionid
+     * 
+     * @param mixed $questionid
+     *            questionid
      * @return integer
      */
     private function get_question_box_id($questionid)
@@ -478,14 +520,17 @@ class Surveys_model extends CRM_Model
         $this->db->from('tblformquestionboxes');
         $this->db->where('questionid', $questionid);
         $box = $this->db->get()->row();
-
+        
         return $box->boxid;
     }
 
     /**
      * Change survey status / active / inactive
-     * @param  mixed $id     surveyid
-     * @param  integer $status active or inactive
+     * 
+     * @param mixed $id
+     *            surveyid
+     * @param integer $status
+     *            active or inactive
      */
     public function change_survey_status($id, $status)
     {
@@ -495,13 +540,15 @@ class Surveys_model extends CRM_Model
         ));
         logActivity('Survey Status Changed [SurveyID: ' . $id . ' - Active: ' . $status . ']');
     }
-
+    
     // MAIL LISTS
-
+    
     /**
      * Get mail list/s
-     * @param  mixed $id Optional
-     * @return mixed     object if id is passed else array
+     * 
+     * @param mixed $id
+     *            Optional
+     * @return mixed object if id is passed else array
      */
     public function get_mail_lists($id = '')
     {
@@ -509,21 +556,23 @@ class Surveys_model extends CRM_Model
         $this->db->from('tblemaillists');
         if (is_numeric($id)) {
             $this->db->where('listid', $id);
-
+            
             return $this->db->get()->row();
         }
         $lists = $this->db->get()->result_array();
-
+        
         return $lists;
     }
 
     /**
      * Add new mail list
-     * @param array $data mail list data
+     * 
+     * @param array $data
+     *            mail list data
      */
     public function add_mail_list($data)
     {
-        $data['creator']     = get_staff_full_name(get_staff_user_id());
+        $data['creator'] = get_staff_full_name(get_staff_user_id());
         $data['datecreated'] = date('Y-m-d H:i:s');
         if (isset($data['list_custom_fields_add'])) {
             $custom_fields = $data['list_custom_fields_add'];
@@ -533,7 +582,7 @@ class Surveys_model extends CRM_Model
         $listid = $this->db->insert_id();
         if (isset($custom_fields)) {
             foreach ($custom_fields as $field) {
-                if (!empty($field)) {
+                if (! empty($field)) {
                     $this->db->insert('tblmaillistscustomfields', array(
                         'listid' => $listid,
                         'fieldname' => $field,
@@ -543,21 +592,24 @@ class Surveys_model extends CRM_Model
             }
         }
         logActivity('New Email List Added [ID: ' . $listid . ', ' . $data['name'] . ']');
-
+        
         return $listid;
     }
 
     /**
      * Update mail list
-     * @param  mixed $data mail list data
-     * @param  mixed $id   list id
+     * 
+     * @param mixed $data
+     *            mail list data
+     * @param mixed $id
+     *            list id
      * @return boolean
      */
     public function update_mail_list($data, $id)
     {
         if (isset($data['list_custom_fields_add'])) {
             foreach ($data['list_custom_fields_add'] as $field) {
-                if (!empty($field)) {
+                if (! empty($field)) {
                     $this->db->insert('tblmaillistscustomfields', array(
                         'listid' => $id,
                         'fieldname' => $field,
@@ -581,16 +633,18 @@ class Surveys_model extends CRM_Model
         $this->db->update('tblemaillists', $data);
         if ($this->db->affected_rows() > 0) {
             logActivity('Mail List Updated [ID: ' . $id . ', ' . $data['name'] . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * Delete mail list and all connections
-     * @param  mixed $id list id
+     * 
+     * @param mixed $id
+     *            list id
      * @return boolean
      */
     public function delete_mail_list($id)
@@ -599,75 +653,91 @@ class Surveys_model extends CRM_Model
         $this->db->where('listid', $id);
         $this->db->delete('tblmaillistscustomfieldvalues');
         if ($this->db->affected_rows() > 0) {
-            $affectedRows++;
+            $affectedRows ++;
         }
         $this->db->where('listid', $id);
         $this->db->delete('tblmaillistscustomfields');
         if ($this->db->affected_rows() > 0) {
-            $affectedRows++;
+            $affectedRows ++;
         }
         $this->db->where('listid', $id);
         $this->db->delete('tbllistemails');
         if ($this->db->affected_rows() > 0) {
-            $affectedRows++;
+            $affectedRows ++;
         }
         $this->db->where('listid', $id);
         $this->db->delete('tblemaillists');
         if ($this->db->affected_rows() > 0) {
-            $affectedRows++;
+            $affectedRows ++;
         }
         if ($affectedRows > 0) {
             logActivity('Mail List Deleted [ID: ' . $id . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * Get all emails from mail list
-     * @param  mixed $id list id
+     * 
+     * @param mixed $id
+     *            list id
      * @return array
      */
     public function get_mail_list_emails($id)
     {
-        $this->db->select('email,emailid')->from('tbllistemails')->where('listid', $id);
-
+        $this->db->select('email,emailid')
+            ->from('tbllistemails')
+            ->where('listid', $id);
+        
         return $this->db->get()->result_array();
     }
 
     /**
      * List data used in view
-     * @param  mixed $id list id
+     * 
+     * @param mixed $id
+     *            list id
      * @return mixed object
      */
     public function get_data_for_view_list($id)
     {
-        $list         = $this->get_mail_lists($id);
-        $list_emails  = $this->db->select('email,dateadded,emailid')->from('tbllistemails')->where('listid', $id)->get()->result_array();
+        $list = $this->get_mail_lists($id);
+        $list_emails = $this->db->select('email,dateadded,emailid')
+            ->from('tbllistemails')
+            ->where('listid', $id)
+            ->get()
+            ->result_array();
         $list->emails = $list_emails;
-
+        
         return $list;
     }
 
     /**
      * Get list custom fields added by staff
-     * @param  mixed $listid list id
+     * 
+     * @param mixed $listid
+     *            list id
      * @return array
      */
     public function get_list_custom_fields($id)
     {
         $this->db->where('listid', $id);
-
+        
         return $this->db->get('tblmaillistscustomfields')->result_array();
     }
 
     /**
      * Get custom field values
-     * @param  mixed $emailid       email id from db
-     * @param  mixed $listid        lis id
-     * @param  mixed $customfieldid custom field id from db
+     * 
+     * @param mixed $emailid
+     *            email id from db
+     * @param mixed $listid
+     *            lis id
+     * @param mixed $customfieldid
+     *            custom field id from db
      * @return mixed
      */
     public function get_email_custom_field_value($emailid, $listid, $customfieldid)
@@ -679,13 +749,14 @@ class Surveys_model extends CRM_Model
         if ($row) {
             return $row->value;
         }
-
+        
         return '';
     }
 
     /**
      * Add new email to mail list
-     * @param array $data
+     * 
+     * @param array $data            
      * @return mixed
      */
     public function add_email_to_list($data)
@@ -720,7 +791,7 @@ class Surveys_model extends CRM_Model
                 }
             }
             logActivity('Email Added To Mail List [ID:' . $data['listid'] . ' - Email:' . $data['email'] . ']');
-
+            
             return array(
                 'success' => true,
                 'dateadded' => $dateadded,
@@ -729,7 +800,7 @@ class Surveys_model extends CRM_Model
                 'message' => _l('email_added_to_mail_list_successfully')
             );
         }
-
+        
         return array(
             'success' => false
         );
@@ -737,8 +808,10 @@ class Surveys_model extends CRM_Model
 
     /**
      * Remove email from mail list
-     * @param  mixed $emailid email id (is unique)
-     * @return mixed          array
+     * 
+     * @param mixed $emailid
+     *            email id (is unique)
+     * @return mixed array
      */
     public function remove_email_from_mail_list($emailid)
     {
@@ -747,13 +820,13 @@ class Surveys_model extends CRM_Model
         if ($this->db->affected_rows() > 0) {
             $this->db->where('emailid', $emailid);
             $this->db->delete('tblmaillistscustomfieldvalues');
-
+            
             return array(
                 'success' => true,
                 'message' => _l('email_removed_from_list')
             );
         }
-
+        
         return array(
             'success' => false,
             'message' => _l('email_remove_fail')
@@ -762,8 +835,10 @@ class Surveys_model extends CRM_Model
 
     /**
      * Remove mail list custom field and all connections
-     * @param  mixed $fieldid custom field id from db
-     * @return mixed          array
+     * 
+     * @param mixed $fieldid
+     *            custom field id from db
+     * @return mixed array
      */
     public function remove_list_custom_field($fieldid)
     {
@@ -772,13 +847,13 @@ class Surveys_model extends CRM_Model
         if ($this->db->affected_rows() > 0) {
             $this->db->where('customfieldid', $fieldid);
             $this->db->delete('tblmaillistscustomfieldvalues');
-
+            
             return array(
                 'success' => true,
                 'message' => _l('custom_field_deleted_success')
             );
         }
-
+        
         return array(
             'success' => false,
             'message' => _l('custom_field_deleted_fail')

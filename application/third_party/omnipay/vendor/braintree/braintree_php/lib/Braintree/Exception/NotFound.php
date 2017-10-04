@@ -6,11 +6,10 @@ use Braintree\Exception;
 /**
  * Raised when a record could not be found.
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Exception
  */
 class NotFound extends Exception
 {
-
 }
 class_alias('Braintree\Exception\NotFound', 'Braintree_Exception_NotFound');

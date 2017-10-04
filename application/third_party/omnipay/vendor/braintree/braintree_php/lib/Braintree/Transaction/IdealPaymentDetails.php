@@ -7,9 +7,9 @@ use Braintree\Instance;
  * iDEAL payment details from a transaction
  * creates an instance of IdealPaymentDetails
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Transaction
- *
+ *            
  * @property-read string $idealPaymentId
  * @property-read string $idealTransactionId
  * @property-read string $imageUrl
@@ -18,6 +18,7 @@ use Braintree\Instance;
  */
 class IdealPaymentDetails extends Instance
 {
+
     protected $_attributes = [];
 }
 class_alias('Braintree\Transaction\IdealPaymentDetails', 'Braintree_Transaction_IdealPaymentDetails');

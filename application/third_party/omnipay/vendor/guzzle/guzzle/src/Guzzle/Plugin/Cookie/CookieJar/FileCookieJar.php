@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Plugin\Cookie\CookieJar;
 
 use Guzzle\Common\Exception\RuntimeException;
@@ -9,14 +8,18 @@ use Guzzle\Common\Exception\RuntimeException;
  */
 class FileCookieJar extends ArrayCookieJar
 {
-    /** @var string filename */
+
+    /**
+     * @var string filename
+     */
     protected $filename;
 
     /**
      * Create a new FileCookieJar object
      *
-     * @param string $cookieFile File to store the cookie data
-     *
+     * @param string $cookieFile
+     *            File to store the cookie data
+     *            
      * @throws RuntimeException if the file cannot be found or created
      */
     public function __construct($cookieFile)
@@ -58,8 +61,8 @@ class FileCookieJar extends ArrayCookieJar
             throw new RuntimeException('Unable to open file ' . $this->filename);
             // @codeCoverageIgnoreEnd
         }
-
+        
         $this->unserialize($json);
-        $this->cookies = $this->cookies ?: array();
+        $this->cookies = $this->cookies ?  : array();
     }
 }

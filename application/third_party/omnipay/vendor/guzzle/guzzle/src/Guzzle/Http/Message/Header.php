@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Http\Message;
 
 use Guzzle\Common\Version;
@@ -10,20 +9,27 @@ use Guzzle\Http\Message\Header\HeaderInterface;
  */
 class Header implements HeaderInterface
 {
+
     protected $values = array();
+
     protected $header;
+
     protected $glue;
 
     /**
-     * @param string       $header Name of the header
-     * @param array|string $values Values of the header as an array or a scalar
-     * @param string       $glue   Glue used to combine multiple values into a string
+     *
+     * @param string $header
+     *            Name of the header
+     * @param array|string $values
+     *            Values of the header as an array or a scalar
+     * @param string $glue
+     *            Glue used to combine multiple values into a string
      */
     public function __construct($header, $values = array(), $glue = ',')
     {
         $this->header = trim($header);
         $this->glue = $glue;
-
+        
         foreach ((array) $values as $value) {
             foreach ((array) $value as $v) {
                 $this->values[] = $v;
@@ -39,7 +45,7 @@ class Header implements HeaderInterface
     public function add($value)
     {
         $this->values[] = $value;
-
+        
         return $this;
     }
 
@@ -51,14 +57,14 @@ class Header implements HeaderInterface
     public function setName($name)
     {
         $this->header = $name;
-
+        
         return $this;
     }
 
     public function setGlue($glue)
     {
         $this->glue = $glue;
-
+        
         return $this;
     }
 
@@ -78,8 +84,8 @@ class Header implements HeaderInterface
     public function normalize()
     {
         $values = $this->toArray();
-
-        for ($i = 0, $total = count($values); $i < $total; $i++) {
+        
+        for ($i = 0, $total = count($values); $i < $total; $i ++) {
             if (strpos($values[$i], $this->glue) !== false) {
                 // Explode on glue when the glue is not inside of a comma
                 foreach (preg_split('/' . preg_quote($this->glue) . '(?=([^"]*"[^"]*")*[^"]*$)/', $values[$i]) as $v) {
@@ -88,9 +94,9 @@ class Header implements HeaderInterface
                 unset($values[$i]);
             }
         }
-
+        
         $this->values = array_values($values);
-
+        
         return $this;
     }
 
@@ -101,10 +107,11 @@ class Header implements HeaderInterface
 
     public function removeValue($searchValue)
     {
-        $this->values = array_values(array_filter($this->values, function ($value) use ($searchValue) {
+        $this->values = array_values(array_filter($this->values, function ($value) use($searchValue)
+        {
             return $value != $searchValue;
         }));
-
+        
         return $this;
     }
 
@@ -126,13 +133,16 @@ class Header implements HeaderInterface
     public function parseParams()
     {
         $params = $matches = array();
-        $callback = array($this, 'trimHeader');
-
+        $callback = array(
+            $this,
+            'trimHeader'
+        );
+        
         // Normalize the header into a single array and iterate over all values
         foreach ($this->normalize()->toArray() as $val) {
             $part = array();
             foreach (preg_split('/;(?=([^"]*"[^"]*")*[^"]*$)/', $val) as $kvp) {
-                if (!preg_match_all('/<[^>]+>|[^=]+/', $kvp, $matches)) {
+                if (! preg_match_all('/<[^>]+>|[^=]+/', $kvp, $matches)) {
                     continue;
                 }
                 $pieces = array_map($callback, $matches[0]);
@@ -142,13 +152,13 @@ class Header implements HeaderInterface
                 $params[] = $part;
             }
         }
-
+        
         return $params;
     }
 
     /**
-     * @deprecated
-     * @codeCoverageIgnore
+     *
+     * @deprecated @codeCoverageIgnore
      */
     public function hasExactHeader($header)
     {
@@ -157,8 +167,8 @@ class Header implements HeaderInterface
     }
 
     /**
-     * @deprecated
-     * @codeCoverageIgnore
+     *
+     * @deprecated @codeCoverageIgnore
      */
     public function raw()
     {
@@ -169,14 +179,15 @@ class Header implements HeaderInterface
     /**
      * Trim a header by removing excess spaces and wrapping quotes
      *
-     * @param $str
-     *
+     * @param
+     *            $str
+     *            
      * @return string
      */
     protected function trimHeader($str)
     {
         static $trimmed = "\"'  \n\t";
-
+        
         return trim($str, $trimmed);
     }
 }

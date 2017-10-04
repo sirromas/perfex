@@ -13,6 +13,7 @@ namespace Omnipay\Stripe\Message;
  */
 class CreatePlanRequest extends AbstractRequest
 {
+
     /**
      * Set the plan ID
      *
@@ -176,7 +177,7 @@ class CreatePlanRequest extends AbstractRequest
     public function getData()
     {
         $this->validate('id', 'amount', 'currency', 'interval', 'name');
-
+        
         $data = array(
             'id' => $this->getId(),
             'amount' => $this->getAmount(),
@@ -184,27 +185,27 @@ class CreatePlanRequest extends AbstractRequest
             'interval' => $this->getInterval(),
             'name' => $this->getName()
         );
-
+        
         $intervalCount = $this->getIntervalCount();
         if ($intervalCount != null) {
             $data['interval_count'] = $intervalCount;
         }
-
+        
         $statementDescriptor = $this->getStatementDescriptor();
         if ($statementDescriptor != null) {
             $data['statement_descriptor'] = $statementDescriptor;
         }
-
+        
         $trialPeriodDays = $this->getTrialPeriodDays();
         if ($trialPeriodDays != null) {
             $data['trial_period_days'] = $trialPeriodDays;
         }
-
+        
         return $data;
     }
 
     public function getEndpoint()
     {
-        return $this->endpoint.'/plans';
+        return $this->endpoint . '/plans';
     }
 }

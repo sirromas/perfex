@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal\Message;
 
 use Omnipay\Common\Message\RedirectResponseInterface;
@@ -9,7 +8,9 @@ use Omnipay\Common\Message\RedirectResponseInterface;
  */
 class ExpressAuthorizeResponse extends Response implements RedirectResponseInterface
 {
+
     protected $liveCheckoutEndpoint = 'https://www.paypal.com/cgi-bin/webscr';
+
     protected $testCheckoutEndpoint = 'https://www.sandbox.paypal.com/cgi-bin/webscr';
 
     public function isSuccessful()
@@ -19,12 +20,15 @@ class ExpressAuthorizeResponse extends Response implements RedirectResponseInter
 
     public function isRedirect()
     {
-        return isset($this->data['ACK']) && in_array($this->data['ACK'], array('Success', 'SuccessWithWarning'));
+        return isset($this->data['ACK']) && in_array($this->data['ACK'], array(
+            'Success',
+            'SuccessWithWarning'
+        ));
     }
 
     public function getRedirectUrl()
     {
-        return $this->getCheckoutEndpoint().'?'.http_build_query($this->getRedirectQueryParameters(), '', '&');
+        return $this->getCheckoutEndpoint() . '?' . http_build_query($this->getRedirectQueryParameters(), '', '&');
     }
 
     public function getTransactionReference()
@@ -47,7 +51,7 @@ class ExpressAuthorizeResponse extends Response implements RedirectResponseInter
         return array(
             'cmd' => '_express-checkout',
             'useraction' => 'commit',
-            'token' => $this->getTransactionReference(),
+            'token' => $this->getTransactionReference()
         );
     }
 

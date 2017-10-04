@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Service\Command;
 
 use Guzzle\Service\Command\DefaultRequestSerializer;
@@ -16,28 +15,44 @@ use Guzzle\Service\Command\LocationVisitor\VisitorFlyweight;
  */
 class DefaultRequestSerializerTest extends \Guzzle\Tests\GuzzleTestCase
 {
-    /** @var EntityEnclosingRequest */
+
+    /**
+     * @var EntityEnclosingRequest
+     */
     protected $request;
 
-    /** @var \Guzzle\Service\Command\AbstractCommand */
+    /**
+     * @var \Guzzle\Service\Command\AbstractCommand
+     */
     protected $command;
 
-    /** @var Client */
+    /**
+     * @var Client
+     */
     protected $client;
 
-    /** @var DefaultRequestSerializer */
+    /**
+     * @var DefaultRequestSerializer
+     */
     protected $serializer;
 
-    /** @var Operation */
+    /**
+     * @var Operation
+     */
     protected $operation;
 
     public function setUp()
     {
         $this->serializer = DefaultRequestSerializer::getInstance();
         $this->client = new Client('http://foo.com/baz');
-        $this->operation = new Operation(array('httpMethod' => 'POST'));
+        $this->operation = new Operation(array(
+            'httpMethod' => 'POST'
+        ));
         $this->command = $this->getMockBuilder('Guzzle\Service\Command\AbstractCommand')
-            ->setConstructorArgs(array(array(), $this->operation))
+            ->setConstructorArgs(array(
+            array(),
+            $this->operation
+        ))
             ->getMockForAbstractClass();
         $this->command->setClient($this->client);
     }
@@ -46,7 +61,10 @@ class DefaultRequestSerializerTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $this->serializer->addVisitor('custom', new HeaderVisitor());
         $this->command['test'] = '123';
-        $this->operation->addParam(new Parameter(array('name' => 'test', 'location' => 'custom')));
+        $this->operation->addParam(new Parameter(array(
+            'name' => 'test',
+            'location' => 'custom'
+        )));
         $request = $this->serializer->prepare($this->command);
         $this->assertEquals('123', (string) $request->getHeader('test'));
     }
@@ -62,7 +80,10 @@ class DefaultRequestSerializerTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $this->command['test'] = '123';
         $this->operation->setUri('bar/{test}');
-        $this->operation->addParam(new Parameter(array('name' => 'test', 'location' => 'uri')));
+        $this->operation->addParam(new Parameter(array(
+            'name' => 'test',
+            'location' => 'uri'
+        )));
         $request = $this->serializer->prepare($this->command);
         $this->assertEquals('http://foo.com/baz/bar/123', (string) $request->getUrl());
     }
@@ -80,18 +101,21 @@ class DefaultRequestSerializerTest extends \Guzzle\Tests\GuzzleTestCase
         $this->operation->addParam(new Parameter(array(
             'name' => 'limit',
             'location' => 'uri',
-            'required' => false,
+            'required' => false
         )));
         $this->operation->addParam(new Parameter(array(
             'name' => 'fields',
             'location' => 'uri',
-            'required' => true,
+            'required' => true
         )));
-
-        $this->command['fields'] = array('id', 'name');
-
+        
+        $this->command['fields'] = array(
+            'id',
+            'name'
+        );
+        
         $request = $this->serializer->prepare($this->command);
-        $this->assertEquals('http://foo.com/baz/bar?fields='.urlencode('id,name'), (string) $request->getUrl());
+        $this->assertEquals('http://foo.com/baz/bar?fields=' . urlencode('id,name'), (string) $request->getUrl());
     }
 
     public function testValidatesAdditionalParameters()
@@ -101,7 +125,9 @@ class DefaultRequestSerializerTest extends \Guzzle\Tests\GuzzleTestCase
                 'foo' => array(
                     'httpMethod' => 'PUT',
                     'parameters' => array(
-                        'bar' => array('location' => 'header')
+                        'bar' => array(
+                            'location' => 'header'
+                        )
                     ),
                     'additionalParameters' => array(
                         'location' => 'json'
@@ -109,7 +135,7 @@ class DefaultRequestSerializerTest extends \Guzzle\Tests\GuzzleTestCase
                 )
             )
         ));
-
+        
         $client = new Client();
         $client->setDescription($description);
         $command = $client->getCommand('foo');

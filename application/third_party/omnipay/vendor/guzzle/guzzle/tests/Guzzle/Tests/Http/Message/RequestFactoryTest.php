@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Http\Message;
 
 use Guzzle\Common\Collection;
@@ -20,6 +19,7 @@ use Guzzle\Plugin\Mock\MockPlugin;
  */
 class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testCachesSingletonInstance()
     {
         $factory = RequestFactory::getInstance();
@@ -38,11 +38,12 @@ class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertEquals('www.google.com', $request->getHost());
         $this->assertEquals('/', $request->getPath());
         $this->assertEquals('/', $request->getResource());
-
+        
         // Create a GET request with a custom receiving body
         $this->getServer()->enqueue("HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n");
         $b = EntityBody::factory();
-        $request = RequestFactory::getInstance()->create('GET', $this->getServer()->getUrl(), null, $b);
+        $request = RequestFactory::getInstance()->create('GET', $this->getServer()
+            ->getUrl(), null, $b);
         $request->setClient(new Client());
         $response = $request->send();
         $this->assertSame($b, $response->getBody());
@@ -62,19 +63,19 @@ class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertInstanceOf('Guzzle\\Http\\EntityBody', $request->getBody());
         $this->assertEquals('Data', (string) $request->getBody());
         unset($request);
-
+        
         // Test using an EntityBody
         $request = RequestFactory::getInstance()->create('PUT', 'http://www.google.com/path?q=1&v=2', null, EntityBody::factory('Data'));
         $this->assertInstanceOf('Guzzle\\Http\\Message\\EntityEnclosingRequest', $request);
         $this->assertEquals('Data', (string) $request->getBody());
-
+        
         // Test using a resource
         $resource = fopen('php://temp', 'w+');
         fwrite($resource, 'Data');
         $request = RequestFactory::getInstance()->create('PUT', 'http://www.google.com/path?q=1&v=2', null, $resource);
         $this->assertInstanceOf('Guzzle\\Http\\Message\\EntityEnclosingRequest', $request);
         $this->assertEquals('Data', (string) $request->getBody());
-
+        
         // Test using an object that can be cast as a string
         $request = RequestFactory::getInstance()->create('PUT', 'http://www.google.com/path?q=1&v=2', null, Url::factory('http://www.example.com/'));
         $this->assertInstanceOf('Guzzle\\Http\\Message\\EntityEnclosingRequest', $request);
@@ -108,30 +109,40 @@ class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
         $request = RequestFactory::getInstance()->create('POST', 'http://www.google.com/path?q=1&v=2', null, array(
             'a' => 'b'
         ));
-        $this->assertEquals(array('a' => 'b'), $request->getPostFields()->getAll());
+        $this->assertEquals(array(
+            'a' => 'b'
+        ), $request->getPostFields()
+            ->getAll());
         unset($request);
-
+        
         // Use a collection
         $request = RequestFactory::getInstance()->create('POST', 'http://www.google.com/path?q=1&v=2', null, new Collection(array(
             'a' => 'b'
         )));
-        $this->assertEquals(array('a' => 'b'), $request->getPostFields()->getAll());
-
+        $this->assertEquals(array(
+            'a' => 'b'
+        ), $request->getPostFields()
+            ->getAll());
+        
         // Use a QueryString
         $request = RequestFactory::getInstance()->create('POST', 'http://www.google.com/path?q=1&v=2', null, new QueryString(array(
             'a' => 'b'
         )));
-        $this->assertEquals(array('a' => 'b'), $request->getPostFields()->getAll());
-
+        $this->assertEquals(array(
+            'a' => 'b'
+        ), $request->getPostFields()
+            ->getAll());
+        
         $request = RequestFactory::getInstance()->create('POST', 'http://www.test.com/', null, array(
             'a' => 'b',
             'file' => '@' . __FILE__
         ));
-
+        
         $this->assertEquals(array(
             'a' => 'b'
-        ), $request->getPostFields()->getAll());
-
+        ), $request->getPostFields()
+            ->getAll());
+        
         $files = $request->getPostFiles();
         $this->assertInstanceOf('Guzzle\Http\Message\PostFile', $files['file'][0]);
     }
@@ -139,7 +150,7 @@ class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     public function testCreatesFromParts()
     {
         $parts = parse_url('http://michael:123@www.google.com:8080/path?q=1&v=2');
-
+        
         $request = RequestFactory::getInstance()->fromParts('PUT', $parts, null, 'Data');
         $this->assertInstanceOf('Guzzle\\Http\\Message\\EntityEnclosingRequest', $request);
         $this->assertEquals('PUT', $request->getMethod());
@@ -159,7 +170,7 @@ class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
             'host' => 'www.google.com',
             'port' => 8080,
             'path' => '/path',
-            'query' => 'q=1&v=2',
+            'query' => 'q=1&v=2'
         ), parse_url($request->getUrl()));
     }
 
@@ -180,10 +191,10 @@ class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertEquals('Data', (string) $request->getBody());
         $this->assertEquals("Basic {$auth}", (string) $request->getHeader('Authorization'));
         $this->assertEquals('8080', $request->getPort());
-
+        
         // Test passing a blank message returns false
         $this->assertFalse($request = RequestFactory::getInstance()->fromMessage(''));
-
+        
         // Test passing a url with no port
         $message = "PUT /path?q=1&v=2 HTTP/1.1\r\nHost: www.google.com\r\nContent-Length: 4\r\nAuthorization: Basic {$auth}\r\n\r\nData";
         $request = RequestFactory::getInstance()->fromMessage($message);
@@ -219,50 +230,44 @@ class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     public function testProperlyDealsWithDuplicateHeaders()
     {
         $parser = new MessageParser();
-
-        $message = "POST / http/1.1\r\n"
-            . "DATE:Mon, 09 Sep 2011 23:36:00 GMT\r\n"
-            . "host:host.foo.com\r\n"
-            . "ZOO:abc\r\n"
-            . "ZOO:123\r\n"
-            . "ZOO:HI\r\n"
-            . "zoo:456\r\n\r\n";
-
+        
+        $message = "POST / http/1.1\r\n" . "DATE:Mon, 09 Sep 2011 23:36:00 GMT\r\n" . "host:host.foo.com\r\n" . "ZOO:abc\r\n" . "ZOO:123\r\n" . "ZOO:HI\r\n" . "zoo:456\r\n\r\n";
+        
         $parts = $parser->parseRequest($message);
-        $this->assertEquals(array (
+        $this->assertEquals(array(
             'DATE' => 'Mon, 09 Sep 2011 23:36:00 GMT',
             'host' => 'host.foo.com',
-            'ZOO'  => array('abc', '123', 'HI'),
-            'zoo'  => '456',
+            'ZOO' => array(
+                'abc',
+                '123',
+                'HI'
+            ),
+            'zoo' => '456'
         ), $parts['headers']);
-
+        
         $request = RequestFactory::getInstance()->fromMessage($message);
-
+        
         $this->assertEquals(array(
-            'abc', '123', 'HI', '456'
-        ), $request->getHeader('zoo')->toArray());
+            'abc',
+            '123',
+            'HI',
+            '456'
+        ), $request->getHeader('zoo')
+            ->toArray());
     }
 
     public function testCreatesHttpMessagesWithBodiesAndNormalizesLineEndings()
     {
-        $message = "POST / http/1.1\r\n"
-                 . "Content-Type:application/x-www-form-urlencoded; charset=utf8\r\n"
-                 . "Date:Mon, 09 Sep 2011 23:36:00 GMT\r\n"
-                 . "Host:host.foo.com\r\n\r\n"
-                 . "foo=bar";
-
+        $message = "POST / http/1.1\r\n" . "Content-Type:application/x-www-form-urlencoded; charset=utf8\r\n" . "Date:Mon, 09 Sep 2011 23:36:00 GMT\r\n" . "Host:host.foo.com\r\n\r\n" . "foo=bar";
+        
         $request = RequestFactory::getInstance()->fromMessage($message);
         $this->assertEquals('application/x-www-form-urlencoded; charset=utf8', (string) $request->getHeader('Content-Type'));
         $this->assertEquals('foo=bar', (string) $request->getBody());
-
-        $message = "POST / http/1.1\n"
-                 . "Content-Type:application/x-www-form-urlencoded; charset=utf8\n"
-                 . "Date:Mon, 09 Sep 2011 23:36:00 GMT\n"
-                 . "Host:host.foo.com\n\n"
-                 . "foo=bar";
+        
+        $message = "POST / http/1.1\n" . "Content-Type:application/x-www-form-urlencoded; charset=utf8\n" . "Date:Mon, 09 Sep 2011 23:36:00 GMT\n" . "Host:host.foo.com\n\n" . "foo=bar";
         $request = RequestFactory::getInstance()->fromMessage($message);
         $this->assertEquals('foo=bar', (string) $request->getBody());
-
+        
         $message = "PUT / HTTP/1.1\r\nContent-Length: 0\r\n\r\n";
         $request = RequestFactory::getInstance()->fromMessage($message);
         $this->assertTrue($request->hasHeader('Content-Length'));
@@ -285,13 +290,13 @@ class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
         ), 'Test');
         $this->assertFalse($request->hasHeader('Content-Length'));
         $this->assertEquals('chunked', $request->getHeader('Transfer-Encoding'));
-
+        
         $request = RequestFactory::getInstance()->create('POST', 'http://www.foo.com/', array(
             'transfer-encoding' => 'chunked'
         ), array(
             'foo' => 'bar'
         ));
-
+        
         $this->assertFalse($request->hasHeader('Content-Length'));
         $this->assertEquals('chunked', $request->getHeader('Transfer-Encoding'));
     }
@@ -299,18 +304,25 @@ class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     public function testClonesRequestsWithMethodWithoutClient()
     {
         $f = RequestFactory::getInstance();
-        $request = $f->create('GET', 'http://www.test.com', array('X-Foo' => 'Bar'));
-        $request->getParams()->replace(array('test' => '123'));
+        $request = $f->create('GET', 'http://www.test.com', array(
+            'X-Foo' => 'Bar'
+        ));
+        $request->getParams()->replace(array(
+            'test' => '123'
+        ));
         $request->getCurlOptions()->set('foo', 'bar');
         $cloned = $f->cloneRequestWithMethod($request, 'PUT');
         $this->assertEquals('PUT', $cloned->getMethod());
         $this->assertEquals('Bar', (string) $cloned->getHeader('X-Foo'));
         $this->assertEquals('http://www.test.com', $cloned->getUrl());
         // Ensure params are cloned and cleaned up
-        $this->assertEquals(1, count($cloned->getParams()->getAll()));
-        $this->assertEquals('123', $cloned->getParams()->get('test'));
+        $this->assertEquals(1, count($cloned->getParams()
+            ->getAll()));
+        $this->assertEquals('123', $cloned->getParams()
+            ->get('test'));
         // Ensure curl options are cloned
-        $this->assertEquals('bar', $cloned->getCurlOptions()->get('foo'));
+        $this->assertEquals('bar', $cloned->getCurlOptions()
+            ->get('foo'));
         // Ensure event dispatcher is cloned
         $this->assertNotSame($request->getEventDispatcher(), $cloned->getEventDispatcher());
     }
@@ -319,7 +331,9 @@ class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $f = RequestFactory::getInstance();
         $client = new Client();
-        $request = $client->put('http://www.test.com', array('Content-Length' => 4), 'test');
+        $request = $client->put('http://www.test.com', array(
+            'Content-Length' => 4
+        ), 'test');
         $cloned = $f->cloneRequestWithMethod($request, 'GET');
         $this->assertEquals('GET', $cloned->getMethod());
         $this->assertNull($cloned->getHeader('Content-Length'));
@@ -331,7 +345,9 @@ class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $f = RequestFactory::getInstance();
         $client = new Client();
-        $request = $client->put('http://www.test.com', array('Content-Length' => 4), 'test');
+        $request = $client->put('http://www.test.com', array(
+            'Content-Length' => 4
+        ), 'test');
         $cloned = $f->cloneRequestWithMethod($request, 'POST');
         $this->assertEquals('POST', $cloned->getMethod());
         $this->assertEquals('test', (string) $cloned->getBody());
@@ -340,42 +356,60 @@ class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     public function testCanDisableRedirects()
     {
         $this->getServer()->enqueue(array(
-            "HTTP/1.1 307\r\nLocation: " . $this->getServer()->getUrl() . "\r\nContent-Length: 0\r\n\r\n"
+            "HTTP/1.1 307\r\nLocation: " . $this->getServer()
+                ->getUrl() . "\r\nContent-Length: 0\r\n\r\n"
         ));
         $client = new Client($this->getServer()->getUrl());
-        $response = $client->get('/', array(), array('allow_redirects' => false))->send();
+        $response = $client->get('/', array(), array(
+            'allow_redirects' => false
+        ))->send();
         $this->assertEquals(307, $response->getStatusCode());
     }
 
     public function testCanAddCookies()
     {
         $client = new Client($this->getServer()->getUrl());
-        $request = $client->get('/', array(), array('cookies' => array('Foo' => 'Bar')));
+        $request = $client->get('/', array(), array(
+            'cookies' => array(
+                'Foo' => 'Bar'
+            )
+        ));
         $this->assertEquals('Bar', $request->getCookie('Foo'));
     }
 
     public function testCanAddQueryString()
     {
         $request = RequestFactory::getInstance()->create('GET', 'http://foo.com', array(), null, array(
-            'query' => array('Foo' => 'Bar')
+            'query' => array(
+                'Foo' => 'Bar'
+            )
         ));
-        $this->assertEquals('Bar', $request->getQuery()->get('Foo'));
+        $this->assertEquals('Bar', $request->getQuery()
+            ->get('Foo'));
     }
 
     public function testCanSetDefaultQueryString()
     {
         $request = new Request('GET', 'http://www.foo.com?test=abc');
         RequestFactory::getInstance()->applyOptions($request, array(
-            'query' => array('test' => '123', 'other' => 't123')
+            'query' => array(
+                'test' => '123',
+                'other' => 't123'
+            )
         ), RequestFactory::OPTIONS_AS_DEFAULTS);
-        $this->assertEquals('abc', $request->getQuery()->get('test'));
-        $this->assertEquals('t123', $request->getQuery()->get('other'));
+        $this->assertEquals('abc', $request->getQuery()
+            ->get('test'));
+        $this->assertEquals('t123', $request->getQuery()
+            ->get('other'));
     }
 
     public function testCanAddBasicAuth()
     {
         $request = RequestFactory::getInstance()->create('GET', 'http://foo.com', array(), null, array(
-            'auth' => array('michael', 'test')
+            'auth' => array(
+                'michael',
+                'test'
+            )
         ));
         $this->assertEquals('michael', $request->getUsername());
         $this->assertEquals('test', $request->getPassword());
@@ -384,9 +418,14 @@ class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     public function testCanAddDigestAuth()
     {
         $request = RequestFactory::getInstance()->create('GET', 'http://foo.com', array(), null, array(
-            'auth' => array('michael', 'test', 'digest')
+            'auth' => array(
+                'michael',
+                'test',
+                'digest'
+            )
         ));
-        $this->assertEquals(CURLAUTH_DIGEST, $request->getCurlOptions()->get(CURLOPT_HTTPAUTH));
+        $this->assertEquals(CURLAUTH_DIGEST, $request->getCurlOptions()
+            ->get(CURLOPT_HTTPAUTH));
         $this->assertEquals('michael', $request->getUsername());
         $this->assertEquals('test', $request->getPassword());
     }
@@ -395,10 +434,16 @@ class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $foo = null;
         $client = new Client();
-        $client->addSubscriber(new MockPlugin(array(new Response(200))));
-        $request = $client->get($this->getServer()->getUrl(), array(), array(
+        $client->addSubscriber(new MockPlugin(array(
+            new Response(200)
+        )));
+        $request = $client->get($this->getServer()
+            ->getUrl(), array(), array(
             'events' => array(
-                'request.before_send' => function () use (&$foo) { $foo = true; }
+                'request.before_send' => function () use(&$foo)
+                {
+                    $foo = true;
+                }
             )
         ));
         $request->send();
@@ -409,10 +454,19 @@ class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $foo = null;
         $client = new Client();
-        $client->addSubscriber(new MockPlugin(array(new Response(200))));
-        $request = $client->get($this->getServer()->getUrl(), array(), array(
+        $client->addSubscriber(new MockPlugin(array(
+            new Response(200)
+        )));
+        $request = $client->get($this->getServer()
+            ->getUrl(), array(), array(
             'events' => array(
-                'request.before_send' => array(function () use (&$foo) { $foo = true; }, 100)
+                'request.before_send' => array(
+                    function () use(&$foo)
+                    {
+                        $foo = true;
+                    },
+                    100
+                )
             )
         ));
         $request->send();
@@ -428,7 +482,9 @@ class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
         $client = new Client();
         $client->addSubscriber($mock);
         $request = $client->get('/', array(), array(
-            'plugins' => array($mock)
+            'plugins' => array(
+                $mock
+            )
         ));
         $request->send();
     }
@@ -437,21 +493,32 @@ class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $client = new Client();
         $request = $client->get('/', array(), array(
-            'plugins' => array(new MockPlugin(array(new Response(500)))),
+            'plugins' => array(
+                new MockPlugin(array(
+                    new Response(500)
+                ))
+            ),
             'exceptions' => false
         ));
-        $this->assertEquals(500, $request->send()->getStatusCode());
+        $this->assertEquals(500, $request->send()
+            ->getStatusCode());
     }
 
     public function testCanDisableExceptionsWithErrorListener()
     {
         $client = new Client();
-        $client->getEventDispatcher()->addListener('request.error', function () {});
+        $client->getEventDispatcher()->addListener('request.error', function ()
+        {});
         $request = $client->get('/', array(), array(
-                'plugins' => array(new MockPlugin(array(new Response(500)))),
-                'exceptions' => false
-            ));
-        $this->assertEquals(500, $request->send()->getStatusCode());
+            'plugins' => array(
+                new MockPlugin(array(
+                    new Response(500)
+                ))
+            ),
+            'exceptions' => false
+        ));
+        $this->assertEquals(500, $request->send()
+            ->getStatusCode());
     }
 
     public function testCanChangeSaveToLocation()
@@ -459,7 +526,11 @@ class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
         $r = EntityBody::factory();
         $client = new Client();
         $request = $client->get('/', array(), array(
-            'plugins' => array(new MockPlugin(array(new Response(200, array(), 'testing')))),
+            'plugins' => array(
+                new MockPlugin(array(
+                    new Response(200, array(), 'testing')
+                ))
+            ),
             'save_to' => $r
         ));
         $request->send();
@@ -469,22 +540,34 @@ class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     public function testCanSetProxy()
     {
         $client = new Client();
-        $request = $client->get('/', array(), array('proxy' => '192.168.16.121'));
-        $this->assertEquals('192.168.16.121', $request->getCurlOptions()->get(CURLOPT_PROXY));
+        $request = $client->get('/', array(), array(
+            'proxy' => '192.168.16.121'
+        ));
+        $this->assertEquals('192.168.16.121', $request->getCurlOptions()
+            ->get(CURLOPT_PROXY));
     }
 
     public function testCanSetHeadersOption()
     {
         $client = new Client();
-        $request = $client->get('/', array(), array('headers' => array('Foo' => 'Bar')));
+        $request = $client->get('/', array(), array(
+            'headers' => array(
+                'Foo' => 'Bar'
+            )
+        ));
         $this->assertEquals('Bar', (string) $request->getHeader('Foo'));
     }
 
     public function testCanSetDefaultHeadersOptions()
     {
-        $request = new Request('GET', 'http://www.foo.com', array('Foo' => 'Bar'));
+        $request = new Request('GET', 'http://www.foo.com', array(
+            'Foo' => 'Bar'
+        ));
         RequestFactory::getInstance()->applyOptions($request, array(
-            'headers' => array('Foo' => 'Baz', 'Bam' => 't123')
+            'headers' => array(
+                'Foo' => 'Baz',
+                'Bam' => 't123'
+            )
         ), RequestFactory::OPTIONS_AS_DEFAULTS);
         $this->assertEquals('Bar', (string) $request->getHeader('Foo'));
         $this->assertEquals('t123', (string) $request->getHeader('Bam'));
@@ -493,7 +576,9 @@ class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     public function testCanSetBodyOption()
     {
         $client = new Client();
-        $request = $client->put('/', array(), null, array('body' => 'test'));
+        $request = $client->put('/', array(), null, array(
+            'body' => 'test'
+        ));
         $this->assertEquals('test', (string) $request->getBody());
     }
 
@@ -503,61 +588,98 @@ class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     public function testValidatesBodyOption()
     {
         $client = new Client();
-        $client->get('/', array(), array('body' => 'test'));
+        $client->get('/', array(), array(
+            'body' => 'test'
+        ));
     }
 
     public function testCanSetTimeoutOption()
     {
         $client = new Client();
-        $request = $client->get('/', array(), array('timeout' => 1.5));
-        $this->assertEquals(1500, $request->getCurlOptions()->get(CURLOPT_TIMEOUT_MS));
+        $request = $client->get('/', array(), array(
+            'timeout' => 1.5
+        ));
+        $this->assertEquals(1500, $request->getCurlOptions()
+            ->get(CURLOPT_TIMEOUT_MS));
     }
 
     public function testCanSetConnectTimeoutOption()
     {
         $client = new Client();
-        $request = $client->get('/', array(), array('connect_timeout' => 1.5));
-        $this->assertEquals(1500, $request->getCurlOptions()->get(CURLOPT_CONNECTTIMEOUT_MS));
+        $request = $client->get('/', array(), array(
+            'connect_timeout' => 1.5
+        ));
+        $this->assertEquals(1500, $request->getCurlOptions()
+            ->get(CURLOPT_CONNECTTIMEOUT_MS));
     }
 
     public function testCanSetDebug()
     {
         $client = new Client();
-        $request = $client->get('/', array(), array('debug' => true));
-        $this->assertTrue($request->getCurlOptions()->get(CURLOPT_VERBOSE));
+        $request = $client->get('/', array(), array(
+            'debug' => true
+        ));
+        $this->assertTrue($request->getCurlOptions()
+            ->get(CURLOPT_VERBOSE));
     }
 
     public function testCanSetVerifyToOff()
     {
         $client = new Client();
-        $request = $client->get('/', array(), array('verify' => false));
-        $this->assertNull($request->getCurlOptions()->get(CURLOPT_CAINFO));
-        $this->assertSame(0, $request->getCurlOptions()->get(CURLOPT_SSL_VERIFYHOST));
-        $this->assertFalse($request->getCurlOptions()->get(CURLOPT_SSL_VERIFYPEER));
+        $request = $client->get('/', array(), array(
+            'verify' => false
+        ));
+        $this->assertNull($request->getCurlOptions()
+            ->get(CURLOPT_CAINFO));
+        $this->assertSame(0, $request->getCurlOptions()
+            ->get(CURLOPT_SSL_VERIFYHOST));
+        $this->assertFalse($request->getCurlOptions()
+            ->get(CURLOPT_SSL_VERIFYPEER));
     }
 
     public function testCanSetVerifyToOn()
     {
         $client = new Client();
-        $request = $client->get('/', array(), array('verify' => true));
-        $this->assertNotNull($request->getCurlOptions()->get(CURLOPT_CAINFO));
-        $this->assertSame(2, $request->getCurlOptions()->get(CURLOPT_SSL_VERIFYHOST));
-        $this->assertTrue($request->getCurlOptions()->get(CURLOPT_SSL_VERIFYPEER));
+        $request = $client->get('/', array(), array(
+            'verify' => true
+        ));
+        $this->assertNotNull($request->getCurlOptions()
+            ->get(CURLOPT_CAINFO));
+        $this->assertSame(2, $request->getCurlOptions()
+            ->get(CURLOPT_SSL_VERIFYHOST));
+        $this->assertTrue($request->getCurlOptions()
+            ->get(CURLOPT_SSL_VERIFYPEER));
     }
 
     public function testCanSetVerifyToPath()
     {
         $client = new Client();
-        $request = $client->get('/', array(), array('verify' => '/foo.pem'));
-        $this->assertEquals('/foo.pem', $request->getCurlOptions()->get(CURLOPT_CAINFO));
-        $this->assertSame(2, $request->getCurlOptions()->get(CURLOPT_SSL_VERIFYHOST));
-        $this->assertTrue($request->getCurlOptions()->get(CURLOPT_SSL_VERIFYPEER));
+        $request = $client->get('/', array(), array(
+            'verify' => '/foo.pem'
+        ));
+        $this->assertEquals('/foo.pem', $request->getCurlOptions()
+            ->get(CURLOPT_CAINFO));
+        $this->assertSame(2, $request->getCurlOptions()
+            ->get(CURLOPT_SSL_VERIFYHOST));
+        $this->assertTrue($request->getCurlOptions()
+            ->get(CURLOPT_SSL_VERIFYPEER));
     }
 
     public function inputValidation()
     {
-        return array_map(function ($option) { return array($option); }, array(
-            'headers', 'query', 'cookies', 'auth', 'events', 'plugins', 'params'
+        return array_map(function ($option)
+        {
+            return array(
+                $option
+            );
+        }, array(
+            'headers',
+            'query',
+            'cookies',
+            'auth',
+            'events',
+            'plugins',
+            'params'
         ));
     }
 
@@ -568,44 +690,71 @@ class HttpRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     public function testValidatesInput($option)
     {
         $client = new Client();
-        $client->get('/', array(), array($option => 'foo'));
+        $client->get('/', array(), array(
+            $option => 'foo'
+        ));
     }
 
     public function testCanAddRequestParams()
     {
         $client = new Client();
-        $request = $client->put('/', array(), null, array('params' => array('foo' => 'test')));
-        $this->assertEquals('test', $request->getParams()->get('foo'));
+        $request = $client->put('/', array(), null, array(
+            'params' => array(
+                'foo' => 'test'
+            )
+        ));
+        $this->assertEquals('test', $request->getParams()
+            ->get('foo'));
     }
 
     public function testCanAddSslKey()
     {
         $client = new Client();
-        $request = $client->get('/', array(), array('ssl_key' => '/foo.pem'));
-        $this->assertEquals('/foo.pem', $request->getCurlOptions()->get(CURLOPT_SSLKEY));
+        $request = $client->get('/', array(), array(
+            'ssl_key' => '/foo.pem'
+        ));
+        $this->assertEquals('/foo.pem', $request->getCurlOptions()
+            ->get(CURLOPT_SSLKEY));
     }
 
     public function testCanAddSslKeyPassword()
     {
         $client = new Client();
-        $request = $client->get('/', array(), array('ssl_key' => array('/foo.pem', 'bar')));
-        $this->assertEquals('/foo.pem', $request->getCurlOptions()->get(CURLOPT_SSLKEY));
-        $this->assertEquals('bar', $request->getCurlOptions()->get(CURLOPT_SSLKEYPASSWD));
+        $request = $client->get('/', array(), array(
+            'ssl_key' => array(
+                '/foo.pem',
+                'bar'
+            )
+        ));
+        $this->assertEquals('/foo.pem', $request->getCurlOptions()
+            ->get(CURLOPT_SSLKEY));
+        $this->assertEquals('bar', $request->getCurlOptions()
+            ->get(CURLOPT_SSLKEYPASSWD));
     }
 
     public function testCanAddSslCert()
     {
         $client = new Client();
-        $request = $client->get('/', array(), array('cert' => '/foo.pem'));
-        $this->assertEquals('/foo.pem', $request->getCurlOptions()->get(CURLOPT_SSLCERT));
+        $request = $client->get('/', array(), array(
+            'cert' => '/foo.pem'
+        ));
+        $this->assertEquals('/foo.pem', $request->getCurlOptions()
+            ->get(CURLOPT_SSLCERT));
     }
 
     public function testCanAddSslCertPassword()
     {
         $client = new Client();
-        $request = $client->get('/', array(), array('cert' => array('/foo.pem', 'bar')));
-        $this->assertEquals('/foo.pem', $request->getCurlOptions()->get(CURLOPT_SSLCERT));
-        $this->assertEquals('bar', $request->getCurlOptions()->get(CURLOPT_SSLCERTPASSWD));
+        $request = $client->get('/', array(), array(
+            'cert' => array(
+                '/foo.pem',
+                'bar'
+            )
+        ));
+        $this->assertEquals('/foo.pem', $request->getCurlOptions()
+            ->get(CURLOPT_SSLCERT));
+        $this->assertEquals('bar', $request->getCurlOptions()
+            ->get(CURLOPT_SSLCERTPASSWD));
     }
 
     public function testCreatesBodyWithoutZeroString()

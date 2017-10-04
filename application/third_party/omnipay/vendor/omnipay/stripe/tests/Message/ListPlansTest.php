@@ -1,12 +1,14 @@
 <?php
-
 namespace Omnipay\Stripe\Message;
 
 use Omnipay\Tests\TestCase;
 
 class ListPlansTest extends TestCase
 {
-    /** @var  ListPlansRequest */
+
+    /**
+     * @var ListPlansRequest
+     */
     protected $request;
 
     public function setUp()
@@ -23,7 +25,7 @@ class ListPlansTest extends TestCase
     {
         $this->setMockHttpResponse('ListPlansSuccess.txt');
         $response = $this->request->send();
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNotNull($response->getList());

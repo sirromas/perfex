@@ -12,7 +12,7 @@ $aColumns = array(
     'contract_value',
     'datestart',
     'dateend'
-    );
+);
 
 $sIndexColumn = "id";
 $sTable = 'tblcontracts';
@@ -25,11 +25,11 @@ $join = array(
 $custom_fields = get_table_custom_fields('contracts');
 
 foreach ($custom_fields as $key => $field) {
-    $selectAs = (is_cf_date($field) ? 'date_picker_cvalue_' . $key : 'cvalue_'.$key);
-    array_push($customFieldsColumns,$selectAs);
+    $selectAs = (is_cf_date($field) ? 'date_picker_cvalue_' . $key : 'cvalue_' . $key);
+    array_push($customFieldsColumns, $selectAs);
     array_push($aColumns, 'ctable_' . $key . '.value as ' . $selectAs);
-
-    array_push($join, 'LEFT JOIN tblcustomfieldsvalues as ctable_'.$key . ' ON tblcontracts.id = ctable_'.$key . '.relid AND ctable_'.$key . '.fieldto="'.$field['fieldto'].'" AND ctable_'.$key . '.fieldid='.$field['id']);
+    
+    array_push($join, 'LEFT JOIN tblcustomfieldsvalues as ctable_' . $key . ' ON tblcontracts.id = ctable_' . $key . '.relid AND ctable_' . $key . '.fieldto="' . $field['fieldto'] . '" AND ctable_' . $key . '.fieldid=' . $field['id']);
 }
 
 $where = array();
@@ -42,7 +42,7 @@ if ($this->_instance->input->post('trash')) {
     array_push($filter, 'OR trash = 1');
 }
 if ($this->_instance->input->post('expired')) {
-    array_push($filter, 'OR dateend IS NOT NULL AND dateend <"'.date('Y-m-d').'" and trash = 0');
+    array_push($filter, 'OR dateend IS NOT NULL AND dateend <"' . date('Y-m-d') . '" and trash = 0');
 }
 
 if ($this->_instance->input->post('without_dateend')) {
@@ -52,44 +52,44 @@ if ($this->_instance->input->post('without_dateend')) {
 $types = $this->_instance->contracts_model->get_contract_types();
 $typesIds = array();
 foreach ($types as $type) {
-    if ($this->_instance->input->post('contracts_by_type_'.$type['id'])) {
+    if ($this->_instance->input->post('contracts_by_type_' . $type['id'])) {
         array_push($typesIds, $type['id']);
     }
 }
 if (count($typesIds) > 0) {
-    array_push($filter, 'AND contract_type IN ('.implode(', ', $typesIds).')');
+    array_push($filter, 'AND contract_type IN (' . implode(', ', $typesIds) . ')');
 }
 $years = $this->_instance->contracts_model->get_contracts_years();
 $yearsArray = array();
 foreach ($years as $year) {
-    if ($this->_instance->input->post('year_'.$year['year'])) {
+    if ($this->_instance->input->post('year_' . $year['year'])) {
         array_push($yearsArray, $year['year']);
     }
 }
 if (count($yearsArray) > 0) {
-    array_push($filter, 'AND YEAR(datestart) IN ('.implode(', ', $yearsArray).')');
+    array_push($filter, 'AND YEAR(datestart) IN (' . implode(', ', $yearsArray) . ')');
 }
 
 $monthArray = array();
-for ($m = 1; $m <= 12; $m++) {
-    if ($this->_instance->input->post('contracts_by_month_'.$m)) {
+for ($m = 1; $m <= 12; $m ++) {
+    if ($this->_instance->input->post('contracts_by_month_' . $m)) {
         array_push($monthArray, $m);
     }
 }
 if (count($monthArray) > 0) {
-    array_push($filter, 'AND MONTH(datestart) IN ('.implode(', ', $monthArray).')');
+    array_push($filter, 'AND MONTH(datestart) IN (' . implode(', ', $monthArray) . ')');
 }
 
 if (count($filter) > 0) {
-    array_push($where, 'AND ('.prepare_dt_filter($filter).')');
+    array_push($where, 'AND (' . prepare_dt_filter($filter) . ')');
 }
 
 if (is_numeric($clientid)) {
-    array_push($where, 'AND client='.$clientid);
+    array_push($where, 'AND client=' . $clientid);
 }
 
-if (!has_permission('contracts', '', 'view')) {
-    array_push($where, 'AND addedfrom='.get_staff_user_id());
+if (! has_permission('contracts', '', 'view')) {
+    array_push($where, 'AND addedfrom=' . get_staff_user_id());
 }
 
 // Fix for big queries. Some hosting have max_join_limit
@@ -97,59 +97,63 @@ if (count($custom_fields) > 4) {
     @$this->_instance->db->query('SET SQL_BIG_SELECTS=1');
 }
 
-$aColumns = do_action('contracts_table_sql_columns',$aColumns);
+$aColumns = do_action('contracts_table_sql_columns', $aColumns);
 
-$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, array('tblcontracts.id', 'trash', 'client'));
+$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, array(
+    'tblcontracts.id',
+    'trash',
+    'client'
+));
 
 $output = $result['output'];
 $rResult = $result['rResult'];
 
 foreach ($rResult as $aRow) {
     $row = array();
-
+    
     $row[] = $aRow['id'];
-
-    $subjectOutput = '<a href="'.admin_url('contracts/contract/'.$aRow['id']).'">'.$aRow['subject'].'</a>';
+    
+    $subjectOutput = '<a href="' . admin_url('contracts/contract/' . $aRow['id']) . '">' . $aRow['subject'] . '</a>';
     if ($aRow['trash'] == 1) {
-        $subjectOutput .= '<span class="label label-danger mleft5 inline-block">'._l('contract_trash').'</span>';
+        $subjectOutput .= '<span class="label label-danger mleft5 inline-block">' . _l('contract_trash') . '</span>';
     }
-
+    
     $row[] = $subjectOutput;
-
-    $row[] = '<a href="'.admin_url('clients/client/'.$aRow['client']).'">'. $aRow['company'] . '</a>';
-
+    
+    $row[] = '<a href="' . admin_url('clients/client/' . $aRow['client']) . '">' . $aRow['company'] . '</a>';
+    
     $row[] = $aRow['type_name'];
-
+    
     $row[] = format_money($aRow['contract_value'], $baseCurrencySymbol);
-
+    
     $row[] = _d($aRow['datestart']);
-
+    
     $row[] = _d($aRow['dateend']);
-
+    
     // Custom fields add values
-    foreach($customFieldsColumns as $customFieldColumn){
+    foreach ($customFieldsColumns as $customFieldColumn) {
         $row[] = (strpos($customFieldColumn, 'date_picker_') !== false ? _d($aRow[$customFieldColumn]) : $aRow[$customFieldColumn]);
     }
-
+    
     $hook = do_action('contracts_table_row_data', array(
         'output' => $row,
         'row' => $aRow
     ));
-
+    
     $row = $hook['output'];
-
-    $options = icon_btn('contracts/contract/'.$aRow['id'], 'pencil-square-o');
+    
+    $options = icon_btn('contracts/contract/' . $aRow['id'], 'pencil-square-o');
     if (has_permission('contracts', '', 'delete')) {
-        $options .= icon_btn('contracts/delete/'.$aRow['id'], 'remove', 'btn-danger _delete');
+        $options .= icon_btn('contracts/delete/' . $aRow['id'], 'remove', 'btn-danger _delete');
     }
     $row[] = $options;
-
-    if (!empty($aRow['dateend'])) {
+    
+    if (! empty($aRow['dateend'])) {
         $_date_end = date('Y-m-d', strtotime($aRow['dateend']));
         if ($_date_end < date('Y-m-d')) {
             $row['DT_RowClass'] = 'alert-danger';
         }
     }
-
+    
     $output['aaData'][] = $row;
 }

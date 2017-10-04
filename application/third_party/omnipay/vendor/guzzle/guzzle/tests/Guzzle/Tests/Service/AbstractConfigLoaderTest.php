@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Service;
 
 /**
@@ -7,16 +6,23 @@ namespace Guzzle\Tests\Service;
  */
 class AbstractConfigLoaderTest extends \Guzzle\Tests\GuzzleTestCase
 {
-    /** @var \Guzzle\Service\AbstractConfigLoader */
+
+    /**
+     * @var \Guzzle\Service\AbstractConfigLoader
+     */
     protected $loader;
 
-    /** @var array Any files that need to be deleted on tear down */
+    /**
+     * @var array Any files that need to be deleted on tear down
+     */
     protected $cleanup = array();
 
     public function setUp()
     {
         $this->loader = $this->getMockBuilder('Guzzle\Service\AbstractConfigLoader')
-            ->setMethods(array('build'))
+            ->setMethods(array(
+            'build'
+        ))
             ->getMockForAbstractClass();
     }
 
@@ -82,16 +88,22 @@ class AbstractConfigLoaderTest extends \Guzzle\Tests\GuzzleTestCase
         $filename = tempnam(sys_get_temp_dir(), 'php') . '.php';
         file_put_contents($filename, '<?php return array("foo" => "bar");');
         $this->cleanup[] = $filename;
-        $this->loader->expects($this->exactly(1))->method('build')->will($this->returnArgument(0));
+        $this->loader->expects($this->exactly(1))
+            ->method('build')
+            ->will($this->returnArgument(0));
         $config = $this->loader->load($filename);
-        $this->assertEquals(array('foo' => 'bar'), $config);
+        $this->assertEquals(array(
+            'foo' => 'bar'
+        ), $config);
     }
 
     public function testCanCreateFromJson()
     {
         $file = dirname(__DIR__) . '/TestData/services/json1.json';
         // The build method will just return the config data
-        $this->loader->expects($this->exactly(1))->method('build')->will($this->returnArgument(0));
+        $this->loader->expects($this->exactly(1))
+            ->method('build')
+            ->will($this->returnArgument(0));
         $data = $this->loader->load($file);
         // Ensure that the config files were merged using the includes directives
         $this->assertArrayHasKey('includes', $data);
@@ -107,7 +119,9 @@ class AbstractConfigLoaderTest extends \Guzzle\Tests\GuzzleTestCase
         $file = dirname(__DIR__) . '/TestData/services/json1.json';
         $this->loader->addAlias('foo', $file);
         // The build method will just return the config data
-        $this->loader->expects($this->exactly(1))->method('build')->will($this->returnArgument(0));
+        $this->loader->expects($this->exactly(1))
+            ->method('build')
+            ->will($this->returnArgument(0));
         $data = $this->loader->load('foo');
         $this->assertEquals('bar', $data['services']['foo']['params']['baz']);
     }
@@ -127,9 +141,15 @@ class AbstractConfigLoaderTest extends \Guzzle\Tests\GuzzleTestCase
     public function testCanLoadArraysWithIncludes()
     {
         $file = dirname(__DIR__) . '/TestData/services/json1.json';
-        $config = array('includes' => array($file));
+        $config = array(
+            'includes' => array(
+                $file
+            )
+        );
         // The build method will just return the config data
-        $this->loader->expects($this->exactly(1))->method('build')->will($this->returnArgument(0));
+        $this->loader->expects($this->exactly(1))
+            ->method('build')
+            ->will($this->returnArgument(0));
         $data = $this->loader->load($config);
         $this->assertEquals('bar', $data['services']['foo']['params']['baz']);
     }

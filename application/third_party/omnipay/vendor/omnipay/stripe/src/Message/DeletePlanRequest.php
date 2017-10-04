@@ -12,6 +12,7 @@ namespace Omnipay\Stripe\Message;
  */
 class DeletePlanRequest extends AbstractRequest
 {
+
     /**
      * Get the plan id.
      *
@@ -35,13 +36,13 @@ class DeletePlanRequest extends AbstractRequest
     public function getData()
     {
         $this->validate('id');
-
+        
         return;
     }
 
     public function getEndpoint()
     {
-        return $this->endpoint.'/plans/'.$this->getId();
+        return $this->endpoint . '/plans/' . $this->getId();
     }
 
     public function getHttpMethod()

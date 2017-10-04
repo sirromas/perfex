@@ -3,24 +3,24 @@ namespace Braintree;
 
 class ClientToken
 {
+
     const DEFAULT_VERSION = 2;
-
-
+    
     // static methods redirecting to gateway
-
+    
     /**
      *
-     * @param array $params
+     * @param array $params            
      * @return array
      */
-    public static function generate($params=[])
+    public static function generate($params = [])
     {
         return Configuration::gateway()->clientToken()->generate($params);
     }
 
     /**
      *
-     * @param type $params
+     * @param type $params            
      * @throws InvalidArgumentException
      */
     public static function conditionallyVerifyKeys($params)

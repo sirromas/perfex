@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal\Message;
 
 /**
@@ -7,6 +6,7 @@ namespace Omnipay\PayPal\Message;
  */
 class ExpressVoidRequest extends AbstractRequest
 {
+
     public function getData()
     {
         $this->validate('transactionReference');

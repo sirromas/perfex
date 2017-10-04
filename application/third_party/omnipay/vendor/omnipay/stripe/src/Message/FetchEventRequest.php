@@ -12,6 +12,7 @@ namespace Omnipay\Stripe\Message;
  */
 class FetchEventRequest extends AbstractRequest
 {
+
     /**
      * Get the event reference.
      *
@@ -36,13 +37,13 @@ class FetchEventRequest extends AbstractRequest
     {
         $this->validate('eventReference');
         $data = array();
-
+        
         return $data;
     }
 
     public function getEndpoint()
     {
-        return $this->endpoint.'/events/'.$this->getEventReference();
+        return $this->endpoint . '/events/' . $this->getEventReference();
     }
 
     public function getHttpMethod()

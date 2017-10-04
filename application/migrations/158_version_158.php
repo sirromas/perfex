@@ -1,8 +1,9 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 class Migration_Version_158 extends CI_Migration
 {
+
     function __construct()
     {
         parent::__construct();
@@ -10,8 +11,8 @@ class Migration_Version_158 extends CI_Migration
 
     public function up()
     {
-     // Nothing to do here only to update database version number
-     update_option('update_info_message', '<div class="col-md-12">
+        // Nothing to do here only to update database version number
+        update_option('update_info_message', '<div class="col-md-12">
         <div class="alert alert-success bold">
             <h4 class="bold">Hi! Thanks for updating Perfex CRM - You are using version 1.4.2</h4>
             <p>

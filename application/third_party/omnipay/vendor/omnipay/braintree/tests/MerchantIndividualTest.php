@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\Braintree;
 
 use DateTime;
@@ -8,21 +7,26 @@ use Omnipay\Tests\TestCase;
 
 class MerchantIndividualTest extends TestCase
 {
+
     public function setUp()
     {
         $this->individual = new MerchantIndividual();
     }
-    
+
     public function testConstructWithParams()
     {
-        $individual = new MerchantIndividual(array('name' => 'Karl Childers'));
+        $individual = new MerchantIndividual(array(
+            'name' => 'Karl Childers'
+        ));
         $this->assertSame('Karl Childers', $individual->getName());
     }
 
     public function testInitializeWithParams()
     {
-        $individual = new MerchantIndividual;
-        $individual->initialize(array('name' => 'Karl Childers'));
+        $individual = new MerchantIndividual();
+        $individual->initialize(array(
+            'name' => 'Karl Childers'
+        ));
         $this->assertSame('Karl Childers', $individual->getName());
     }
 
@@ -34,9 +38,9 @@ class MerchantIndividualTest extends TestCase
             'city' => 'Millsburg',
             'state' => 'AR',
             'postCode' => '72015',
-            'birthday' => '1996-11-27',
+            'birthday' => '1996-11-27'
         ));
-
+        
         $parameters = $card->getParameters();
         $this->assertSame('Karl', $parameters['firstName']);
         $this->assertSame('Childers', $parameters['lastName']);

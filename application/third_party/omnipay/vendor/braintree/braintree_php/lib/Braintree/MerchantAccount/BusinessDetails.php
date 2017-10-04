@@ -5,6 +5,7 @@ use Braintree\Base;
 
 class BusinessDetails extends Base
 {
+
     protected function _initialize($businessAttribs)
     {
         $this->_attributes = $businessAttribs;

@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Plugin\Backoff;
 
 use Guzzle\Plugin\Backoff\LinearBackoffStrategy;
@@ -9,6 +8,7 @@ use Guzzle\Plugin\Backoff\LinearBackoffStrategy;
  */
 class LinearBackoffStrategyTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testRetriesWithLinearDelay()
     {
         $strategy = new LinearBackoffStrategy(5);

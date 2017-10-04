@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\EventDispatcher;
 
 /**
@@ -18,6 +17,7 @@ namespace Symfony\Component\EventDispatcher;
  */
 class ImmutableEventDispatcher implements EventDispatcherInterface
 {
+
     /**
      * The proxied dispatcher.
      *
@@ -28,7 +28,8 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
     /**
      * Creates an unmodifiable proxy for an event dispatcher.
      *
-     * @param EventDispatcherInterface $dispatcher The proxied event dispatcher
+     * @param EventDispatcherInterface $dispatcher
+     *            The proxied event dispatcher
      */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
@@ -36,7 +37,9 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function dispatch($eventName, Event $event = null)
     {
@@ -44,7 +47,9 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function addListener($eventName, $listener, $priority = 0)
     {
@@ -52,7 +57,9 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function addSubscriber(EventSubscriberInterface $subscriber)
     {
@@ -60,7 +67,9 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function removeListener($eventName, $listener)
     {
@@ -68,7 +77,9 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function removeSubscriber(EventSubscriberInterface $subscriber)
     {
@@ -76,7 +87,9 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getListeners($eventName = null)
     {
@@ -84,7 +97,9 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getListenerPriority($eventName, $listener)
     {
@@ -92,7 +107,9 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function hasListeners($eventName = null)
     {

@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Plugin\Cache;
 
 use Guzzle\Cache\DoctrineCacheAdapter;
@@ -14,12 +13,15 @@ use Doctrine\Common\Cache\ArrayCache;
  */
 class DefaultCacheStorageTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     protected function getCache()
     {
         $a = new ArrayCache();
         $c = new DoctrineCacheAdapter($a);
         $s = new DefaultCacheStorage($c);
-        $request = new Request('GET', 'http://foo.com', array('Accept' => 'application/json'));
+        $request = new Request('GET', 'http://foo.com', array(
+            'Accept' => 'application/json'
+        ));
         $response = new Response(200, array(
             'Content-Type' => 'application/json',
             'Connection' => 'close',
@@ -28,7 +30,7 @@ class DefaultCacheStorageTest extends \Guzzle\Tests\GuzzleTestCase
         ), 'test');
         $s->cache($request, $response);
         $data = $this->readAttribute($a, 'data');
-
+        
         return array(
             'cache' => $a,
             'adapter' => $c,
@@ -109,24 +111,31 @@ class DefaultCacheStorageTest extends \Guzzle\Tests\GuzzleTestCase
     public function testPurgeRemovesAllMethodCaches()
     {
         $cache = $this->getCache();
-        foreach (array('HEAD', 'POST', 'PUT', 'DELETE') as $method) {
+        foreach (array(
+            'HEAD',
+            'POST',
+            'PUT',
+            'DELETE'
+        ) as $method) {
             $request = RequestFactory::getInstance()->cloneRequestWithMethod($cache['request'], $method);
             $cache['storage']->cache($request, $cache['response']);
         }
         $cache['storage']->purge('http://foo.com');
         $this->assertFalse(in_array('test', $this->readAttribute($cache['cache'], 'data')));
         $this->assertFalse(in_array($cache['serialized'], $this->readAttribute($cache['cache'], 'data')));
-        $this->assertEquals(
-            array('DoctrineNamespaceCacheKey[]'),
-            array_keys($this->readAttribute($cache['cache'], 'data'))
-        );
+        $this->assertEquals(array(
+            'DoctrineNamespaceCacheKey[]'
+        ), array_keys($this->readAttribute($cache['cache'], 'data')));
     }
 
     public function testRemovesExpiredResponses()
     {
         $cache = $this->getCache();
         $request = new Request('GET', 'http://xyz.com');
-        $response = new Response(200, array('Age' => 1000, 'Cache-Control' => 'max-age=-10000'));
+        $response = new Response(200, array(
+            'Age' => 1000,
+            'Cache-Control' => 'max-age=-10000'
+        ));
         $cache['storage']->cache($request, $response);
         $this->assertNull($cache['storage']->fetch($request));
         $data = $this->readAttribute($cache['cache'], 'data');
@@ -138,7 +147,9 @@ class DefaultCacheStorageTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $cache = $this->getCache();
         $this->assertInstanceOf('Guzzle\Http\Message\Response', $cache['storage']->fetch($cache['request']));
-        $request = new Request('GET', 'http://foo.com', array('Accept' => 'application/xml'));
+        $request = new Request('GET', 'http://foo.com', array(
+            'Accept' => 'application/xml'
+        ));
         $this->assertNull($cache['storage']->fetch($request));
     }
 
@@ -147,7 +158,7 @@ class DefaultCacheStorageTest extends \Guzzle\Tests\GuzzleTestCase
         $cache = $this->getCache();
         $data = $this->readAttribute($cache['cache'], 'data');
         $key = array_search('test', $data);
-        $cache['cache']->delete(substr($key, 1, -4));
+        $cache['cache']->delete(substr($key, 1, - 4));
         $this->assertNull($cache['storage']->fetch($cache['request']));
     }
 
@@ -155,12 +166,22 @@ class DefaultCacheStorageTest extends \Guzzle\Tests\GuzzleTestCase
     {
         return array(
             array(
-                new Request('GET', 'http://foo.com', array('Accept' => 'foo')),
-                new Response(200, array('Cache-Control' => 'stale-if-error=100', 'Vary' => 'Accept'))
+                new Request('GET', 'http://foo.com', array(
+                    'Accept' => 'foo'
+                )),
+                new Response(200, array(
+                    'Cache-Control' => 'stale-if-error=100',
+                    'Vary' => 'Accept'
+                ))
             ),
             array(
-                new Request('GET', 'http://foo.com', array('Accept' => 'foo')),
-                new Response(200, array('Cache-Control' => 'stale-if-error', 'Vary' => 'Accept'))
+                new Request('GET', 'http://foo.com', array(
+                    'Accept' => 'foo'
+                )),
+                new Response(200, array(
+                    'Cache-Control' => 'stale-if-error',
+                    'Vary' => 'Accept'
+                ))
             )
         );
     }

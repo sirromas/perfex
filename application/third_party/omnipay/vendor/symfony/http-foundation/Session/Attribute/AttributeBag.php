@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\Session\Attribute;
 
 /**
@@ -16,14 +15,17 @@ namespace Symfony\Component\HttpFoundation\Session\Attribute;
  */
 class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Countable
 {
+
     private $name = 'attributes';
 
     /**
+     *
      * @var string
      */
     private $storageKey;
 
     /**
+     *
      * @var array
      */
     protected $attributes = array();
@@ -31,7 +33,8 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     /**
      * Constructor.
      *
-     * @param string $storageKey The key used to store attributes in the session
+     * @param string $storageKey
+     *            The key used to store attributes in the session
      */
     public function __construct($storageKey = '_sf2_attributes')
     {
@@ -39,7 +42,9 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getName()
     {
@@ -52,7 +57,9 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function initialize(array &$attributes)
     {
@@ -60,7 +67,9 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getStorageKey()
     {
@@ -68,7 +77,9 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function has($name)
     {
@@ -76,7 +87,9 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function get($name, $default = null)
     {
@@ -84,7 +97,9 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function set($name, $value)
     {
@@ -92,7 +107,9 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function all()
     {
@@ -100,7 +117,9 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function replace(array $attributes)
     {
@@ -111,7 +130,9 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function remove($name)
     {
@@ -120,18 +141,20 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
             $retval = $this->attributes[$name];
             unset($this->attributes[$name]);
         }
-
+        
         return $retval;
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function clear()
     {
         $return = $this->attributes;
         $this->attributes = array();
-
+        
         return $return;
     }
 

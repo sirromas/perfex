@@ -7,7 +7,9 @@
 		<?php foreach($groups as $group){ ?>
 		<div class="col-md-12">
 			<div class="article_group_wrapper">
-				<h4 class="bold"><i class="fa fa-folder-o"></i> <a href="<?php echo site_url('knowledge-base'); ?>?groupid=<?php echo $group['groupid']; ?>"><?php echo $group['name']; ?></a>
+				<h4 class="bold">
+					<i class="fa fa-folder-o"></i> <a
+						href="<?php echo site_url('knowledge-base'); ?>?groupid=<?php echo $group['groupid']; ?>"><?php echo $group['name']; ?></a>
 					<small><?php echo count($group['articles']); ?></small>
 				</h4>
 				<p><?php echo $group['description']; ?></p>
@@ -18,11 +20,13 @@
 		<?php } else { ?>
 		<div class="col-md-12">
 			<?php foreach($groups as $group){ ?>
-			<h4 class="bold mbot30"><i class="fa fa-folder-o"></i> <?php echo $group['name']; ?></h4>
+			<h4 class="bold mbot30">
+				<i class="fa fa-folder-o"></i> <?php echo $group['name']; ?></h4>
 			<ul class="list-unstyled articles_list">
 				<?php foreach($group['articles'] as $article) { ?>
-				<li>
-					<a href="<?php echo site_url('knowledge-base/'.$article['slug']); ?>" class="article-heading"><?php echo $article['subject']; ?></a>
+				<li><a
+					href="<?php echo site_url('knowledge-base/'.$article['slug']); ?>"
+					class="article-heading"><?php echo $article['subject']; ?></a>
 					<div class="text-muted mtop10"><?php echo strip_tags(mb_substr($article['description'],0,250)); ?>...</div>
 				</li>
 				<hr />

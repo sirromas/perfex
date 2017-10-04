@@ -3,15 +3,16 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 use Omnipay\Omnipay;
 
-require_once(APPPATH . 'third_party/omnipay/vendor/autoload.php');
+require_once (APPPATH . 'third_party/omnipay/vendor/autoload.php');
 
 class Authorize_sim_gateway extends App_gateway
 {
+
     public function __construct()
     {
         /**
-        * Call App_gateway __construct function
-        */
+         * Call App_gateway __construct function
+         */
         parent::__construct();
         /**
          * REQUIRED
@@ -19,18 +20,18 @@ class Authorize_sim_gateway extends App_gateway
          * The ID must be alpha/alphanumeric
          */
         $this->setId('authorize_sim');
-
+        
         /**
          * REQUIRED
          * Gateway name
          */
         $this->setName('Authorize.net SIM');
-
+        
         /**
          * Add gateway settings
-        */
+         */
         $this->setSettings(array(
-
+            
             array(
                 'name' => 'api_login_id',
                 'encrypted' => true,
@@ -49,8 +50,8 @@ class Authorize_sim_gateway extends App_gateway
             array(
                 'name' => 'description_dashboard',
                 'label' => 'settings_paymentmethod_description',
-                'type'=>'textarea',
-                'default_value'=>'Payment for Invoice'
+                'type' => 'textarea',
+                'default_value' => 'Payment for Invoice'
             ),
             array(
                 'name' => 'currencies',
@@ -70,12 +71,15 @@ class Authorize_sim_gateway extends App_gateway
                 'label' => 'settings_paymentmethod_developer_mode'
             )
         ));
-
+        
         /**
-        * REQUIRED
-        * Hook gateway with other online payment modes
-        */
-        add_action('before_add_online_payment_modes', array( $this, 'initMode' ));
+         * REQUIRED
+         * Hook gateway with other online payment modes
+         */
+        add_action('before_add_online_payment_modes', array(
+            $this,
+            'initMode'
+        ));
         add_action('before_render_payment_gateway_settings', 'authorize_sim_notice');
     }
 
@@ -87,39 +91,40 @@ class Authorize_sim_gateway extends App_gateway
         $gateway->setHashSecret($this->decryptSetting('api_secret_key'));
         $gateway->setTestMode($this->getSetting('test_mode_enabled'));
         $gateway->setDeveloperMode($this->getSetting('developer_mode_enabled'));
-
-        $billing_data['billingCompany']  = $data['invoice']->client->company;
+        
+        $billing_data['billingCompany'] = $data['invoice']->client->company;
         $billing_data['billingAddress1'] = $data['invoice']->billing_street;
-        $billing_data['billingName']     = '';
-        $billing_data['billingCity']     = $data['invoice']->billing_city;
-        $billing_data['billingState']    = $data['invoice']->billing_state;
+        $billing_data['billingName'] = '';
+        $billing_data['billingCity'] = $data['invoice']->billing_city;
+        $billing_data['billingState'] = $data['invoice']->billing_state;
         $billing_data['billingPostcode'] = $data['invoice']->billing_zip;
-
+        
         $_country = '';
         $country = get_country($data['invoice']->billing_country);
-
+        
         if ($country) {
             $_country = $country->short_name;
         }
-
-        $billing_data['billingCountry']  = $_country;
+        
+        $billing_data['billingCountry'] = $_country;
         $trans_id = time();
-
+        
         $requestData = array(
-                'amount' => number_format($data['amount'], 2, '.', ''),
-                'currency' => $data['invoice']->currency_name,
-                'returnUrl'=>site_url('gateways/authorize_sim/complete_purchase'),
-                'description' => $this->getSetting('description_dashboard') . ' - ' . format_invoice_number($data['invoice']->id),
-                'transactionId' => $trans_id,
-                'invoiceNumber'=>format_invoice_number($data['invoice']->id),
-                'card' => $billing_data
-            );
-
-
+            'amount' => number_format($data['amount'], 2, '.', ''),
+            'currency' => $data['invoice']->currency_name,
+            'returnUrl' => site_url('gateways/authorize_sim/complete_purchase'),
+            'description' => $this->getSetting('description_dashboard') . ' - ' . format_invoice_number($data['invoice']->id),
+            'transactionId' => $trans_id,
+            'invoiceNumber' => format_invoice_number($data['invoice']->id),
+            'card' => $billing_data
+        );
+        
         $oResponse = $gateway->purchase($requestData)->send();
         if ($oResponse->isRedirect()) {
             $this->ci->db->where('id', $data['invoice']->id);
-            $this->ci->db->update('tblinvoices', array('token'=>$trans_id));
+            $this->ci->db->update('tblinvoices', array(
+                'token' => $trans_id
+            ));
             // redirect to offsite payment gateway
             $oResponse->redirect();
         } else {
@@ -128,6 +133,7 @@ class Authorize_sim_gateway extends App_gateway
         }
     }
 }
+
 function authorize_sim_notice($gateway)
 {
     if ($gateway['id'] == 'authorize_sim') {

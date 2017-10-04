@@ -1,5 +1,8 @@
-<?php $_announcements = get_announcements_for_user();
-if(sizeof($_announcements) > 0 && isset($is_home) && is_staff_member()){ ?>
+<?php
+
+$_announcements = get_announcements_for_user();
+if (sizeof($_announcements) > 0 && isset($is_home) && is_staff_member()) {
+    ?>
 <div class="col-lg-12">
 	<div class="panel_s">
 		<?php foreach($_announcements as $__announcement){ ?>
@@ -9,11 +12,13 @@ if(sizeof($_announcements) > 0 && isset($is_home) && is_staff_member()){ ?>
 					<?php echo _l('announcement'); ?>! <?php if($__announcement['showname'] == 1){ echo '<br /><small class="font-medium-xs">'._l('announcement_from').' '. $__announcement['userid']; } ?></small><br />
 					<small><?php echo _l('announcement_date',_dt($__announcement['dateadded'])); ?></small>
 				</h4>
-				<a href="<?php echo admin_url('misc/dismiss_announcement/'.$__announcement['announcementid']); ?>" class="close">
-					<span aria-hidden="true">&times;</span>
+				<a
+					href="<?php echo admin_url('misc/dismiss_announcement/'.$__announcement['announcementid']); ?>"
+					class="close"> <span aria-hidden="true">&times;</span>
 				</a>
 				<?php if(is_admin()){ ?>
-				<a href="<?php echo admin_url('announcements/announcement/'.$__announcement['announcementid']); ?>">
+				<a
+					href="<?php echo admin_url('announcements/announcement/'.$__announcement['announcementid']); ?>">
 					<i class="fa fa-pencil-square-o pull-right"></i>
 				</a>
 				<?php } ?>

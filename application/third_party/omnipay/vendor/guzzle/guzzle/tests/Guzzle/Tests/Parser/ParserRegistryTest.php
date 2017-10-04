@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Parser;
 
 use Guzzle\Parser\ParserRegistry;
@@ -9,6 +8,7 @@ use Guzzle\Parser\ParserRegistry;
  */
 class ParserRegistryTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testStoresObjects()
     {
         $r = new ParserRegistry();

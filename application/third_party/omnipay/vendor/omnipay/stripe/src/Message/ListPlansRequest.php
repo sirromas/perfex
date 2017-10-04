@@ -15,16 +15,17 @@ namespace Omnipay\Stripe\Message;
  */
 class ListPlansRequest extends AbstractRequest
 {
+
     public function getData()
     {
         $data = array();
-
+        
         return $data;
     }
 
     public function getEndpoint()
     {
-        return $this->endpoint.'/plans';
+        return $this->endpoint . '/plans';
     }
 
     public function getHttpMethod()

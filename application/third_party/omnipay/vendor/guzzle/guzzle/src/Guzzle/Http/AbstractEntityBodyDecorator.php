@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Http;
 
 use Guzzle\Stream\Stream;
@@ -9,11 +8,16 @@ use Guzzle\Stream\Stream;
  */
 class AbstractEntityBodyDecorator implements EntityBodyInterface
 {
-    /** @var EntityBodyInterface Decorated entity body */
+
+    /**
+     * @var EntityBodyInterface Decorated entity body
+     */
     protected $body;
 
     /**
-     * @param EntityBodyInterface $body Entity body to decorate
+     *
+     * @param EntityBodyInterface $body
+     *            Entity body to decorate
      */
     public function __construct(EntityBodyInterface $body)
     {
@@ -28,14 +32,19 @@ class AbstractEntityBodyDecorator implements EntityBodyInterface
     /**
      * Allow decorators to implement custom methods
      *
-     * @param string $method Missing method name
-     * @param array  $args   Method arguments
-     *
+     * @param string $method
+     *            Missing method name
+     * @param array $args
+     *            Method arguments
+     *            
      * @return mixed
      */
     public function __call($method, array $args)
     {
-        return call_user_func_array(array($this->body, $method), $args);
+        return call_user_func_array(array(
+            $this->body,
+            $method
+        ), $args);
     }
 
     public function close()
@@ -46,7 +55,7 @@ class AbstractEntityBodyDecorator implements EntityBodyInterface
     public function setRewindFunction($callable)
     {
         $this->body->setRewindFunction($callable);
-
+        
         return $this;
     }
 
@@ -78,7 +87,7 @@ class AbstractEntityBodyDecorator implements EntityBodyInterface
     public function getContentMd5($rawOutput = false, $base64Encode = false)
     {
         $hash = Stream::getHash($this, 'md5', $rawOutput);
-
+        
         return $hash && $base64Encode ? base64_encode($hash) : $hash;
     }
 
@@ -100,14 +109,14 @@ class AbstractEntityBodyDecorator implements EntityBodyInterface
     public function setStream($stream, $size = 0)
     {
         $this->body->setStream($stream, $size);
-
+        
         return $this;
     }
 
     public function detachStream()
     {
         $this->body->detachStream();
-
+        
         return $this;
     }
 
@@ -158,7 +167,9 @@ class AbstractEntityBodyDecorator implements EntityBodyInterface
 
     /**
      * Alias of isConsumed()
-     * {@inheritdoc}
+     * 
+     * @ERROR!!!
+     *
      */
     public function feof()
     {
@@ -178,7 +189,7 @@ class AbstractEntityBodyDecorator implements EntityBodyInterface
     public function setSize($size)
     {
         $this->body->setSize($size);
-
+        
         return $this;
     }
 
@@ -215,7 +226,7 @@ class AbstractEntityBodyDecorator implements EntityBodyInterface
     public function setCustomData($key, $value)
     {
         $this->body->setCustomData($key, $value);
-
+        
         return $this;
     }
 }

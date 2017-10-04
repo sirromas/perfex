@@ -1,16 +1,18 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
 class Currencies extends Admin_controller
 {
+
     public function __construct()
     {
         parent::__construct();
         $this->load->model('currencies_model');
-        if (!is_admin()) {
+        if (! is_admin()) {
             access_denied('Currencies');
         }
     }
-
+    
     /* List all currencies */
     public function index()
     {
@@ -20,7 +22,7 @@ class Currencies extends Admin_controller
         $data['title'] = _l('currencies');
         $this->load->view('admin/currencies/manage', $data);
     }
-
+    
     /* Update currency or add new / ajax */
     public function manage()
     {
@@ -49,11 +51,11 @@ class Currencies extends Admin_controller
             }
         }
     }
-
+    
     /* Make currency your base currency */
     public function make_base_currency($id)
     {
-        if (!$id) {
+        if (! $id) {
             redirect(admin_url('currencies'));
         }
         $response = $this->currencies_model->make_base_currency($id);
@@ -64,11 +66,11 @@ class Currencies extends Admin_controller
         }
         redirect(admin_url('currencies'));
     }
-
+    
     /* Delete currency from database */
     public function delete($id)
     {
-        if (!$id) {
+        if (! $id) {
             redirect(admin_url('currencies'));
         }
         $response = $this->currencies_model->delete($id);
@@ -83,7 +85,7 @@ class Currencies extends Admin_controller
         }
         redirect(admin_url('currencies'));
     }
-
+    
     /* Get symbol by currency id passed */
     public function get_currency_symbol($id)
     {

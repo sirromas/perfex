@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Inflection;
 
 /**
@@ -7,7 +6,10 @@ namespace Guzzle\Inflection;
  */
 class Inflector implements InflectorInterface
 {
-    /** @var InflectorInterface */
+
+    /**
+     * @var InflectorInterface
+     */
     protected static $default;
 
     /**
@@ -18,11 +20,11 @@ class Inflector implements InflectorInterface
     public static function getDefault()
     {
         // @codeCoverageIgnoreStart
-        if (!self::$default) {
+        if (! self::$default) {
             self::$default = new MemoizingInflector(new self());
         }
         // @codeCoverageIgnoreEnd
-
+        
         return self::$default;
     }
 

@@ -1,16 +1,15 @@
 <?php
-
 namespace Omnipay\Stripe\Message;
 
 use Omnipay\Tests\TestCase;
 
 class VoidRequestTest extends TestCase
 {
+
     public function setUp()
     {
         $this->request = new VoidRequest($this->getHttpClient(), $this->getHttpRequest());
-        $this->request->setTransactionReference('ch_12RgN9L7XhO9mI')
-            ->setRefundApplicationFee(true);
+        $this->request->setTransactionReference('ch_12RgN9L7XhO9mI')->setRefundApplicationFee(true);
     }
 
     public function testEndpoint()
@@ -28,7 +27,7 @@ class VoidRequestTest extends TestCase
     {
         $this->setMockHttpResponse('VoidSuccess.txt');
         $response = $this->request->send();
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertSame('ch_12RgN9L7XhO9mI', $response->getTransactionReference());
@@ -40,7 +39,7 @@ class VoidRequestTest extends TestCase
     {
         $this->setMockHttpResponse('VoidFailure.txt');
         $response = $this->request->send();
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());

@@ -12,6 +12,7 @@ namespace Omnipay\Stripe\Message;
  */
 class FetchPlanRequest extends AbstractRequest
 {
+
     /**
      * Get the plan id.
      *
@@ -36,13 +37,13 @@ class FetchPlanRequest extends AbstractRequest
     {
         $this->validate('id');
         $data = array();
-
+        
         return $data;
     }
 
     public function getEndpoint()
     {
-        return $this->endpoint.'/plans/'.$this->getId();
+        return $this->endpoint . '/plans/' . $this->getId();
     }
 
     public function getHttpMethod()

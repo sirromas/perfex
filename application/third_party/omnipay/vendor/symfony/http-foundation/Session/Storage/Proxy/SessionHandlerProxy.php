@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\Session\Storage\Proxy;
 
 /**
@@ -18,7 +17,9 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Proxy;
  */
 class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterface
 {
+
     /**
+     *
      * @var \SessionHandlerInterface
      */
     protected $handler;
@@ -26,7 +27,7 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
     /**
      * Constructor.
      *
-     * @param \SessionHandlerInterface $handler
+     * @param \SessionHandlerInterface $handler            
      */
     public function __construct(\SessionHandlerInterface $handler)
     {
@@ -36,17 +37,20 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
     }
 
     /**
+     *
      * @return \SessionHandlerInterface
      */
     public function getHandler()
     {
         return $this->handler;
     }
-
+    
     // \SessionHandlerInterface
-
+    
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function open($savePath, $sessionName)
     {
@@ -54,7 +58,9 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function close()
     {
@@ -62,7 +68,9 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function read($sessionId)
     {
@@ -70,7 +78,9 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function write($sessionId, $data)
     {
@@ -78,7 +88,9 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function destroy($sessionId)
     {
@@ -86,7 +98,9 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function gc($maxlifetime)
     {

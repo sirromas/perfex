@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Service\Command\LocationVisitor\Request;
 
 use Guzzle\Common\Exception\InvalidArgumentException;
@@ -12,6 +11,7 @@ use Guzzle\Service\Description\Parameter;
  */
 class HeaderVisitor extends AbstractRequestVisitor
 {
+
     public function visit(CommandInterface $command, RequestInterface $request, Parameter $param, $value)
     {
         $value = $param->filter($value);
@@ -25,15 +25,18 @@ class HeaderVisitor extends AbstractRequestVisitor
     /**
      * Add a prefixed array of headers to the request
      *
-     * @param RequestInterface $request Request to update
-     * @param Parameter        $param   Parameter object
-     * @param array            $value   Header array to add
-     *
+     * @param RequestInterface $request
+     *            Request to update
+     * @param Parameter $param
+     *            Parameter object
+     * @param array $value
+     *            Header array to add
+     *            
      * @throws InvalidArgumentException
      */
     protected function addPrefixedHeaders(RequestInterface $request, Parameter $param, $value)
     {
-        if (!is_array($value)) {
+        if (! is_array($value)) {
             throw new InvalidArgumentException('An array of mapped headers expected, but received a single value');
         }
         $prefix = $param->getSentAs();

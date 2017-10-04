@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\Braintree\Message;
 
 use Omnipay\Common\Message\ResponseInterface;
@@ -11,25 +10,27 @@ use Omnipay\Common\Message\ResponseInterface;
  */
 class ReleaseFromEscrowRequest extends AbstractRequest
 {
+
     public function getData()
     {
         $this->validate('transactionId');
-
+        
         return array(
-            'transactionId' => $this->getTransactionId(),
+            'transactionId' => $this->getTransactionId()
         );
     }
 
     /**
      * Send the request with specified data
      *
-     * @param  mixed $data The data to send
+     * @param mixed $data
+     *            The data to send
      * @return ResponseInterface
      */
     public function sendData($data)
     {
         $response = $this->braintree->transaction()->releaseFromEscrow($data['transactionId']);
-
+        
         return $this->createResponse($response);
     }
 }

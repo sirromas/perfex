@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal\Message;
 
 /**
@@ -7,11 +6,12 @@ namespace Omnipay\PayPal\Message;
  */
 class ProAuthorizeRequest extends AbstractRequest
 {
+
     public function getData()
     {
         $this->validate('amount', 'card');
         $this->getCard()->validate();
-
+        
         $data = $this->getBaseData();
         $data['METHOD'] = 'DoDirectPayment';
         $data['PAYMENTACTION'] = 'Authorization';
@@ -19,7 +19,7 @@ class ProAuthorizeRequest extends AbstractRequest
         $data['CURRENCYCODE'] = $this->getCurrency();
         $data['INVNUM'] = $this->getTransactionId();
         $data['DESC'] = $this->getDescription();
-
+        
         // add credit card details
         $data['ACCT'] = $this->getCard()->getNumber();
         $data['CREDITCARDTYPE'] = $this->getCard()->getBrand();
@@ -37,7 +37,7 @@ class ProAuthorizeRequest extends AbstractRequest
         $data['STATE'] = $this->getCard()->getState();
         $data['ZIP'] = $this->getCard()->getPostcode();
         $data['COUNTRYCODE'] = strtoupper($this->getCard()->getCountry());
-
+        
         return $data;
     }
 }

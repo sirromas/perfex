@@ -1,11 +1,11 @@
 <?php
-
 namespace Guzzle\Tests\Common\Exception;
 
 use Guzzle\Common\Exception\ExceptionCollection;
 
 class ExceptionCollectionTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     private function getExceptions()
     {
         return array(
@@ -29,7 +29,9 @@ class ExceptionCollectionTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $ex = new \Exception('foo');
         $e = new ExceptionCollection();
-        $e->setExceptions(array($ex));
+        $e->setExceptions(array(
+            $ex
+        ));
         $this->assertSame($ex, $e->getFirst());
     }
 
@@ -40,7 +42,8 @@ class ExceptionCollectionTest extends \Guzzle\Tests\GuzzleTestCase
         $e->add($exceptions[0]);
         $e->add($exceptions[1]);
         $this->assertEquals(2, count($e));
-        $this->assertEquals($exceptions, $e->getIterator()->getArrayCopy());
+        $this->assertEquals($exceptions, $e->getIterator()
+            ->getArrayCopy());
     }
 
     public function testCanAddSelf()

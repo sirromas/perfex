@@ -1,16 +1,18 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
 class Departments extends Admin_controller
 {
+
     public function __construct()
     {
         parent::__construct();
         $this->load->model('departments_model');
-        if (!is_admin()) {
+        if (! is_admin()) {
             access_denied('Departments');
         }
     }
-
+    
     /* List all departments */
     public function index()
     {
@@ -20,13 +22,13 @@ class Departments extends Admin_controller
         $data['title'] = _l('departments');
         $this->load->view('admin/departments/manage', $data);
     }
-
+    
     /* Edit or add new department */
     public function department($id = '')
     {
         if ($this->input->post()) {
             $message = '';
-            if (!$this->input->post('id')) {
+            if (! $this->input->post('id')) {
                 $data = $this->input->post(null, false);
                 if (isset($data['fakeusernameremembered'])) {
                     unset($data['fakeusernameremembered']);
@@ -51,7 +53,7 @@ class Departments extends Admin_controller
                 if (isset($data['fakepasswordremembered'])) {
                     unset($data['fakepasswordremembered']);
                 }
-                $id   = $data['id'];
+                $id = $data['id'];
                 unset($data['id']);
                 $success = $this->departments_model->update($data, $id);
                 if ($success) {
@@ -62,14 +64,14 @@ class Departments extends Admin_controller
                     'message' => $message
                 ));
             }
-            die;
+            die();
         }
     }
-
+    
     /* Delete department from database */
     public function delete($id)
     {
-        if (!$id) {
+        if (! $id) {
             redirect(admin_url('departments'));
         }
         $response = $this->departments_model->delete($id);
@@ -107,30 +109,30 @@ class Departments extends Admin_controller
 
     public function test_imap_connection()
     {
-        $email         = $this->input->post('email');
-        $password      = $this->input->post('password');
-        $host          = $this->input->post('host');
+        $email = $this->input->post('email');
+        $password = $this->input->post('password');
+        $host = $this->input->post('host');
         $imap_username = $this->input->post('username');
         if ($this->input->post('encryption')) {
             $encryption = $this->input->post('encryption');
         } else {
             $encryption = '';
         }
-
-        require_once(APPPATH . 'third_party/php-imap/Imap.php');
-
+        
+        require_once (APPPATH . 'third_party/php-imap/Imap.php');
+        
         $mailbox = $host;
-
+        
         if ($imap_username != '') {
             $username = $imap_username;
         } else {
             $username = $email;
         }
-
-        $password   = $password;
+        
+        $password = $password;
         $encryption = $encryption;
         // open connection
-        $imap       = new Imap($mailbox, $username, $password, $encryption);
+        $imap = new Imap($mailbox, $username, $password, $encryption);
         if ($imap->isConnected() === true) {
             echo json_encode(array(
                 'alert_type' => 'success',

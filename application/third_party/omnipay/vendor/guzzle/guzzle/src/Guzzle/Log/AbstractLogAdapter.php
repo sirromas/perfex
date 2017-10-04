@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Log;
 
 /**
@@ -7,6 +6,7 @@ namespace Guzzle\Log;
  */
 abstract class AbstractLogAdapter implements LogAdapterInterface
 {
+
     protected $log;
 
     public function getLogObject()

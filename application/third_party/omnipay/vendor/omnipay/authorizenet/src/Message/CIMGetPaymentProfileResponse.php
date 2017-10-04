@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\AuthorizeNet\Message;
 
 /**
@@ -7,6 +6,7 @@ namespace Omnipay\AuthorizeNet\Message;
  */
 class CIMGetPaymentProfileResponse extends CIMCreatePaymentProfileResponse
 {
+
     protected $responseType = 'getCustomerPaymentProfileResponse';
 
     public function getCustomerPaymentProfileId()

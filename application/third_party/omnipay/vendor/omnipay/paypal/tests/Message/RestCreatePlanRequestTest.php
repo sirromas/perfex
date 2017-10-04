@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal\Message;
 
 use Omnipay\Tests\TestCase;
@@ -7,7 +6,10 @@ use Omnipay\PayPal\RestGateway;
 
 class RestCreatePlanRequestTest extends TestCase
 {
-    /** @var \Omnipay\PayPal\Message\RestCreatePlanRequest */
+
+    /**
+     * @var \Omnipay\PayPal\Message\RestCreatePlanRequest
+     */
     private $request;
 
     public function setUp()
@@ -15,27 +17,27 @@ class RestCreatePlanRequestTest extends TestCase
         $client = $this->getHttpClient();
         $request = $this->getHttpRequest();
         $this->request = new RestCreatePlanRequest($client, $request);
-
+        
         $this->request->initialize(array(
-            'name'                  => 'Super Duper Billing Plan',
-            'description'           => 'Test Billing Plan',
-            'type'                  => RestGateway::BILLING_PLAN_TYPE_FIXED,
-            'paymentDefinitions'    => array(
+            'name' => 'Super Duper Billing Plan',
+            'description' => 'Test Billing Plan',
+            'type' => RestGateway::BILLING_PLAN_TYPE_FIXED,
+            'paymentDefinitions' => array(
                 array(
-                    'name'                  => 'Monthly Payments',
-                    'type'                  => RestGateway::PAYMENT_REGULAR,
-                    'frequency'             => RestGateway::BILLING_PLAN_FREQUENCY_MONTH,
-                    'frequency_interval'    => 1,
-	                'cycles'                => 12,
-	                'amount'                => array(
-                        'value'     => 10.00,
-                        'currency'  => 'USD',
+                    'name' => 'Monthly Payments',
+                    'type' => RestGateway::PAYMENT_REGULAR,
+                    'frequency' => RestGateway::BILLING_PLAN_FREQUENCY_MONTH,
+                    'frequency_interval' => 1,
+                    'cycles' => 12,
+                    'amount' => array(
+                        'value' => 10.00,
+                        'currency' => 'USD'
                     )
                 )
             ),
-            'merchantPreferences'    => array(
-                'name'  => 'asdf',
-            ),
+            'merchantPreferences' => array(
+                'name' => 'asdf'
+            )
         ));
     }
 

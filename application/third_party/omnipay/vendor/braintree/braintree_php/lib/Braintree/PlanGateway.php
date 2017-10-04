@@ -3,8 +3,11 @@ namespace Braintree;
 
 class PlanGateway
 {
+
     private $_gateway;
+
     private $_config;
+
     private $_http;
 
     public function __construct($gateway)
@@ -19,16 +22,17 @@ class PlanGateway
     {
         $path = $this->_config->merchantPath() . '/plans';
         $response = $this->_http->get($path);
-        if (key_exists('plans', $response)){
-            $plans = ["plan" => $response['plans']];
+        if (key_exists('plans', $response)) {
+            $plans = [
+                "plan" => $response['plans']
+            ];
         } else {
-            $plans = ["plan" => []];
+            $plans = [
+                "plan" => []
+            ];
         }
-
-        return Util::extractAttributeAsArray(
-            $plans,
-            'plan'
-        );
+        
+        return Util::extractAttributeAsArray($plans, 'plan');
     }
 }
 class_alias('Braintree\PlanGateway', 'Braintree_PlanGateway');

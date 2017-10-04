@@ -1,11 +1,11 @@
 <?php
-
 namespace Omnipay\Stripe\Message;
 
 use Omnipay\Tests\TestCase;
 
 class UpdateInvoiceItemRequestTest extends TestCase
 {
+
     public function setUp()
     {
         $this->request = new CreateInvoiceItemRequest($this->getHttpClient(), $this->getHttpRequest());
@@ -28,7 +28,6 @@ class UpdateInvoiceItemRequestTest extends TestCase
         $this->assertSame('ii_17hCVWCry4L0tg4v2hLQvxrX', $response->getInvoiceItemReference());
         $this->assertNull($response->getMessage());
     }
-
 
     public function testSendError()
     {

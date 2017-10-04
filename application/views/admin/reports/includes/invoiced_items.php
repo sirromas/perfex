@@ -1,0 +1,79 @@
+<div  class="hide">
+    <?php if($mysqlVersion && strpos($mysqlVersion->version,'5.6') !== FALSE && $sqlMode && strpos($sqlMode->mode,'ONLY_FULL_GROUP_BY') !== FALSE){ ?>
+        <div class="alert alert-danger">
+            Sales Report may not work properly because ONLY_FULL_GROUP_BY is enabled, consult with your hosting provider to disable ONLY_FULL_GROUP_BY in sql_mode configuration. In case the items report is working properly you can just ignore this message.
+        </div>
+    <?php } ?>
+
+
+
+    <?php if(count($invoices_sale_agents) > 0 ) { ?>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="sale_agent_items"><?php echo _l('sale_agent_string'); ?></label>
+                    <select name="sale_agent_items" class="selectpicker" multiple data-width="100%">
+                        <option value="" selected><?php echo _l('invoice_status_report_all'); ?></option>
+                        <?php foreach($invoices_sale_agents as $agent){ ?>
+                            <option value="<?php echo $agent['sale_agent']; ?>"><?php echo get_staff_full_name($agent['sale_agent']); ?></option>
+                        <?php } ?>
+                    </select>
+                </div>
+            </div>
+        </div>
+    <?php } ?>
+
+    <div class="row">
+
+        <?php if(count($regions) > 0 ) { ?>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="i_regions"><?php echo _l('regions'); ?></label>
+                <select name="i_regions" class="selectpicker" multiple data-width="100%">
+                    <option value="" selected><?php echo _l('regions_all'); ?></option>
+                    <?php foreach($regions as $r){ ?>
+                        <option value="<?php echo $r; ?>"><?php echo $r; ?></option>
+                    <?php } ?>
+                </select>
+            </div>
+        </div>
+        <?php } ?>
+
+
+         <?php
+        if(count($employees) > 0 ) { ?>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="i_employees"><?php echo _l('employee_string'); ?></label>
+                <select name="i_employees" class="selectpicker" multiple data-width="100%">
+                    <option value="" selected><?php echo _l('employee_all'); ?></option>
+                    <?php foreach($employees as $e){ ?>
+                    <option value="<?php echo $e; ?>"><?php echo get_staff_full_name($e); ?></option>
+                    <?php } ?>
+                </select>
+            </div>
+        </div>
+        <?php } ?>
+
+        <div class="clearfix"></div>
+
+    </div>
+    <table class="table table-striped table-items-report scroll-responsive">
+        <thead>
+        <tr>
+
+            <th><?php echo _l('reports_item'); ?></th>
+            <th><?php echo _l('quantity_sold'); ?></th>
+            <th><?php echo _l('total_amount'); ?></th>
+            <th><?php echo _l('avg_price'); ?></th>
+
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+        <tfoot>
+       
+        </tfoot>
+    </table>
+</div>

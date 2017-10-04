@@ -14,20 +14,26 @@ use Iterator;
  * $result = Customer::all();
  *
  * foreach($result as $transaction) {
- *   print_r($transaction->id);
+ * print_r($transaction->id);
  * }
  * </code>
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Utility
  */
 class ResourceCollection implements Iterator
 {
+
     private $_batchIndex;
+
     private $_ids;
+
     private $_index;
+
     private $_items;
+
     private $_pageSize;
+
     private $_pager;
 
     /**
@@ -35,10 +41,10 @@ class ResourceCollection implements Iterator
      *
      * expects an array of attributes with literal keys
      *
-     * @param array $response
-     * @param array $pager
+     * @param array $response            
+     * @param array $pager            
      */
-    public function  __construct($response, $pager)
+    public function __construct($response, $pager)
     {
         $this->_pageSize = $response["searchResults"]["pageSize"];
         $this->_ids = $response["searchResults"]["ids"];
@@ -61,7 +67,9 @@ class ResourceCollection implements Iterator
     public function firstItem()
     {
         $ids = $this->_ids;
-        $page = $this->_getPage([$ids[0]]);
+        $page = $this->_getPage([
+            $ids[0]
+        ]);
         return $page[0];
     }
 
@@ -75,7 +83,7 @@ class ResourceCollection implements Iterator
      */
     public function next()
     {
-        ++$this->_index;
+        ++ $this->_index;
     }
 
     /**
@@ -95,7 +103,7 @@ class ResourceCollection implements Iterator
         if ($this->_index == count($this->_items) && $this->_batchIndex < count($this->_ids)) {
             $this->_getNextPage();
         }
-
+        
         if ($this->_index < count($this->_items)) {
             return true;
         } else {
@@ -110,12 +118,9 @@ class ResourceCollection implements Iterator
 
     private function _getNextPage()
     {
-        if (empty($this->_ids))
-        {
+        if (empty($this->_ids)) {
             $this->_items = [];
-        }
-        else
-        {
+        } else {
             $this->_items = $this->_getPage(array_slice($this->_ids, $this->_batchIndex, $this->_pageSize));
             $this->_batchIndex += $this->_pageSize;
             $this->_index = 0;
@@ -136,11 +141,11 @@ class ResourceCollection implements Iterator
             array_push($methodArgs, $arg);
         }
         array_push($methodArgs, $ids);
-
-        return call_user_func_array(
-            [$object, $method],
-            $methodArgs
-        );
+        
+        return call_user_func_array([
+            $object,
+            $method
+        ], $methodArgs);
     }
 
     /**
@@ -150,7 +155,7 @@ class ResourceCollection implements Iterator
      */
     public function getIds()
     {
-       return $this->_ids;
+        return $this->_ids;
     }
 }
 class_alias('Braintree\ResourceCollection', 'Braintree_ResourceCollection');

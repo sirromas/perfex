@@ -11,10 +11,11 @@ use Omnipay\Common\Message\ResponseInterface;
  */
 class AuthorizeRequest extends AbstractRequest
 {
+
     public function getData()
     {
         $this->validate('amount');
-
+        
         $data = array(
             'amount' => $this->getAmount(),
             'billingAddressId' => $this->getBillingAddressId(),
@@ -31,9 +32,9 @@ class AuthorizeRequest extends AbstractRequest
             'serviceFeeAmount' => $this->getServiceFeeAmount(),
             'shippingAddressId' => $this->getShippingAddressId(),
             'taxAmount' => $this->getTaxAmount(),
-            'taxExempt' => $this->getTaxExempt(),
+            'taxExempt' => $this->getTaxExempt()
         );
-
+        
         // special validation
         if ($this->getPaymentMethodToken()) {
             $data['paymentMethodToken'] = $this->getPaymentMethodToken();
@@ -44,50 +45,54 @@ class AuthorizeRequest extends AbstractRequest
         } else {
             throw new InvalidRequestException("The token (payment nonce), paymentMethodToken or customerId field should be set.");
         }
-
+        
         // Remove null values
-        $data = array_filter($data, function($value){
+        $data = array_filter($data, function ($value)
+        {
             return ! is_null($value);
         });
-
+        
         if ($this->getCardholderName()) {
             $data['creditCard'] = array(
-                'cardholderName' => $this->getCardholderName(),
+                'cardholderName' => $this->getCardholderName()
             );
         }
-
+        
         $data += $this->getOptionData();
         $data += $this->getCardData();
         $data['options']['submitForSettlement'] = false;
-
+        
         return $data;
     }
 
     /**
      * Send the request with specified data
      *
-     * @param  mixed $data The data to send
+     * @param mixed $data
+     *            The data to send
      * @return ResponseInterface
      */
     public function sendData($data)
     {
         $response = $this->braintree->transaction()->sale($data);
-
+        
         return $this->createResponse($response);
     }
 
     /**
-     * [optional] The cardholder name associated with the credit card. 175 character maximum.
+     * [optional] The cardholder name associated with the credit card.
+     * 175 character maximum.
      * Required for iOS integration because its missing in "tokenizeCard" function there.
      * See: https://developers.braintreepayments.com/reference/request/transaction/sale/php#credit_card.cardholder_name
      *
-     * @param $value
+     * @param
+     *            $value
      * @return mixed
      */
     public function setCardholderName($value)
     {
         $cardholderName = trim($value);
-        $cardholderName = strlen($cardholderName)>0 ? $cardholderName : null;
+        $cardholderName = strlen($cardholderName) > 0 ? $cardholderName : null;
         return $this->setParameter('cardholderName', $cardholderName);
     }
 

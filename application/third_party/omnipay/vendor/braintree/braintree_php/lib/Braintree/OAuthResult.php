@@ -4,11 +4,12 @@ namespace Braintree;
 /**
  * Braintree OAuthCredentials module
  *
- * @package    Braintree
- * @category   Resources
+ * @package Braintree
+ * @category Resources
  */
 class OAuthResult extends Base
 {
+
     protected function _initialize($attribs)
     {
         $this->_attributes = $attribs;
@@ -23,12 +24,12 @@ class OAuthResult extends Base
 
     /**
      * returns a string representation of the result
+     * 
      * @return string
      */
     public function __toString()
     {
-        return __CLASS__ . '[' .
-                Util::attributesToString($this->_attributes) .']';
+        return __CLASS__ . '[' . Util::attributesToString($this->_attributes) . ']';
     }
 }
 class_alias('Braintree\OAuthResult', 'Braintree_OAuthResult');

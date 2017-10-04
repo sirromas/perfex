@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Http;
 
 use Guzzle\Http\EntityBody;
@@ -9,11 +8,14 @@ use Guzzle\Http\EntityBody;
  */
 class AbstractEntityBodyDecoratorTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testDecoratesEntityBody()
     {
         $e = EntityBody::factory();
-        $mock = $this->getMockForAbstractClass('Guzzle\Http\AbstractEntityBodyDecorator', array($e));
-
+        $mock = $this->getMockForAbstractClass('Guzzle\Http\AbstractEntityBodyDecorator', array(
+            $e
+        ));
+        
         $this->assertSame($e->getStream(), $mock->getStream());
         $this->assertSame($e->getContentLength(), $mock->getContentLength());
         $this->assertSame($e->getSize(), $mock->getSize());

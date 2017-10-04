@@ -3,8 +3,11 @@ namespace Braintree;
 
 class PaginatedResult
 {
+
     private $_totalItems;
+
     private $_pageSize;
+
     private $_currentPage;
 
     public function __construct($totalItems, $pageSize, $currentPage)

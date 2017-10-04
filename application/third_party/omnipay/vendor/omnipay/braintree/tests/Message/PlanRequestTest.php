@@ -5,20 +5,22 @@
  * Date: 1/22/16
  * Time: 5:53 PM
  */
-
 namespace Omnipay\Braintree\Message;
 
 use Omnipay\Tests\TestCase;
 
 class PlanRequestTest extends TestCase
 {
-    /** @var PlanRequest */
+
+    /**
+     * @var PlanRequest
+     */
     private $request;
 
     public function setUp()
     {
         parent::setUp();
-
+        
         $gateway = $this->buildMockGateway();
         $this->request = new PlanRequest($this->getHttpClient(), $this->getHttpRequest(), $gateway);
         $this->request->initialize(array());
@@ -34,7 +36,7 @@ class PlanRequestTest extends TestCase
     {
         $data = array();
         $response = $this->request->sendData($data);
-
+        
         $this->assertInstanceOf('Omnipay\BrainTree\Message\PlanResponse', $response);
     }
 
@@ -43,18 +45,18 @@ class PlanRequestTest extends TestCase
         $gateway = $this->getMockBuilder('\Braintree_Gateway')
             ->disableOriginalConstructor()
             ->setMethods(array(
-                'plan'
-            ))
+            'plan'
+        ))
             ->getMock();
-
+        
         $plan = $this->getMockBuilder('\Braintree_PlanGateway')
             ->disableOriginalConstructor()
             ->getMock();
-
+        
         $gateway->expects($this->any())
             ->method('plan')
             ->will($this->returnValue($plan));
-
+        
         return $gateway;
     }
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal\Message;
 
 use DateTime;
@@ -8,97 +7,97 @@ use DateTime;
  * Paypal Express Checkout - Transaction Search
  *
  * @see https://developer.paypal.com/docs/classic/api/merchant/TransactionSearch_API_Operation_NVP/
- * @see https://developer.paypal.com/docs/classic/express-checkout/ht_searchRetrieveTransactionData-curl-etc/
- *
- * pt_BR:
+ * @see https://developer.paypal.com/docs/classic/express-checkout/ht_searchRetrieveTransactionData-curl-etc/ pt_BR:
  * @see https://www.paypal-brasil.com.br/desenvolvedores/tutorial/criando-relatorios-customizados-via-api/
  */
 class ExpressTransactionSearchRequest extends AbstractRequest
 {
+
     public function getData()
     {
         $data = $this->getBaseData();
         $data['METHOD'] = 'TransactionSearch';
-
+        
         $this->validate('startDate');
-
+        
         $data['STARTDATE'] = $this->getStartDate()->format(DateTime::ISO8601);
-
+        
         if ($this->getEndDate()) {
             $data['ENDDATE'] = $this->getEndDate()->format(DateTime::ISO8601);
         }
-
+        
         if ($this->getSalutation()) {
             $data['SALUTATION'] = $this->getSalutation();
         }
-
+        
         if ($this->getFirstName()) {
             $data['FIRSTNAME'] = $this->getFirstName();
         }
-
+        
         if ($this->getMiddleName()) {
             $data['MIDDLENAME'] = $this->getMiddleName();
         }
-
+        
         if ($this->getLastName()) {
             $data['LASTNAME'] = $this->getLastName();
         }
-
+        
         if ($this->getSuffix()) {
             $data['SUFFIX'] = $this->getSuffix();
         }
-
+        
         if ($this->getEmail()) {
             $data['EMAIL'] = $this->getEmail();
         }
-
+        
         if ($this->getReceiver()) {
             $data['RECEIVER'] = $this->getReceiver();
         }
-
+        
         if ($this->getReceiptId()) {
             $data['RECEIPTID'] = $this->getReceiptId();
         }
-
+        
         if ($this->getTransactionId()) {
             $data['TRANSACTIONID'] = $this->getTransactionId();
         }
-
+        
         if ($this->getInvoiceNumber()) {
             $data['INVNUM'] = $this->getInvoiceNumber();
         }
-
+        
         if ($this->getCard()) {
             $data['ACCT'] = $this->getCard()->getNumber();
         }
-
+        
         if ($this->getAuctionItemNumber()) {
             $data['AUCTIONITEMNUMBER'] = $this->getAuctionItemNumber();
         }
-
+        
         if ($this->getTransactionClass()) {
             $data['TRANSACTIONCLASS'] = $this->getTransactionClass();
         }
-
+        
         if ($this->getAmount()) {
             $this->validate('currency');
-
+            
             $data['AMT'] = $this->getAmount();
             $data['CURRENCYCODE'] = $this->getCurrency();
         }
-
+        
         if ($this->getStatus()) {
             $data['STATUS'] = $this->getStatus();
         }
-
+        
         if ($this->getProfileId()) {
             $data['PROFILEID'] = $this->getProfileId();
         }
-
+        
         return $data;
     }
 
     /**
+     *
      * @return DateTime|null
      */
     public function getStartDate()
@@ -107,7 +106,8 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
-     * @param DateTime|string $date
+     *
+     * @param DateTime|string $date            
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setStartDate($date)
@@ -115,11 +115,12 @@ class ExpressTransactionSearchRequest extends AbstractRequest
         if (! $date instanceof DateTime) {
             $date = new DateTime($date);
         }
-
+        
         return $this->setParameter('startDate', $date);
     }
 
     /**
+     *
      * @return DateTime|null
      */
     public function getEndDate()
@@ -128,7 +129,8 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
-     * @param DateTime|string $date
+     *
+     * @param DateTime|string $date            
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setEndDate($date)
@@ -136,11 +138,12 @@ class ExpressTransactionSearchRequest extends AbstractRequest
         if (! $date instanceof DateTime) {
             $date = new DateTime($date);
         }
-
+        
         return $this->setParameter('endDate', $date);
     }
 
     /**
+     *
      * @return string
      */
     public function getSalutation()
@@ -149,7 +152,8 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
-     * @param string $salutation
+     *
+     * @param string $salutation            
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setSalutation($salutation)
@@ -158,6 +162,7 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return string
      */
     public function getFirstName()
@@ -166,7 +171,8 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
-     * @param string $firstName
+     *
+     * @param string $firstName            
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setFirstName($firstName)
@@ -175,6 +181,7 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return string
      */
     public function getMiddleName()
@@ -183,7 +190,8 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
-     * @param string $middleName
+     *
+     * @param string $middleName            
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setMiddleName($middleName)
@@ -192,6 +200,7 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return string
      */
     public function getLastName()
@@ -200,7 +209,8 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
-     * @param string $lastName
+     *
+     * @param string $lastName            
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setLastName($lastName)
@@ -209,6 +219,7 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return string
      */
     public function getSuffix()
@@ -217,7 +228,8 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
-     * @param string $suffix
+     *
+     * @param string $suffix            
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setSuffix($suffix)
@@ -226,6 +238,7 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return string
      */
     public function getEmail()
@@ -234,7 +247,8 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
-     * @param string $email
+     *
+     * @param string $email            
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setEmail($email)
@@ -243,6 +257,7 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return string
      */
     public function getReceiver()
@@ -251,7 +266,8 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
-     * @param string $receiver
+     *
+     * @param string $receiver            
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setReceiver($receiver)
@@ -260,6 +276,7 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return string
      */
     public function getReceiptId()
@@ -268,7 +285,8 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
-     * @param string $receiptId
+     *
+     * @param string $receiptId            
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setReceiptId($receiptId)
@@ -277,6 +295,7 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return string
      */
     public function getInvoiceNumber()
@@ -285,7 +304,8 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
-     * @param string $invoiceNumber
+     *
+     * @param string $invoiceNumber            
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setInvoiceNumber($invoiceNumber)
@@ -294,6 +314,7 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return string
      */
     public function getAuctionItemNumber()
@@ -302,7 +323,8 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
-     * @param string $auctionItemNumber
+     *
+     * @param string $auctionItemNumber            
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setAuctionItemNumber($auctionItemNumber)
@@ -311,6 +333,7 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return string
      */
     public function getTransactionClass()
@@ -319,7 +342,8 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
-     * @param string $transactionClass
+     *
+     * @param string $transactionClass            
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setTransactionClass($transactionClass)
@@ -328,6 +352,7 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return string
      */
     public function getStatus()
@@ -336,7 +361,8 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
-     * @param string $status
+     *
+     * @param string $status            
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setStatus($status)
@@ -345,6 +371,7 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return string
      */
     public function getProfileId()
@@ -353,7 +380,8 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
-     * @param string $profileId
+     *
+     * @param string $profileId            
      * @return \Omnipay\Common\Message\AbstractRequest
      */
     public function setProfileId($profileId)
@@ -362,6 +390,7 @@ class ExpressTransactionSearchRequest extends AbstractRequest
     }
 
     /**
+     *
      * @return ExpressTransactionSearchResponse
      */
     public function createResponse($data)

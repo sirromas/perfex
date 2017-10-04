@@ -1,11 +1,14 @@
 <?php
-
 namespace Omnipay\AuthorizeNet\Model;
 
 class TransactionReferenceTest extends \PHPUnit_Framework_TestCase
 {
+
     private $data;
-    /** @var TransactionReference */
+
+    /**
+     * @var TransactionReference
+     */
     private $transactionReference;
 
     public function setUp()
@@ -26,6 +29,6 @@ class TransactionReferenceTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldSerializeModel()
     {
-        $this->assertEquals($this->data, (string)$this->transactionReference);
+        $this->assertEquals($this->data, (string) $this->transactionReference);
     }
 }

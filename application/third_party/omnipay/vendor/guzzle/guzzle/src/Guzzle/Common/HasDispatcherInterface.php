@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Common;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -10,6 +9,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 interface HasDispatcherInterface
 {
+
     /**
      * Get a list of all of the events emitted from the class
      *
@@ -20,7 +20,7 @@ interface HasDispatcherInterface
     /**
      * Set the EventDispatcher of the request
      *
-     * @param EventDispatcherInterface $eventDispatcher
+     * @param EventDispatcherInterface $eventDispatcher            
      *
      * @return self
      */
@@ -36,9 +36,11 @@ interface HasDispatcherInterface
     /**
      * Helper to dispatch Guzzle events and set the event name on the event
      *
-     * @param string $eventName Name of the event to dispatch
-     * @param array  $context   Context of the event
-     *
+     * @param string $eventName
+     *            Name of the event to dispatch
+     * @param array $context
+     *            Context of the event
+     *            
      * @return Event Returns the created event object
      */
     public function dispatch($eventName, array $context = array());
@@ -46,8 +48,9 @@ interface HasDispatcherInterface
     /**
      * Add an event subscriber to the dispatcher
      *
-     * @param EventSubscriberInterface $subscriber Event subscriber
-     *
+     * @param EventSubscriberInterface $subscriber
+     *            Event subscriber
+     *            
      * @return self
      */
     public function addSubscriber(EventSubscriberInterface $subscriber);

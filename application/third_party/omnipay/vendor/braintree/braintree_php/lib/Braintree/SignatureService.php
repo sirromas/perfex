@@ -19,6 +19,5 @@ class SignatureService
     {
         return call_user_func($this->digest, $this->key, $data);
     }
-
 }
 class_alias('Braintree\SignatureService', 'Braintree_SignatureService');

@@ -2,7 +2,6 @@
 /**
  * Stripe Fetch Transaction Request
  */
-
 namespace Omnipay\Stripe\Message;
 
 /**
@@ -13,12 +12,12 @@ namespace Omnipay\Stripe\Message;
  * See PurchaseRequest for the first part of this example transaction:
  *
  * <code>
- *   // Fetch the balance to get information about the payment.
- *   $balance = $gateway->fetchBalanceTransaction();
- *   $balance->setBalanceTransactionReference($balance_transaction_id);
- *   $response = $balance->send();
- *   $data = $response->getData();
- *   echo "Gateway fetchBalance response data == " . print_r($data, true) . "\n";
+ * // Fetch the balance to get information about the payment.
+ * $balance = $gateway->fetchBalanceTransaction();
+ * $balance->setBalanceTransactionReference($balance_transaction_id);
+ * $response = $balance->send();
+ * $data = $response->getData();
+ * echo "Gateway fetchBalance response data == " . print_r($data, true) . "\n";
  * </code>
  *
  * @see PurchaseRequest
@@ -27,6 +26,7 @@ namespace Omnipay\Stripe\Message;
  */
 class FetchBalanceTransactionRequest extends AbstractRequest
 {
+
     /**
      * Get the transaction balance reference
      *
@@ -50,15 +50,15 @@ class FetchBalanceTransactionRequest extends AbstractRequest
     public function getData()
     {
         $this->validate('balanceTransactionReference');
-
+        
         $data = array();
-
+        
         return $data;
     }
 
     public function getEndpoint()
     {
-        return $this->endpoint.'/balance/history/'.$this->getBalanceTransactionReference();
+        return $this->endpoint . '/balance/history/' . $this->getBalanceTransactionReference();
     }
 
     public function getHttpMethod()

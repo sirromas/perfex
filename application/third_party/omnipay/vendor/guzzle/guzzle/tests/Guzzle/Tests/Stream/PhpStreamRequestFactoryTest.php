@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Stream;
 
 use Guzzle\Stream\Stream;
@@ -12,10 +11,15 @@ use Guzzle\Http\Client;
  */
 class PhpStreamRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
 {
-    /** @var Client */
+
+    /**
+     * @var Client
+     */
     protected $client;
 
-    /** @var PhpStreamRequestFactory */
+    /**
+     * @var PhpStreamRequestFactory
+     */
     protected $factory;
 
     protected function setUp()
@@ -41,15 +45,23 @@ class PhpStreamRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $request = $this->client->get('/');
         $this->factory = $this->getMockBuilder('Guzzle\Stream\PhpStreamRequestFactory')
-            ->setMethods(array('createContext', 'createStream'))
+            ->setMethods(array(
+            'createContext',
+            'createStream'
+        ))
             ->getMock();
         $this->factory->expects($this->never())
             ->method('createContext');
         $this->factory->expects($this->once())
             ->method('createStream')
             ->will($this->returnValue(new Stream(fopen('php://temp', 'r'))));
-
-        $context = array('http' => array('method' => 'HEAD', 'ignore_errors' => false));
+        
+        $context = array(
+            'http' => array(
+                'method' => 'HEAD',
+                'ignore_errors' => false
+            )
+        );
         $this->factory->fromRequest($request, stream_context_create($context));
         $options = stream_context_get_options($this->readAttribute($this->factory, 'context'));
         $this->assertEquals('HEAD', $options['http']['method']);
@@ -62,7 +74,9 @@ class PhpStreamRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
         $request = $this->client->get('/');
         $request->getCurlOptions()->set(CURLOPT_PROXY, 'tcp://foo.com');
         $this->factory = $this->getMockBuilder('Guzzle\Stream\PhpStreamRequestFactory')
-            ->setMethods(array('createStream'))
+            ->setMethods(array(
+            'createStream'
+        ))
             ->getMock();
         $this->factory->expects($this->once())
             ->method('createStream')
@@ -76,15 +90,19 @@ class PhpStreamRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $this->getServer()->flush();
         $this->getServer()->enqueue("HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nhi");
-        $request = $this->client->post('/', array('Foo' => 'Bar'), array('foo' => 'baz bar'));
+        $request = $this->client->post('/', array(
+            'Foo' => 'Bar'
+        ), array(
+            'foo' => 'baz bar'
+        ));
         $stream = $this->factory->fromRequest($request);
         $this->assertEquals('hi', (string) $stream);
-
+        
         $headers = $this->factory->getLastResponseHeaders();
         $this->assertContains('HTTP/1.1 200 OK', $headers);
         $this->assertContains('Content-Length: 2', $headers);
         $this->assertSame($headers, $stream->getCustomData('response_headers'));
-
+        
         $received = $this->getServer()->getReceivedRequests();
         $this->assertEquals(1, count($received));
         $this->assertContains('POST / HTTP/1.1', $received[0]);
@@ -99,15 +117,17 @@ class PhpStreamRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $this->getServer()->flush();
         $this->getServer()->enqueue("HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nhi");
-        $request = $this->client->put('/', array('Foo' => 'Bar'), 'Testing...123');
+        $request = $this->client->put('/', array(
+            'Foo' => 'Bar'
+        ), 'Testing...123');
         $stream = $this->factory->fromRequest($request);
         $this->assertEquals('hi', (string) $stream);
-
+        
         $headers = $this->factory->getLastResponseHeaders();
         $this->assertContains('HTTP/1.1 200 OK', $headers);
         $this->assertContains('Content-Length: 2', $headers);
         $this->assertSame($headers, $stream->getCustomData('response_headers'));
-
+        
         $received = $this->getServer()->getReceivedRequests();
         $this->assertEquals(1, count($received));
         $this->assertContains('PUT / HTTP/1.1', $received[0]);
@@ -123,7 +143,9 @@ class PhpStreamRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
         $request = $this->client->get('/');
         $request->getCurlOptions()->set(CURLOPT_SSL_VERIFYPEER, false);
         $this->factory = $this->getMockBuilder('Guzzle\Stream\PhpStreamRequestFactory')
-            ->setMethods(array('createStream'))
+            ->setMethods(array(
+            'createStream'
+        ))
             ->getMock();
         $this->factory->expects($this->once())
             ->method('createStream')
@@ -137,7 +159,9 @@ class PhpStreamRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $request = $this->client->get('/');
         $this->factory = $this->getMockBuilder('Guzzle\Stream\PhpStreamRequestFactory')
-            ->setMethods(array('createStream'))
+            ->setMethods(array(
+            'createStream'
+        ))
             ->getMock();
         $this->factory->expects($this->once())
             ->method('createStream')
@@ -145,7 +169,8 @@ class PhpStreamRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
         $this->factory->fromRequest($request);
         $options = stream_context_get_options($this->readAttribute($this->factory, 'context'));
         $this->assertTrue($options['ssl']['verify_peer']);
-        $this->assertSame($request->getCurlOptions()->get(CURLOPT_CAINFO), $options['ssl']['cafile']);
+        $this->assertSame($request->getCurlOptions()
+            ->get(CURLOPT_CAINFO), $options['ssl']['cafile']);
     }
 
     public function testBasicAuthAddsUserAndPassToUrl()
@@ -153,7 +178,9 @@ class PhpStreamRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
         $request = $this->client->get('/');
         $request->setAuth('Foo', 'Bar');
         $this->factory = $this->getMockBuilder('Guzzle\Stream\PhpStreamRequestFactory')
-            ->setMethods(array('createStream'))
+            ->setMethods(array(
+            'createStream'
+        ))
             ->getMock();
         $this->factory->expects($this->once())
             ->method('createStream')
@@ -166,7 +193,9 @@ class PhpStreamRequestFactoryTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $this->getServer()->enqueue("HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nhi");
         $request = $this->client->get('/');
-        $stream = $this->factory->fromRequest($request, array(), array('stream_class' => 'Guzzle\Http\EntityBody'));
+        $stream = $this->factory->fromRequest($request, array(), array(
+            'stream_class' => 'Guzzle\Http\EntityBody'
+        ));
         $this->assertInstanceOf('Guzzle\Http\EntityBody', $stream);
     }
 }

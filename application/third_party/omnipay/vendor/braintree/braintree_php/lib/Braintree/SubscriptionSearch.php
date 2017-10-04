@@ -3,6 +3,7 @@ namespace Braintree;
 
 class SubscriptionSearch
 {
+
     public static function billingCyclesRemaining()
     {
         return new RangeNode('billing_cycles_remaining');
@@ -20,7 +21,10 @@ class SubscriptionSearch
 
     public static function inTrialPeriod()
     {
-        return new MultipleValueNode('in_trial_period', [true, false]);
+        return new MultipleValueNode('in_trial_period', [
+            true,
+            false
+        ]);
     }
 
     public static function merchantAccountId()
@@ -50,7 +54,7 @@ class SubscriptionSearch
             Subscription::CANCELED,
             Subscription::EXPIRED,
             Subscription::PAST_DUE,
-            Subscription::PENDING,
+            Subscription::PENDING
         ]);
     }
 

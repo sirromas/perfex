@@ -10,6 +10,7 @@ use Omnipay\Common\Message\ResponseInterface;
  */
 class ClientTokenRequest extends AbstractRequest
 {
+
     public function getData()
     {
         $data = array();
@@ -17,20 +18,21 @@ class ClientTokenRequest extends AbstractRequest
             $data['customerId'] = $customerId;
         }
         $data += $this->getOptionData();
-
+        
         return $data;
     }
 
     /**
      * Send the request with specified data
      *
-     * @param  mixed $data The data to send
+     * @param mixed $data
+     *            The data to send
      * @return ResponseInterface
      */
     public function sendData($data)
     {
         $token = $this->braintree->clientToken()->generate($data);
-
+        
         return new ClientTokenResponse($this, $token);
     }
 }

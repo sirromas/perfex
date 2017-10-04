@@ -9,9 +9,9 @@ namespace Braintree;
  *
  * See {@link https://developers.braintreepayments.com/javascript+php}<br />
  *
- * @package    Braintree
- * @category   Resources
- *
+ * @package Braintree
+ * @category Resources
+ *          
  * @property-read string $account-holder-name
  * @property-read string $bic
  * @property-read string $customerId
@@ -23,7 +23,7 @@ namespace Braintree;
  */
 class EuropeBankAccount extends Base
 {
-
+    
     /* instance methods */
     /**
      * returns false if default is null or false
@@ -36,17 +36,17 @@ class EuropeBankAccount extends Base
     }
 
     /**
-     *  factory method: returns an instance of EuropeBankAccount
-     *  to the requesting method, with populated properties
+     * factory method: returns an instance of EuropeBankAccount
+     * to the requesting method, with populated properties
      *
      * @ignore
+     *
      * @return EuropeBankAccount
      */
     public static function factory($attributes)
     {
-        $defaultAttributes = [
-        ];
-
+        $defaultAttributes = [];
+        
         $instance = new self();
         $instance->_initialize(array_merge($defaultAttributes, $attributes));
         return $instance;
@@ -56,7 +56,8 @@ class EuropeBankAccount extends Base
      * sets instance properties from an array of values
      *
      * @access protected
-     * @param array $europeBankAccountAttribs array of EuropeBankAccount properties
+     * @param array $europeBankAccountAttribs
+     *            array of EuropeBankAccount properties
      * @return void
      */
     protected function _initialize($europeBankAccountAttribs)

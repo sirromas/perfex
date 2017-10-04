@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\Braintree;
 
 use DateTime;
@@ -25,6 +24,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
  */
 class MerchantIndividual
 {
+
     /**
      * Internal storage of all of the individual parameters.
      *
@@ -35,7 +35,8 @@ class MerchantIndividual
     /**
      * Create a new MerchantIndividual object using the specified parameters
      *
-     * @param array $parameters An array of parameters to set on the new object
+     * @param array $parameters
+     *            An array of parameters to set on the new object
      */
     public function __construct($parameters = null)
     {
@@ -50,14 +51,14 @@ class MerchantIndividual
     public function getBirthday($format = 'Y-m-d')
     {
         $value = $this->getParameter('birthday');
-
+        
         return $value ? $value->format($format) : null;
     }
 
     /**
      * Sets the individual's birthday.
      *
-     * @param string $value
+     * @param string $value            
      * @return $this
      */
     public function setBirthday($value)
@@ -67,11 +68,12 @@ class MerchantIndividual
         } else {
             $value = null;
         }
-
+        
         return $this->setParameter('birthday', $value);
     }
 
     /**
+     *
      * @return mixed
      */
     public function getCity()
@@ -80,17 +82,19 @@ class MerchantIndividual
     }
 
     /**
-     * @param string $city
+     *
+     * @param string $city            
      * @return $this
      */
     public function setCity($city)
     {
         $this->setParameter('city', $city);
-
+        
         return $this;
     }
 
     /**
+     *
      * @return mixed
      */
     public function getEmail()
@@ -99,17 +103,19 @@ class MerchantIndividual
     }
 
     /**
-     * @param mixed $email
+     *
+     * @param mixed $email            
      * @return $this
      */
     public function setEmail($email)
     {
         $this->setParameter('email', $email);
-
+        
         return $this;
     }
 
     /**
+     *
      * @return mixed
      */
     public function getFirstName()
@@ -118,13 +124,14 @@ class MerchantIndividual
     }
 
     /**
-     * @param mixed $firstName
+     *
+     * @param mixed $firstName            
      * @return $this
      */
     public function setFirstName($firstName)
     {
         $this->setParameter('firstName', $firstName);
-
+        
         return $this;
     }
 
@@ -133,19 +140,21 @@ class MerchantIndividual
      *
      * If any unknown parameters passed, they will be ignored.
      *
-     * @param array $parameters An associative array of parameters
+     * @param array $parameters
+     *            An associative array of parameters
      * @return CreditCard provides a fluent interface.
      */
     public function initialize($parameters = null)
     {
         $this->parameters = new ParameterBag();
-
+        
         Helper::initialize($this, $parameters);
-
+        
         return $this;
     }
 
     /**
+     *
      * @return mixed
      */
     public function getLastName()
@@ -154,13 +163,14 @@ class MerchantIndividual
     }
 
     /**
-     * @param mixed $lastName
+     *
+     * @param mixed $lastName            
      * @return $this
      */
     public function setLastName($lastName)
     {
         $this->setParameter('lastName', $lastName);
-
+        
         return $this;
     }
 
@@ -177,7 +187,7 @@ class MerchantIndividual
     /**
      * Sets the individual name.
      *
-     * @param string $value
+     * @param string $value            
      * @return $this
      */
     public function setName($value)
@@ -185,7 +195,7 @@ class MerchantIndividual
         $names = explode(' ', $value, 2);
         $this->setFirstName($names[0]);
         $this->setLastName(isset($names[1]) ? $names[1] : null);
-
+        
         return $this;
     }
 
@@ -200,6 +210,7 @@ class MerchantIndividual
     }
 
     /**
+     *
      * @return mixed
      */
     public function getPhone()
@@ -208,17 +219,19 @@ class MerchantIndividual
     }
 
     /**
-     * @param mixed $phone
+     *
+     * @param mixed $phone            
      * @return $this
      */
     public function setPhone($phone)
     {
         $this->setParameter('phone', $phone);
-
+        
         return $this;
     }
 
     /**
+     *
      * @return mixed
      */
     public function getPostCode()
@@ -227,17 +240,19 @@ class MerchantIndividual
     }
 
     /**
-     * @param mixed $postCode
+     *
+     * @param mixed $postCode            
      * @return $this
      */
     public function setPostCode($postCode)
     {
         $this->setParameter('postCode', $postCode);
-
+        
         return $this;
     }
 
     /**
+     *
      * @return mixed
      */
     public function getState()
@@ -246,17 +261,19 @@ class MerchantIndividual
     }
 
     /**
-     * @param string $state
+     *
+     * @param string $state            
      * @return $this
      */
     public function setState($state)
     {
         $this->setParameter('state', $state);
-
+        
         return $this;
     }
 
     /**
+     *
      * @return mixed
      */
     public function getSsn()
@@ -265,17 +282,19 @@ class MerchantIndividual
     }
 
     /**
-     * @param mixed $ssn
+     *
+     * @param mixed $ssn            
      * @return $this
      */
     public function setSsn($ssn)
     {
         $this->setParameter('ssn', $ssn);
-
+        
         return $this;
     }
 
     /**
+     *
      * @return mixed
      */
     public function getAddress1()
@@ -284,13 +303,14 @@ class MerchantIndividual
     }
 
     /**
-     * @param mixed $streetAddress
+     *
+     * @param mixed $streetAddress            
      * @return $this
      */
     public function setAddress1($streetAddress)
     {
         $this->setParameter('address1', $streetAddress);
-
+        
         return $this;
     }
 
@@ -307,14 +327,16 @@ class MerchantIndividual
     /**
      * Set one parameter.
      *
-     * @param string $key Parameter key
-     * @param mixed $value Parameter value
+     * @param string $key
+     *            Parameter key
+     * @param mixed $value
+     *            Parameter value
      * @return CreditCard provides a fluent interface.
      */
     protected function setParameter($key, $value)
     {
         $this->parameters->set($key, $value);
-
+        
         return $this;
     }
 }

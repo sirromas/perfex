@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Service\Resource;
 
 use Guzzle\Common\Exception\InvalidArgumentException;
@@ -10,10 +9,15 @@ use Guzzle\Service\Command\CommandInterface;
  */
 class CompositeResourceIteratorFactory implements ResourceIteratorFactoryInterface
 {
-    /** @var array Array of factories */
+
+    /**
+     * @var array Array of factories
+     */
     protected $factories;
 
-    /** @param array $factories Array of factories used to instantiate iterators */
+    /**
+     * @param array $factories Array of factories used to instantiate iterators
+     */
     public function __construct(array $factories)
     {
         $this->factories = $factories;
@@ -21,10 +25,10 @@ class CompositeResourceIteratorFactory implements ResourceIteratorFactoryInterfa
 
     public function build(CommandInterface $command, array $options = array())
     {
-        if (!($factory = $this->getFactory($command))) {
+        if (! ($factory = $this->getFactory($command))) {
             throw new InvalidArgumentException('Iterator was not found for ' . $command->getName());
         }
-
+        
         return $factory->build($command, $options);
     }
 
@@ -36,22 +40,24 @@ class CompositeResourceIteratorFactory implements ResourceIteratorFactoryInterfa
     /**
      * Add a factory to the composite factory
      *
-     * @param ResourceIteratorFactoryInterface $factory Factory to add
-     *
+     * @param ResourceIteratorFactoryInterface $factory
+     *            Factory to add
+     *            
      * @return self
      */
     public function addFactory(ResourceIteratorFactoryInterface $factory)
     {
         $this->factories[] = $factory;
-
+        
         return $this;
     }
 
     /**
      * Get the factory that matches the command object
      *
-     * @param CommandInterface $command Command retrieving the iterator for
-     *
+     * @param CommandInterface $command
+     *            Command retrieving the iterator for
+     *            
      * @return ResourceIteratorFactoryInterface|bool
      */
     protected function getFactory(CommandInterface $command)
@@ -61,7 +67,7 @@ class CompositeResourceIteratorFactory implements ResourceIteratorFactoryInterfa
                 return $factory;
             }
         }
-
+        
         return false;
     }
 }

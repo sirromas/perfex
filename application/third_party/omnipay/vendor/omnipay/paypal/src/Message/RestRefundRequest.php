@@ -2,7 +2,6 @@
 /**
  * PayPal REST Refund Request
  */
-
 namespace Omnipay\PayPal\Message;
 
 /**
@@ -15,7 +14,7 @@ namespace Omnipay\PayPal\Message;
  * TODO: There might be a problem here, in that refunding a capture requires a different URL.
  *
  * TODO: Yes I know. The gateway doesn't yet support looking up or refunding captured
- * transactions.  That will require adding additional message classes because the URLs
+ * transactions. That will require adding additional message classes because the URLs
  * are all different.
  *
  * A non-zero amount can be provided for the refund using setAmount(), if this is not
@@ -26,40 +25,41 @@ namespace Omnipay\PayPal\Message;
  * See RestPurchaseRequest for the first part of this example transaction:
  *
  * <code>
- *   $transaction = $gateway->refund(array(
- *       'amount'    => '10.00',
- *       'currency'  => 'AUD',
- *   ));
- *   $transaction->setTransactionReference($sale_id);
- *   $response = $transaction->send();
- *   if ($response->isSuccessful()) {
- *       echo "Refund transaction was successful!\n";
- *       $data = $response->getData();
- *       echo "Gateway refund response data == " . print_r($data, true) . "\n";
- *   }
+ * $transaction = $gateway->refund(array(
+ * 'amount' => '10.00',
+ * 'currency' => 'AUD',
+ * ));
+ * $transaction->setTransactionReference($sale_id);
+ * $response = $transaction->send();
+ * if ($response->isSuccessful()) {
+ * echo "Refund transaction was successful!\n";
+ * $data = $response->getData();
+ * echo "Gateway refund response data == " . print_r($data, true) . "\n";
+ * }
  * </code>
  *
  * ### Known Issues
  *
  * PayPal subscription payments cannot be refunded. PayPal is working on this functionality
- * for their future API release.  In order to refund a PayPal subscription payment, you will
+ * for their future API release. In order to refund a PayPal subscription payment, you will
  * need to use the PayPal web interface to refund it manually.
  *
  * @see RestPurchaseRequest
  */
 class RestRefundRequest extends AbstractRestRequest
 {
+
     public function getData()
     {
         $this->validate('transactionReference');
-
+        
         if ($this->getAmount() > 0) {
             return array(
                 'amount' => array(
                     'currency' => $this->getCurrency(),
-                    'total' => $this->getAmount(),
+                    'total' => $this->getAmount()
                 ),
-                'description' => $this->getDescription(),
+                'description' => $this->getDescription()
             );
         } else {
             return new \stdClass();

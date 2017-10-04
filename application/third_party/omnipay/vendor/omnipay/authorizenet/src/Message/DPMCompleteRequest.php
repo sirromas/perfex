@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\AuthorizeNet\Message;
 
 use Omnipay\Common\Exception\InvalidRequestException;
@@ -9,6 +8,7 @@ use Omnipay\Common\Exception\InvalidRequestException;
  */
 class DPMCompleteRequest extends SIMCompleteAuthorizeRequest
 {
+
     public function sendData($data)
     {
         return $this->response = new DPMCompleteResponse($this, $data);

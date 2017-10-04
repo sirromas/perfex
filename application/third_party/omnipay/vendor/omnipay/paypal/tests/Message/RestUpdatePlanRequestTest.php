@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal\Message;
 
 use Omnipay\Tests\TestCase;
@@ -7,7 +6,10 @@ use Omnipay\PayPal\RestGateway;
 
 class RestUpdatePlanRequestTest extends TestCase
 {
-    /** @var \Omnipay\PayPal\Message\RestUpdatePlanRequest */
+
+    /**
+     * @var \Omnipay\PayPal\Message\RestUpdatePlanRequest
+     */
     private $request;
 
     public function setUp()
@@ -15,10 +17,10 @@ class RestUpdatePlanRequestTest extends TestCase
         $client = $this->getHttpClient();
         $request = $this->getHttpRequest();
         $this->request = new RestUpdatePlanRequest($client, $request);
-
+        
         $this->request->initialize(array(
-            'transactionReference'  => 'ABC-123',
-            'state'                 => 'ACTIVE',
+            'transactionReference' => 'ABC-123',
+            'state' => 'ACTIVE'
         ));
     }
 

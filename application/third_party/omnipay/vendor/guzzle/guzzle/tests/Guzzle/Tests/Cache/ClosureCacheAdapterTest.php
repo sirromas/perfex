@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Cache;
 
 use Guzzle\Cache\ClosureCacheAdapter;
@@ -9,13 +8,20 @@ use Guzzle\Cache\ClosureCacheAdapter;
  */
 class ClosureCacheAdapterTest extends \Guzzle\Tests\GuzzleTestCase
 {
-    /** @var ClosureCacheAdapter */
+
+    /**
+     * @var ClosureCacheAdapter
+     */
     private $adapter;
 
-    /** Array of callables to use for testing */
+    /**
+     * Array of callables to use for testing
+     */
     private $callables;
 
-    /** Cache data for testing */
+    /**
+     * Cache data for testing
+     */
     public $data = array();
 
     /**
@@ -24,25 +30,29 @@ class ClosureCacheAdapterTest extends \Guzzle\Tests\GuzzleTestCase
     protected function setUp()
     {
         parent::setUp();
-
+        
         $that = $this;
         $this->callables = array(
-            'contains' => function($id, $options = array()) use ($that) {
+            'contains' => function ($id, $options = array()) use($that)
+            {
                 return array_key_exists($id, $that->data);
             },
-            'delete' => function($id, $options = array()) use ($that) {
+            'delete' => function ($id, $options = array()) use($that)
+            {
                 unset($that->data[$id]);
                 return true;
             },
-            'fetch' => function($id, $options = array()) use ($that) {
+            'fetch' => function ($id, $options = array()) use($that)
+            {
                 return array_key_exists($id, $that->data) ? $that->data[$id] : null;
             },
-            'save' => function($id, $data, $lifeTime, $options = array()) use ($that) {
+            'save' => function ($id, $data, $lifeTime, $options = array()) use($that)
+            {
                 $that->data[$id] = $data;
                 return true;
             }
         );
-
+        
         $this->adapter = new ClosureCacheAdapter($this->callables);
     }
 

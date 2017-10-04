@@ -1,17 +1,18 @@
 <?php
-
 namespace Guzzle\Service\Exception;
 
 use Guzzle\Common\Exception\RuntimeException;
 
 class ValidationException extends RuntimeException
 {
+
     protected $errors = array();
 
     /**
      * Set the validation error messages
      *
-     * @param array $errors Array of validation errors
+     * @param array $errors
+     *            Array of validation errors
      */
     public function setErrors(array $errors)
     {

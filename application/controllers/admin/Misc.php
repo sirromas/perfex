@@ -1,7 +1,9 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
 class Misc extends Admin_controller
 {
+
     public function __construct()
     {
         parent::__construct();
@@ -10,19 +12,19 @@ class Misc extends Admin_controller
 
     public function fetch_address_info_gmaps()
     {
-        include_once(APPPATH.'third_party/JD_Geocoder_Request.php');
+        include_once (APPPATH . 'third_party/JD_Geocoder_Request.php');
         $data = $this->input->post();
         $address = '';
-
-        $address.= $data['address'];
-        if (!empty($data['city'])) {
-            $address .= ', '.$data['city'];
+        
+        $address .= $data['address'];
+        if (! empty($data['city'])) {
+            $address .= ', ' . $data['city'];
         }
-
-        if (!empty($data['country'])) {
-            $address .= ', '.$data['country'];
+        
+        if (! empty($data['country'])) {
+            $address .= ', ' . $data['country'];
         }
-
+        
         $georequest = new JD_Geocoder_Request();
         $georequest->forwardSearch($address);
         echo json_encode($georequest);
@@ -30,7 +32,7 @@ class Misc extends Admin_controller
 
     public function get_taxes_dropdown_template()
     {
-        $name    = $this->input->post('name');
+        $name = $this->input->post('name');
         $taxname = $this->input->post('taxname');
         echo $this->misc_model->get_taxes_dropdown_template($name, $taxname);
     }
@@ -68,10 +70,10 @@ class Misc extends Admin_controller
             } else {
                 $rel_id = '';
             }
-
+            
             $relOptions = init_relation_options($data, $type, $rel_id);
             echo json_encode($relOptions);
-            die;
+            die();
         }
     }
 
@@ -105,7 +107,7 @@ class Misc extends Admin_controller
         } else {
             $v = 1;
         }
-
+        
         $this->db->where('id', $id);
         $this->db->update('tblfiles', array(
             'visible_to_customer' => $v
@@ -156,17 +158,17 @@ class Misc extends Admin_controller
             ));
         }
     }
-
+    
     /* Since version 1.0.2 add client reminder */
     public function add_reminder($rel_id_id, $rel_type)
     {
-        $message    = '';
+        $message = '';
         $alert_type = 'warning';
         if ($this->input->post()) {
             $success = $this->misc_model->add_reminder($this->input->post(), $rel_id_id);
             if ($success) {
                 $alert_type = 'success';
-                $message    = _l('reminder_added_successfully');
+                $message = _l('reminder_added_successfully');
             }
         }
         echo json_encode(array(
@@ -191,19 +193,19 @@ class Misc extends Admin_controller
             $this->perfex_base->get_table_data('staff_reminders');
         }
     }
-
+    
     /* Since version 1.0.2 delete client reminder */
     public function delete_reminder($rel_id, $id, $rel_type)
     {
-        if (!$id && !$rel_id) {
+        if (! $id && ! $rel_id) {
             die('No reminder found');
         }
-        $success    = $this->misc_model->delete_reminder($id);
+        $success = $this->misc_model->delete_reminder($id);
         $alert_type = 'warning';
-        $message    = _l('reminder_failed_to_delete');
+        $message = _l('reminder_failed_to_delete');
         if ($success) {
             $alert_type = 'success';
-            $message    = _l('reminder_deleted');
+            $message = _l('reminder_deleted');
         }
         echo json_encode(array(
             'alert_type' => $alert_type,
@@ -219,7 +221,7 @@ class Misc extends Admin_controller
             redirect(admin_url('settings?group=cronjob'));
         }
     }
-
+    
     /* Since Version 1.0.1 - General search */
     public function search()
     {
@@ -257,7 +259,7 @@ class Misc extends Admin_controller
         }
         redirect($_SERVER['HTTP_REFERER']);
     }
-
+    
     /* Remove customizer open from database */
     public function set_setup_menu_closed()
     {
@@ -267,7 +269,7 @@ class Misc extends Admin_controller
             ));
         }
     }
-
+    
     /* Set session that user clicked on setup_menu menu link to stay open */
     public function set_setup_menu_open()
     {
@@ -277,14 +279,14 @@ class Misc extends Admin_controller
             ));
         }
     }
-
+    
     /* User dismiss announcement */
     public function dismiss_announcement($id)
     {
         $this->misc_model->dismiss_announcement($id);
         redirect($_SERVER['HTTP_REFERER']);
     }
-
+    
     /* Set notifications to read */
     public function set_notifications_read()
     {
@@ -315,20 +317,21 @@ class Misc extends Admin_controller
         $notificationsIds = array();
         if (get_option('desktop_notifications') == "1") {
             $notifications = $this->misc_model->get_user_notifications(false);
-
-            $notificationsPluck = array_filter($notifications, function ($n) {
+            
+            $notificationsPluck = array_filter($notifications, function ($n)
+            {
                 return $n['isread'] == 0;
             });
-
+            
             $notificationsIds = array_pluck($notificationsPluck, 'id');
         }
-
+        
         echo json_encode(array(
-        'html'=>$this->load->view('admin/includes/notifications', array(), true),
-        'notificationsIds'=>$notificationsIds
+            'html' => $this->load->view('admin/includes/notifications', array(), true),
+            'notificationsIds' => $notificationsIds
         ));
     }
-
+    
     /* Check if staff email exists / ajax */
     public function staff_email_exists()
     {
@@ -355,8 +358,8 @@ class Misc extends Admin_controller
             }
         }
     }
-
-    /* Check if client email exists/  ajax */
+    
+    /* Check if client email exists/ ajax */
     public function contact_email_exists()
     {
         if ($this->input->is_ajax_request()) {
@@ -382,19 +385,19 @@ class Misc extends Admin_controller
             }
         }
     }
-
+    
     /* Goes blank page but with messagae access danied / message set from session flashdata */
     public function access_denied()
     {
         $this->load->view('admin/blank_page');
     }
-
+    
     /* Goes to blank page with message page not found / message set from session flashdata */
     public function not_found()
     {
         $this->load->view('admin/blank_page');
     }
-
+    
     /* Get role permission for specific role id / Function relocated here becuase the Roles Model have statement on top if has role permission */
     public function get_role_permissions_ajax($id)
     {
@@ -403,7 +406,7 @@ class Misc extends Admin_controller
             die();
         }
     }
-
+    
     // Temporary function
     public function replace_changed_lang_keys_v162()
     {
@@ -417,32 +420,32 @@ class Misc extends Admin_controller
         if (is_admin()) {
             $tables = $this->db->query("SELECT *
                 FROM INFORMATION_SCHEMA.TABLES
-                WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA='".APP_DB_NAME."'")->result_array();
+                WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA='" . APP_DB_NAME . "'")->result_array();
             foreach ($tables as $table_data) {
                 $table = $table_data['TABLE_NAME'];
                 $fields = $this->db->list_fields($table);
-
+                
                 foreach ($fields as $field) {
                     $field_info = $this->db->query("SHOW FIELDS
-                        FROM ".$table." where Field ='".$field."'")->result_array();
+                        FROM " . $table . " where Field ='" . $field . "'")->result_array();
                     $field_type = strtolower($field_info[0]['Type']);
                     if (strpos($field_type, 'decimal') !== false) {
-
+                        
                         $field_null = strtoupper($field_info[0]['Null']);
                         if ($field_null == 'YES') {
                             $field_is_null = 'NULL';
                         } else {
                             $field_is_null = 'NOT NULL';
                         }
-                        $total_decimals = strafter($field_info[0]['Type'],',');
-                        $total_decimals = strbefore($total_decimals,')');
-
+                        $total_decimals = strafter($field_info[0]['Type'], ',');
+                        $total_decimals = strbefore($total_decimals, ')');
+                        
                         if ($field_info[0]['Default'] == null) {
                             $field_default_value = '';
                         } else {
-                            $field_default_value = ' DEFAULT 0.'.str_repeat(0, $total_decimals);
+                            $field_default_value = ' DEFAULT 0.' . str_repeat(0, $total_decimals);
                         }
-
+                        
                         $this->db->query("ALTER TABLE $table CHANGE $field $field DECIMAL($digits,$total_decimals) $field_is_null$field_default_value;");
                     }
                 }
@@ -454,21 +457,23 @@ class Misc extends Admin_controller
 
     public function change_decimal_places($total_decimals)
     {
-        $notChangableFields = array('estimated_hours');
-
+        $notChangableFields = array(
+            'estimated_hours'
+        );
+        
         if (is_admin()) {
             $tables = $this->db->query("SELECT *
                 FROM INFORMATION_SCHEMA.TABLES
-                WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA='".APP_DB_NAME."'")->result_array();
-
+                WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA='" . APP_DB_NAME . "'")->result_array();
+            
             foreach ($tables as $table_data) {
                 $table = $table_data['TABLE_NAME'];
                 $fields = $this->db->list_fields($table);
-
+                
                 foreach ($fields as $field) {
-                    if (!in_array($field, $notChangableFields)) {
+                    if (! in_array($field, $notChangableFields)) {
                         $field_info = $this->db->query("SHOW FIELDS
-                            FROM ".$table." where Field ='".$field."'")->result_array();
+                            FROM " . $table . " where Field ='" . $field . "'")->result_array();
                         $field_type = strtolower($field_info[0]['Type']);
                         if (strpos($field_type, 'decimal') !== false) {
                             $field_null = strtoupper($field_info[0]['Null']);
@@ -480,7 +485,7 @@ class Misc extends Admin_controller
                             if ($field_info[0]['Default'] == null) {
                                 $field_default_value = '';
                             } else {
-                                $field_default_value = ' DEFAULT 0.'.str_repeat(0, $total_decimals);
+                                $field_default_value = ' DEFAULT 0.' . str_repeat(0, $total_decimals);
                             }
                             $this->db->query("ALTER TABLE $table CHANGE $field $field DECIMAL(15,$total_decimals) $field_is_null$field_default_value;");
                         }

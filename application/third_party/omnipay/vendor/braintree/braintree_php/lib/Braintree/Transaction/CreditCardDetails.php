@@ -7,9 +7,9 @@ use Braintree\Instance;
  * CreditCard details from a transaction
  * creates an instance of CreditCardDetails
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Transaction
- *
+ *            
  * @property-read string $bin
  * @property-read string $cardType
  * @property-read string $expirationDate
@@ -22,17 +22,19 @@ use Braintree\Instance;
  */
 class CreditCardDetails extends Instance
 {
+
     protected $_attributes = [];
 
     /**
+     *
      * @ignore
+     *
      */
     public function __construct($attributes)
     {
         parent::__construct($attributes);
         $this->_attributes['expirationDate'] = $this->expirationMonth . '/' . $this->expirationYear;
         $this->_attributes['maskedNumber'] = $this->bin . '******' . $this->last4;
-
     }
 }
 class_alias('Braintree\Transaction\CreditCardDetails', 'Braintree_Transaction_CreditCardDetails');

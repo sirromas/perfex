@@ -2,7 +2,6 @@
 /**
  * PayPal Abstract REST Request
  */
-
 namespace Omnipay\PayPal\Message;
 
 use Omnipay\Common\Exception\InvalidResponseException;
@@ -30,6 +29,7 @@ use Omnipay\Common\Exception\InvalidResponseException;
  */
 abstract class AbstractRestRequest extends \Omnipay\Common\Message\AbstractRequest
 {
+
     const API_VERSION = 'v1';
 
     /**
@@ -123,57 +123,43 @@ abstract class AbstractRestRequest extends \Omnipay\Common\Message\AbstractReque
     public function sendData($data)
     {
         // don't throw exceptions for 4xx errors
-        $this->httpClient->getEventDispatcher()->addListener(
-            'request.error',
-            function ($event) {
-                if ($event['response']->isClientError()) {
-                    $event->stopPropagation();
-                }
+        $this->httpClient->getEventDispatcher()->addListener('request.error', function ($event)
+        {
+            if ($event['response']->isClientError()) {
+                $event->stopPropagation();
             }
-        );
-
+        });
+        
         // Guzzle HTTP Client createRequest does funny things when a GET request
         // has attached data, so don't send the data if the method is GET.
         if ($this->getHttpMethod() == 'GET') {
-            $httpRequest = $this->httpClient->createRequest(
-                $this->getHttpMethod(),
-                $this->getEndpoint() . '?' . http_build_query($data),
-                array(
-                    'Accept' => 'application/json',
-                    'Authorization' => 'Bearer ' . $this->getToken(),
-                    'Content-type' => 'application/json',
-                )
-            );
+            $httpRequest = $this->httpClient->createRequest($this->getHttpMethod(), $this->getEndpoint() . '?' . http_build_query($data), array(
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . $this->getToken(),
+                'Content-type' => 'application/json'
+            ));
         } else {
-            $httpRequest = $this->httpClient->createRequest(
-                $this->getHttpMethod(),
-                $this->getEndpoint(),
-                array(
-                    'Accept' => 'application/json',
-                    'Authorization' => 'Bearer ' . $this->getToken(),
-                    'Content-type' => 'application/json',
-                ),
-                $this->toJSON($data)
-            );
+            $httpRequest = $this->httpClient->createRequest($this->getHttpMethod(), $this->getEndpoint(), array(
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . $this->getToken(),
+                'Content-type' => 'application/json'
+            ), $this->toJSON($data));
         }
-
+        
         // Might be useful to have some debug code here, PayPal especially can be
-        // a bit fussy about data formats and ordering.  Perhaps hook to whatever
+        // a bit fussy about data formats and ordering. Perhaps hook to whatever
         // logging engine is being used.
         // echo "Data == " . json_encode($data) . "\n";
-
+        
         try {
             $httpRequest->getCurlOptions()->set(CURLOPT_SSLVERSION, 6); // CURL_SSLVERSION_TLSv1_2 for libcurl < 7.35
             $httpResponse = $httpRequest->send();
             // Empty response body should be parsed also as and empty array
             $body = $httpResponse->getBody(true);
-            $jsonToArrayResponse = !empty($body) ? $httpResponse->json() : array();
+            $jsonToArrayResponse = ! empty($body) ? $httpResponse->json() : array();
             return $this->response = $this->createResponse($jsonToArrayResponse, $httpResponse->getStatusCode());
         } catch (\Exception $e) {
-            throw new InvalidResponseException(
-                'Error communicating with payment gateway: ' . $e->getMessage(),
-                $e->getCode()
-            );
+            throw new InvalidResponseException('Error communicating with payment gateway: ' . $e->getMessage(), $e->getCode());
         }
     }
 
@@ -184,7 +170,8 @@ abstract class AbstractRestRequest extends \Omnipay\Common\Message\AbstractReque
      * Adapted from the official PayPal REST API PHP SDK.
      * (https://github.com/paypal/PayPal-PHP-SDK/blob/master/lib/PayPal/Common/PayPalModel.php)
      *
-     * @param int $options http://php.net/manual/en/json.constants.php
+     * @param int $options
+     *            http://php.net/manual/en/json.constants.php
      * @return string
      */
     public function toJSON($data, $options = 0)

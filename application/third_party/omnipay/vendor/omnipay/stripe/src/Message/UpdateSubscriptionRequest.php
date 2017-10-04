@@ -3,7 +3,6 @@
 /**
  * Stripe Update Subscription Request.
  */
-
 namespace Omnipay\Stripe\Message;
 
 /**
@@ -14,6 +13,7 @@ namespace Omnipay\Stripe\Message;
  */
 class UpdateSubscriptionRequest extends AbstractRequest
 {
+
     /**
      * Get the plan
      *
@@ -27,7 +27,8 @@ class UpdateSubscriptionRequest extends AbstractRequest
     /**
      * Set the plan
      *
-     * @param $value
+     * @param
+     *            $value
      * @return \Omnipay\Common\Message\AbstractRequest|UpdateSubscriptionRequest
      */
     public function setPlan($value)
@@ -36,7 +37,9 @@ class UpdateSubscriptionRequest extends AbstractRequest
     }
 
     /**
+     *
      * @deprecated
+     *
      */
     public function getPlanId()
     {
@@ -44,8 +47,11 @@ class UpdateSubscriptionRequest extends AbstractRequest
     }
 
     /**
+     *
      * @deprecated
-     * @param $value
+     *
+     * @param
+     *            $value
      * @return \Omnipay\Common\Message\AbstractRequest|UpdateSubscriptionRequest
      */
     public function setPlanId($value)
@@ -66,7 +72,8 @@ class UpdateSubscriptionRequest extends AbstractRequest
     /**
      * Set the subscription reference
      *
-     * @param $value
+     * @param
+     *            $value
      * @return \Omnipay\Common\Message\AbstractRequest|UpdateSubscriptionRequest
      */
     public function setSubscriptionReference($value)
@@ -77,25 +84,24 @@ class UpdateSubscriptionRequest extends AbstractRequest
     public function getData()
     {
         $this->validate('customerReference', 'subscriptionReference', 'plan');
-
+        
         $data = array(
             'plan' => $this->getPlan()
         );
-
+        
         if ($this->parameters->has('tax_percent')) {
-            $data['tax_percent'] = (float)$this->getParameter('tax_percent');
+            $data['tax_percent'] = (float) $this->getParameter('tax_percent');
         }
-
+        
         if ($this->getMetadata()) {
             $data['metadata'] = $this->getMetadata();
         }
-
+        
         return $data;
     }
 
     public function getEndpoint()
     {
-        return $this->endpoint.'/customers/'.$this->getCustomerReference()
-            .'/subscriptions/'.$this->getSubscriptionReference();
+        return $this->endpoint . '/customers/' . $this->getCustomerReference() . '/subscriptions/' . $this->getSubscriptionReference();
     }
 }

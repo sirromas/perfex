@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
@@ -22,24 +21,34 @@ use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
  */
 class MetadataBag implements SessionBagInterface
 {
+
     const CREATED = 'c';
+
     const UPDATED = 'u';
+
     const LIFETIME = 'l';
 
     /**
+     *
      * @var string
      */
     private $name = '__metadata';
 
     /**
+     *
      * @var string
      */
     private $storageKey;
 
     /**
+     *
      * @var array
      */
-    protected $meta = array(self::CREATED => 0, self::UPDATED => 0, self::LIFETIME => 0);
+    protected $meta = array(
+        self::CREATED => 0,
+        self::UPDATED => 0,
+        self::LIFETIME => 0
+    );
 
     /**
      * Unix timestamp.
@@ -49,6 +58,7 @@ class MetadataBag implements SessionBagInterface
     private $lastUsed;
 
     /**
+     *
      * @var int
      */
     private $updateThreshold;
@@ -56,8 +66,10 @@ class MetadataBag implements SessionBagInterface
     /**
      * Constructor.
      *
-     * @param string $storageKey      The key used to store bag in the session
-     * @param int    $updateThreshold The time to wait between two UPDATED updates
+     * @param string $storageKey
+     *            The key used to store bag in the session
+     * @param int $updateThreshold
+     *            The time to wait between two UPDATED updates
      */
     public function __construct($storageKey = '_sf2_meta', $updateThreshold = 0)
     {
@@ -66,15 +78,17 @@ class MetadataBag implements SessionBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function initialize(array &$array)
     {
         $this->meta = &$array;
-
+        
         if (isset($array[self::CREATED])) {
             $this->lastUsed = $this->meta[self::UPDATED];
-
+            
             $timeStamp = time();
             if ($timeStamp - $array[self::UPDATED] >= $this->updateThreshold) {
                 $this->meta[self::UPDATED] = $timeStamp;
@@ -97,10 +111,11 @@ class MetadataBag implements SessionBagInterface
     /**
      * Stamps a new session's metadata.
      *
-     * @param int $lifetime Sets the cookie lifetime for the session cookie. A null value
-     *                      will leave the system settings unchanged, 0 sets the cookie
-     *                      to expire with browser session. Time is in seconds, and is
-     *                      not a Unix timestamp.
+     * @param int $lifetime
+     *            Sets the cookie lifetime for the session cookie. A null value
+     *            will leave the system settings unchanged, 0 sets the cookie
+     *            to expire with browser session. Time is in seconds, and is
+     *            not a Unix timestamp.
      */
     public function stampNew($lifetime = null)
     {
@@ -108,7 +123,9 @@ class MetadataBag implements SessionBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getStorageKey()
     {
@@ -136,7 +153,9 @@ class MetadataBag implements SessionBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function clear()
     {
@@ -144,7 +163,9 @@ class MetadataBag implements SessionBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getName()
     {
@@ -154,7 +175,7 @@ class MetadataBag implements SessionBagInterface
     /**
      * Sets name.
      *
-     * @param string $name
+     * @param string $name            
      */
     public function setName($name)
     {

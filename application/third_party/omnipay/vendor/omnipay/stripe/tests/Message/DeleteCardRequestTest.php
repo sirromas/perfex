@@ -1,11 +1,11 @@
 <?php
-
 namespace Omnipay\Stripe\Message;
 
 use Omnipay\Tests\TestCase;
 
 class DeleteCardRequestTest extends TestCase
 {
+
     public function setUp()
     {
         $this->request = new DeleteCardRequest($this->getHttpClient(), $this->getHttpRequest());
@@ -26,7 +26,7 @@ class DeleteCardRequestTest extends TestCase
     {
         $this->setMockHttpResponse('DeleteCardSuccess.txt');
         $response = $this->request->send();
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());
@@ -38,7 +38,7 @@ class DeleteCardRequestTest extends TestCase
     {
         $this->setMockHttpResponse('DeleteCardFailure.txt');
         $response = $this->request->send();
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertNull($response->getTransactionReference());

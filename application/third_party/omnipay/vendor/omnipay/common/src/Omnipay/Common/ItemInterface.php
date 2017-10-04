@@ -2,7 +2,6 @@
 /**
  * Cart Item interface
  */
-
 namespace Omnipay\Common;
 
 /**
@@ -13,6 +12,7 @@ namespace Omnipay\Common;
  */
 interface ItemInterface
 {
+
     /**
      * Name of the item
      */

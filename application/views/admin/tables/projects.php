@@ -11,8 +11,8 @@ $aColumns = array(
     '(SELECT GROUP_CONCAT(name SEPARATOR ",") FROM tbltags_in JOIN tbltags ON tbltags_in.tag_id = tbltags.id WHERE rel_id = tblprojects.id and rel_type="project" ORDER by tag_order ASC) as tags',
     'start_date',
     'deadline',
-    '(SELECT GROUP_CONCAT(CONCAT(firstname, \' \', lastname) SEPARATOR ",") FROM tblprojectmembers JOIN tblstaff on tblstaff.staffid = tblprojectmembers.staff_id WHERE project_id=tblprojects.id ORDER BY staff_id) as members',
-    );
+    '(SELECT GROUP_CONCAT(CONCAT(firstname, \' \', lastname) SEPARATOR ",") FROM tblprojectmembers JOIN tblstaff on tblstaff.staffid = tblprojectmembers.staff_id WHERE project_id=tblprojects.id ORDER BY staff_id) as members'
+);
 
 $billingTypeVisible = false;
 if (has_permission('projects', '', 'create') || has_permission('projects', '', 'edit')) {
@@ -23,20 +23,20 @@ if (has_permission('projects', '', 'create') || has_permission('projects', '', '
 array_push($aColumns, 'status');
 
 $sIndexColumn = "id";
-$sTable       = 'tblprojects';
+$sTable = 'tblprojects';
 
-$join             = array(
+$join = array(
     'JOIN tblclients ON tblclients.userid = tblprojects.clientid'
 );
 
-$where  = array();
+$where = array();
 $filter = array();
 
 if (is_numeric($clientid)) {
     array_push($where, ' AND clientid=' . $clientid);
 }
 
-if (!has_permission('projects', '', 'view') || $this->_instance->input->post('my_projects')) {
+if (! has_permission('projects', '', 'view') || $this->_instance->input->post('my_projects')) {
     array_push($where, ' AND tblprojects.id IN (SELECT project_id FROM tblprojectmembers WHERE staff_id=' . get_staff_user_id() . ')');
 }
 
@@ -59,7 +59,7 @@ if (count($filter) > 0) {
 $custom_fields = get_table_custom_fields('projects');
 
 foreach ($custom_fields as $key => $field) {
-    $selectAs = (is_cf_date($field) ? 'date_picker_cvalue_' . $key : 'cvalue_'.$key);
+    $selectAs = (is_cf_date($field) ? 'date_picker_cvalue_' . $key : 'cvalue_' . $key);
     array_push($customFieldsColumns, $selectAs);
     array_push($aColumns, 'ctable_' . $key . '.value as ' . $selectAs);
     array_push($join, 'LEFT JOIN tblcustomfieldsvalues as ctable_' . $key . ' ON tblprojects.id = ctable_' . $key . '.relid AND ctable_' . $key . '.fieldto="' . $field['fieldto'] . '" AND ctable_' . $key . '.fieldid=' . $field['id']);
@@ -77,47 +77,46 @@ $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, arr
     '(SELECT GROUP_CONCAT(staff_id SEPARATOR ",") FROM tblprojectmembers WHERE project_id=tblprojects.id ORDER BY staff_id) as members_ids'
 ));
 
-$output  = $result['output'];
+$output = $result['output'];
 $rResult = $result['rResult'];
 
 foreach ($rResult as $aRow) {
     $row = array();
-
+    
     $row[] = '<a href="' . admin_url('projects/view/' . $aRow['id']) . '">' . $aRow['id'] . '</a>';
-
+    
     $row[] = '<a href="' . admin_url('projects/view/' . $aRow['id']) . '">' . $aRow['name'] . '</a>';
-
+    
     $row[] = '<a href="' . admin_url('clients/client/' . $aRow['clientid']) . '">' . $aRow['company'] . '</a>';
-
+    
     $row[] = render_tags($aRow['tags']);
-
+    
     $row[] = _d($aRow['start_date']);
-
+    
     $row[] = _d($aRow['deadline']);
-
+    
     $membersOutput = '';
-
-    $members        = explode(',', $aRow['members']);
+    
+    $members = explode(',', $aRow['members']);
     $exportMembers = '';
-    foreach ($members as $key=> $member) {
+    foreach ($members as $key => $member) {
         if ($member != '') {
             $members_ids = explode(',', $aRow['members_ids']);
-            $member_id   = $members_ids[$key];
-            $membersOutput .= '<a href="' . admin_url('profile/' . $member_id) . '">' .
-            staff_profile_image($member_id, array(
+            $member_id = $members_ids[$key];
+            $membersOutput .= '<a href="' . admin_url('profile/' . $member_id) . '">' . staff_profile_image($member_id, array(
                 'staff-profile-image-small mright5'
-                ), 'small', array(
+            ), 'small', array(
                 'data-toggle' => 'tooltip',
                 'data-title' => $member
-                )) . '</a>';
-                    // For exporting
+            )) . '</a>';
+            // For exporting
             $exportMembers .= $member . ', ';
         }
     }
-
+    
     $membersOutput .= '<span class="hide">' . trim($exportMembers, ', ') . '</span>';
     $row[] = $membersOutput;
-
+    
     if ($billingTypeVisible) {
         if ($aRow['billing_type'] == 1) {
             $type_name = 'project_billing_type_fixed_cost';
@@ -128,31 +127,31 @@ foreach ($rResult as $aRow) {
         }
         $row[] = _l($type_name);
     }
-
+    
     $status = get_project_status_by_id($aRow['status']);
-    $row[] = '<span class="label label inline-block project-status-' . $aRow['status'] . '" style="color:'.$status['color'].';border:1px solid '.$status['color'].'">' . $status['name'] . '</span>';
-
+    $row[] = '<span class="label label inline-block project-status-' . $aRow['status'] . '" style="color:' . $status['color'] . ';border:1px solid ' . $status['color'] . '">' . $status['name'] . '</span>';
+    
     // Custom fields add values
     foreach ($customFieldsColumns as $customFieldColumn) {
         $row[] = (strpos($customFieldColumn, 'date_picker_') !== false ? _d($aRow[$customFieldColumn]) : $aRow[$customFieldColumn]);
     }
-
+    
     $hook = do_action('projects_table_row_data', array(
         'output' => $row,
         'row' => $aRow
     ));
-
+    
     $row = $hook['output'];
-
+    
     $options = '';
     if ($hasPermissionEdit) {
         $options .= icon_btn('projects/project/' . $aRow['id'], 'pencil-square-o');
     }
-
+    
     if ($hasPermissionDelete) {
         $options .= icon_btn('projects/delete/' . $aRow['id'], 'remove', 'btn-danger _delete');
     }
-
-    $row[]              = $options;
+    
+    $row[] = $options;
     $output['aaData'][] = $row;
 }

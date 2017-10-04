@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Batch;
 
 use Guzzle\Batch\BatchSizeDivisor;
@@ -9,6 +8,7 @@ use Guzzle\Batch\BatchSizeDivisor;
  */
 class BatchSizeDivisorTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testDividesBatch()
     {
         $queue = new \SplQueue();
@@ -19,6 +19,14 @@ class BatchSizeDivisorTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertEquals(3, $d->getSize());
         $d->setSize(2);
         $batches = $d->createBatches($queue);
-        $this->assertEquals(array(array('foo', 'baz'), array('bar')), $batches);
+        $this->assertEquals(array(
+            array(
+                'foo',
+                'baz'
+            ),
+            array(
+                'bar'
+            )
+        ), $batches);
     }
 }

@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\File\MimeType;
 
 /**
@@ -16,6 +15,7 @@ namespace Symfony\Component\HttpFoundation\File\MimeType;
  */
 class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
 {
+
     /**
      * A map of mime types and their default extensions.
      *
@@ -796,11 +796,13 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
         'video/x-msvideo' => 'avi',
         'video/x-sgi-movie' => 'movie',
         'video/x-smv' => 'smv',
-        'x-conference/x-cooltalk' => 'ice',
+        'x-conference/x-cooltalk' => 'ice'
     );
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function guess($mimeType)
     {

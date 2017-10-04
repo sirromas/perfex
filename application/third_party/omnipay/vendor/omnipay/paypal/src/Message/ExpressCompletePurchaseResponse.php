@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal\Message;
 
 /**
@@ -14,8 +13,11 @@ class ExpressCompletePurchaseResponse extends ExpressAuthorizeResponse
      */
     public function isSuccessful()
     {
-        $success = isset($this->data['ACK']) && in_array($this->data['ACK'], array('Success', 'SuccessWithWarning'));
-        return !$this->isRedirect() && $success;
+        $success = isset($this->data['ACK']) && in_array($this->data['ACK'], array(
+            'Success',
+            'SuccessWithWarning'
+        ));
+        return ! $this->isRedirect() && $success;
     }
 
     /**
@@ -25,7 +27,9 @@ class ExpressCompletePurchaseResponse extends ExpressAuthorizeResponse
      */
     public function isRedirect()
     {
-        return isset($this->data['L_ERRORCODE0']) && in_array($this->data['L_ERRORCODE0'], array('10486'));
+        return isset($this->data['L_ERRORCODE0']) && in_array($this->data['L_ERRORCODE0'], array(
+            '10486'
+        ));
     }
 
     /**
@@ -38,7 +42,7 @@ class ExpressCompletePurchaseResponse extends ExpressAuthorizeResponse
         if ($this->isSuccessful() && isset($this->data['PAYMENTINFO_0_TRANSACTIONID'])) {
             return $this->data['PAYMENTINFO_0_TRANSACTIONID'];
         }
-
+        
         return parent::getTransactionReference();
     }
 }

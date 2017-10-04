@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\Stripe\Message;
 
 use Mockery;
@@ -7,6 +6,7 @@ use Omnipay\Tests\TestCase;
 
 class AbstractRequestTest extends TestCase
 {
+
     public function setUp()
     {
         $this->request = Mockery::mock('\Omnipay\Stripe\Message\AbstractRequest')->makePartial();
@@ -36,7 +36,7 @@ class AbstractRequestTest extends TestCase
         $card = $this->getValidCard();
         $this->request->setCard($card);
         $data = $this->request->getCardData();
-
+        
         $this->assertSame($card['number'], $data['number']);
         $this->assertSame($card['cvv'], $data['cvc']);
     }
@@ -47,56 +47,49 @@ class AbstractRequestTest extends TestCase
         $card['cvv'] = '';
         $this->request->setCard($card);
         $data = $this->request->getCardData();
-
+        
         $this->assertTrue(empty($data['cvv']));
     }
 
     public function testMetadata()
     {
-        $this->assertSame($this->request, $this->request->setMetadata(array('foo' => 'bar')));
-        $this->assertSame(array('foo' => 'bar'), $this->request->getMetadata());
+        $this->assertSame($this->request, $this->request->setMetadata(array(
+            'foo' => 'bar'
+        )));
+        $this->assertSame(array(
+            'foo' => 'bar'
+        ), $this->request->getMetadata());
     }
 
     public function testIdempotencyKey()
     {
         $this->request->setIdempotencyKeyHeader('UUID');
-
+        
         $this->assertSame('UUID', $this->request->getIdempotencyKeyHeader());
-
+        
         $headers = $this->request->getHeaders();
-
+        
         $this->assertArrayHasKey('Idempotency-Key', $headers);
         $this->assertSame('UUID', $headers['Idempotency-Key']);
-
-        $httpRequest = $this->getHttpClient()->createRequest(
-            'GET',
-            '/',
-            $headers,
-            array()
-        );
-
+        
+        $httpRequest = $this->getHttpClient()->createRequest('GET', '/', $headers, array());
+        
         $this->assertTrue($httpRequest->hasHeader('Idempotency-Key'));
     }
-
 
     public function testConnectedStripeAccount()
     {
         $this->request->setConnectedStripeAccountHeader('ACCOUNT_ID');
-
+        
         $this->assertSame('ACCOUNT_ID', $this->request->getConnectedStripeAccountHeader());
-
+        
         $headers = $this->request->getHeaders();
-
+        
         $this->assertArrayHasKey('Stripe-Account', $headers);
         $this->assertSame('ACCOUNT_ID', $headers['Stripe-Account']);
-
-        $httpRequest = $this->getHttpClient()->createRequest(
-            'GET',
-            '/',
-            $headers,
-            array()
-        );
-
+        
+        $httpRequest = $this->getHttpClient()->createRequest('GET', '/', $headers, array());
+        
         $this->assertTrue($httpRequest->hasHeader('Stripe-Account'));
     }
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Service\Command\LocationVisitor\Request;
 
 use Guzzle\Http\Message\RequestInterface;
@@ -11,10 +10,15 @@ use Guzzle\Service\Description\Parameter;
  */
 class JsonVisitor extends AbstractRequestVisitor
 {
-    /** @var bool Whether or not to add a Content-Type header when JSON is found */
+
+    /**
+     * @var bool Whether or not to add a Content-Type header when JSON is found
+     */
     protected $jsonContentType = 'application/json';
 
-    /** @var \SplObjectStorage Data object for persisting JSON data */
+    /**
+     * @var \SplObjectStorage Data object for persisting JSON data
+     */
     protected $data;
 
     public function __construct()
@@ -23,17 +27,19 @@ class JsonVisitor extends AbstractRequestVisitor
     }
 
     /**
-     * Set the Content-Type header to add to the request if JSON is added to the body. This visitor does not add a
+     * Set the Content-Type header to add to the request if JSON is added to the body.
+     * This visitor does not add a
      * Content-Type header unless you specify one here.
      *
-     * @param string $header Header to set when JSON is added (e.g. application/json)
-     *
+     * @param string $header
+     *            Header to set when JSON is added (e.g. application/json)
+     *            
      * @return self
      */
     public function setContentTypeHeader($header = 'application/json')
     {
         $this->jsonContentType = $header;
-
+        
         return $this;
     }
 
@@ -52,10 +58,10 @@ class JsonVisitor extends AbstractRequestVisitor
     {
         if (isset($this->data[$command])) {
             // Don't overwrite the Content-Type if one is set
-            if ($this->jsonContentType && !$request->hasHeader('Content-Type')) {
+            if ($this->jsonContentType && ! $request->hasHeader('Content-Type')) {
                 $request->setHeader('Content-Type', $this->jsonContentType);
             }
-
+            
             $request->setBody(json_encode($this->data[$command]));
             unset($this->data[$command]);
         }

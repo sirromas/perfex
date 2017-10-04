@@ -5,25 +5,26 @@ use Omnipay\Tests\TestCase;
 
 class NotificationRequestTest extends TestCase
 {
+
     private $request;
 
     public function setUp()
     {
         parent::setUp();
-
+        
         $mockHttpRequest = $this->getMockBuilder('\Symfony\Component\HttpFoundation\Request')
-                                ->setConstructorArgs(
-                                    array(
-                                        array(),
-                                        // directly passing an array of the POSTed data would do but to prevent
-                                        // duplicate array in test, i made it seem like an API response then
-                                        // get the response as an array using json() method.
-                                        $this->getMockHttpResponse('FraudChangeNotificationFail.txt')->json()
-                                    )
-                                )
-                                ->setMethods(null)
-                                ->getMock();
-
+            ->setConstructorArgs(array(
+            array(),
+            
+            // directly passing an array of the POSTed data would do but to prevent
+            // duplicate array in test, i made it seem like an API response then
+            // get the response as an array using json() method.
+            $this->getMockHttpResponse('FraudChangeNotificationFail.txt')
+                ->json()
+        ))
+            ->setMethods(null)
+            ->getMock();
+        
         $this->request = new NotificationRequest($this->getHttpClient(), $mockHttpRequest);
         $this->request->setAccountNumber('901290261');
         $this->request->setSecretWord('MzBjODg5YTUtNzcwMS00N2NlLWFkODMtNzQ2YzllZWRjMzBj');
@@ -38,12 +39,10 @@ class NotificationRequestTest extends TestCase
         $this->assertSame('901290261', $data['accountNumber']);
     }
 
-
     public function testSendData()
     {
-        $data     = $this->request->getData();
+        $data = $this->request->getData();
         $response = $this->request->sendData($data);
         $this->assertSame('Omnipay\TwoCheckoutPlus\Message\NotificationResponse', get_class($response));
     }
-
 }

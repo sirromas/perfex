@@ -8,6 +8,7 @@ use Braintree;
 
 class PayPalAccountTest extends Setup
 {
+
     public function testFind()
     {
         $paymentMethodToken = 'PAYPALToken-' . strval(rand());
@@ -19,14 +20,14 @@ class PayPalAccountTest extends Setup
                 'token' => $paymentMethodToken
             ]
         ]);
-
+        
         Braintree\PaymentMethod::create([
             'customerId' => $customer->id,
             'paymentMethodNonce' => $nonce
         ]);
-
+        
         $foundPayPalAccount = Braintree\PayPalAccount::find($paymentMethodToken);
-
+        
         $this->assertSame('jane.doe@example.com', $foundPayPalAccount->email);
         $this->assertSame($paymentMethodToken, $foundPayPalAccount->token);
         $this->assertNotNull($foundPayPalAccount->imageUrl);
@@ -43,12 +44,12 @@ class PayPalAccountTest extends Setup
                 'token' => $paymentMethodToken
             ]
         ]);
-
+        
         Braintree\PaymentMethod::create([
             'customerId' => $customer->id,
             'paymentMethodNonce' => $nonce
         ]);
-
+        
         $gateway = new Braintree\Gateway([
             'environment' => 'development',
             'merchantId' => 'integration_merchant_id',
@@ -56,7 +57,7 @@ class PayPalAccountTest extends Setup
             'privateKey' => 'integration_private_key'
         ]);
         $foundPayPalAccount = $gateway->paypalAccount()->find($paymentMethodToken);
-
+        
         $this->assertSame('jane.doe@example.com', $foundPayPalAccount->email);
         $this->assertSame($paymentMethodToken, $foundPayPalAccount->token);
         $this->assertNotNull($foundPayPalAccount->imageUrl);
@@ -74,7 +75,7 @@ class PayPalAccountTest extends Setup
             'token' => $creditCardToken
         ]);
         $this->assertTrue($result->success);
-
+        
         $this->setExpectedException('Braintree\Exception\NotFound');
         Braintree\PayPalAccount::find($creditCardToken);
     }
@@ -84,10 +85,10 @@ class PayPalAccountTest extends Setup
         $customer = Braintree\Customer::createNoValidate();
         $result = Braintree\PaymentMethod::create([
             'customerId' => $customer->id,
-            'paymentMethodNonce' => Braintree\Test\Nonces::$paypalFuturePayment,
+            'paymentMethodNonce' => Braintree\Test\Nonces::$paypalFuturePayment
         ]);
         $this->assertTrue($result->success);
-
+        
         $this->assertNotNull($result->paymentMethod->createdAt);
         $this->assertNotNull($result->paymentMethod->updatedAt);
     }
@@ -100,9 +101,9 @@ class PayPalAccountTest extends Setup
             'paymentMethodNonce' => Braintree\Test\Nonces::$paypalBillingAgreement
         ]);
         $this->assertTrue($result->success);
-
+        
         $foundPayPalAccount = Braintree\PayPalAccount::find($result->paymentMethod->token);
-
+        
         $this->assertNotNull($foundPayPalAccount->billingAgreementId);
     }
 
@@ -128,7 +129,7 @@ class PayPalAccountTest extends Setup
     {
         $customer = Braintree\Customer::createNoValidate();
         $paymentMethodToken = 'paypal-account-' . strval(rand());
-
+        
         $http = new HttpClientApi(Braintree\Configuration::$global);
         $nonce = $http->nonceForPayPalAccount([
             'paypal_account' => [
@@ -136,28 +137,31 @@ class PayPalAccountTest extends Setup
                 'token' => $paymentMethodToken
             ]
         ]);
-
+        
         $result = Braintree\PaymentMethod::create([
             'paymentMethodNonce' => $nonce,
             'customerId' => $customer->id
         ]);
         $this->assertTrue($result->success);
-
+        
         $token = $result->paymentMethod->token;
         $triallessPlan = SubscriptionHelper::triallessPlan();
-
+        
         $subscription1 = Braintree\Subscription::create([
             'paymentMethodToken' => $token,
             'planId' => $triallessPlan['id']
         ])->subscription;
-
+        
         $subscription2 = Braintree\Subscription::create([
             'paymentMethodToken' => $token,
             'planId' => $triallessPlan['id']
         ])->subscription;
-
+        
         $paypalAccount = Braintree\PayPalAccount::find($token);
-        $getIds = function($sub) { return $sub->id; };
+        $getIds = function ($sub)
+        {
+            return $sub->id;
+        };
         $subIds = array_map($getIds, $paypalAccount->subscriptions);
         $this->assertTrue(in_array($subscription1->id, $subIds));
         $this->assertTrue(in_array($subscription2->id, $subIds));
@@ -174,54 +178,55 @@ class PayPalAccountTest extends Setup
                 'token' => $originalToken
             ]
         ]);
-
+        
         $createResult = Braintree\PaymentMethod::create([
             'customerId' => $customer->id,
             'paymentMethodNonce' => $nonce
         ]);
         $this->assertTrue($createResult->success);
-
+        
         $newToken = 'NEW_PAYPALToken-' . strval(rand());
         $updateResult = Braintree\PayPalAccount::update($originalToken, [
             'token' => $newToken
         ]);
-
+        
         $this->assertTrue($updateResult->success);
         $this->assertEquals($newToken, $updateResult->paypalAccount->token);
-
+        
         $this->setExpectedException('Braintree\Exception\NotFound');
         Braintree\PayPalAccount::find($originalToken);
-
     }
 
     public function testUpdateAndMakeDefault()
     {
         $customer = Braintree\Customer::createNoValidate();
-
+        
         $creditCardResult = Braintree\CreditCard::create([
             'customerId' => $customer->id,
             'number' => '5105105105105100',
             'expirationDate' => '05/12'
         ]);
         $this->assertTrue($creditCardResult->success);
-
+        
         $http = new HttpClientApi(Braintree\Configuration::$global);
         $nonce = $http->nonceForPayPalAccount([
             'paypal_account' => [
                 'consent_code' => 'PAYPAL_CONSENT_CODE'
             ]
         ]);
-
+        
         $createResult = Braintree\PaymentMethod::create([
             'customerId' => $customer->id,
             'paymentMethodNonce' => $nonce
         ]);
         $this->assertTrue($createResult->success);
-
+        
         $updateResult = Braintree\PayPalAccount::update($createResult->paymentMethod->token, [
-            'options' => ['makeDefault' => true]
+            'options' => [
+                'makeDefault' => true
+            ]
         ]);
-
+        
         $this->assertTrue($updateResult->success);
         $this->assertTrue($updateResult->paypalAccount->isDefault());
     }
@@ -229,7 +234,7 @@ class PayPalAccountTest extends Setup
     public function testUpdate_handleErrors()
     {
         $customer = Braintree\Customer::createNoValidate();
-
+        
         $firstToken = 'FIRST_PAYPALToken-' . strval(rand());
         $http = new HttpClientApi(Braintree\Configuration::$global);
         $firstNonce = $http->nonceForPayPalAccount([
@@ -243,7 +248,7 @@ class PayPalAccountTest extends Setup
             'paymentMethodNonce' => $firstNonce
         ]);
         $this->assertTrue($firstPaypalAccount->success);
-
+        
         $secondToken = 'SECOND_PAYPALToken-' . strval(rand());
         $http = new HttpClientApi(Braintree\Configuration::$global);
         $secondNonce = $http->nonceForPayPalAccount([
@@ -257,11 +262,11 @@ class PayPalAccountTest extends Setup
             'paymentMethodNonce' => $secondNonce
         ]);
         $this->assertTrue($secondPaypalAccount->success);
-
+        
         $updateResult = Braintree\PayPalAccount::update($firstToken, [
             'token' => $secondToken
         ]);
-
+        
         $this->assertFalse($updateResult->success);
         $errors = $updateResult->errors->forKey('paypalAccount')->errors;
         $this->assertEquals(Braintree\Error\Codes::PAYPAL_ACCOUNT_TOKEN_IS_IN_USE, $errors[0]->code);
@@ -278,14 +283,14 @@ class PayPalAccountTest extends Setup
                 'token' => $paymentMethodToken
             ]
         ]);
-
+        
         Braintree\PaymentMethod::create([
             'customerId' => $customer->id,
             'paymentMethodNonce' => $nonce
         ]);
-
+        
         Braintree\PayPalAccount::delete($paymentMethodToken);
-
+        
         $this->setExpectedException('Braintree\Exception\NotFound');
         Braintree\PayPalAccount::find($paymentMethodToken);
     }
@@ -297,7 +302,7 @@ class PayPalAccountTest extends Setup
             'paymentMethodNonce' => $nonce
         ]);
         $paypalAccount = $customer->paypalAccounts[0];
-
+        
         $result = Braintree\PayPalAccount::sale($paypalAccount->token, [
             'amount' => '100.00'
         ]);

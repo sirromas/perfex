@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Http\Exception;
 
 use Guzzle\Http\Curl\CurlHandle;
@@ -9,38 +8,45 @@ use Guzzle\Http\Curl\CurlHandle;
  */
 class CurlException extends RequestException
 {
+
     private $curlError;
+
     private $curlErrorNo;
+
     private $handle;
+
     private $curlInfo = array();
 
     /**
      * Set the cURL error message
      *
-     * @param string $error  Curl error
-     * @param int    $number Curl error number
-     *
+     * @param string $error
+     *            Curl error
+     * @param int $number
+     *            Curl error number
+     *            
      * @return self
      */
     public function setError($error, $number)
     {
         $this->curlError = $error;
         $this->curlErrorNo = $number;
-
+        
         return $this;
     }
 
     /**
      * Set the associated curl handle
      *
-     * @param CurlHandle $handle Curl handle
-     *
+     * @param CurlHandle $handle
+     *            Curl handle
+     *            
      * @return self
      */
     public function setCurlHandle(CurlHandle $handle)
     {
         $this->handle = $handle;
-
+        
         return $this;
     }
 
@@ -87,15 +93,16 @@ class CurlException extends RequestException
     /**
      * Set curl transfer information
      *
-     * @param array $info Array of curl transfer information
-     *
+     * @param array $info
+     *            Array of curl transfer information
+     *            
      * @return self
      * @link http://php.net/manual/en/function.curl-getinfo.php
      */
     public function setCurlInfo(array $info)
     {
         $this->curlInfo = $info;
-
+        
         return $this;
     }
 }

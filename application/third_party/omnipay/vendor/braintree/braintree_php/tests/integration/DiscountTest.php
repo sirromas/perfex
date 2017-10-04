@@ -8,10 +8,11 @@ use Braintree;
 
 class DiscountTest extends Setup
 {
+
     public function testAll_returnsAllDiscounts()
     {
         $newId = strval(rand());
-
+        
         $discountParams = [
             "amount" => "100.00",
             "description" => "some description",
@@ -21,21 +22,21 @@ class DiscountTest extends Setup
             "neverExpires" => "false",
             "numberOfBillingCycles" => "1"
         ];
-
+        
         $http = new Braintree\Http(Braintree\Configuration::$global);
         $path = Braintree\Configuration::$global->merchantPath() . "/modifications/create_modification_for_tests";
-        $http->post($path, ["modification" => $discountParams]);
-
+        $http->post($path, [
+            "modification" => $discountParams
+        ]);
+        
         $discounts = Braintree\Discount::all();
-
-        foreach ($discounts as $discount)
-        {
-            if ($discount->id == $newId)
-            {
+        
+        foreach ($discounts as $discount) {
+            if ($discount->id == $newId) {
                 $actualDiscount = $discount;
             }
         }
-
+        
         $this->assertNotNull($actualDiscount);
         $this->assertEquals($discountParams["amount"], $actualDiscount->amount);
         $this->assertEquals($discountParams["description"], $actualDiscount->description);
@@ -49,7 +50,7 @@ class DiscountTest extends Setup
     public function testGatewayAll_returnsAllDiscounts()
     {
         $newId = strval(rand());
-
+        
         $discountParams = [
             "amount" => "100.00",
             "description" => "some description",
@@ -59,11 +60,13 @@ class DiscountTest extends Setup
             "neverExpires" => "false",
             "numberOfBillingCycles" => "1"
         ];
-
+        
         $http = new Braintree\Http(Braintree\Configuration::$global);
         $path = Braintree\Configuration::$global->merchantPath() . "/modifications/create_modification_for_tests";
-        $http->post($path, ["modification" => $discountParams]);
-
+        $http->post($path, [
+            "modification" => $discountParams
+        ]);
+        
         $gateway = new Braintree\Gateway([
             'environment' => 'development',
             'merchantId' => 'integration_merchant_id',
@@ -71,15 +74,13 @@ class DiscountTest extends Setup
             'privateKey' => 'integration_private_key'
         ]);
         $discounts = $gateway->discount()->all();
-
-        foreach ($discounts as $discount)
-        {
-            if ($discount->id == $newId)
-            {
+        
+        foreach ($discounts as $discount) {
+            if ($discount->id == $newId) {
                 $actualDiscount = $discount;
             }
         }
-
+        
         $this->assertNotNull($actualDiscount);
         $this->assertEquals($discountParams["amount"], $actualDiscount->amount);
         $this->assertEquals($discountParams["id"], $actualDiscount->id);

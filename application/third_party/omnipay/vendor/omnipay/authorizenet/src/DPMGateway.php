@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\AuthorizeNet;
 
 /**
@@ -7,6 +6,7 @@ namespace Omnipay\AuthorizeNet;
  */
 class DPMGateway extends SIMGateway
 {
+
     public function getName()
     {
         return 'Authorize.Net DPM';

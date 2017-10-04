@@ -5,35 +5,50 @@ namespace Braintree;
  *
  * Configuration registry
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Utility
  */
-
 class Configuration
 {
+
     public static $global;
 
     private $_environment = null;
+
     private $_merchantId = null;
+
     private $_publicKey = null;
+
     private $_privateKey = null;
+
     private $_clientId = null;
+
     private $_clientSecret = null;
+
     private $_accessToken = null;
+
     private $_proxyHost = null;
+
     private $_proxyPort = null;
+
     private $_proxyType = null;
+
     private $_proxyUser = null;
+
     private $_proxyPassword = null;
+
     private $_timeout = 60;
+
     private $_sslVersion = null;
+
     private $_acceptGzipEncoding = true;
 
     /**
      * Braintree API version to use
+     * 
      * @access public
      */
-     const API_VERSION =  4;
+    const API_VERSION = 4;
 
     public function __construct($attribs = [])
     {
@@ -52,13 +67,13 @@ class Configuration
                 $this->_privateKey = $value;
             }
         }
-
+        
         if (isset($attribs['clientId']) || isset($attribs['accessToken'])) {
             if (isset($attribs['environment']) || isset($attribs['merchantId']) || isset($attribs['publicKey']) || isset($attribs['privateKey'])) {
                 throw new Exception\Configuration('Cannot mix OAuth credentials (clientId, clientSecret, accessToken) with key credentials (publicKey, privateKey, environment, merchantId).');
             }
             $parsedCredentials = new CredentialsParser($attribs);
-
+            
             $this->_environment = $parsedCredentials->getEnvironment();
             $this->_merchantId = $parsedCredentials->getMerchantId();
             $this->_clientId = $parsedCredentials->getClientId();
@@ -69,6 +84,7 @@ class Configuration
 
     /**
      * resets configuration to default
+     * 
      * @access public
      */
     public static function reset()
@@ -81,7 +97,7 @@ class Configuration
         return new Gateway(self::$global);
     }
 
-    public static function environment($value=null)
+    public static function environment($value = null)
     {
         if (empty($value)) {
             return self::$global->getEnvironment();
@@ -90,7 +106,7 @@ class Configuration
         self::$global->setEnvironment($value);
     }
 
-    public static function merchantId($value=null)
+    public static function merchantId($value = null)
     {
         if (empty($value)) {
             return self::$global->getMerchantId();
@@ -98,7 +114,7 @@ class Configuration
         self::$global->setMerchantId($value);
     }
 
-    public static function publicKey($value=null)
+    public static function publicKey($value = null)
     {
         if (empty($value)) {
             return self::$global->getPublicKey();
@@ -106,7 +122,7 @@ class Configuration
         self::$global->setPublicKey($value);
     }
 
-    public static function privateKey($value=null)
+    public static function privateKey($value = null)
     {
         if (empty($value)) {
             return self::$global->getPrivateKey();
@@ -117,10 +133,11 @@ class Configuration
     /**
      * Sets or gets the read timeout to use for making requests.
      *
-     * @param integer $value If provided, sets the read timeout
+     * @param integer $value
+     *            If provided, sets the read timeout
      * @return integer The read timeout used for connecting to Braintree
      */
-    public static function timeout($value=null)
+    public static function timeout($value = null)
     {
         if (empty($value)) {
             return self::$global->getTimeout();
@@ -129,14 +146,16 @@ class Configuration
     }
 
     /**
-     * Sets or gets the SSL version to use for making requests. See
+     * Sets or gets the SSL version to use for making requests.
+     * See
      * http://php.net/manual/en/function.curl-setopt.php for possible
      * CURLOPT_SSLVERSION values.
      *
-     * @param integer $value If provided, sets the SSL version
+     * @param integer $value
+     *            If provided, sets the SSL version
      * @return integer The SSL version used for connecting to Braintree
      */
-    public static function sslVersion($value=null)
+    public static function sslVersion($value = null)
     {
         if (empty($value)) {
             return self::$global->getSslVersion();
@@ -147,7 +166,8 @@ class Configuration
     /**
      * Sets or gets the proxy host to use for connecting to Braintree
      *
-     * @param string $value If provided, sets the proxy host
+     * @param string $value
+     *            If provided, sets the proxy host
      * @return string The proxy host used for connecting to Braintree
      */
     public static function proxyHost($value = null)
@@ -161,7 +181,8 @@ class Configuration
     /**
      * Sets or gets the port of the proxy to use for connecting to Braintree
      *
-     * @param string $value If provided, sets the port of the proxy
+     * @param string $value
+     *            If provided, sets the port of the proxy
      * @return string The port of the proxy used for connecting to Braintree
      */
     public static function proxyPort($value = null)
@@ -173,10 +194,12 @@ class Configuration
     }
 
     /**
-     * Sets or gets the proxy type to use for connecting to Braintree. This value
+     * Sets or gets the proxy type to use for connecting to Braintree.
+     * This value
      * can be any of the CURLOPT_PROXYTYPE options in PHP cURL.
      *
-     * @param string $value If provided, sets the proxy type
+     * @param string $value
+     *            If provided, sets the proxy type
      * @return string The proxy type used for connecting to Braintree
      */
     public static function proxyType($value = null)
@@ -196,7 +219,7 @@ class Configuration
     {
         $proxyHost = self::$global->getProxyHost();
         $proxyPort = self::$global->getProxyPort();
-        return !empty($proxyHost) && !empty($proxyPort);
+        return ! empty($proxyHost) && ! empty($proxyPort);
     }
 
     public static function proxyUser($value = null)
@@ -225,13 +248,14 @@ class Configuration
     {
         $proxyUser = self::$global->getProxyUser();
         $proxyPwd = self::$global->getProxyPassword();
-        return !empty($proxyUser) && !empty($proxyPwd);
+        return ! empty($proxyUser) && ! empty($proxyPwd);
     }
 
     /**
      * Specify if the HTTP client is able to decode gzipped responses.
      *
-     * @param bool $value If true, will send an Accept-Encoding header with a gzip value. If false, will not send an Accept-Encoding header with a gzip value.
+     * @param bool $value
+     *            If true, will send an Accept-Encoding header with a gzip value. If false, will not send an Accept-Encoding header with a gzip value.
      * @return bool true if an Accept-Encoding header with a gzip value will be sent, false if not
      */
     public static function acceptGzipEncoding($value = null)
@@ -252,13 +276,16 @@ class Configuration
         if (empty($this->_accessToken)) {
             if (empty($this->_merchantId)) {
                 throw new Exception\Configuration('Braintree\\Configuration::merchantId needs to be set (or accessToken needs to be passed to Braintree\\Gateway).');
-            } else if (empty($this->_environment)) {
-                throw new Exception\Configuration('Braintree\\Configuration::environment needs to be set.');
-            } else if (empty($this->_publicKey)) {
-                throw new Exception\Configuration('Braintree\\Configuration::publicKey needs to be set.');
-            } else if (empty($this->_privateKey)) {
-                throw new Exception\Configuration('Braintree\\Configuration::privateKey needs to be set.');
-            }
+            } else 
+                if (empty($this->_environment)) {
+                    throw new Exception\Configuration('Braintree\\Configuration::environment needs to be set.');
+                } else 
+                    if (empty($this->_publicKey)) {
+                        throw new Exception\Configuration('Braintree\\Configuration::publicKey needs to be set.');
+                    } else 
+                        if (empty($this->_privateKey)) {
+                            throw new Exception\Configuration('Braintree\\Configuration::privateKey needs to be set.');
+                        }
         }
     }
 
@@ -288,7 +315,8 @@ class Configuration
     }
 
     /**
-     * Do not use this method directly. Pass in the environment to the constructor.
+     * Do not use this method directly.
+     * Pass in the environment to the constructor.
      */
     public function setEnvironment($value)
     {
@@ -301,7 +329,8 @@ class Configuration
     }
 
     /**
-     * Do not use this method directly. Pass in the merchantId to the constructor.
+     * Do not use this method directly.
+     * Pass in the merchantId to the constructor.
      */
     public function setMerchantId($value)
     {
@@ -319,7 +348,8 @@ class Configuration
     }
 
     /**
-     * Do not use this method directly. Pass in the publicKey to the constructor.
+     * Do not use this method directly.
+     * Pass in the publicKey to the constructor.
      */
     public function setPublicKey($value)
     {
@@ -337,7 +367,8 @@ class Configuration
     }
 
     /**
-     * Do not use this method directly. Pass in the privateKey to the constructor.
+     * Do not use this method directly.
+     * Pass in the privateKey to the constructor.
      */
     public function setPrivateKey($value)
     {
@@ -431,18 +462,20 @@ class Configuration
 
     public function isAccessToken()
     {
-        return !empty($this->_accessToken);
+        return ! empty($this->_accessToken);
     }
 
     public function isClientCredentials()
     {
-        return !empty($this->_clientId);
+        return ! empty($this->_clientId);
     }
+
     /**
      * returns the base braintree gateway URL based on config values
      *
      * @access public
-     * @param none
+     * @param
+     *            none
      * @return string braintree gateway URL
      */
     public function baseUrl()
@@ -454,7 +487,8 @@ class Configuration
      * sets the merchant path based on merchant ID
      *
      * @access protected
-     * @param none
+     * @param
+     *            none
      * @return string merchant path uri
      */
     public function merchantPath()
@@ -466,20 +500,19 @@ class Configuration
      * sets the physical path for the location of the CA certs
      *
      * @access public
-     * @param none
+     * @param
+     *            none
      * @return string filepath
      */
     public function caFile($sslPath = NULL)
     {
-        $sslPath = $sslPath ? $sslPath : DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR .
-                   'ssl' . DIRECTORY_SEPARATOR;
+        $sslPath = $sslPath ? $sslPath : DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'ssl' . DIRECTORY_SEPARATOR;
         $caPath = __DIR__ . $sslPath . 'api_braintreegateway_com.ca.crt';
-
-        if (!file_exists($caPath))
-        {
+        
+        if (! file_exists($caPath)) {
             throw new Exception\SSLCaFileNotFound();
         }
-
+        
         return $caPath;
     }
 
@@ -487,7 +520,8 @@ class Configuration
      * returns the port number depending on environment
      *
      * @access public
-     * @param none
+     * @param
+     *            none
      * @return int portnumber
      */
     public function portNumber()
@@ -502,7 +536,8 @@ class Configuration
      * returns http protocol depending on environment
      *
      * @access public
-     * @param none
+     * @param
+     *            none
      * @return string http || https
      */
     public function protocol()
@@ -514,50 +549,51 @@ class Configuration
      * returns gateway server name depending on environment
      *
      * @access public
-     * @param none
+     * @param
+     *            none
      * @return string server domain name
      */
     public function serverName()
     {
-        switch($this->_environment) {
-         case 'production':
-             $serverName = 'api.braintreegateway.com';
-             break;
-         case 'qa':
-             $serverName = 'gateway.qa.braintreepayments.com';
-             break;
-         case 'sandbox':
-             $serverName = 'api.sandbox.braintreegateway.com';
-             break;
-         case 'development':
-         case 'integration':
-         default:
-             $serverName = 'localhost';
-             break;
+        switch ($this->_environment) {
+            case 'production':
+                $serverName = 'api.braintreegateway.com';
+                break;
+            case 'qa':
+                $serverName = 'gateway.qa.braintreepayments.com';
+                break;
+            case 'sandbox':
+                $serverName = 'api.sandbox.braintreegateway.com';
+                break;
+            case 'development':
+            case 'integration':
+            default:
+                $serverName = 'localhost';
+                break;
         }
-
+        
         return $serverName;
     }
 
     public function authUrl()
     {
-        switch($this->_environment) {
-         case 'production':
-             $serverName = 'https://auth.venmo.com';
-             break;
-         case 'qa':
-             $serverName = 'https://auth.qa.venmo.com';
-             break;
-         case 'sandbox':
-             $serverName = 'https://auth.sandbox.venmo.com';
-             break;
-         case 'development':
-         case 'integration':
-         default:
-             $serverName = 'http://auth.venmo.dev:9292';
-             break;
+        switch ($this->_environment) {
+            case 'production':
+                $serverName = 'https://auth.venmo.com';
+                break;
+            case 'qa':
+                $serverName = 'https://auth.qa.venmo.com';
+                break;
+            case 'sandbox':
+                $serverName = 'https://auth.sandbox.venmo.com';
+                break;
+            case 'development':
+            case 'integration':
+            default:
+                $serverName = 'http://auth.venmo.dev:9292';
+                break;
         }
-
+        
         return $serverName;
     }
 
@@ -566,31 +602,32 @@ class Configuration
      * depending on environment
      *
      * @access public
-     * @param none
+     * @param
+     *            none
      * @return boolean
      */
     public function sslOn()
     {
-        switch($this->_environment) {
-         case 'integration':
-         case 'development':
-             $ssl = false;
-             break;
-         case 'production':
-         case 'qa':
-         case 'sandbox':
-         default:
-             $ssl = true;
-             break;
+        switch ($this->_environment) {
+            case 'integration':
+            case 'development':
+                $ssl = false;
+                break;
+            case 'production':
+            case 'qa':
+            case 'sandbox':
+            default:
+                $ssl = true;
+                break;
         }
-
-       return $ssl;
+        
+        return $ssl;
     }
 
     /**
      * log message to default logger
      *
-     * @param string $message
+     * @param string $message            
      *
      */
     public function logMessage($message)

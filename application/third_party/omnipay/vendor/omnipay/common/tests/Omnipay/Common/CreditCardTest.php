@@ -1,35 +1,41 @@
 <?php
-
 namespace Omnipay\Common;
 
 use Omnipay\Tests\TestCase;
 
 class CreditCardTest extends TestCase
 {
-    /** @var CreditCard */
+
+    /**
+     * @var CreditCard
+     */
     private $card;
 
     public function setUp()
     {
-        $this->card = new CreditCard;
+        $this->card = new CreditCard();
         $this->card->setNumber('4111111111111111');
         $this->card->setFirstName('Example');
         $this->card->setLastName('Customer');
         $this->card->setExpiryMonth('4');
-        $this->card->setExpiryYear(gmdate('Y')+2);
+        $this->card->setExpiryYear(gmdate('Y') + 2);
         $this->card->setCvv('123');
     }
 
     public function testConstructWithParams()
     {
-        $card = new CreditCard(array('name' => 'Test Customer'));
+        $card = new CreditCard(array(
+            'name' => 'Test Customer'
+        ));
         $this->assertSame('Test Customer', $card->getName());
     }
 
     public function testInitializeWithParams()
     {
-        $card = new CreditCard;
-        $card->initialize(array('name' => 'Test Customer'));
+        $card = new CreditCard();
+        $card->initialize(array(
+            'name' => 'Test Customer'
+        ));
         $this->assertSame('Test Customer', $card->getName());
     }
 
@@ -39,9 +45,9 @@ class CreditCardTest extends TestCase
             'name' => 'Example Customer',
             'number' => '1234',
             'expiryMonth' => 6,
-            'expiryYear' => 2016,
+            'expiryYear' => 2016
         ));
-
+        
         $parameters = $card->getParameters();
         $this->assertSame('Example', $parameters['billingFirstName']);
         $this->assertSame('Customer', $parameters['billingLastName']);
@@ -91,7 +97,7 @@ class CreditCardTest extends TestCase
      */
     public function testValidateExpiryDate()
     {
-        $this->card->setExpiryYear(gmdate('Y')-1);
+        $this->card->setExpiryYear(gmdate('Y') - 1);
         $this->card->validate();
     }
 
@@ -213,60 +219,76 @@ class CreditCardTest extends TestCase
     public function testGetNumberMasked()
     {
         $this->card->setNumber('4000000000001234');
-
+        
         $this->assertSame('XXXXXXXXXXXX1234', $this->card->getNumberMasked());
     }
 
     public function testGetNumberMaskedNonDigits()
     {
         $this->card->setNumber('4000 0000 0000 12x34');
-
+        
         $this->assertSame('XXXXXXXXXXXX1234', $this->card->getNumberMasked());
     }
 
     public function testGetBrandDefault()
     {
-        $card = new CreditCard;
+        $card = new CreditCard();
         $this->assertNull($card->getBrand());
     }
 
     public function testGetBrandVisa()
     {
-        $card = new CreditCard(array('number' => '4242424242424242'));
+        $card = new CreditCard(array(
+            'number' => '4242424242424242'
+        ));
         $this->assertSame(CreditCard::BRAND_VISA, $card->getBrand());
     }
 
     public function testGetBrandMasterCard()
     {
-        $card = new CreditCard(array('number' => '5555555555554444'));
+        $card = new CreditCard(array(
+            'number' => '5555555555554444'
+        ));
         $this->assertSame(CreditCard::BRAND_MASTERCARD, $card->getBrand());
-        $card = new CreditCard(array('number' => '2230000010000006'));
+        $card = new CreditCard(array(
+            'number' => '2230000010000006'
+        ));
         $this->assertSame(CreditCard::BRAND_MASTERCARD, $card->getBrand());
-        $card = new CreditCard(array('number' => '6771890000000008'));
+        $card = new CreditCard(array(
+            'number' => '6771890000000008'
+        ));
         $this->assertSame(CreditCard::BRAND_MASTERCARD, $card->getBrand());
     }
 
     public function testGetBrandAmex()
     {
-        $card = new CreditCard(array('number' => '378282246310005'));
+        $card = new CreditCard(array(
+            'number' => '378282246310005'
+        ));
         $this->assertSame(CreditCard::BRAND_AMEX, $card->getBrand());
     }
 
     public function testGetBrandDiscover()
     {
-        $card = new CreditCard(array('number' => '6011111111111117'));
+        $card = new CreditCard(array(
+            'number' => '6011111111111117'
+        ));
         $this->assertSame(CreditCard::BRAND_DISCOVER, $card->getBrand());
     }
 
     public function testGetBrandDinersClub()
     {
-        $card = new CreditCard(array('number' => '30569309025904'));
+        $card = new CreditCard(array(
+            'number' => '30569309025904'
+        ));
         $this->assertSame(CreditCard::BRAND_DINERS_CLUB, $card->getBrand());
     }
 
     public function testGetBrandJcb()
     {
-        $card = new CreditCard(array('number' => '3530111333300000'));
+        $card = new CreditCard(array(
+            'number' => '3530111333300000'
+        ));
         $this->assertSame(CreditCard::BRAND_JCB, $card->getBrand());
     }
 
@@ -390,7 +412,7 @@ class CreditCardTest extends TestCase
         $this->card->setBillingFirstName('Bob');
         $this->card->setBillingLastName('Smith');
         $this->assertEquals('Bob Smith', $this->card->getBillingName());
-
+        
         $this->card->setBillingName('John Foo');
         $this->assertEquals('John', $this->card->getBillingFirstName());
         $this->assertEquals('Foo', $this->card->getBillingLastName());
@@ -489,7 +511,7 @@ class CreditCardTest extends TestCase
         $this->card->setShippingFirstName('Bob');
         $this->card->setShippingLastName('Smith');
         $this->assertEquals('Bob Smith', $this->card->getShippingName());
-
+        
         $this->card->setShippingName('John Foo');
         $this->assertEquals('John', $this->card->getShippingFirstName());
         $this->assertEquals('Foo', $this->card->getShippingLastName());

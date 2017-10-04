@@ -3,6 +3,7 @@ namespace Braintree;
 
 class IsNode
 {
+
     public function __construct($name)
     {
         $this->name = $name;
@@ -12,7 +13,7 @@ class IsNode
     public function is($value)
     {
         $this->searchTerms['is'] = strval($value);
-
+        
         return $this;
     }
 

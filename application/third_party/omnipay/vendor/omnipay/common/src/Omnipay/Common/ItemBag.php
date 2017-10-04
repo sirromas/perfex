@@ -2,7 +2,6 @@
 /**
  * Cart Item Bag
  */
-
 namespace Omnipay\Common;
 
 /**
@@ -15,6 +14,7 @@ namespace Omnipay\Common;
  */
 class ItemBag implements \IteratorAggregate, \Countable
 {
+
     /**
      * Item storage
      *
@@ -27,7 +27,8 @@ class ItemBag implements \IteratorAggregate, \Countable
     /**
      * Constructor
      *
-     * @param array $items An array of items
+     * @param array $items
+     *            An array of items
      */
     public function __construct(array $items = array())
     {
@@ -51,12 +52,13 @@ class ItemBag implements \IteratorAggregate, \Countable
      *
      * @see Item
      *
-     * @param array $items An array of items
+     * @param array $items
+     *            An array of items
      */
     public function replace(array $items = array())
     {
         $this->items = array();
-
+        
         foreach ($items as $item) {
             $this->add($item);
         }
@@ -67,7 +69,8 @@ class ItemBag implements \IteratorAggregate, \Countable
      *
      * @see Item
      *
-     * @param ItemInterface|array $item An existing item, or associative array of item parameters
+     * @param ItemInterface|array $item
+     *            An existing item, or associative array of item parameters
      */
     public function add($item)
     {

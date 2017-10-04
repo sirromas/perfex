@@ -9,9 +9,9 @@ namespace Braintree;
  *
  * For more detailed information on CreditCard verifications, see {@link http://www.braintreepayments.com/gateway/credit-card-verification-api http://www.braintreepaymentsolutions.com/gateway/credit-card-verification-api}
  *
- * @package    Braintree
- * @category   Resources
- *
+ * @package Braintree
+ * @category Resources
+ *          
  * @property-read string $billingAddress
  * @property-read string $bin
  * @property-read string $cardType
@@ -68,26 +68,25 @@ class MasterpassCard extends Base
      * sets instance properties from an array of values
      *
      * @access protected
-     * @param array $creditCardAttribs array of creditcard data
+     * @param array $creditCardAttribs
+     *            array of creditcard data
      * @return void
      */
     protected function _initialize($creditCardAttribs)
     {
         // set the attributes
         $this->_attributes = $creditCardAttribs;
-
+        
         // map each address into its own object
-        $billingAddress = isset($creditCardAttribs['billingAddress']) ?
-            Address::factory($creditCardAttribs['billingAddress']) :
-            null;
-
+        $billingAddress = isset($creditCardAttribs['billingAddress']) ? Address::factory($creditCardAttribs['billingAddress']) : null;
+        
         $subscriptionArray = [];
         if (isset($creditCardAttribs['subscriptions'])) {
-            foreach ($creditCardAttribs['subscriptions'] AS $subscription) {
+            foreach ($creditCardAttribs['subscriptions'] as $subscription) {
                 $subscriptionArray[] = Subscription::factory($subscription);
             }
         }
-
+        
         $this->_set('subscriptions', $subscriptionArray);
         $this->_set('billingAddress', $billingAddress);
         $this->_set('expirationDate', $this->expirationMonth . '/' . $this->expirationYear);
@@ -98,41 +97,43 @@ class MasterpassCard extends Base
      * returns false if comparing object is not a CreditCard,
      * or is a CreditCard with a different id
      *
-     * @param object $otherCreditCard customer to compare against
+     * @param object $otherCreditCard
+     *            customer to compare against
      * @return boolean
      */
     public function isEqual($otherMasterpassCard)
     {
-        return !($otherMasterpassCard instanceof self) ? false : $this->token === $otherMasterpassCard->token;
+        return ! ($otherMasterpassCard instanceof self) ? false : $this->token === $otherMasterpassCard->token;
     }
 
     /**
      * create a printable representation of the object as:
      * ClassName[property=value, property=value]
+     * 
      * @return string
      */
-    public function  __toString()
+    public function __toString()
     {
-        return __CLASS__ . '[' .
-                Util::attributesToString($this->_attributes) .']';
+        return __CLASS__ . '[' . Util::attributesToString($this->_attributes) . ']';
     }
 
     /**
-     *  factory method: returns an instance of CreditCard
-     *  to the requesting method, with populated properties
+     * factory method: returns an instance of CreditCard
+     * to the requesting method, with populated properties
      *
      * @ignore
+     *
      * @return MasterpassCard
      */
     public static function factory($attributes)
     {
         $defaultAttributes = [
             'bin' => '',
-            'expirationMonth'    => '',
-            'expirationYear'    => '',
-            'last4'  => '',
+            'expirationMonth' => '',
+            'expirationYear' => '',
+            'last4' => ''
         ];
-
+        
         $instance = new self();
         $instance->_initialize(array_merge($defaultAttributes, $attributes));
         return $instance;

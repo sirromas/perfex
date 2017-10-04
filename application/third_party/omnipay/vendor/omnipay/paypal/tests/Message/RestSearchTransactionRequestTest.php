@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal\Message;
 
 use Omnipay\Tests\TestCase;
@@ -7,7 +6,10 @@ use Omnipay\PayPal\RestGateway;
 
 class RestSearchTransactionRequestTest extends TestCase
 {
-    /** @var \Omnipay\PayPal\Message\RestSearchTransactionRequest */
+
+    /**
+     * @var \Omnipay\PayPal\Message\RestSearchTransactionRequest
+     */
     private $request;
 
     public function setUp()
@@ -15,11 +17,11 @@ class RestSearchTransactionRequestTest extends TestCase
         $client = $this->getHttpClient();
         $request = $this->getHttpRequest();
         $this->request = new RestSearchTransactionRequest($client, $request);
-
+        
         $this->request->initialize(array(
-            'agreementId'       => 'ABC-123',
-            'startDate'         => '2015-09-01',
-            'endDate'           => '2015-09-30',
+            'agreementId' => 'ABC-123',
+            'startDate' => '2015-09-01',
+            'endDate' => '2015-09-30'
         ));
     }
 

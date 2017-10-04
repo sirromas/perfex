@@ -10,70 +10,81 @@ namespace Braintree;
  *
  * PHP Version 5
  *
- * @package   Braintree
+ * @package Braintree
  */
 class Subscription extends Base
 {
-    const ACTIVE = 'Active';
-    const CANCELED = 'Canceled';
-    const EXPIRED = 'Expired';
-    const PAST_DUE = 'Past Due';
-    const PENDING = 'Pending';
 
+    const ACTIVE = 'Active';
+
+    const CANCELED = 'Canceled';
+
+    const EXPIRED = 'Expired';
+
+    const PAST_DUE = 'Past Due';
+
+    const PENDING = 'Pending';
+    
     // Subscription Sources
-    const API           = 'api';
+    const API = 'api';
+
     const CONTROL_PANEL = 'control_panel';
-    const RECURRING     = 'recurring';
+
+    const RECURRING = 'recurring';
 
     /**
+     *
      * @ignore
+     *
      */
     public static function factory($attributes)
     {
         $instance = new self();
         $instance->_initialize($attributes);
-
+        
         return $instance;
     }
 
     /**
+     *
      * @ignore
+     *
      */
     protected function _initialize($attributes)
     {
         $this->_attributes = $attributes;
-
+        
         $addOnArray = [];
         if (isset($attributes['addOns'])) {
-            foreach ($attributes['addOns'] AS $addOn) {
+            foreach ($attributes['addOns'] as $addOn) {
                 $addOnArray[] = AddOn::factory($addOn);
             }
         }
         $this->_attributes['addOns'] = $addOnArray;
-
+        
         $discountArray = [];
         if (isset($attributes['discounts'])) {
-            foreach ($attributes['discounts'] AS $discount) {
+            foreach ($attributes['discounts'] as $discount) {
                 $discountArray[] = Discount::factory($discount);
             }
         }
         $this->_attributes['discounts'] = $discountArray;
-
+        
         if (isset($attributes['descriptor'])) {
             $this->_set('descriptor', new Descriptor($attributes['descriptor']));
         }
-
+        
         $statusHistory = [];
         if (isset($attributes['statusHistory'])) {
-            foreach ($attributes['statusHistory'] AS $history) {
+            foreach ($attributes['statusHistory'] as $history) {
                 $statusHistory[] = new Subscription\StatusDetails($history);
             }
         }
         $this->_attributes['statusHistory'] = $statusHistory;
-
+        
         $transactionArray = [];
         if (isset($attributes['transactions'])) {
-            foreach ($attributes['transactions'] AS $transaction) {
+            foreach ($attributes['transactions'] as $transaction) {
                 $transactionArray[] = Transaction::factory($transaction);
             }
         }
@@ -82,26 +93,26 @@ class Subscription extends Base
 
     /**
      * returns a string representation of the customer
+     * 
      * @return string
      */
-    public function  __toString()
+    public function __toString()
     {
-        $excludedAttributes = ['statusHistory'];
-
+        $excludedAttributes = [
+            'statusHistory'
+        ];
+        
         $displayAttributes = [];
-        foreach($this->_attributes as $key => $val) {
-            if (!in_array($key, $excludedAttributes)) {
+        foreach ($this->_attributes as $key => $val) {
+            if (! in_array($key, $excludedAttributes)) {
                 $displayAttributes[$key] = $val;
             }
         }
-
-        return __CLASS__ . '[' .
-                Util::attributesToString($displayAttributes) .']';
+        
+        return __CLASS__ . '[' . Util::attributesToString($displayAttributes) . ']';
     }
-
-
+    
     // static methods redirecting to gateway
-
     public static function create($attributes)
     {
         return Configuration::gateway()->subscription()->create($attributes);

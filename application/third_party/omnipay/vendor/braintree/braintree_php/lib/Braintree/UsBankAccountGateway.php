@@ -6,8 +6,8 @@ use InvalidArgumentException;
 /**
  * Braintree UsBankAccountGateway module
  *
- * @package    Braintree
- * @category   Resources
+ * @package Braintree
+ * @category Resources
  */
 
 /**
@@ -16,13 +16,16 @@ use InvalidArgumentException;
  * <b>== More information ==</b>
  *
  *
- * @package    Braintree
- * @category   Resources
+ * @package Braintree
+ * @category Resources
  */
 class UsBankAccountGateway
 {
+
     private $_gateway;
+
     private $_config;
+
     private $_http;
 
     public function __construct($gateway)
@@ -33,12 +36,12 @@ class UsBankAccountGateway
         $this->_http = new Http($gateway->config);
     }
 
-
     /**
      * find a usBankAccount by token
      *
      * @access public
-     * @param string $token paypal accountunique id
+     * @param string $token
+     *            paypal accountunique id
      * @return UsBankAccount
      * @throws Exception\NotFound
      */
@@ -49,29 +52,23 @@ class UsBankAccountGateway
             $response = $this->_http->get($path);
             return UsBankAccount::factory($response['usBankAccount']);
         } catch (Exception\NotFound $e) {
-            throw new Exception\NotFound(
-                'US bank account with token ' . $token . ' not found'
-            );
+            throw new Exception\NotFound('US bank account with token ' . $token . ' not found');
         }
-
     }
 
     /**
      * create a new sale for the current UsBank account
      *
-     * @param string $token
-     * @param array $transactionAttribs
+     * @param string $token            
+     * @param array $transactionAttribs            
      * @return Result\Successful|Result\Error
      * @see Transaction::sale()
      */
     public function sale($token, $transactionAttribs)
     {
-        return Transaction::sale(
-            array_merge(
-                $transactionAttribs,
-                ['paymentMethodToken' => $token]
-            )
-        );
+        return Transaction::sale(array_merge($transactionAttribs, [
+            'paymentMethodToken' => $token
+        ]));
     }
 
     /**
@@ -83,7 +80,9 @@ class UsBankAccountGateway
      * alternatively, throws an Unexpected exception if the response is invalid.
      *
      * @ignore
-     * @param array $response gateway response values
+     *
+     * @param array $response
+     *            gateway response values
      * @return Result\Successful|Result\Error
      * @throws Exception\Unexpected
      */
@@ -91,16 +90,13 @@ class UsBankAccountGateway
     {
         if (isset($response['usBankAccount'])) {
             // return a populated instance of UsBankAccount
-            return new Result\Successful(
-                    UsBankAccount::factory($response['usBankAccount'])
-            );
-        } else if (isset($response['apiErrorResponse'])) {
-            return new Result\Error($response['apiErrorResponse']);
-        } else {
-            throw new Exception\Unexpected(
-            'Expected US bank account or apiErrorResponse'
-            );
-        }
+            return new Result\Successful(UsBankAccount::factory($response['usBankAccount']));
+        } else 
+            if (isset($response['apiErrorResponse'])) {
+                return new Result\Error($response['apiErrorResponse']);
+            } else {
+                throw new Exception\Unexpected('Expected US bank account or apiErrorResponse');
+            }
     }
 }
 class_alias('Braintree\UsBankAccountGateway', 'Braintree_UsBankAccountGateway');

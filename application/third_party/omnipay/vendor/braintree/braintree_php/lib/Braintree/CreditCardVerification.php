@@ -3,12 +3,13 @@ namespace Braintree;
 
 class CreditCardVerification extends Result\CreditCardVerification
 {
+
     public static function factory($attributes)
     {
         $instance = new self($attributes);
         return $instance;
     }
-
+    
     // static methods redirecting to gateway
     //
     public static function create($attributes)
@@ -30,14 +31,26 @@ class CreditCardVerification extends Result\CreditCardVerification
     public static function createSignature()
     {
         return [
-                ['options' => ['amount', 'merchantAccountId']],
-                ['creditCard' =>
+            [
+                'options' => [
+                    'amount',
+                    'merchantAccountId'
+                ]
+            ],
+            [
+                'creditCard' => [
+                    'cardholderName',
+                    'cvv',
+                    'number',
+                    'expirationDate',
+                    'expirationMonth',
+                    'expirationYear',
                     [
-                        'cardholderName', 'cvv', 'number',
-                        'expirationDate', 'expirationMonth', 'expirationYear',
-                        ['billingAddress' => CreditCardGateway::billingAddressSignature()]
+                        'billingAddress' => CreditCardGateway::billingAddressSignature()
                     ]
-                ]];
+                ]
+            ]
+        ];
     }
 }
 class_alias('Braintree\CreditCardVerification', 'Braintree_CreditCardVerification');

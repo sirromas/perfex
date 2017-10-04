@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Http;
 
 use Guzzle\Http\EntityBody;
@@ -10,10 +9,15 @@ use Guzzle\Http\ReadLimitEntityBody;
  */
 class ReadLimitEntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
 {
-    /** @var ReadLimitEntityBody */
+
+    /**
+     * @var ReadLimitEntityBody
+     */
     protected $body;
 
-    /** @var EntityBody */
+    /**
+     * @var EntityBody
+     */
     protected $decorated;
 
     public function setUp()
@@ -55,7 +59,7 @@ class ReadLimitEntityBodyTest extends \Guzzle\Tests\GuzzleTestCase
         $data = $this->body->read(100);
         $this->assertEquals(10, strlen($data));
         $this->assertFalse($this->body->read(1000));
-
+        
         $this->body->setOffset(10);
         $newData = $this->body->read(100);
         $this->assertEquals(10, strlen($newData));

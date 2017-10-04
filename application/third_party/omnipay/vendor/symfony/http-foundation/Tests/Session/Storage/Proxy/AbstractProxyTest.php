@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Proxy;
 
 use PHPUnit\Framework\TestCase;
@@ -22,29 +21,24 @@ class ConcreteProxy extends AbstractProxy
 
 class ConcreteSessionHandlerInterfaceProxy extends AbstractProxy implements \SessionHandlerInterface
 {
+
     public function open($savePath, $sessionName)
-    {
-    }
+    {}
 
     public function close()
-    {
-    }
+    {}
 
     public function read($id)
-    {
-    }
+    {}
 
     public function write($id, $data)
-    {
-    }
+    {}
 
     public function destroy($id)
-    {
-    }
+    {}
 
     public function gc($maxlifetime)
-    {
-    }
+    {}
 }
 
 /**
@@ -54,7 +48,9 @@ class ConcreteSessionHandlerInterfaceProxy extends AbstractProxy implements \Ses
  */
 class AbstractProxyTest extends TestCase
 {
+
     /**
+     *
      * @var AbstractProxy
      */
     protected $proxy;

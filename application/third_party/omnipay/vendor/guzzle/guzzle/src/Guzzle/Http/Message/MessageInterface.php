@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Http\Message;
 
 /**
@@ -7,6 +6,7 @@ namespace Guzzle\Http\Message;
  */
 interface MessageInterface
 {
+
     /**
      * Get application and plugin specific parameters set on the message.
      *
@@ -17,9 +17,11 @@ interface MessageInterface
     /**
      * Add a header to an existing collection of headers.
      *
-     * @param string $header Header name to add
-     * @param string $value  Value of the header
-     *
+     * @param string $header
+     *            Header name to add
+     * @param string $value
+     *            Value of the header
+     *            
      * @return self
      */
     public function addHeader($header, $value);
@@ -27,17 +29,20 @@ interface MessageInterface
     /**
      * Add and merge in an array of HTTP headers.
      *
-     * @param array $headers Associative array of header data.
-     *
+     * @param array $headers
+     *            Associative array of header data.
+     *            
      * @return self
      */
     public function addHeaders(array $headers);
 
     /**
-     * Retrieve an HTTP header by name. Performs a case-insensitive search of all headers.
+     * Retrieve an HTTP header by name.
+     * Performs a case-insensitive search of all headers.
      *
-     * @param string $header Header to retrieve.
-     *
+     * @param string $header
+     *            Header to retrieve.
+     *            
      * @return Header|null
      */
     public function getHeader($header);
@@ -52,8 +57,9 @@ interface MessageInterface
     /**
      * Check if the specified header is present.
      *
-     * @param string $header The header to check.
-     *
+     * @param string $header
+     *            The header to check.
+     *            
      * @return bool
      */
     public function hasHeader($header);
@@ -61,8 +67,9 @@ interface MessageInterface
     /**
      * Remove a specific HTTP header.
      *
-     * @param string $header HTTP header to remove.
-     *
+     * @param string $header
+     *            HTTP header to remove.
+     *            
      * @return self
      */
     public function removeHeader($header);
@@ -70,9 +77,11 @@ interface MessageInterface
     /**
      * Set an HTTP header and overwrite any existing value for the header
      *
-     * @param string $header Name of the header to set.
-     * @param mixed  $value  Value to set.
-     *
+     * @param string $header
+     *            Name of the header to set.
+     * @param mixed $value
+     *            Value to set.
+     *            
      * @return self
      */
     public function setHeader($header, $value);
@@ -80,14 +89,16 @@ interface MessageInterface
     /**
      * Overwrite all HTTP headers with the supplied array of headers
      *
-     * @param array $headers Associative array of header data.
-     *
+     * @param array $headers
+     *            Associative array of header data.
+     *            
      * @return self
      */
     public function setHeaders(array $headers);
 
     /**
-     * Get an array of message header lines (e.g. ["Host: example.com", ...])
+     * Get an array of message header lines (e.g.
+     * ["Host: example.com", ...])
      *
      * @return array
      */

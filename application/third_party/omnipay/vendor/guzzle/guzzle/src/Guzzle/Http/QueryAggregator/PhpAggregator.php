@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Http\QueryAggregator;
 
 use Guzzle\Http\QueryString;
@@ -9,10 +8,11 @@ use Guzzle\Http\QueryString;
  */
 class PhpAggregator implements QueryAggregatorInterface
 {
+
     public function aggregate($key, $value, QueryString $query)
     {
         $ret = array();
-
+        
         foreach ($value as $k => $v) {
             $k = "{$key}[{$k}]";
             if (is_array($v)) {
@@ -21,7 +21,7 @@ class PhpAggregator implements QueryAggregatorInterface
                 $ret[$query->encodeValue($k)] = $query->encodeValue($v);
             }
         }
-
+        
         return $ret;
     }
 }

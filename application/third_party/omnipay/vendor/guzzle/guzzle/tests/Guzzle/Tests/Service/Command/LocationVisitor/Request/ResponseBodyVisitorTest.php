@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Service\Command\LocationVisitor\Request;
 
 use Guzzle\Service\Command\LocationVisitor\Request\ResponseBodyVisitor as Visitor;
@@ -9,6 +8,7 @@ use Guzzle\Service\Command\LocationVisitor\Request\ResponseBodyVisitor as Visito
  */
 class ResponseBodyVisitorTest extends AbstractVisitorTestCase
 {
+
     public function testVisitsLocation()
     {
         $visitor = new Visitor();

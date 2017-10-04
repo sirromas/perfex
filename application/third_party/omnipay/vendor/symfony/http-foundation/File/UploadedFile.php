@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\File;
 
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -24,6 +23,7 @@ use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
  */
 class UploadedFile extends File
 {
+
     /**
      * Whether the test mode is activated.
      *
@@ -68,31 +68,37 @@ class UploadedFile extends File
      * isValid() method returns true). Otherwise the only methods that could be called
      * on an UploadedFile instance are:
      *
-     *   * getClientOriginalName,
-     *   * getClientMimeType,
-     *   * isValid,
-     *   * getError.
+     * * getClientOriginalName,
+     * * getClientMimeType,
+     * * isValid,
+     * * getError.
      *
      * Calling any other method on an non-valid instance will cause an unpredictable result.
      *
-     * @param string      $path         The full temporary path to the file
-     * @param string      $originalName The original file name
-     * @param string|null $mimeType     The type of the file as provided by PHP; null defaults to application/octet-stream
-     * @param int|null    $size         The file size
-     * @param int|null    $error        The error constant of the upload (one of PHP's UPLOAD_ERR_XXX constants); null defaults to UPLOAD_ERR_OK
-     * @param bool        $test         Whether the test mode is active
-     *
-     * @throws FileException         If file_uploads is disabled
+     * @param string $path
+     *            The full temporary path to the file
+     * @param string $originalName
+     *            The original file name
+     * @param string|null $mimeType
+     *            The type of the file as provided by PHP; null defaults to application/octet-stream
+     * @param int|null $size
+     *            The file size
+     * @param int|null $error
+     *            The error constant of the upload (one of PHP's UPLOAD_ERR_XXX constants); null defaults to UPLOAD_ERR_OK
+     * @param bool $test
+     *            Whether the test mode is active
+     *            
+     * @throws FileException If file_uploads is disabled
      * @throws FileNotFoundException If the file does not exist
      */
     public function __construct($path, $originalName, $mimeType = null, $size = null, $error = null, $test = false)
     {
         $this->originalName = $this->getName($originalName);
-        $this->mimeType = $mimeType ?: 'application/octet-stream';
+        $this->mimeType = $mimeType ?  : 'application/octet-stream';
         $this->size = $size;
-        $this->error = $error ?: UPLOAD_ERR_OK;
+        $this->error = $error ?  : UPLOAD_ERR_OK;
         $this->test = (bool) $test;
-
+        
         parent::__construct($path, UPLOAD_ERR_OK === $this->error);
     }
 
@@ -102,7 +108,7 @@ class UploadedFile extends File
      * It is extracted from the request from which the file has been uploaded.
      * Then it should not be considered as a safe value.
      *
-     * @return string|null The original name
+     * @return string|null original name
      */
     public function getClientOriginalName()
     {
@@ -131,8 +137,8 @@ class UploadedFile extends File
      * For a trusted mime type, use getMimeType() instead (which guesses the mime
      * type based on the file content).
      *
-     * @return string|null The mime type
-     *
+     * @return string|null mime type
+     *        
      * @see getMimeType()
      */
     public function getClientMimeType()
@@ -152,8 +158,8 @@ class UploadedFile extends File
      * For a trusted extension, use guessExtension() instead (which guesses
      * the extension based on the guessed mime type for the file).
      *
-     * @return string|null The guessed extension or null if it cannot be guessed
-     *
+     * @return string|null guessed extension or null if it cannot be guessed
+     *        
      * @see guessExtension()
      * @see getClientMimeType()
      */
@@ -161,7 +167,7 @@ class UploadedFile extends File
     {
         $type = $this->getClientMimeType();
         $guesser = ExtensionGuesser::getInstance();
-
+        
         return $guesser->guess($type);
     }
 
@@ -171,7 +177,7 @@ class UploadedFile extends File
      * It is extracted from the request from which the file has been uploaded.
      * Then it should not be considered as a safe value.
      *
-     * @return int|null The file size
+     * @return int|null file size
      */
     public function getClientSize()
     {
@@ -199,18 +205,20 @@ class UploadedFile extends File
     public function isValid()
     {
         $isOk = $this->error === UPLOAD_ERR_OK;
-
+        
         return $this->test ? $isOk : $isOk && is_uploaded_file($this->getPathname());
     }
 
     /**
      * Moves the file to a new location.
      *
-     * @param string $directory The destination folder
-     * @param string $name      The new file name
-     *
+     * @param string $directory
+     *            The destination folder
+     * @param string $name
+     *            The new file name
+     *            
      * @return File A File object representing the new file
-     *
+     *        
      * @throws FileException if, for any reason, the file could not have been moved
      */
     public function move($directory, $name = null)
@@ -219,19 +227,19 @@ class UploadedFile extends File
             if ($this->test) {
                 return parent::move($directory, $name);
             }
-
+            
             $target = $this->getTargetFile($directory, $name);
-
-            if (!@move_uploaded_file($this->getPathname(), $target)) {
+            
+            if (! @move_uploaded_file($this->getPathname(), $target)) {
                 $error = error_get_last();
                 throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
             }
-
-            @chmod($target, 0666 & ~umask());
-
+            
+            @chmod($target, 0666 & ~ umask());
+            
             return $target;
         }
-
+        
         throw new FileException($this->getErrorMessage());
     }
 
@@ -243,11 +251,11 @@ class UploadedFile extends File
     public static function getMaxFilesize()
     {
         $iniMax = strtolower(ini_get('upload_max_filesize'));
-
+        
         if ('' === $iniMax) {
             return PHP_INT_MAX;
         }
-
+        
         $max = ltrim($iniMax, '+');
         if (0 === strpos($max, '0x')) {
             $max = intval($max, 16);
@@ -256,14 +264,18 @@ class UploadedFile extends File
         } else {
             $max = (int) $max;
         }
-
-        switch (substr($iniMax, -1)) {
-            case 't': $max *= 1024;
-            case 'g': $max *= 1024;
-            case 'm': $max *= 1024;
-            case 'k': $max *= 1024;
+        
+        switch (substr($iniMax, - 1)) {
+            case 't':
+                $max *= 1024;
+            case 'g':
+                $max *= 1024;
+            case 'm':
+                $max *= 1024;
+            case 'k':
+                $max *= 1024;
         }
-
+        
         return $max;
     }
 
@@ -281,13 +293,13 @@ class UploadedFile extends File
             UPLOAD_ERR_NO_FILE => 'No file was uploaded.',
             UPLOAD_ERR_CANT_WRITE => 'The file "%s" could not be written on disk.',
             UPLOAD_ERR_NO_TMP_DIR => 'File could not be uploaded: missing temporary directory.',
-            UPLOAD_ERR_EXTENSION => 'File upload was stopped by a PHP extension.',
+            UPLOAD_ERR_EXTENSION => 'File upload was stopped by a PHP extension.'
         );
-
+        
         $errorCode = $this->error;
         $maxFilesize = $errorCode === UPLOAD_ERR_INI_SIZE ? self::getMaxFilesize() / 1024 : 0;
         $message = isset($errors[$errorCode]) ? $errors[$errorCode] : 'The file "%s" was not uploaded due to an unknown error.';
-
+        
         return sprintf($message, $this->getClientOriginalName(), $maxFilesize);
     }
 }

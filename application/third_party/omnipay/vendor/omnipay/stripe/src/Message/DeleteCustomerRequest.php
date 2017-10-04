@@ -15,10 +15,11 @@ namespace Omnipay\Stripe\Message;
  */
 class DeleteCustomerRequest extends AbstractRequest
 {
+
     public function getData()
     {
         $this->validate('customerReference');
-
+        
         return;
     }
 
@@ -29,6 +30,6 @@ class DeleteCustomerRequest extends AbstractRequest
 
     public function getEndpoint()
     {
-        return $this->endpoint.'/customers/'.$this->getCustomerReference();
+        return $this->endpoint . '/customers/' . $this->getCustomerReference();
     }
 }

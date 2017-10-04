@@ -6,7 +6,8 @@
 				<div class="panel_s">
 					<div class="panel-body">
 						<div class="_buttons">
-							<a href="#" onclick="new_status(); return false;" class="btn btn-info pull-left display-block">
+							<a href="#" onclick="new_status(); return false;"
+								class="btn btn-info pull-left display-block">
 								<?php echo _l('new_ticket_status'); ?>
 							</a>
 						</div>
@@ -24,13 +25,25 @@
 								<?php foreach($statuses as $status){ ?>
 								<tr>
 									<td><?php echo $status['ticketstatusid']; ?></td>
-									<td><a href="#" onclick="edit_status(this,<?php echo $status['ticketstatusid']; ?>); return false" data-name="<?php echo $status['name']; ?>" data-color="<?php echo $status['statuscolor']; ?>" data-order="<?php echo $status['statusorder']; ?>"><?php echo $status['name']; ?></a><br />
+									<td><a href="#"
+										onclick="edit_status(this,<?php echo $status['ticketstatusid']; ?>); return false"
+										data-name="<?php echo $status['name']; ?>"
+										data-color="<?php echo $status['statuscolor']; ?>"
+										data-order="<?php echo $status['statusorder']; ?>"><?php echo $status['name']; ?></a><br />
 										<?php echo _l('ticket_statuses_table_total',total_rows('tbltickets',array('status'=>$status['ticketstatusid']))); ?>
 									</td>
-									<td>
-										<a href="#" onclick="edit_status(this,<?php echo $status['ticketstatusid']; ?>); return false" data-name="<?php echo $status['name']; ?>" data-color="<?php echo $status['statuscolor']; ?>" data-order="<?php echo $status['statusorder']; ?>" class="btn btn-default btn-icon"><i class="fa fa-pencil-square-o"></i></a>
+									<td><a href="#"
+										onclick="edit_status(this,<?php echo $status['ticketstatusid']; ?>); return false"
+										data-name="<?php echo $status['name']; ?>"
+										data-color="<?php echo $status['statuscolor']; ?>"
+										data-order="<?php echo $status['statusorder']; ?>"
+										class="btn btn-default btn-icon"><i
+											class="fa fa-pencil-square-o"></i></a>
 										<?php if ($status['isdefault'] == 0) { ?>
-										<a href="<?php echo admin_url('tickets/delete_ticket_status/'.$status['ticketstatusid']); ?>" class="btn btn-danger btn-icon _delete"><i class="fa fa-remove"></i></a>
+										<a
+										href="<?php echo admin_url('tickets/delete_ticket_status/'.$status['ticketstatusid']); ?>"
+										class="btn btn-danger btn-icon _delete"><i
+											class="fa fa-remove"></i></a>
 										<?php } ?>
 									</td>
 								</tr>
@@ -51,7 +64,10 @@
 		<?php echo form_open(admin_url('tickets/status')); ?>
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
 				<h4 class="modal-title">
 					<span class="edit-title"><?php echo _l('ticket_status_edit'); ?></span>
 					<span class="add-title"><?php echo _l('new_ticket_status'); ?></span>
@@ -71,10 +87,13 @@
 				<button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
 				<button type="submit" class="btn btn-info"><?php echo _l('submit'); ?></button>
 			</div>
-		</div><!-- /.modal-content -->
+		</div>
+		<!-- /.modal-content -->
 		<?php echo form_close(); ?>
-	</div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 <?php init_tail(); ?>
 <script>
 	$(function(){

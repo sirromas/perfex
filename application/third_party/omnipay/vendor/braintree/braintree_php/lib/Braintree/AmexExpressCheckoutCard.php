@@ -9,9 +9,9 @@ namespace Braintree;
  *
  * See {@link https://developers.braintreepayments.com/javascript+php}<br />
  *
- * @package    Braintree
- * @category   Resources
- *
+ * @package Braintree
+ * @category Resources
+ *          
  * @property-read string $createdAt
  * @property-read string $default
  * @property-read string $updatedAt
@@ -40,15 +40,15 @@ class AmexExpressCheckoutCard extends Base
     }
 
     /**
-     *  factory method: returns an instance of AmexExpressCheckoutCard
-     *  to the requesting method, with populated properties
+     * factory method: returns an instance of AmexExpressCheckoutCard
+     * to the requesting method, with populated properties
      *
      * @ignore
+     *
      * @return AmexExpressCheckoutCard
      */
     public static function factory($attributes)
     {
-
         $instance = new self();
         $instance->_initialize($attributes);
         return $instance;
@@ -58,21 +58,22 @@ class AmexExpressCheckoutCard extends Base
      * sets instance properties from an array of values
      *
      * @access protected
-     * @param array $amexExpressCheckoutCardAttribs array of Amex Express Checkout card properties
+     * @param array $amexExpressCheckoutCardAttribs
+     *            array of Amex Express Checkout card properties
      * @return void
      */
     protected function _initialize($amexExpressCheckoutCardAttribs)
     {
         // set the attributes
         $this->_attributes = $amexExpressCheckoutCardAttribs;
-
+        
         $subscriptionArray = [];
         if (isset($amexExpressCheckoutCardAttribs['subscriptions'])) {
-            foreach ($amexExpressCheckoutCardAttribs['subscriptions'] AS $subscription) {
+            foreach ($amexExpressCheckoutCardAttribs['subscriptions'] as $subscription) {
                 $subscriptionArray[] = Subscription::factory($subscription);
             }
         }
-
+        
         $this->_set('subscriptions', $subscriptionArray);
     }
 }

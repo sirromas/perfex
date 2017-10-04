@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal\Message;
 
 use Omnipay\PayPal\Message\CaptureRequest;
@@ -7,7 +6,9 @@ use Omnipay\Tests\TestCase;
 
 class CaptureRequestTest extends TestCase
 {
+
     /**
+     *
      * @var \Omnipay\PayPal\Message\CaptureRequest
      */
     private $request;
@@ -29,7 +30,7 @@ class CaptureRequestTest extends TestCase
         $this->request->setSignature('SIG');
         $this->request->setSubject('SUB');
         $this->request->setButtonSource('BNCode_PP');
-
+        
         $expected = array();
         $expected['METHOD'] = 'DoCapture';
         $expected['AUTHORIZATIONID'] = 'ABC-123';
@@ -42,7 +43,7 @@ class CaptureRequestTest extends TestCase
         $expected['SUBJECT'] = 'SUB';
         $expected['BUTTONSOURCE'] = 'BNCode_PP';
         $expected['VERSION'] = CaptureRequest::API_VERSION;
-
+        
         $this->assertEquals($expected, $this->request->getData());
     }
 }

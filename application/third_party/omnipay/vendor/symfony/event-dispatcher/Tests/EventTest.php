@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\EventDispatcher\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -20,12 +19,15 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
  */
 class EventTest extends TestCase
 {
+
     /**
+     *
      * @var \Symfony\Component\EventDispatcher\Event
      */
     protected $event;
 
     /**
+     *
      * @var \Symfony\Component\EventDispatcher\EventDispatcher
      */
     protected $dispatcher;

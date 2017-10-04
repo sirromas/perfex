@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\Session\Flash;
 
 /**
@@ -18,6 +17,7 @@ namespace Symfony\Component\HttpFoundation\Session\Flash;
  */
 class FlashBag implements FlashBagInterface
 {
+
     private $name = 'flashes';
 
     /**
@@ -37,7 +37,8 @@ class FlashBag implements FlashBagInterface
     /**
      * Constructor.
      *
-     * @param string $storageKey The key used to store flashes in the session
+     * @param string $storageKey
+     *            The key used to store flashes in the session
      */
     public function __construct($storageKey = '_sf2_flashes')
     {
@@ -45,7 +46,9 @@ class FlashBag implements FlashBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getName()
     {
@@ -58,7 +61,9 @@ class FlashBag implements FlashBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function initialize(array &$flashes)
     {
@@ -66,7 +71,9 @@ class FlashBag implements FlashBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function add($type, $message)
     {
@@ -74,7 +81,9 @@ class FlashBag implements FlashBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function peek($type, array $default = array())
     {
@@ -82,7 +91,9 @@ class FlashBag implements FlashBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function peekAll()
     {
@@ -90,34 +101,40 @@ class FlashBag implements FlashBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function get($type, array $default = array())
     {
-        if (!$this->has($type)) {
+        if (! $this->has($type)) {
             return $default;
         }
-
+        
         $return = $this->flashes[$type];
-
+        
         unset($this->flashes[$type]);
-
+        
         return $return;
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function all()
     {
         $return = $this->peekAll();
         $this->flashes = array();
-
+        
         return $return;
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function set($type, $messages)
     {
@@ -125,7 +142,9 @@ class FlashBag implements FlashBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function setAll(array $messages)
     {
@@ -133,7 +152,9 @@ class FlashBag implements FlashBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function has($type)
     {
@@ -141,7 +162,9 @@ class FlashBag implements FlashBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function keys()
     {
@@ -149,7 +172,9 @@ class FlashBag implements FlashBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getStorageKey()
     {
@@ -157,7 +182,9 @@ class FlashBag implements FlashBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function clear()
     {

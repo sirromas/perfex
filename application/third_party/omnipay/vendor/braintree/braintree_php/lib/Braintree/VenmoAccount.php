@@ -9,9 +9,9 @@ namespace Braintree;
  *
  * See {@link https://developers.braintreepayments.com/javascript+php}<br />
  *
- * @package    Braintree
- * @category   Resources
- *
+ * @package Braintree
+ * @category Resources
+ *          
  * @property-read string $createdAt
  * @property-read string $default
  * @property-read string $updatedAt
@@ -36,15 +36,15 @@ class VenmoAccount extends Base
     }
 
     /**
-     *  factory method: returns an instance of VenmoAccount
-     *  to the requesting method, with populated properties
+     * factory method: returns an instance of VenmoAccount
+     * to the requesting method, with populated properties
      *
      * @ignore
+     *
      * @return VenmoAccount
      */
     public static function factory($attributes)
     {
-
         $instance = new self();
         $instance->_initialize($attributes);
         return $instance;
@@ -54,20 +54,21 @@ class VenmoAccount extends Base
      * sets instance properties from an array of values
      *
      * @access protected
-     * @param array $venmoAccountAttribs array of Venmo account properties
+     * @param array $venmoAccountAttribs
+     *            array of Venmo account properties
      * @return void
      */
     protected function _initialize($venmoAccountAttribs)
     {
         $this->_attributes = $venmoAccountAttribs;
-
+        
         $subscriptionArray = array();
         if (isset($venmoAccountAttribs['subscriptions'])) {
-            foreach ($venmoAccountAttribs['subscriptions'] AS $subscription) {
+            foreach ($venmoAccountAttribs['subscriptions'] as $subscription) {
                 $subscriptionArray[] = Subscription::factory($subscription);
             }
         }
-
+        
         $this->_set('subscriptions', $subscriptionArray);
     }
 }

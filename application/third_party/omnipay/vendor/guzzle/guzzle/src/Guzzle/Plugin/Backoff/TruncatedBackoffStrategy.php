@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Plugin\Backoff;
 
 use Guzzle\Http\Message\RequestInterface;
@@ -11,12 +10,18 @@ use Guzzle\Http\Exception\HttpException;
  */
 class TruncatedBackoffStrategy extends AbstractBackoffStrategy
 {
-    /** @var int Maximum number of retries per request */
+
+    /**
+     * @var int Maximum number of retries per request
+     */
     protected $max;
 
     /**
-     * @param int                      $maxRetries Maximum number of retries per request
-     * @param BackoffStrategyInterface $next The optional next strategy
+     *
+     * @param int $maxRetries
+     *            Maximum number of retries per request
+     * @param BackoffStrategyInterface $next
+     *            The optional next strategy
      */
     public function __construct($maxRetries, BackoffStrategyInterface $next = null)
     {

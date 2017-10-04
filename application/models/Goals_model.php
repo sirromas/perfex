@@ -1,34 +1,39 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
 class Goals_model extends CRM_Model
 {
+
     public function __construct()
     {
         parent::__construct();
     }
 
     /**
-     * @param  integer (optional)
-     * @return object
-     * Get single goal
+     *
+     * @param
+     *            integer (optional)
+     * @return object Get single goal
      */
     public function get($id = '', $exclude_notified = false)
     {
         if (is_numeric($id)) {
             $this->db->where('id', $id);
-
+            
             return $this->db->get('tblgoals')->row();
         }
         if ($exclude_notified == true) {
             $this->db->where('notified', 0);
         }
-
+        
         return $this->db->get('tblgoals')->result_array();
     }
 
     /**
      * Add new goal
-     * @param mixed $data All $_POST dat
+     * 
+     * @param mixed $data
+     *            All $_POST dat
      * @return mixed
      */
     public function add($data)
@@ -44,22 +49,25 @@ class Goals_model extends CRM_Model
             $data['notify_when_achieve'] = 0;
         }
         $data['start_date'] = to_sql_date($data['start_date']);
-        $data['end_date']   = to_sql_date($data['end_date']);
+        $data['end_date'] = to_sql_date($data['end_date']);
         $this->db->insert('tblgoals', $data);
         $insert_id = $this->db->insert_id();
         if ($insert_id) {
             logActivity('New Goal Added [ID:' . $insert_id . ']');
-
+            
             return $insert_id;
         }
-
+        
         return false;
     }
 
     /**
      * Update goal
-     * @param  mixed $data All $_POST data
-     * @param  mixed $id   goal id
+     * 
+     * @param mixed $data
+     *            All $_POST data
+     * @param mixed $id
+     *            goal id
      * @return boolean
      */
     public function update($data, $id)
@@ -75,22 +83,23 @@ class Goals_model extends CRM_Model
             $data['notify_when_achieve'] = 0;
         }
         $data['start_date'] = to_sql_date($data['start_date']);
-        $data['end_date']   = to_sql_date($data['end_date']);
+        $data['end_date'] = to_sql_date($data['end_date']);
         $this->db->where('id', $id);
         $this->db->update('tblgoals', $data);
         if ($this->db->affected_rows() > 0) {
             logActivity('Goal Updated [ID:' . $id . ']');
-
-            return true;
             
+            return true;
         }
-
+        
         return false;
     }
 
     /**
      * Delete goal
-     * @param  mixed $id goal id
+     * 
+     * @param mixed $id
+     *            goal id
      * @return boolean
      */
     public function delete($id)
@@ -99,18 +108,22 @@ class Goals_model extends CRM_Model
         $this->db->delete('tblgoals');
         if ($this->db->affected_rows() > 0) {
             logActivity('Goal Deleted [ID:' . $id . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * Notify staff members about goal result
-     * @param  mixed $id          goal id
-     * @param  string $notify_type is success or failed
-     * @param  mixed $achievement total achievent (Option)
+     * 
+     * @param mixed $id
+     *            goal id
+     * @param string $notify_type
+     *            is success or failed
+     * @param mixed $achievement
+     *            total achievent (Option)
      * @return boolean
      */
     public function notify_staff_members($id, $notify_type, $achievement = '')
@@ -124,7 +137,7 @@ class Goals_model extends CRM_Model
         } else {
             $goal_desc = 'not_goal_message_failed';
         }
-
+        
         $this->load->model('staff_model');
         $staff = $this->staff_model->get('', 1);
         $notifiedUsers = array();
@@ -155,23 +168,25 @@ class Goals_model extends CRM_Model
         if (count($staff) > 0 && $this->db->affected_rows() > 0) {
             return true;
         }
-
+        
         return false;
     }
 
     /**
      * Calculate goal achievement
-     * @param  mixed $id goal id
+     * 
+     * @param mixed $id
+     *            goal id
      * @return array
      */
     public function calculate_goal_achievement($id)
     {
-        $goal       = $this->get($id);
+        $goal = $this->get($id);
         $start_date = $goal->start_date;
-        $end_date   = $goal->end_date;
-        $type       = $goal->goal_type;
-        $total      = 0;
-        $percent    = 0;
+        $end_date = $goal->end_date;
+        $type = $goal->goal_type;
+        $total = 0;
+        $percent = 0;
         if ($type == 1) {
             $sql = "SELECT SUM(amount) as total FROM tblinvoicepaymentrecords WHERE date BETWEEN '" . $start_date . "' AND '" . $end_date . "'";
         } elseif ($type == 2) {
@@ -200,7 +215,7 @@ class Goals_model extends CRM_Model
             }
         }
         $progress_bar_percent = $percent / 100;
-
+        
         return array(
             'total' => $total,
             'percent' => $percent,

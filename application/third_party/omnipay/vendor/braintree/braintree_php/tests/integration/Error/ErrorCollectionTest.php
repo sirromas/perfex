@@ -8,6 +8,7 @@ use Braintree;
 
 class ErrorCollectionTest extends Setup
 {
+
     public function testDeepSize_withNestedErrors()
     {
         $result = Braintree\Customer::create([
@@ -70,9 +71,11 @@ class ErrorCollectionTest extends Setup
             'email' => 'invalid',
             'creditCard' => [
                 'number' => '5105105105105100',
-                'expirationDate' => '05/12',
+                'expirationDate' => '05/12'
             ],
-            'customFields' => ['storeMe' => 'value']
+            'customFields' => [
+                'storeMe' => 'value'
+            ]
         ]);
         $this->assertEquals(false, $result->success);
         $this->assertEquals([], $result->errors->onHtmlField('customer[custom_fields][store_me]'));

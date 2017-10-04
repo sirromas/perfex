@@ -9,11 +9,10 @@ use Braintree\Exception;
  * the attempted action according to the roles assigned to the user
  * who owns the API key.
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Exception
  */
 class Authorization extends Exception
 {
-
 }
 class_alias('Braintree\Exception\Authorization', 'Braintree_Exception_Authorization');

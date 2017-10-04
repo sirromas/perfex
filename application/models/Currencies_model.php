@@ -1,30 +1,35 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
 class Currencies_model extends CRM_Model
 {
+
     public function __construct()
     {
         parent::__construct();
     }
 
     /**
-     * @param  integer ID (optional)
-     * @return mixed
-     * Get currency object based on passed id if not passed id return array of all currencies
+     *
+     * @param
+     *            integer ID (optional)
+     * @return mixed Get currency object based on passed id if not passed id return array of all currencies
      */
     public function get($id = false)
     {
         if (is_numeric($id)) {
             $this->db->where('id', $id);
-
+            
             return $this->db->get('tblcurrencies')->row();
         }
-
+        
         return $this->db->get('tblcurrencies')->result_array();
     }
 
     /**
-     * @param array $_POST data
+     *
+     * @param array $_POST
+     *            data
      * @return boolean
      */
     public function add($data)
@@ -35,17 +40,18 @@ class Currencies_model extends CRM_Model
         $insert_id = $this->db->insert_id();
         if ($insert_id) {
             logActivity('New Currency Added [ID: ' . $data['name'] . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
-     * @param  array $_POST data
-     * @return boolean
-     * Update currency values
+     *
+     * @param array $_POST
+     *            data
+     * @return boolean Update currency values
      */
     public function edit($data)
     {
@@ -56,17 +62,18 @@ class Currencies_model extends CRM_Model
         $this->db->update('tblcurrencies', $data);
         if ($this->db->affected_rows() > 0) {
             logActivity('Currency Updated [' . $data['name'] . ']');
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
-     * @param  integer ID
-     * @return mixed
-     * Delete currency from database, if used return array with key referenced
+     *
+     * @param
+     *            integer ID
+     * @return mixed Delete currency from database, if used return array with key referenced
      */
     public function delete($id)
     {
@@ -77,35 +84,36 @@ class Currencies_model extends CRM_Model
                 );
             }
         }
-
+        
         $currency = $this->get($id);
         if ($currency->isdefault == 1) {
             return array(
                 'is_default' => true
             );
         }
-
+        
         $this->db->where('id', $id);
         $this->db->delete('tblcurrencies');
         if ($this->db->affected_rows() > 0) {
             $this->load->dbforge();
             $columns = $this->db->list_fields('tblitems');
-            foreach($columns as $column){
-                if($column == 'rate_currency_'.$id) {
-                    $this->dbforge->drop_column('tblitems','rate_currency_'.$id);
+            foreach ($columns as $column) {
+                if ($column == 'rate_currency_' . $id) {
+                    $this->dbforge->drop_column('tblitems', 'rate_currency_' . $id);
                 }
             }
             logActivity('Currency Deleted [' . $id . ']');
             return true;
         }
-
+        
         return false;
     }
 
     /**
-     * @param  integer ID
-     * @return boolean
-     * Make currency your base currency for better using reports if found invoices with more then 1 currency
+     *
+     * @param
+     *            integer ID
+     * @return boolean Make currency your base currency for better using reports if found invoices with more then 1 currency
      */
     public function make_base_currency($id)
     {
@@ -117,7 +125,7 @@ class Currencies_model extends CRM_Model
                 );
             }
         }
-
+        
         $this->db->where('id', $id);
         $this->db->update('tblcurrencies', array(
             'isdefault' => 1
@@ -127,38 +135,39 @@ class Currencies_model extends CRM_Model
             $this->db->update('tblcurrencies', array(
                 'isdefault' => 0
             ));
-
+            
             return true;
         }
-
+        
         return false;
     }
 
     /**
-     * @return object
-     * Get base currency
+     *
+     * @return object Get base currency
      */
     public function get_base_currency()
     {
         $this->db->where('isdefault', 1);
-
+        
         return $this->db->get('tblcurrencies')->row();
     }
 
     /**
-     * @param  integer ID
-     * @return string
-     * Get the symbol from the currency
+     *
+     * @param
+     *            integer ID
+     * @return string Get the symbol from the currency
      */
     public function get_currency_symbol($id)
     {
-        if (!is_numeric($id)) {
+        if (! is_numeric($id)) {
             $id = $this->get_base_currency()->id;
         }
         $this->db->select('symbol');
         $this->db->from('tblcurrencies');
         $this->db->where('id', $id);
-
+        
         return $this->db->get()->row()->symbol;
     }
 }

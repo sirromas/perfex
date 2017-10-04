@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Http\Message\Header;
 
 use Guzzle\Common\ToArrayInterface;
@@ -9,7 +8,10 @@ use Guzzle\Common\ToArrayInterface;
  */
 class HeaderCollection implements \IteratorAggregate, \Countable, \ArrayAccess, ToArrayInterface
 {
-    /** @var array */
+
+    /**
+     * @var array
+     */
     protected $headers;
 
     public function __construct($headers = array())
@@ -35,14 +37,15 @@ class HeaderCollection implements \IteratorAggregate, \Countable, \ArrayAccess, 
     /**
      * Set a header on the collection
      *
-     * @param HeaderInterface $header Header to add
-     *
+     * @param HeaderInterface $header
+     *            Header to add
+     *            
      * @return self
      */
     public function add(HeaderInterface $header)
     {
         $this->headers[strtolower($header->getName())] = $header;
-
+        
         return $this;
     }
 
@@ -77,7 +80,7 @@ class HeaderCollection implements \IteratorAggregate, \Countable, \ArrayAccess, 
     public function offsetGet($offset)
     {
         $l = strtolower($offset);
-
+        
         return isset($this->headers[$l]) ? $this->headers[$l] : null;
     }
 
@@ -102,7 +105,7 @@ class HeaderCollection implements \IteratorAggregate, \Countable, \ArrayAccess, 
         foreach ($this->headers as $header) {
             $result[$header->getName()] = $header->toArray();
         }
-
+        
         return $result;
     }
 }

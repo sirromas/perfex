@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Batch;
 
 use Guzzle\Batch\BatchClosureTransfer;
@@ -9,18 +8,24 @@ use Guzzle\Batch\BatchClosureTransfer;
  */
 class BatchClosureTransferTest extends \Guzzle\Tests\GuzzleTestCase
 {
-    /** @var \Guzzle\Batch\BatchClosureTransfer The transfer fixture */
+
+    /**
+     * @var \Guzzle\Batch\BatchClosureTransfer The transfer fixture
+     */
     protected $transferStrategy;
 
-    /** @var array|null An array for keeping track of items passed into the transfer closure */
+    /**
+     * @var array|null An array for keeping track of items passed into the transfer closure
+     */
     protected $itemsTransferred;
 
     protected function setUp()
     {
         $this->itemsTransferred = null;
-        $itemsTransferred =& $this->itemsTransferred;
-
-        $this->transferStrategy = new BatchClosureTransfer(function (array $batch) use (&$itemsTransferred) {
+        $itemsTransferred = & $this->itemsTransferred;
+        
+        $this->transferStrategy = new BatchClosureTransfer(function (array $batch) use(&$itemsTransferred)
+        {
             $itemsTransferred = $batch;
             return;
         });
@@ -28,9 +33,13 @@ class BatchClosureTransferTest extends \Guzzle\Tests\GuzzleTestCase
 
     public function testTransfersBatch()
     {
-        $batchedItems = array('foo', 'bar', 'baz');
+        $batchedItems = array(
+            'foo',
+            'bar',
+            'baz'
+        );
         $this->transferStrategy->transfer($batchedItems);
-
+        
         $this->assertEquals($batchedItems, $this->itemsTransferred);
     }
 
@@ -38,7 +47,7 @@ class BatchClosureTransferTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $batchedItems = array();
         $this->transferStrategy->transfer($batchedItems);
-
+        
         $this->assertNull($this->itemsTransferred);
     }
 

@@ -1,17 +1,19 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
 class Paymentmodes extends Admin_controller
 {
+
     public function __construct()
     {
         parent::__construct();
         $this->load->model('payment_modes_model');
-        if (!is_admin()) {
+        if (! is_admin()) {
             access_denied('Payment Modes');
         }
     }
-
-    /* List all peyment modes*/
+    
+    /* List all peyment modes */
     public function index()
     {
         if ($this->input->is_ajax_request()) {
@@ -20,7 +22,7 @@ class Paymentmodes extends Admin_controller
         $data['title'] = _l('payment_modes');
         $this->load->view('admin/paymentmodes/manage', $data);
     }
-
+    
     /* Add or update payment mode / ajax */
     public function manage()
     {
@@ -49,11 +51,11 @@ class Paymentmodes extends Admin_controller
             }
         }
     }
-
+    
     /* Delete payment mode */
     public function delete($id)
     {
-        if (!$id) {
+        if (! $id) {
             redirect(admin_url('paymentmodes'));
         }
         $response = $this->payment_modes_model->delete($id);
@@ -66,7 +68,7 @@ class Paymentmodes extends Admin_controller
         }
         redirect(admin_url('paymentmodes'));
     }
-
+    
     // Since version 1.0.1
     // Change payment mode active or inactive
     public function change_payment_mode_status($id, $status)
@@ -75,7 +77,7 @@ class Paymentmodes extends Admin_controller
             $this->payment_modes_model->change_payment_mode_status($id, $status);
         }
     }
-
+    
     // Since version 1.0.1
     // Change to show this mode to client or not
     public function change_payment_mode_show_to_client_status($id, $status)

@@ -4,29 +4,34 @@ namespace Braintree;
 /**
  * Connected Merchant Status Transitioned Payload
  *
- * @package    Braintree
- *
+ * @package Braintree
+ *         
  * @property-read string $merchantPublicId
  * @property-read string $status
  * @property-read string $oauthApplicationClientId
  */
 class ConnectedMerchantStatusTransitioned extends Base
 {
+
     protected $_attributes = [];
 
     /**
+     *
      * @ignore
+     *
      */
     public static function factory($attributes)
     {
         $instance = new self();
         $instance->_initialize($attributes);
-
+        
         return $instance;
     }
 
     /**
+     *
      * @ignore
+     *
      */
     protected function _initialize($attributes)
     {

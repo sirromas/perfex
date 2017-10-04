@@ -10,40 +10,53 @@ use Braintree;
 
 class ParserTest extends Setup
 {
+
     public function testTypeCastIntegers()
     {
         $array = Braintree\Xml::buildArrayFromXml('<root><foo type="integer">123</foo></root>');
-        $this->assertEquals($array, ['root' => ['foo' => 123]]);
-
+        $this->assertEquals($array, [
+            'root' => [
+                'foo' => 123
+            ]
+        ]);
     }
 
     public function testDashesUnderscores()
     {
-        $xml =<<<XML
+        $xml = <<<XML
         <root>
           <dash-es />
           <under_scores />
         </root>
 XML;
-
+        
         $array = Braintree\Xml::buildArrayFromXml($xml);
-        $this->assertEquals(['root' =>
-            ['dashEs' => '', 'underScores' => '']], $array);
+        $this->assertEquals([
+            'root' => [
+                'dashEs' => '',
+                'underScores' => ''
+            ]
+        ], $array);
     }
 
     public function testCustomFieldsUnderscore()
     {
-        $xml =<<<XML
+        $xml = <<<XML
         <root>
           <custom-fields>
             <with-dashes>convert to underscore</with-dashes>
           </custom-fields>
         </root>
 XML;
-
+        
         $array = Braintree\Xml::buildArrayFromXml($xml);
-        $this->assertEquals(['root' =>
-            ['customFields' => ['with_dashes' => 'convert to underscore']]], $array);
+        $this->assertEquals([
+            'root' => [
+                'customFields' => [
+                    'with_dashes' => 'convert to underscore'
+                ]
+            ]
+        ], $array);
     }
 
     public function testNullOrEmptyString()
@@ -55,8 +68,12 @@ XML;
         </root>
 XML;
         $array = Braintree\Xml::buildArrayFromXml($xml);
-        $this->assertEquals(['root' =>
-            ['aNilValue' => null, 'anEmptyString' => '']], $array);
+        $this->assertEquals([
+            'root' => [
+                'aNilValue' => null,
+                'anEmptyString' => ''
+            ]
+        ], $array);
     }
 
     public function testTypeCastsDatetimes()
@@ -69,7 +86,11 @@ XML;
         $array = Braintree\Xml::buildArrayFromXml($xml);
         date_default_timezone_set('UTC');
         $dateTime = new DateTime('2009-10-28T10:19:49', new DateTimeZone('UTC'));
-        $this->assertEquals(['root' => ['createdAt' => $dateTime]], $array);
+        $this->assertEquals([
+            'root' => [
+                'createdAt' => $dateTime
+            ]
+        ], $array);
         $this->assertInstanceOf('DateTime', $array['root']['createdAt']);
     }
 
@@ -83,7 +104,11 @@ XML;
         $array = Braintree\Xml::buildArrayFromXml($xml);
         date_default_timezone_set('UTC');
         $dateTime = new DateTime('2009-10-28', new DateTimeZone('UTC'));
-        $this->assertEquals(['root' => ['someDate' => $dateTime]], $array);
+        $this->assertEquals([
+            'root' => [
+                'someDate' => $dateTime
+            ]
+        ], $array);
     }
 
     public function testBuildsArray()
@@ -97,14 +122,18 @@ XML;
         </root>
 XML;
         $array = Braintree\Xml::buildArrayFromXml($xml);
-        $this->assertEquals(['root' =>
-            ['customers' =>
-                    [['name' => 'Adam'],
-                           ['name' => 'Ben']]
+        $this->assertEquals([
+            'root' => [
+                'customers' => [
+                    [
+                        'name' => 'Adam'
+                    ],
+                    [
+                        'name' => 'Ben'
                     ]
-            ], $array
-        );
-
+                ]
+            ]
+        ], $array);
     }
 
     public function testReturnsBoolean()
@@ -118,16 +147,16 @@ XML;
           <uncasted-true>true</uncasted-true>
         </root>
 XML;
-         $array = Braintree\Xml::buildArrayFromXml($xml);
-         $this->assertEquals(
-            ['root' =>
-              ['castedTrue' => true,
-                    'castedOne' => true,
-                    'castedFalse' => false,
-                    'castedAnything' => false,
-                    'uncastedTrue' => 'true']
+        $array = Braintree\Xml::buildArrayFromXml($xml);
+        $this->assertEquals([
+            'root' => [
+                'castedTrue' => true,
+                'castedOne' => true,
+                'castedFalse' => false,
+                'castedAnything' => false,
+                'uncastedTrue' => 'true'
+            ]
         ], $array);
-
     }
 
     public function testEmptyArrayAndNestedElements()
@@ -140,16 +169,16 @@ XML;
           <no-values type="array"/>
         </root>
 XML;
-
-         $array = Braintree\Xml::buildArrayFromXml($xml);
-         $this->assertEquals(
-              ['root' => [
-                  'noValues' => [],
-                   'nestedValues' => [
-                       'value' => 1
-                   ]
-              ]
-         ], $array);
+        
+        $array = Braintree\Xml::buildArrayFromXml($xml);
+        $this->assertEquals([
+            'root' => [
+                'noValues' => [],
+                'nestedValues' => [
+                    'value' => 1
+                ]
+            ]
+        ], $array);
     }
 
     public function testParsingNilEqualsTrueAfterArray()
@@ -164,7 +193,6 @@ XML;
 XML;
         $array = Braintree\Xml::buildArrayFromXml($xml);
         $this->assertEquals(null, $array['root']['blank']);
-
     }
 
     public function testTransactionParsingNil()
@@ -270,7 +298,6 @@ XML;
         $this->assertEquals(null, $array['transaction']['creditCard']['cardholderName']);
         $this->assertEquals('First', $array['transaction']['customer']['firstName']);
         $this->assertEquals('Approved', $array['transaction']['processorResponseText']);
-
     }
 
     public function testParsingWithNodeHavingSameNameAsNodesDirectlyUnderCollection()
@@ -288,7 +315,10 @@ XML;
 </foos>
 END;
         $array = Braintree\Xml::buildArrayFromXml($xml);
-        $this->assertEquals(['baz' => 'two', 'bar' => 'bug was here'], $array['foos']['bar'][1]);
+        $this->assertEquals([
+            'baz' => 'two',
+            'bar' => 'bug was here'
+        ], $array['foos']['bar'][1]);
     }
 
     public function testParsingCreditCardSearchResults()
@@ -455,63 +485,75 @@ END;
     {
         $xml = Braintree\Xml::buildXmlFromArray($array);
         return Braintree\Xml::buildArrayFromXml($xml);
-
     }
 
     public function testSimpleCaseRoundtrip()
     {
-        $array = ['root' => [
-            'foo' => 'fooValue',
-            'bar' => 'barValue']
-            ];
-
+        $array = [
+            'root' => [
+                'foo' => 'fooValue',
+                'bar' => 'barValue'
+            ]
+        ];
+        
         $array2 = $this->xmlAndBack($array);
         $this->assertEquals($array, $array2);
     }
 
     public function testArrayRoundtrip()
     {
-        $array = ['root' => [
-            'items' => [
-                ['name' => 'first'],
-                ['name' => 'second'],
+        $array = [
+            'root' => [
+                'items' => [
+                    [
+                        'name' => 'first'
+                    ],
+                    [
+                        'name' => 'second'
+                    ]
+                ]
             ]
-        ]];
+        ];
         $array2 = $this->xmlAndBack($array);
         $this->assertEquals($array, $array2);
     }
 
     public function testBooleanRoundtrip()
     {
-        $array = ['root' => [
-            'stringTrue' => true,
-            'boolTrue' => true,
-            'stringFalse' => false,
-            'boolFalse' => false,
-        ]];
+        $array = [
+            'root' => [
+                'stringTrue' => true,
+                'boolTrue' => true,
+                'stringFalse' => false,
+                'boolFalse' => false
+            ]
+        ];
         $array2 = $this->xmlAndBack($array);
         $this->assertEquals($array, $array2);
-
     }
+
     public function testTimestampRoundtrip()
     {
         date_default_timezone_set('UTC');
-        $array = ['root' => [
-           'aTimestamp' => date('D M d H:i:s e Y', mktime(1, 2, 3, 10, 28, 2009)),
-        ]];
+        $array = [
+            'root' => [
+                'aTimestamp' => date('D M d H:i:s e Y', mktime(1, 2, 3, 10, 28, 2009))
+            ]
+        ];
         $array2 = $this->xmlAndBack($array);
         $this->assertEquals($array, $array2);
-
     }
 
     public function testNullvsEmptyStringToXml()
     {
-        $array = ['root' => [
-            'anEmptyString' => '',
-            'aNullValue' => null,
-            ]];
+        $array = [
+            'root' => [
+                'anEmptyString' => '',
+                'aNullValue' => null
+            ]
+        ];
         $xml = Braintree\Xml::buildXmlFromArray($array);
-        $xml2 =<<<XML
+        $xml2 = <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
  <an-empty-string></an-empty-string>
@@ -519,23 +561,26 @@ END;
 </root>
 
 XML;
-
+        
         $this->assertEquals($xml, $xml2);
     }
 
     public function testIncludesTheEncodingRoundtrip()
     {
-        $array = ['root' => [
-           'root' => 'bar',
-        ]];
+        $array = [
+            'root' => [
+                'root' => 'bar'
+            ]
+        ];
         $xml = Braintree\Xml::buildXmlFromArray($array);
         $this->assertRegExp('<\?xml version=\"1.0\" encoding=\"UTF-8\"\?>', $xml);
-
     }
 
     public function testRootNodeAndStringRoundtrip()
     {
-        $array = ['id' => '123'];
+        $array = [
+            'id' => '123'
+        ];
         $array2 = $this->xmlAndBack($array);
         $this->assertEquals($array, $array2);
     }

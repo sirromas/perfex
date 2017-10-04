@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\TwoCheckoutPlus;
 
 use Omnipay\Common\AbstractGateway;
@@ -9,6 +8,7 @@ use Omnipay\Common\AbstractGateway;
  */
 class Gateway extends AbstractGateway
 {
+
     public function getName()
     {
         return 'TwoCheckoutPlus';
@@ -19,9 +19,10 @@ class Gateway extends AbstractGateway
         return array(
             'accountNumber' => '',
             'secretWord' => '',
+            
             // if true, transaction with the live checkout URL will be a demo sale and card won't be charged.
             'demoMode' => false,
-            'testMode' => false,
+            'testMode' => false
         );
     }
 
@@ -41,31 +42,31 @@ class Gateway extends AbstractGateway
      * format:
      * $gateway->setCart(array(
      * array(
-     * 'type'        => 'product',
-     * 'name'        => 'Product 1',
+     * 'type' => 'product',
+     * 'name' => 'Product 1',
      * 'description' => 'Description of product 1',
-     * 'quantity'    => 2,
-     * 'price'       => 22,
-     * 'tangible'    => 'N',
-     * 'product_id'  => 12345,
-     * 'recurrence'  => '1 Week',
-     * 'duration'    => '1 Year',
+     * 'quantity' => 2,
+     * 'price' => 22,
+     * 'tangible' => 'N',
+     * 'product_id' => 12345,
+     * 'recurrence' => '1 Week',
+     * 'duration' => '1 Year',
      * 'startup_fee' => '5',
      * ),
      * array(
-     * 'type'     => 'product',
-     * 'name'     => 'Product 2',
+     * 'type' => 'product',
+     * 'name' => 'Product 2',
      * 'quantity' => 1,
-     * 'price'    => 10,
+     * 'price' => 10,
      * 'tangible' => 'N'
-     * 'product_id'  => 45678,
-     * 'recurrence'  => '2 Week',
-     * 'duration'    => '1 Year',
+     * 'product_id' => 45678,
+     * 'recurrence' => '2 Week',
+     * 'duration' => '1 Year',
      * 'startup_fee' => '3',
      * )
      * ));
      *
-     * @param array $value
+     * @param array $value            
      *
      * @return $this
      */
@@ -87,8 +88,9 @@ class Gateway extends AbstractGateway
     /**
      * Setter: demo mode.
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return $this
      */
     public function setDemoMode($value)
@@ -109,8 +111,9 @@ class Gateway extends AbstractGateway
     /**
      * Setter: checkout language.
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return $this
      */
     public function setLanguage($value)
@@ -121,8 +124,9 @@ class Gateway extends AbstractGateway
     /**
      * Getter: purchase step.
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return $this
      */
     public function getPurchaseStep()
@@ -133,8 +137,9 @@ class Gateway extends AbstractGateway
     /**
      * Setter: purchase step.
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return $this
      */
     public function setPurchaseStep($value)
@@ -155,8 +160,9 @@ class Gateway extends AbstractGateway
     /**
      * Setter: coupon.
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return $this
      */
     public function setCoupon($value)
@@ -177,8 +183,9 @@ class Gateway extends AbstractGateway
     /**
      * Setter: 2Checkout account number.
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return $this
      */
     public function setAccountNumber($value)
@@ -199,8 +206,9 @@ class Gateway extends AbstractGateway
     /**
      * Setter: 2Checkout secret word.
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return $this
      */
     public function setSecretWord($value)
@@ -211,8 +219,9 @@ class Gateway extends AbstractGateway
     /**
      * Setter: sale ID for use by refund.
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return $this
      */
     public function setSaleId($value)
@@ -233,8 +242,9 @@ class Gateway extends AbstractGateway
     /**
      * Setter: sale ID for use by refund.
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return $this
      */
     public function setInvoiceId($value)
@@ -252,7 +262,6 @@ class Gateway extends AbstractGateway
         return $this->getParameter('invoiceId');
     }
 
-
     /**
      * Getter: admin username for use by refund.
      *
@@ -266,8 +275,9 @@ class Gateway extends AbstractGateway
     /**
      * Setter: admin username for use by refund.
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return $this
      */
     public function setAdminUsername($value)
@@ -285,7 +295,6 @@ class Gateway extends AbstractGateway
         return $this->getParameter('adminPassword');
     }
 
-
     /**
      * Getter: category for use by refund.
      *
@@ -299,8 +308,9 @@ class Gateway extends AbstractGateway
     /**
      * Setter: category for use by refund.
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return $this
      */
     public function setCategory($value)
@@ -321,8 +331,9 @@ class Gateway extends AbstractGateway
     /**
      * Setter: category for use by refund.
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return $this
      */
     public function setComment($value)
@@ -333,8 +344,9 @@ class Gateway extends AbstractGateway
     /**
      * Setter: lineitem_id for use by stop recurring.
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return $this
      */
     public function setLineItemId($value)
@@ -375,8 +387,9 @@ class Gateway extends AbstractGateway
     /**
      * Setter: admin password for use by refund.
      *
-     * @param $value
-     *
+     * @param
+     *            $value
+     *            
      * @return $this
      */
     public function setAdminPassword($value)
@@ -385,7 +398,8 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * @param array $parameters
+     *
+     * @param array $parameters            
      *
      * @return \Omnipay\Common\Message\AbstractRequest
      */
@@ -410,7 +424,8 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * @param array $parameters
+     *
+     * @param array $parameters            
      *
      * @return \Omnipay\Common\Message\AbstractRequest
      */
@@ -420,7 +435,8 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * @param array $parameters
+     *
+     * @param array $parameters            
      *
      * @return \Omnipay\Common\Message\AbstractRequest
      */

@@ -14,6 +14,7 @@ namespace Omnipay\Stripe\Message;
  */
 class FetchChargeRequest extends AbstractRequest
 {
+
     /**
      * Get the charge reference.
      *
@@ -27,7 +28,8 @@ class FetchChargeRequest extends AbstractRequest
     /**
      * Set the charge reference.
      *
-     * @param string
+     * @param
+     *            string
      * @return FetchChargeRequest provides a fluent interface.
      */
     public function setChargeReference($value)
@@ -42,7 +44,7 @@ class FetchChargeRequest extends AbstractRequest
 
     public function getEndpoint()
     {
-        return $this->endpoint.'/charges/'.$this->getChargeReference();
+        return $this->endpoint . '/charges/' . $this->getChargeReference();
     }
 
     public function getHttpMethod()

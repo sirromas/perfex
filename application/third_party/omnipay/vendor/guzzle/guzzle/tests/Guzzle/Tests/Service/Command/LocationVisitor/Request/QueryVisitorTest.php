@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Service\Command\LocationVisitor\Request;
 
 use Guzzle\Service\Command\LocationVisitor\Request\QueryVisitor as Visitor;
@@ -9,12 +8,16 @@ use Guzzle\Service\Command\LocationVisitor\Request\QueryVisitor as Visitor;
  */
 class QueryVisitorTest extends AbstractVisitorTestCase
 {
+
     public function testVisitsLocation()
     {
         $visitor = new Visitor();
-        $param = $this->getNestedCommand('query')->getParam('foo')->setSentAs('test');
+        $param = $this->getNestedCommand('query')
+            ->getParam('foo')
+            ->setSentAs('test');
         $visitor->visit($this->command, $this->request, $param, '123');
-        $this->assertEquals('123', $this->request->getQuery()->get('test'));
+        $this->assertEquals('123', $this->request->getQuery()
+            ->get('test'));
     }
 
     /**
@@ -24,12 +27,11 @@ class QueryVisitorTest extends AbstractVisitorTestCase
     public function testRecursivelyBuildsQueryStrings()
     {
         $command = $this->getCommand('query');
-        $command->getOperation()->getParam('foo')->setSentAs('Foo');
+        $command->getOperation()
+            ->getParam('foo')
+            ->setSentAs('Foo');
         $request = $command->prepare();
-        $this->assertEquals(
-            'Foo[test][baz]=1&Foo[test][Jenga_Yall!]=HELLO&Foo[bar]=123',
-            rawurldecode($request->getQuery())
-        );
+        $this->assertEquals('Foo[test][baz]=1&Foo[test][Jenga_Yall!]=HELLO&Foo[bar]=123', rawurldecode($request->getQuery()));
     }
 
     /**

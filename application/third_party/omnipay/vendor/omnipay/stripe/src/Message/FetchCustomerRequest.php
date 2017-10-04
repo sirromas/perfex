@@ -13,6 +13,7 @@ namespace Omnipay\Stripe\Message;
  */
 class FetchCustomerRequest extends AbstractRequest
 {
+
     public function getData()
     {
         $this->validate('customerReference');

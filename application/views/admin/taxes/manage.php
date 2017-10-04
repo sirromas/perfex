@@ -6,55 +6,64 @@
 				<div class="panel_s">
 					<div class="panel-body">
 						<div class="_buttons">
-							<a href="#" class="btn btn-info pull-left" data-toggle="modal" data-target="#tax_modal"><?php echo _l('new_tax'); ?></a>
+							<a href="#" class="btn btn-info pull-left" data-toggle="modal"
+								data-target="#tax_modal"><?php echo _l('new_tax'); ?></a>
 						</div>
 						<div class="clearfix"></div>
 						<hr class="hr-panel-heading" />
 						<div class="clearfix"></div>
-						<?php render_datatable(array(
-							_l('tax_dt_name'),
-							_l('tax_dt_rate'),
-							_l('options')
-							),'taxes'); ?>
+						<?php
+    
+render_datatable(array(
+        _l('tax_dt_name'),
+        _l('tax_dt_rate'),
+        _l('options')
+    ), 'taxes');
+    ?>
 						</div>
-					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div class="modal fade" id="tax_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-					<h4 class="modal-title" id="myModalLabel">
-						<span class="edit-title"><?php echo _l('tax_edit_title'); ?></span>
-						<span class="add-title"><?php echo _l('tax_add_title'); ?></span>
-					</h4>
-				</div>
+</div>
+<div class="modal fade" id="tax_modal" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="myModalLabel">
+					<span class="edit-title"><?php echo _l('tax_edit_title'); ?></span>
+					<span class="add-title"><?php echo _l('tax_add_title'); ?></span>
+				</h4>
+			</div>
 				<?php echo form_open('admin/taxes/manage',array('id'=>'tax_form')); ?>
 				<?php echo form_hidden('taxid'); ?>
 				<div class="modal-body">
-					<div class="row">
-						<div class="col-md-12">
-							<div class="alert alert-warning hide tax_is_used_in_expenses_warning">
+				<div class="row">
+					<div class="col-md-12">
+						<div
+							class="alert alert-warning hide tax_is_used_in_expenses_warning">
 								<?php echo _l('tax_is_used_in_expenses_warning'); ?>
 							</div>
 							<?php echo render_input('name','tax_add_edit_name'); ?>
 							<?php echo render_input('taxrate','tax_add_edit_rate','','number'); ?>
 						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
-					<button type="submit" class="btn btn-info"><?php echo _l('submit'); ?></button>
-					<?php echo form_close(); ?>
 				</div>
 			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+				<button type="submit" class="btn btn-info"><?php echo _l('submit'); ?></button>
+					<?php echo form_close(); ?>
+				</div>
 		</div>
 	</div>
-	<?php init_tail(); ?>
-	<script>
+</div>
+<?php init_tail(); ?>
+<script>
 		initDataTable('.table-taxes', window.location.href, [2], [2]);
 		_validate_form($('form'),{
 			name:{

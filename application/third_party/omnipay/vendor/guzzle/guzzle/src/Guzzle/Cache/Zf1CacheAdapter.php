@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Cache;
 
 use Guzzle\Common\Version;
@@ -8,13 +7,15 @@ use Guzzle\Common\Version;
  * Zend Framework 1 cache adapter
  *
  * @link http://framework.zend.com/manual/en/zend.cache.html
- * @deprecated
- * @codeCoverageIgnore
+ * @deprecated @codeCoverageIgnore
  */
 class Zf1CacheAdapter extends AbstractCacheAdapter
 {
+
     /**
-     * @param \Zend_Cache_Backend $cache Cache object to wrap
+     *
+     * @param \Zend_Cache_Backend $cache
+     *            Cache object to wrap
      */
     public function __construct(\Zend_Cache_Backend $cache)
     {

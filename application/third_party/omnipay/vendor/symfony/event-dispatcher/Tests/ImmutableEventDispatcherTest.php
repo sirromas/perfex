@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\EventDispatcher\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -16,16 +15,20 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 
 /**
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class ImmutableEventDispatcherTest extends TestCase
 {
+
     /**
+     *
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     private $innerDispatcher;
 
     /**
+     *
      * @var ImmutableEventDispatcher
      */
     private $dispatcher;
@@ -39,12 +42,12 @@ class ImmutableEventDispatcherTest extends TestCase
     public function testDispatchDelegates()
     {
         $event = new Event();
-
+        
         $this->innerDispatcher->expects($this->once())
             ->method('dispatch')
             ->with('event', $event)
             ->will($this->returnValue('result'));
-
+        
         $this->assertSame('result', $this->dispatcher->dispatch('event', $event));
     }
 
@@ -54,7 +57,7 @@ class ImmutableEventDispatcherTest extends TestCase
             ->method('getListeners')
             ->with('event')
             ->will($this->returnValue('result'));
-
+        
         $this->assertSame('result', $this->dispatcher->getListeners('event'));
     }
 
@@ -64,7 +67,7 @@ class ImmutableEventDispatcherTest extends TestCase
             ->method('hasListeners')
             ->with('event')
             ->will($this->returnValue('result'));
-
+        
         $this->assertSame('result', $this->dispatcher->hasListeners('event'));
     }
 
@@ -73,7 +76,10 @@ class ImmutableEventDispatcherTest extends TestCase
      */
     public function testAddListenerDisallowed()
     {
-        $this->dispatcher->addListener('event', function () { return 'foo'; });
+        $this->dispatcher->addListener('event', function ()
+        {
+            return 'foo';
+        });
     }
 
     /**
@@ -82,7 +88,7 @@ class ImmutableEventDispatcherTest extends TestCase
     public function testAddSubscriberDisallowed()
     {
         $subscriber = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventSubscriberInterface')->getMock();
-
+        
         $this->dispatcher->addSubscriber($subscriber);
     }
 
@@ -91,7 +97,10 @@ class ImmutableEventDispatcherTest extends TestCase
      */
     public function testRemoveListenerDisallowed()
     {
-        $this->dispatcher->removeListener('event', function () { return 'foo'; });
+        $this->dispatcher->removeListener('event', function ()
+        {
+            return 'foo';
+        });
     }
 
     /**
@@ -100,7 +109,7 @@ class ImmutableEventDispatcherTest extends TestCase
     public function testRemoveSubscriberDisallowed()
     {
         $subscriber = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventSubscriberInterface')->getMock();
-
+        
         $this->dispatcher->removeSubscriber($subscriber);
     }
 }

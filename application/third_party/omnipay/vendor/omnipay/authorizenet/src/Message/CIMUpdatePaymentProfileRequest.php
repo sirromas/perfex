@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\AuthorizeNet\Message;
 
 use Omnipay\Common\CreditCard;
@@ -9,28 +8,31 @@ use Omnipay\Common\CreditCard;
  */
 class CIMUpdatePaymentProfileRequest extends CIMCreatePaymentProfileRequest
 {
+
     protected $requestType = 'updateCustomerPaymentProfileRequest';
 
     public function getData()
     {
         $this->validate('card', 'customerProfileId', 'customerPaymentProfileId');
-
-        /** @var CreditCard $card */
+        
+        /**
+         * @var CreditCard $card
+         */
         $card = $this->getCard();
         $card->validate();
-
+        
         $data = $this->getBaseData();
         $data->customerProfileId = $this->getCustomerProfileId();
         $this->addPaymentProfileData($data);
         $this->addTransactionSettings($data);
-
+        
         return $data;
     }
 
     /**
      * Adds payment profile to the specified xml element
      *
-     * @param \SimpleXMLElement $data
+     * @param \SimpleXMLElement $data            
      */
     protected function addPaymentProfileData(\SimpleXMLElement $data)
     {
@@ -42,10 +44,13 @@ class CIMUpdatePaymentProfileRequest extends CIMCreatePaymentProfileRequest
 
     public function sendData($data)
     {
-        $headers = array('Content-Type' => 'text/xml; charset=utf-8');
+        $headers = array(
+            'Content-Type' => 'text/xml; charset=utf-8'
+        );
         $data = $data->saveXml();
-        $httpResponse = $this->httpClient->post($this->getEndpoint(), $headers, $data)->send();
-
+        $httpResponse = $this->httpClient->post($this->getEndpoint(), $headers, $data)
+            ->send();
+        
         return $this->response = new CIMUpdatePaymentProfileResponse($this, $httpResponse->getBody());
     }
 }

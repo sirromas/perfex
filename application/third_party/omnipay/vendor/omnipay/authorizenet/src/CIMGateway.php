@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\AuthorizeNet;
 
 use Omnipay\AuthorizeNet\Message\CIMCreateCardRequest;
@@ -9,6 +8,7 @@ use Omnipay\AuthorizeNet\Message\CIMCreateCardRequest;
  */
 class CIMGateway extends AIMGateway
 {
+
     public function getName()
     {
         return 'Authorize.Net CIM';
@@ -37,7 +37,7 @@ class CIMGateway extends AIMGateway
     /**
      * Create a new debit or credit card
      *
-     * @param array $parameters
+     * @param array $parameters            
      *
      * @return CIMCreateCardRequest
      */

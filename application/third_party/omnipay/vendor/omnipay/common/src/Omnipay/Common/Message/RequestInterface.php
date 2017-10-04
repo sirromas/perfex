@@ -2,22 +2,24 @@
 /**
  * Request Interface
  */
-
 namespace Omnipay\Common\Message;
 
 /**
  * Request Interface
  *
  * This interface class defines the standard functions that any Omnipay request
- * interface needs to be able to provide.  It is an extension of MessageInterface.
+ * interface needs to be able to provide. It is an extension of MessageInterface.
  *
  * @see MessageInterface
  */
 interface RequestInterface extends MessageInterface
 {
+
     /**
      * Initialize request with parameters
-     * @param array $parameters The parameters to send
+     * 
+     * @param array $parameters
+     *            The parameters to send
      */
     public function initialize(array $parameters = array());
 
@@ -45,7 +47,8 @@ interface RequestInterface extends MessageInterface
     /**
      * Send the request with specified data
      *
-     * @param  mixed             $data The data to send
+     * @param mixed $data
+     *            The data to send
      * @return ResponseInterface
      */
     public function sendData($data);

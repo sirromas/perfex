@@ -1,7 +1,9 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
 class User_Autologin extends CRM_Model
 {
+
     public function __construct()
     {
         parent::__construct();
@@ -9,8 +11,11 @@ class User_Autologin extends CRM_Model
 
     /**
      * Check if autologin found
-     * @param  mixed $user_id clientid/staffid
-     * @param  string $key     key from cookie to retrieve from database
+     * 
+     * @param mixed $user_id
+     *            clientid/staffid
+     * @param string $key
+     *            key from cookie to retrieve from database
      * @return mixed
      */
     public function get($user_id, $key)
@@ -19,18 +24,18 @@ class User_Autologin extends CRM_Model
         $this->db->where('user_id', $user_id);
         $this->db->where('key_id', $key);
         $user = $this->db->get('tbluserautologin')->row();
-        if (!$user) {
+        if (! $user) {
             return null;
         }
         if ($user->staff == 1) {
             $table = 'tblstaff';
             $this->db->select($table . '.staffid as id');
-            $_id   = 'staffid';
+            $_id = 'staffid';
             $staff = true;
         } else {
             $table = 'tblcontacts';
             $this->db->select($table . '.id as id');
-            $_id   = 'id';
+            $_id = 'id';
             $staff = false;
         }
         $this->db->select($table . '.' . $_id);
@@ -41,21 +46,25 @@ class User_Autologin extends CRM_Model
         $query = $this->db->get();
         if ($query) {
             if ($query->num_rows() == 1) {
-                $user        = $query->row();
+                $user = $query->row();
                 $user->staff = $staff;
-
+                
                 return $user;
             }
         }
-
+        
         return null;
     }
 
     /**
      * Set new autologin if user have clicked remember me
-     * @param mixed $user_id clientid/userid
-     * @param string $key     cookie key
-     * @param integer $staff   is staff or client
+     * 
+     * @param mixed $user_id
+     *            clientid/userid
+     * @param string $key
+     *            cookie key
+     * @param integer $staff
+     *            is staff or client
      */
     public function set($user_id, $key, $staff)
     {
@@ -70,9 +79,13 @@ class User_Autologin extends CRM_Model
 
     /**
      * Delete user autologin
-     * @param  mixed $user_id clientid/userid
-     * @param  string $key     cookie key
-     * @param integer $staff   is staff or client
+     * 
+     * @param mixed $user_id
+     *            clientid/userid
+     * @param string $key
+     *            cookie key
+     * @param integer $staff
+     *            is staff or client
      */
     public function delete($user_id, $key, $staff)
     {

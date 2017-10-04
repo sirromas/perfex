@@ -1,11 +1,11 @@
 <?php
-
 namespace Omnipay\Stripe\Message;
 
 use Omnipay\Tests\TestCase;
 
 class CancelSubscriptionRequestTest extends TestCase
 {
+
     public function setUp()
     {
         $this->request = new CancelSubscriptionRequest($this->getHttpClient(), $this->getHttpRequest());
@@ -18,7 +18,7 @@ class CancelSubscriptionRequestTest extends TestCase
     {
         $this->assertSame('https://api.stripe.com/v1/customers/cus_7lfqk3Om3t4xSU/subscriptions/sub_7mU0FokE8GQZFW', $this->request->getEndpoint());
         $this->assertSame(true, $this->request->getAtPeriodEnd());
-
+        
         $data = $this->request->getData();
         $this->assertSame('true', $data['at_period_end']);
     }
@@ -33,7 +33,6 @@ class CancelSubscriptionRequestTest extends TestCase
         $this->assertNotNull($response->getPlan());
         $this->assertNull($response->getMessage());
     }
-
 
     public function testSendError()
     {

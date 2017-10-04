@@ -2,10 +2,11 @@
 namespace Braintree\Transaction;
 
 use Braintree\Instance;
+
 /**
  * Venmo account details from a transaction
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Transaction
  */
 
@@ -13,9 +14,9 @@ use Braintree\Instance;
  * creates an instance of VenmoAccountDetails
  *
  *
- * @package    Braintree
+ * @package Braintree
  * @subpackage Transaction
- *
+ *            
  * @property-read string $sourceDescription
  * @property-read string $token
  * @property-read string $imageUrl
@@ -25,10 +26,13 @@ use Braintree\Instance;
  */
 class VenmoAccountDetails extends Instance
 {
+
     protected $_attributes = array();
 
     /**
+     *
      * @ignore
+     *
      */
     public function __construct($attributes)
     {

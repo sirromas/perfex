@@ -3,6 +3,7 @@ namespace Braintree;
 
 class KeyValueNode
 {
+
     public function __construct($name)
     {
         $this->name = $name;

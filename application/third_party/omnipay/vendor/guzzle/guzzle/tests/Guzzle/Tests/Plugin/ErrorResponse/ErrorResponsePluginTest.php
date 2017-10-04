@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Plugin\ErrorResponse;
 
 use Guzzle\Service\Client;
@@ -13,6 +12,7 @@ use Guzzle\Tests\Mock\ErrorResponseMock;
  */
 class ErrorResponsePluginTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     protected $client;
 
     public static function tearDownAfterClass()
@@ -28,30 +28,51 @@ class ErrorResponsePluginTest extends \Guzzle\Tests\GuzzleTestCase
                 'works' => array(
                     'httpMethod' => 'GET',
                     'errorResponses' => array(
-                        array('code' => 500, 'class' => $mockError),
-                        array('code' => 503, 'reason' => 'foo', 'class' => $mockError),
-                        array('code' => 200, 'reason' => 'Error!', 'class' => $mockError)
+                        array(
+                            'code' => 500,
+                            'class' => $mockError
+                        ),
+                        array(
+                            'code' => 503,
+                            'reason' => 'foo',
+                            'class' => $mockError
+                        ),
+                        array(
+                            'code' => 200,
+                            'reason' => 'Error!',
+                            'class' => $mockError
+                        )
                     )
                 ),
                 'bad_class' => array(
                     'httpMethod' => 'GET',
                     'errorResponses' => array(
-                        array('code' => 500, 'class' => 'Does\\Not\\Exist')
+                        array(
+                            'code' => 500,
+                            'class' => 'Does\\Not\\Exist'
+                        )
                     )
                 ),
                 'does_not_implement' => array(
                     'httpMethod' => 'GET',
                     'errorResponses' => array(
-                        array('code' => 500, 'class' => __CLASS__)
+                        array(
+                            'code' => 500,
+                            'class' => __CLASS__
+                        )
                     )
                 ),
-                'no_errors' => array('httpMethod' => 'GET'),
+                'no_errors' => array(
+                    'httpMethod' => 'GET'
+                ),
                 'no_class' => array(
                     'httpMethod' => 'GET',
                     'errorResponses' => array(
-                        array('code' => 500)
+                        array(
+                            'code' => 500
+                        )
                     )
-                ),
+                )
             )
         ));
         $this->client = new Client($this->getServer()->getUrl());

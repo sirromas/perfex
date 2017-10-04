@@ -15,9 +15,9 @@ class WebhookNotificationGateway
         if (preg_match("/[^A-Za-z0-9+=\/\n]/", $payload) === 1) {
             throw new Exception\InvalidSignature("payload contains illegal characters");
         }
-
+        
         self::_validateSignature($signature, $payload);
-
+        
         $xml = base64_decode($payload);
         $attributes = Xml::buildArrayFromXml($xml);
         return WebhookNotification::factory($attributes['notification']);
@@ -25,7 +25,7 @@ class WebhookNotificationGateway
 
     public function verify($challenge)
     {
-        if (!preg_match('/^[a-f0-9]{20,32}$/', $challenge)) {
+        if (! preg_match('/^[a-f0-9]{20,32}$/', $challenge)) {
             throw new Exception\InvalidChallenge("challenge contains non-hex characters");
         }
         $publicKey = $this->config->publicKey();
@@ -43,25 +43,24 @@ class WebhookNotificationGateway
     {
         $signaturePairs = preg_split("/&/", $signatureString);
         $signature = self::_matchingSignature($signaturePairs);
-        if (!$signature) {
+        if (! $signature) {
             throw new Exception\InvalidSignature("no matching public key");
         }
-
-        if (!(self::_payloadMatches($signature, $payload) || self::_payloadMatches($signature, $payload . "\n"))) {
+        
+        if (! (self::_payloadMatches($signature, $payload) || self::_payloadMatches($signature, $payload . "\n"))) {
             throw new Exception\InvalidSignature("signature does not match payload - one has been modified");
         }
     }
 
     private function _matchingSignature($signaturePairs)
     {
-        foreach ($signaturePairs as $pair)
-        {
+        foreach ($signaturePairs as $pair) {
             $components = preg_split("/\|/", $pair);
             if ($components[0] == $this->config->publicKey()) {
                 return $components[1];
             }
         }
-
+        
         return null;
     }
 }

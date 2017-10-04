@@ -3,8 +3,11 @@ namespace Braintree;
 
 class MerchantGateway
 {
+
     private $_gateway;
+
     private $_config;
+
     private $_http;
 
     public function __construct($gateway)
@@ -18,7 +21,9 @@ class MerchantGateway
 
     public function create($attribs)
     {
-        $response = $this->_http->post('/merchants/create_via_api', ['merchant' => $attribs]);
+        $response = $this->_http->post('/merchants/create_via_api', [
+            'merchant' => $attribs
+        ]);
         return $this->_verifyGatewayResponse($response);
     }
 
@@ -28,15 +33,14 @@ class MerchantGateway
             // return a populated instance of merchant
             return new Result\Successful([
                 Merchant::factory($response['response']['merchant']),
-                OAuthCredentials::factory($response['response']['credentials']),
+                OAuthCredentials::factory($response['response']['credentials'])
             ]);
-        } else if (isset($response['apiErrorResponse'])) {
-            return new Result\Error($response['apiErrorResponse']);
-        } else {
-            throw new Exception\Unexpected(
-            "Expected merchant or apiErrorResponse"
-            );
-        }
+        } else 
+            if (isset($response['apiErrorResponse'])) {
+                return new Result\Error($response['apiErrorResponse']);
+            } else {
+                throw new Exception\Unexpected("Expected merchant or apiErrorResponse");
+            }
     }
 }
 class_alias('Braintree\MerchantGateway', 'Braintree_MerchantGateway');

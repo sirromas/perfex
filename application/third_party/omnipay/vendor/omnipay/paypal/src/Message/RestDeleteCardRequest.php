@@ -2,7 +2,6 @@
 /**
  * PayPal REST Delete Card Request
  */
-
 namespace Omnipay\PayPal\Message;
 
 /**
@@ -21,20 +20,20 @@ namespace Omnipay\PayPal\Message;
  * As of January 2015 these transactions are only supported in the UK
  * and in the USA.
  *
- * Example.  This example assumes that the card has already been created
+ * Example. This example assumes that the card has already been created
  * using a RestCreateCardRequest call and that the card ID has been stored
- * in $card_id.  See RestCreateCardRequest for the details of the first
+ * in $card_id. See RestCreateCardRequest for the details of the first
  * part of this process.
  *
  * <code>
- *   $transaction = $gateway->deleteCard();
- *   $transaction->setCardReference($card_id);
- *   $response = $transaction->send();
- *   if ($response->isSuccessful()) {
- *       echo "Gateway deleteCard was successful.\n";
- *   } else {
- *       echo "Gateway deleteCard failed.\n";
- *   }
+ * $transaction = $gateway->deleteCard();
+ * $transaction->setCardReference($card_id);
+ * $response = $transaction->send();
+ * if ($response->isSuccessful()) {
+ * echo "Gateway deleteCard was successful.\n";
+ * } else {
+ * echo "Gateway deleteCard failed.\n";
+ * }
  * </code>
  *
  * @link https://developer.paypal.com/docs/api/#vault
@@ -44,6 +43,7 @@ namespace Omnipay\PayPal\Message;
  */
 class RestDeleteCardRequest extends AbstractRestRequest
 {
+
     public function getHttpMethod()
     {
         return 'DELETE';

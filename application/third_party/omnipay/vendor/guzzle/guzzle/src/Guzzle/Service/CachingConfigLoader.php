@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Service;
 
 use Guzzle\Cache\CacheAdapterInterface;
@@ -9,15 +8,23 @@ use Guzzle\Cache\CacheAdapterInterface;
  */
 class CachingConfigLoader implements ConfigLoaderInterface
 {
-    /** @var ConfigLoaderInterface */
+
+    /**
+     * @var ConfigLoaderInterface
+     */
     protected $loader;
 
-    /** @var CacheAdapterInterface */
+    /**
+     * @var CacheAdapterInterface
+     */
     protected $cache;
 
     /**
-     * @param ConfigLoaderInterface $loader Loader used to load the config when there is a cache miss
-     * @param CacheAdapterInterface $cache  Object used to cache the loaded result
+     *
+     * @param ConfigLoaderInterface $loader
+     *            Loader used to load the config when there is a cache miss
+     * @param CacheAdapterInterface $cache
+     *            Object used to cache the loaded result
      */
     public function __construct(ConfigLoaderInterface $loader, CacheAdapterInterface $cache)
     {
@@ -27,7 +34,7 @@ class CachingConfigLoader implements ConfigLoaderInterface
 
     public function load($config, array $options = array())
     {
-        if (!is_string($config)) {
+        if (! is_string($config)) {
             $key = false;
         } else {
             $key = 'loader_' . crc32($config);
@@ -35,12 +42,12 @@ class CachingConfigLoader implements ConfigLoaderInterface
                 return $result;
             }
         }
-
+        
         $result = $this->loader->load($config, $options);
         if ($key) {
             $this->cache->save($key, $result);
         }
-
+        
         return $result;
     }
 }

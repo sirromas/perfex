@@ -16,13 +16,14 @@ use Omnipay\Common\Message\AbstractResponse;
  */
 class Response extends AbstractResponse
 {
+
     /**
      * Request id
      *
      * @var string URL
      */
     protected $requestId = null;
-    
+
     /**
      * Is the transaction successful?
      *
@@ -30,7 +31,7 @@ class Response extends AbstractResponse
      */
     public function isSuccessful()
     {
-        return !isset($this->data['error']);
+        return ! isset($this->data['error']);
     }
 
     /**
@@ -45,7 +46,7 @@ class Response extends AbstractResponse
         if (isset($this->data['object']) && $this->data['object'] == 'charge') {
             return $this->data['id'];
         }
-
+        
         return null;
     }
 
@@ -62,7 +63,7 @@ class Response extends AbstractResponse
         if (isset($this->data['error']) && isset($this->data['error']['charge'])) {
             return $this->data['error']['charge'];
         }
-
+        
         return null;
     }
 
@@ -82,7 +83,7 @@ class Response extends AbstractResponse
         if (isset($this->data['error']) && isset($this->data['error']['charge'])) {
             return $this->data['error']['charge'];
         }
-
+        
         return null;
     }
 
@@ -97,11 +98,11 @@ class Response extends AbstractResponse
             return $this->data['id'];
         }
         if (isset($this->data['object']) && 'card' === $this->data['object']) {
-            if (!empty($this->data['customer'])) {
+            if (! empty($this->data['customer'])) {
                 return $this->data['customer'];
             }
         }
-
+        
         return null;
     }
 
@@ -113,20 +114,20 @@ class Response extends AbstractResponse
     public function getCardReference()
     {
         if (isset($this->data['object']) && 'customer' === $this->data['object']) {
-            if (isset($this->data['default_source']) && !empty($this->data['default_source'])) {
+            if (isset($this->data['default_source']) && ! empty($this->data['default_source'])) {
                 return $this->data['default_source'];
             }
-
-            if (isset($this->data['default_card']) && !empty($this->data['default_card'])) {
+            
+            if (isset($this->data['default_card']) && ! empty($this->data['default_card'])) {
                 return $this->data['default_card'];
             }
             
-            if (!empty($this->data['id'])) {
+            if (! empty($this->data['id'])) {
                 return $this->data['id'];
             }
         }
         if (isset($this->data['object']) && 'card' === $this->data['object']) {
-            if (!empty($this->data['id'])) {
+            if (! empty($this->data['id'])) {
                 return $this->data['id'];
             }
         }
@@ -137,7 +138,7 @@ class Response extends AbstractResponse
                 }
             }
         }
-
+        
         return null;
     }
 
@@ -151,7 +152,7 @@ class Response extends AbstractResponse
         if (isset($this->data['object']) && 'token' === $this->data['object']) {
             return $this->data['id'];
         }
-
+        
         return null;
     }
 
@@ -165,7 +166,7 @@ class Response extends AbstractResponse
         if (isset($this->data['card'])) {
             return $this->data['card'];
         }
-
+        
         return null;
     }
 
@@ -179,7 +180,7 @@ class Response extends AbstractResponse
         if (isset($this->data['source']) && $this->data['source']['object'] == 'card') {
             return $this->data['source'];
         }
-
+        
         return null;
     }
 
@@ -193,7 +194,7 @@ class Response extends AbstractResponse
         if (isset($this->data['object']) && $this->data['object'] == 'subscription') {
             return $this->data['id'];
         }
-
+        
         return null;
     }
 
@@ -207,7 +208,7 @@ class Response extends AbstractResponse
         if (isset($this->data['object']) && $this->data['object'] == 'event') {
             return $this->data['id'];
         }
-
+        
         return null;
     }
 
@@ -221,7 +222,7 @@ class Response extends AbstractResponse
         if (isset($this->data['object']) && $this->data['object'] == 'invoice') {
             return $this->data['id'];
         }
-
+        
         return null;
     }
 
@@ -236,7 +237,7 @@ class Response extends AbstractResponse
         if (isset($this->data['object']) && $this->data['object'] == 'transfer') {
             return $this->data['id'];
         }
-
+        
         return null;
     }
 
@@ -251,7 +252,7 @@ class Response extends AbstractResponse
         if (isset($this->data['object']) && $this->data['object'] == 'transfer_reversal') {
             return $this->data['id'];
         }
-
+        
         return null;
     }
 
@@ -265,7 +266,7 @@ class Response extends AbstractResponse
         if (isset($this->data['object']) && $this->data['object'] == 'list') {
             return $this->data['data'];
         }
-
+        
         return null;
     }
 
@@ -281,7 +282,7 @@ class Response extends AbstractResponse
         } elseif (array_key_exists('object', $this->data) && $this->data['object'] == 'plan') {
             return $this->data;
         }
-
+        
         return null;
     }
 
@@ -296,7 +297,7 @@ class Response extends AbstractResponse
         if ($plan && array_key_exists('id', $plan)) {
             return $plan['id'];
         }
-
+        
         return null;
     }
 
@@ -310,7 +311,7 @@ class Response extends AbstractResponse
         if (isset($this->data['object']) && $this->data['object'] == 'invoiceitem') {
             return $this->data['id'];
         }
-
+        
         return null;
     }
 
@@ -323,10 +324,10 @@ class Response extends AbstractResponse
      */
     public function getMessage()
     {
-        if (!$this->isSuccessful() && isset($this->data['error']) && isset($this->data['error']['message'])) {
+        if (! $this->isSuccessful() && isset($this->data['error']) && isset($this->data['error']['message'])) {
             return $this->data['error']['message'];
         }
-
+        
         return null;
     }
 
@@ -339,14 +340,15 @@ class Response extends AbstractResponse
      */
     public function getCode()
     {
-        if (!$this->isSuccessful() && isset($this->data['error']) && isset($this->data['error']['code'])) {
+        if (! $this->isSuccessful() && isset($this->data['error']) && isset($this->data['error']['code'])) {
             return $this->data['error']['code'];
         }
-
+        
         return null;
     }
-    
+
     /**
+     *
      * @return string
      */
     public function getRequestId()

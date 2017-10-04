@@ -4,8 +4,8 @@ namespace Braintree;
 /**
  * Braintree IdealPayment module
  *
- * @package    Braintree
- * @category   Resources
+ * @package Braintree
+ * @category Resources
  */
 
 /**
@@ -14,9 +14,9 @@ namespace Braintree;
  * <b>== More information ==</b>
  *
  *
- * @package    Braintree
- * @category   Resources
- *
+ * @package Braintree
+ * @category Resources
+ *          
  * @property-read string $id
  * @property-read string $idealTransactionId
  * @property-read string $currency
@@ -28,11 +28,13 @@ namespace Braintree;
  */
 class IdealPayment extends Base
 {
+
     /**
-     *  factory method: returns an instance of IdealPayment
-     *  to the requesting method, with populated properties
+     * factory method: returns an instance of IdealPayment
+     * to the requesting method, with populated properties
      *
      * @ignore
+     *
      * @return IdealPayment
      */
     public static function factory($attributes)
@@ -41,41 +43,38 @@ class IdealPayment extends Base
         $instance->_initialize($attributes);
         return $instance;
     }
-
+    
     /* instance methods */
-
+    
     /**
      * sets instance properties from an array of values
      *
      * @access protected
-     * @param array $idealPaymentAttribs array of idealPayment data
+     * @param array $idealPaymentAttribs
+     *            array of idealPayment data
      * @return void
      */
     protected function _initialize($idealPaymentAttribs)
     {
         // set the attributes
         $this->_attributes = $idealPaymentAttribs;
-
-        $ibanBankAccount = isset($idealPaymentAttribs['ibanBankAccount']) ?
-            IbanBankAccount::factory($idealPaymentAttribs['ibanBankAccount']) :
-            null;
+        
+        $ibanBankAccount = isset($idealPaymentAttribs['ibanBankAccount']) ? IbanBankAccount::factory($idealPaymentAttribs['ibanBankAccount']) : null;
         $this->_set('ibanBankAccount', $ibanBankAccount);
     }
 
     /**
      * create a printable representation of the object as:
      * ClassName[property=value, property=value]
+     * 
      * @return string
      */
-    public function  __toString()
+    public function __toString()
     {
-        return __CLASS__ . '[' .
-                Util::attributesToString($this->_attributes) . ']';
+        return __CLASS__ . '[' . Util::attributesToString($this->_attributes) . ']';
     }
-
-
+    
     // static methods redirecting to gateway
-
     public static function find($idealPaymentId)
     {
         return Configuration::gateway()->idealPayment()->find($idealPaymentId);

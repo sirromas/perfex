@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Service\Command\LocationVisitor\Request;
 
 use Guzzle\Service\Command\LocationVisitor\Request\JsonVisitor as Visitor;
@@ -10,12 +9,13 @@ use Guzzle\Service\Command\LocationVisitor\Request\JsonVisitor as Visitor;
  */
 class JsonVisitorTest extends AbstractVisitorTestCase
 {
+
     public function testVisitsLocation()
     {
         $visitor = new Visitor();
         // Test after when no body query values were found
         $visitor->after($this->command, $this->request);
-
+        
         $param = $this->getNestedCommand('json')->getParam('foo');
         $visitor->visit($this->command, $this->request, $param->setSentAs('test'), '123');
         $visitor->visit($this->command, $this->request, $param->setSentAs('test2'), 'abc');
@@ -43,7 +43,9 @@ class JsonVisitorTest extends AbstractVisitorTestCase
     public function testAppliesFiltersToAdditionalProperties()
     {
         $command = $this->getCommand('json');
-        $command->set('foo', array('not_set' => 'abc'));
+        $command->set('foo', array(
+            'not_set' => 'abc'
+        ));
         $request = $command->prepare();
         $result = json_decode($request->getBody(), true);
         $this->assertEquals('ABC', $result['Foo']['not_set']);
@@ -52,9 +54,15 @@ class JsonVisitorTest extends AbstractVisitorTestCase
     public function testAppliesFiltersToArrayItemValues()
     {
         $command = $this->getCommand('json');
-        $command->set('arr', array('a', 'b'));
+        $command->set('arr', array(
+            'a',
+            'b'
+        ));
         $request = $command->prepare();
         $result = json_decode($request->getBody(), true);
-        $this->assertEquals(array('A', 'B'), $result['arr']);
+        $this->assertEquals(array(
+            'A',
+            'B'
+        ), $result['arr']);
     }
 }

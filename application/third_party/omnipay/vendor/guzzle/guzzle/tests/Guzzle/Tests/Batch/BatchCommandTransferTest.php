@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Batch;
 
 use Guzzle\Batch\BatchCommandTransfer;
@@ -11,13 +10,20 @@ use Guzzle\Tests\Service\Mock\Command\MockCommand as Mc;
  */
 class BatchCommandTransferTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testCreatesBatchesBasedOnClient()
     {
         $client1 = new Client('http://www.example.com');
         $client2 = new Client('http://www.example.com');
-
-        $commands = array(new Mc(), new Mc(), new Mc(), new Mc(), new Mc());
-
+        
+        $commands = array(
+            new Mc(),
+            new Mc(),
+            new Mc(),
+            new Mc(),
+            new Mc()
+        );
+        
         $queue = new \SplQueue();
         foreach ($commands as $i => $command) {
             if ($i % 2) {
@@ -27,12 +33,20 @@ class BatchCommandTransferTest extends \Guzzle\Tests\GuzzleTestCase
             }
             $queue[] = $command;
         }
-
+        
         $batch = new BatchCommandTransfer(2);
         $this->assertEquals(array(
-            array($commands[0], $commands[2]),
-            array($commands[4]),
-            array($commands[1], $commands[3])
+            array(
+                $commands[0],
+                $commands[2]
+            ),
+            array(
+                $commands[4]
+            ),
+            array(
+                $commands[1],
+                $commands[3]
+            )
         ), $batch->createBatches($queue));
     }
 
@@ -50,14 +64,18 @@ class BatchCommandTransferTest extends \Guzzle\Tests\GuzzleTestCase
     public function testTransfersBatches()
     {
         $client = $this->getMockBuilder('Guzzle\Service\Client')
-            ->setMethods(array('send'))
+            ->setMethods(array(
+            'send'
+        ))
             ->getMock();
         $client->expects($this->once())
             ->method('send');
         $command = new Mc();
         $command->setClient($client);
         $batch = new BatchCommandTransfer(2);
-        $batch->transfer(array($command));
+        $batch->transfer(array(
+            $command
+        ));
     }
 
     public function testDoesNotTransfersEmptyBatches()
@@ -78,6 +96,9 @@ class BatchCommandTransferTest extends \Guzzle\Tests\GuzzleTestCase
         $command1->setClient($client1);
         $command2 = new Mc();
         $command2->setClient($client2);
-        $batch->transfer(array($command1, $command2));
+        $batch->transfer(array(
+            $command1,
+            $command2
+        ));
     }
 }

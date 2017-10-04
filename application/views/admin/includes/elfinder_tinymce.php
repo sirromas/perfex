@@ -1,20 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2" />
-    <!-- jQuery and jQuery UI (REQUIRED) -->
-    <script src="<?php echo base_url('assets/plugins/jquery/jquery.min.js'); ?>"></script>
-    <script src="<?php echo base_url('assets/plugins/jquery-ui/jquery-ui.min.js'); ?>"></script>
-    <!-- elFinder CSS (REQUIRED) -->
-    <link rel="stylesheet" type="text/css" media="screen" href="<?php echo base_url('assets/plugins/elFinder/css/elfinder.min.css'); ?>">
-    <link rel="stylesheet" type="text/css" media="screen" href="<?php echo base_url('assets/plugins/elFinder/themes/windows-10/css/theme.css'); ?>">
-    <!-- elFinder JS (REQUIRED) -->
-    <script src="<?php echo base_url('assets/plugins/elFinder/js/elfinder.min.js'); ?>"></script>
-    <?php echo app_stylesheet('assets/css','style.css');
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=2" />
+<!-- jQuery and jQuery UI (REQUIRED) -->
+<script
+	src="<?php echo base_url('assets/plugins/jquery/jquery.min.js'); ?>"></script>
+<script
+	src="<?php echo base_url('assets/plugins/jquery-ui/jquery-ui.min.js'); ?>"></script>
+<!-- elFinder CSS (REQUIRED) -->
+<link rel="stylesheet" type="text/css" media="screen"
+	href="<?php echo base_url('assets/plugins/elFinder/css/elfinder.min.css'); ?>">
+<link rel="stylesheet" type="text/css" media="screen"
+	href="<?php echo base_url('assets/plugins/elFinder/themes/windows-10/css/theme.css'); ?>">
+<!-- elFinder JS (REQUIRED) -->
+<script
+	src="<?php echo base_url('assets/plugins/elFinder/js/elfinder.min.js'); ?>"></script>
+    <?php
+    
+echo app_stylesheet('assets/css', 'style.css');
     $lng = get_media_locale($locale);
-    if(file_exists(FCPATH.'assets/plugins/elFinder/js/i18n/elfinder.'.$lng.'.js') && $lng != 'en'){ ?>
-    <script src="<?php echo base_url('assets/plugins/elFinder/js/i18n/elfinder.'.$lng.'.js'); ?>"></script>
+    if (file_exists(FCPATH . 'assets/plugins/elFinder/js/i18n/elfinder.' . $lng . '.js') && $lng != 'en') {
+        ?>
+    <script
+	src="<?php echo base_url('assets/plugins/elFinder/js/i18n/elfinder.'.$lng.'.js'); ?>"></script>
     <?php } ?>
     <script type="text/javascript">
         var FileBrowserDialogue = {
@@ -60,7 +70,7 @@
 </script>
 </head>
 <body>
-    <!-- Element where elFinder will be created (REQUIRED) -->
-    <div id="elfinder"></div>
+	<!-- Element where elFinder will be created (REQUIRED) -->
+	<div id="elfinder"></div>
 </body>
 </html>

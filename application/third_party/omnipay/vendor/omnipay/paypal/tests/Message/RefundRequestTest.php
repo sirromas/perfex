@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\PayPal\Message;
 
 use Omnipay\PayPal\Message\RefundRequest;
@@ -7,7 +6,9 @@ use Omnipay\Tests\TestCase;
 
 class RefundRequestTest extends TestCase
 {
+
     /**
+     *
      * @var \Omnipay\PayPal\Message\RefundRequest
      */
     private $request;
@@ -15,9 +16,9 @@ class RefundRequestTest extends TestCase
     public function setUp()
     {
         $client = $this->getHttpClient();
-
+        
         $request = $this->getHttpRequest();
-
+        
         $this->request = new RefundRequest($client, $request);
     }
 
@@ -33,7 +34,7 @@ class RefundRequestTest extends TestCase
         $this->request->setPassword('testpass');
         $this->request->setSignature('SIG');
         $this->request->setSubject('SUB');
-
+        
         $expected = array();
         $expected['REFUNDTYPE'] = $type;
         $expected['METHOD'] = 'RefundTransaction';
@@ -44,20 +45,27 @@ class RefundRequestTest extends TestCase
         $expected['SUBJECT'] = 'SUB';
         $expected['VERSION'] = RefundRequest::API_VERSION;
         // $amount will be a formatted string, and '0.00' evaluates to true
-        if ((float)$amount) {
+        if ((float) $amount) {
             $expected['AMT'] = $amount;
             $expected['CURRENCYCODE'] = 'USD';
         }
-
+        
         $this->assertEquals($expected, $this->request->getData());
     }
 
     public function provideRefundTypes()
     {
         return array(
-            'Partial' => array('Partial', '1.23'),
+            'Partial' => array(
+                'Partial',
+                '1.23'
+            ),
+            
             // All amounts must include decimals or be a float if the currency supports decimals.
-            'Full' => array('Full', '0.00'),
+            'Full' => array(
+                'Full',
+                '0.00'
+            )
         );
     }
 }

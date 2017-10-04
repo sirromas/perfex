@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\File\MimeType;
 
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
@@ -21,13 +20,15 @@ use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
  */
 class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
 {
+
     private $magicFile;
 
     /**
      * Constructor.
      *
-     * @param string $magicFile A magic file to use with the finfo instance
-     *
+     * @param string $magicFile
+     *            A magic file to use with the finfo instance
+     *            
      * @see http://www.php.net/manual/en/function.finfo-open.php
      */
     public function __construct($magicFile = null)
@@ -46,26 +47,28 @@ class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function guess($path)
     {
-        if (!is_file($path)) {
+        if (! is_file($path)) {
             throw new FileNotFoundException($path);
         }
-
-        if (!is_readable($path)) {
+        
+        if (! is_readable($path)) {
             throw new AccessDeniedException($path);
         }
-
-        if (!self::isSupported()) {
+        
+        if (! self::isSupported()) {
             return;
         }
-
-        if (!$finfo = new \finfo(FILEINFO_MIME_TYPE, $this->magicFile)) {
+        
+        if (! $finfo = new \finfo(FILEINFO_MIME_TYPE, $this->magicFile)) {
             return;
         }
-
+        
         return $finfo->file($path);
     }
 }

@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Proxy;
 
 use PHPUnit\Framework\TestCase;
@@ -21,6 +20,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy;
  */
 class NativeProxyTest extends TestCase
 {
+
     public function testIsWrapper()
     {
         $proxy = new NativeProxy();

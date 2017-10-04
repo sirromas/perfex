@@ -2,7 +2,6 @@
 /**
  * PayPal REST Token Request
  */
-
 namespace Omnipay\PayPal\Message;
 
 /**
@@ -18,9 +17,12 @@ namespace Omnipay\PayPal\Message;
  */
 class RestTokenRequest extends AbstractRestRequest
 {
+
     public function getData()
     {
-        return array('grant_type' => 'client_credentials');
+        return array(
+            'grant_type' => 'client_credentials'
+        );
     }
 
     protected function getEndpoint()
@@ -31,26 +33,22 @@ class RestTokenRequest extends AbstractRestRequest
     public function sendData($data)
     {
         // don't throw exceptions for 4xx errors
-        $this->httpClient->getEventDispatcher()->addListener(
-            'request.error',
-            function ($event) {
-                if ($event['response']->isClientError()) {
-                    $event->stopPropagation();
-                }
+        $this->httpClient->getEventDispatcher()->addListener('request.error', function ($event)
+        {
+            if ($event['response']->isClientError()) {
+                $event->stopPropagation();
             }
-        );
-
-        $httpRequest = $this->httpClient->createRequest(
-            $this->getHttpMethod(),
-            $this->getEndpoint(),
-            array('Accept' => 'application/json'),
-            $data
-        );
-
-        $httpResponse = $httpRequest->setAuth($this->getClientId(), $this->getSecret())->send();
+        });
+        
+        $httpRequest = $this->httpClient->createRequest($this->getHttpMethod(), $this->getEndpoint(), array(
+            'Accept' => 'application/json'
+        ), $data);
+        
+        $httpResponse = $httpRequest->setAuth($this->getClientId(), $this->getSecret())
+            ->send();
         // Empty response body should be parsed also as and empty array
         $body = $httpResponse->getBody(true);
-        $jsonToArrayResponse = !empty($body) ? $httpResponse->json() : array();
+        $jsonToArrayResponse = ! empty($body) ? $httpResponse->json() : array();
         return $this->response = new RestResponse($this, $jsonToArrayResponse, $httpResponse->getStatusCode());
     }
 }

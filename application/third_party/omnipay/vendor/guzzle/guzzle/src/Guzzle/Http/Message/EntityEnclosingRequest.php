@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Http\Message;
 
 use Guzzle\Http\EntityBody;
@@ -13,16 +12,25 @@ use Guzzle\Http\Exception\RequestException;
  */
 class EntityEnclosingRequest extends Request implements EntityEnclosingRequestInterface
 {
-    /** @var int When the size of the body is greater than 1MB, then send Expect: 100-Continue */
+
+    /**
+     * @var int When the size of the body is greater than 1MB, then send Expect: 100-Continue
+     */
     protected $expectCutoff = 1048576;
 
-    /** @var EntityBodyInterface $body Body of the request */
+    /**
+     * @var EntityBodyInterface $body Body of the request
+     */
     protected $body;
 
-    /** @var QueryString POST fields to use in the EntityBody */
+    /**
+     * @var QueryString POST fields to use in the EntityBody
+     */
     protected $postFields;
 
-    /** @var array POST files to send with the request */
+    /**
+     * @var array POST files to send with the request
+     */
     protected $postFiles = array();
 
     public function __construct($method, $url, $headers = array())
@@ -32,6 +40,7 @@ class EntityEnclosingRequest extends Request implements EntityEnclosingRequestIn
     }
 
     /**
+     *
      * @return string
      */
     public function __toString()
@@ -40,38 +49,38 @@ class EntityEnclosingRequest extends Request implements EntityEnclosingRequestIn
         if (count($this->postFields) && empty($this->postFiles)) {
             return parent::__toString() . (string) $this->postFields;
         }
-
+        
         return parent::__toString() . $this->body;
     }
 
     public function setState($state, array $context = array())
     {
         parent::setState($state, $context);
-        if ($state == self::STATE_TRANSFER && !$this->body && !count($this->postFields) && !count($this->postFiles)) {
+        if ($state == self::STATE_TRANSFER && ! $this->body && ! count($this->postFields) && ! count($this->postFiles)) {
             $this->setHeader('Content-Length', 0)->removeHeader('Transfer-Encoding');
         }
-
+        
         return $this->state;
     }
 
     public function setBody($body, $contentType = null)
     {
         $this->body = EntityBody::factory($body);
-
+        
         // Auto detect the Content-Type from the path of the request if possible
-        if ($contentType === null && !$this->hasHeader('Content-Type')) {
+        if ($contentType === null && ! $this->hasHeader('Content-Type')) {
             $contentType = $this->body->getContentType();
         }
-
+        
         if ($contentType) {
             $this->setHeader('Content-Type', $contentType);
         }
-
+        
         // Always add the Expect 100-Continue header if the body cannot be rewound. This helps with redirects.
-        if (!$this->body->isSeekable() && $this->expectCutoff !== false) {
+        if (! $this->body->isSeekable() && $this->expectCutoff !== false) {
             $this->setHeader('Expect', '100-Continue');
         }
-
+        
         // Set the Content-Length header if it can be determined
         $size = $this->body->getContentLength();
         if ($size !== null && $size !== false) {
@@ -79,16 +88,14 @@ class EntityEnclosingRequest extends Request implements EntityEnclosingRequestIn
             if ($size > $this->expectCutoff) {
                 $this->setHeader('Expect', '100-Continue');
             }
-        } elseif (!$this->hasHeader('Content-Length')) {
+        } elseif (! $this->hasHeader('Content-Length')) {
             if ('1.1' == $this->protocolVersion) {
                 $this->setHeader('Transfer-Encoding', 'chunked');
             } else {
-                throw new RequestException(
-                    'Cannot determine Content-Length and cannot use chunked Transfer-Encoding when using HTTP/1.0'
-                );
+                throw new RequestException('Cannot determine Content-Length and cannot use chunked Transfer-Encoding when using HTTP/1.0');
             }
         }
-
+        
         return $this;
     }
 
@@ -100,19 +107,20 @@ class EntityEnclosingRequest extends Request implements EntityEnclosingRequestIn
     /**
      * Set the size that the entity body of the request must exceed before adding the Expect: 100-Continue header.
      *
-     * @param int|bool $size Cutoff in bytes. Set to false to never send the expect header (even with non-seekable data)
-     *
+     * @param int|bool $size
+     *            Cutoff in bytes. Set to false to never send the expect header (even with non-seekable data)
+     *            
      * @return self
      */
     public function setExpectHeaderCutoff($size)
     {
         $this->expectCutoff = $size;
-        if ($size === false || !$this->body) {
+        if ($size === false || ! $this->body) {
             $this->removeHeader('Expect');
         } elseif ($this->body && $this->body->getSize() && $this->body->getSize() > $size) {
             $this->setHeader('Expect', '100-Continue');
         }
-
+        
         return $this;
     }
 
@@ -124,7 +132,7 @@ class EntityEnclosingRequest extends Request implements EntityEnclosingRequestIn
         } else {
             $this->getParams()->set(RedirectPlugin::MAX_REDIRECTS, $maxRedirects);
         }
-
+        
         return $this;
     }
 
@@ -142,7 +150,7 @@ class EntityEnclosingRequest extends Request implements EntityEnclosingRequestIn
     {
         $this->postFields->set($key, $value);
         $this->processPostFields();
-
+        
         return $this;
     }
 
@@ -150,7 +158,7 @@ class EntityEnclosingRequest extends Request implements EntityEnclosingRequestIn
     {
         $this->postFields->merge($fields);
         $this->processPostFields();
-
+        
         return $this;
     }
 
@@ -158,7 +166,7 @@ class EntityEnclosingRequest extends Request implements EntityEnclosingRequestIn
     {
         $this->postFields->remove($field);
         $this->processPostFields();
-
+        
         return $this;
     }
 
@@ -176,14 +184,14 @@ class EntityEnclosingRequest extends Request implements EntityEnclosingRequestIn
     {
         unset($this->postFiles[$fieldName]);
         $this->processPostFields();
-
+        
         return $this;
     }
 
     public function addPostFile($field, $filename = null, $contentType = null, $postname = null)
     {
         $data = null;
-
+        
         if ($field instanceof PostFileInterface) {
             $data = $field;
         } elseif (is_array($filename)) {
@@ -192,22 +200,24 @@ class EntityEnclosingRequest extends Request implements EntityEnclosingRequestIn
                 $this->addPostFile($field, $file, $contentType);
             }
             return $this;
-        } elseif (!is_string($filename)) {
+        } elseif (! is_string($filename)) {
             throw new RequestException('The path to a file must be a string');
-        } elseif (!empty($filename)) {
+        } elseif (! empty($filename)) {
             // Adding an empty file will cause cURL to error out
             $data = new PostFile($field, $filename, $contentType, $postname);
         }
-
+        
         if ($data) {
-            if (!isset($this->postFiles[$data->getFieldName()])) {
-                $this->postFiles[$data->getFieldName()] = array($data);
+            if (! isset($this->postFiles[$data->getFieldName()])) {
+                $this->postFiles[$data->getFieldName()] = array(
+                    $data
+                );
             } else {
                 $this->postFiles[$data->getFieldName()][] = $data;
             }
             $this->processPostFields();
         }
-
+        
         return $this;
     }
 
@@ -226,7 +236,7 @@ class EntityEnclosingRequest extends Request implements EntityEnclosingRequestIn
                 throw new RequestException('File must be a string or instance of PostFileInterface');
             }
         }
-
+        
         return $this;
     }
 
@@ -235,7 +245,7 @@ class EntityEnclosingRequest extends Request implements EntityEnclosingRequestIn
      */
     protected function processPostFields()
     {
-        if (!$this->postFiles) {
+        if (! $this->postFiles) {
             $this->removeHeader('Expect')->setHeader('Content-Type', self::URL_ENCODED);
         } else {
             $this->setHeader('Content-Type', self::MULTIPART);

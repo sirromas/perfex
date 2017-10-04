@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\Session\Flash;
 
 /**
@@ -18,6 +17,7 @@ namespace Symfony\Component\HttpFoundation\Session\Flash;
  */
 class AutoExpireFlashBag implements FlashBagInterface
 {
+
     private $name = 'flashes';
 
     /**
@@ -25,7 +25,10 @@ class AutoExpireFlashBag implements FlashBagInterface
      *
      * @var array
      */
-    private $flashes = array('display' => array(), 'new' => array());
+    private $flashes = array(
+        'display' => array(),
+        'new' => array()
+    );
 
     /**
      * The storage key for flashes in the session.
@@ -37,7 +40,8 @@ class AutoExpireFlashBag implements FlashBagInterface
     /**
      * Constructor.
      *
-     * @param string $storageKey The key used to store flashes in the session
+     * @param string $storageKey
+     *            The key used to store flashes in the session
      */
     public function __construct($storageKey = '_sf2_flashes')
     {
@@ -45,7 +49,9 @@ class AutoExpireFlashBag implements FlashBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getName()
     {
@@ -58,21 +64,25 @@ class AutoExpireFlashBag implements FlashBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function initialize(array &$flashes)
     {
         $this->flashes = &$flashes;
-
+        
         // The logic: messages from the last request will be stored in new, so we move them to previous
-        // This request we will show what is in 'display'.  What is placed into 'new' this time round will
+        // This request we will show what is in 'display'. What is placed into 'new' this time round will
         // be moved to display next time round.
         $this->flashes['display'] = array_key_exists('new', $this->flashes) ? $this->flashes['new'] : array();
         $this->flashes['new'] = array();
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function add($type, $message)
     {
@@ -80,7 +90,9 @@ class AutoExpireFlashBag implements FlashBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function peek($type, array $default = array())
     {
@@ -88,7 +100,9 @@ class AutoExpireFlashBag implements FlashBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function peekAll()
     {
@@ -96,37 +110,46 @@ class AutoExpireFlashBag implements FlashBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function get($type, array $default = array())
     {
         $return = $default;
-
-        if (!$this->has($type)) {
+        
+        if (! $this->has($type)) {
             return $return;
         }
-
+        
         if (isset($this->flashes['display'][$type])) {
             $return = $this->flashes['display'][$type];
             unset($this->flashes['display'][$type]);
         }
-
+        
         return $return;
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function all()
     {
         $return = $this->flashes['display'];
-        $this->flashes = array('new' => array(), 'display' => array());
-
+        $this->flashes = array(
+            'new' => array(),
+            'display' => array()
+        );
+        
         return $return;
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function setAll(array $messages)
     {
@@ -134,7 +157,9 @@ class AutoExpireFlashBag implements FlashBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function set($type, $messages)
     {
@@ -142,7 +167,9 @@ class AutoExpireFlashBag implements FlashBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function has($type)
     {
@@ -150,7 +177,9 @@ class AutoExpireFlashBag implements FlashBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function keys()
     {
@@ -158,7 +187,9 @@ class AutoExpireFlashBag implements FlashBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getStorageKey()
     {
@@ -166,7 +197,9 @@ class AutoExpireFlashBag implements FlashBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function clear()
     {

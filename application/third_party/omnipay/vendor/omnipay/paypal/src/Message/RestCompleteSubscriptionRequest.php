@@ -2,7 +2,6 @@
 /**
  * PayPal REST Complete Subscription Request
  */
-
 namespace Omnipay\PayPal\Message;
 
 /**
@@ -27,40 +26,40 @@ namespace Omnipay\PayPal\Message;
  * To create the agreement, see the code example in RestCreateSubscriptionRequest.
  *
  * At the completion of a createSubscription call, the customer should be
- * redirected to the redirect URL contained in $response->getRedirectUrl().  Once
+ * redirected to the redirect URL contained in $response->getRedirectUrl(). Once
  * the customer has approved the agreement and be returned to the returnUrl
- * in the call.  The returnUrl can contain the following code to complete
+ * in the call. The returnUrl can contain the following code to complete
  * the agreement:
  *
  * <code>
- *   // Create a gateway for the PayPal REST Gateway
- *   // (routes to GatewayFactory::create)
- *   $gateway = Omnipay::create('Paypal_Rest');
+ * // Create a gateway for the PayPal REST Gateway
+ * // (routes to GatewayFactory::create)
+ * $gateway = Omnipay::create('Paypal_Rest');
  *
- *   // Initialise the gateway
- *   $gateway->initialize(array(
- *       'clientId' => 'MyPayPalClientId',
- *       'secret'   => 'MyPayPalSecret',
- *       'testMode' => true, // Or false when you are ready for live transactions
- *   ));
+ * // Initialise the gateway
+ * $gateway->initialize(array(
+ * 'clientId' => 'MyPayPalClientId',
+ * 'secret' => 'MyPayPalSecret',
+ * 'testMode' => true, // Or false when you are ready for live transactions
+ * ));
  *
- *   // Do a complete subscription transaction on the gateway
- *   $transaction = $gateway->completeSubscription(array(
- *       'transactionReference'     => $subscription_id,
- *   ));
- *   $response = $transaction->send();
- *   if ($response->isSuccessful()) {
- *       echo "Complete Subscription transaction was successful!\n";
- *       $subscription_id = $response->getTransactionReference();
- *       echo "Subscription reference = " . $subscription_id;
- *   }
+ * // Do a complete subscription transaction on the gateway
+ * $transaction = $gateway->completeSubscription(array(
+ * 'transactionReference' => $subscription_id,
+ * ));
+ * $response = $transaction->send();
+ * if ($response->isSuccessful()) {
+ * echo "Complete Subscription transaction was successful!\n";
+ * $subscription_id = $response->getTransactionReference();
+ * echo "Subscription reference = " . $subscription_id;
+ * }
  * </code>
  *
  * Note that the subscription_id that you get from calling the response's
  * getTransactionReference() method at the end of the completeSubscription
  * call will be different to the one that you got after calling the response's
  * getTransactionReference() method at the end of the createSubscription
- * call.  The one that you get from completeSubscription is the correct
+ * call. The one that you get from completeSubscription is the correct
  * one to use going forwards (e.g. for cancelling or updating the subscription).
  *
  * ### Request Sample
@@ -69,9 +68,9 @@ namespace Omnipay\PayPal\Message;
  *
  * <code>
  * curl -v POST https://api.sandbox.paypal.com/v1/payments/billing-agreements/EC-0JP008296V451950C/agreement-execute \
- *     -H 'Content-Type:application/json' \
- *     -H 'Authorization: Bearer <Access-Token>' \
- *     -d '{}'
+ * -H 'Content-Type:application/json' \
+ * -H 'Authorization: Bearer <Access-Token>' \
+ * -d '{}'
  * </code>
  *
  * ### Response Sample
@@ -80,14 +79,14 @@ namespace Omnipay\PayPal\Message;
  *
  * <code>
  * {
- *     "id": "I-0LN988D3JACS",
- *     "links": [
- *         {
- *             "href": "https://api.sandbox.paypal.com/v1/payments/billing-agreements/I-0LN988D3JACS",
- *             "rel": "self",
- *             "method": "GET"
- *         }
- *     ]
+ * "id": "I-0LN988D3JACS",
+ * "links": [
+ * {
+ * "href": "https://api.sandbox.paypal.com/v1/payments/billing-agreements/I-0LN988D3JACS",
+ * "rel": "self",
+ * "method": "GET"
+ * }
+ * ]
  * }
  * </code>
  *
@@ -97,11 +96,12 @@ namespace Omnipay\PayPal\Message;
  */
 class RestCompleteSubscriptionRequest extends AbstractRestRequest
 {
+
     public function getData()
     {
         $this->validate('transactionReference');
         $data = array();
-
+        
         return $data;
     }
 
@@ -114,7 +114,6 @@ class RestCompleteSubscriptionRequest extends AbstractRestRequest
      */
     protected function getEndpoint()
     {
-        return parent::getEndpoint() . '/payments/billing-agreements/' .
-            $this->getTransactionReference() . '/agreement-execute';
+        return parent::getEndpoint() . '/payments/billing-agreements/' . $this->getTransactionReference() . '/agreement-execute';
     }
 }

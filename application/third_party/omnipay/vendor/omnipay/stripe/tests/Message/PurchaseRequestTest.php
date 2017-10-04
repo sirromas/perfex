@@ -1,21 +1,19 @@
 <?php
-
 namespace Omnipay\Stripe\Message;
 
 use Omnipay\Tests\TestCase;
 
 class PurchaseRequestTest extends TestCase
 {
+
     public function setUp()
     {
         $this->request = new PurchaseRequest($this->getHttpClient(), $this->getHttpRequest());
-        $this->request->initialize(
-            array(
-                'amount' => '10.00',
-                'currency' => 'USD',
-                'card' => $this->getValidCard(),
-            )
-        );
+        $this->request->initialize(array(
+            'amount' => '10.00',
+            'currency' => 'USD',
+            'card' => $this->getValidCard()
+        ));
     }
 
     public function testCaptureIsTrue()
@@ -28,7 +26,7 @@ class PurchaseRequestTest extends TestCase
     {
         $this->setMockHttpResponse('PurchaseSuccess.txt');
         $response = $this->request->send();
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertSame('ch_1IU9gcUiNASROd', $response->getTransactionReference());
@@ -40,7 +38,7 @@ class PurchaseRequestTest extends TestCase
     {
         $this->setMockHttpResponse('PurchaseWithSourceSuccess.txt');
         $response = $this->request->send();
-
+        
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertSame('ch_1IU9gcUiNASROd', $response->getTransactionReference());
@@ -52,7 +50,7 @@ class PurchaseRequestTest extends TestCase
     {
         $this->setMockHttpResponse('PurchaseFailure.txt');
         $response = $this->request->send();
-
+        
         $this->assertFalse($response->isSuccessful());
         $this->assertFalse($response->isRedirect());
         $this->assertSame('ch_1IUAZQWFYrPooM', $response->getTransactionReference());

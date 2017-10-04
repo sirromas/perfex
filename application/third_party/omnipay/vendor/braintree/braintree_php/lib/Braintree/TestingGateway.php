@@ -3,8 +3,11 @@ namespace Braintree;
 
 class TestingGateway
 {
+
     private $_gateway;
+
     private $_config;
+
     private $_http;
 
     public function __construct($gateway)

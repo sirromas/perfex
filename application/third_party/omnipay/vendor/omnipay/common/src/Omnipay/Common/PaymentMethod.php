@@ -2,7 +2,6 @@
 /**
  * Payment Method
  */
-
 namespace Omnipay\Common;
 
 /**
@@ -16,7 +15,8 @@ class PaymentMethod
 {
 
     /**
-     * The ID of the payment method.  Used as the payment method ID in the
+     * The ID of the payment method.
+     * Used as the payment method ID in the
      * Issuer class.
      *
      * @see Issuer
@@ -24,7 +24,7 @@ class PaymentMethod
      * @var string
      */
     protected $id;
-    
+
     /**
      * The full name of the payment method
      *
@@ -35,8 +35,10 @@ class PaymentMethod
     /**
      * Create a new PaymentMethod
      *
-     * @param string $id   The identifier of this payment method
-     * @param string $name The name of this payment method
+     * @param string $id
+     *            The identifier of this payment method
+     * @param string $name
+     *            The name of this payment method
      */
     public function __construct($id, $name)
     {

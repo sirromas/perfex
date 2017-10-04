@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Plugin\CurlAuth;
 
 use Guzzle\Common\Version;
@@ -11,6 +10,7 @@ use Guzzle\Http\Client;
  */
 class CurlAuthPluginTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testAddsBasicAuthentication()
     {
         Version::$emitWarnings = false;
@@ -32,8 +32,10 @@ class CurlAuthPluginTest extends \Guzzle\Tests\GuzzleTestCase
         $request = $client->get('/');
         $this->assertEquals('julian', $request->getUsername());
         $this->assertEquals('test', $request->getPassword());
-        $this->assertEquals('julian:test', $request->getCurlOptions()->get(CURLOPT_USERPWD));
-        $this->assertEquals(CURLAUTH_DIGEST, $request->getCurlOptions()->get(CURLOPT_HTTPAUTH));
+        $this->assertEquals('julian:test', $request->getCurlOptions()
+            ->get(CURLOPT_USERPWD));
+        $this->assertEquals(CURLAUTH_DIGEST, $request->getCurlOptions()
+            ->get(CURLOPT_HTTPAUTH));
         Version::$emitWarnings = true;
     }
 }

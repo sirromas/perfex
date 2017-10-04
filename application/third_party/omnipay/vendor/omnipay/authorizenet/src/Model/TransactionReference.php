@@ -1,10 +1,10 @@
 <?php
-
 namespace Omnipay\AuthorizeNet\Model;
 
 /**
  * Unlike most other gateways, Authorize.Net sometimes requires more than just the transaction ID to perform operations
- * on a prior transaction. For example, performing a refund requires the original transaction ID as well as some credit
+ * on a prior transaction.
+ * For example, performing a refund requires the original transaction ID as well as some credit
  * card details used in the original transaction.
  *
  * Rather than requiring these additional parameters for subsequent operations, we create a composite transaction
@@ -13,10 +13,16 @@ namespace Omnipay\AuthorizeNet\Model;
  */
 class TransactionReference
 {
+
     private $transId;
+
     private $approvalCode;
+
     private $card;
-    /** @var CardReference */
+
+    /**
+     * @var CardReference
+     */
     private $cardReference;
 
     public function __construct($data = null)
@@ -51,12 +57,13 @@ class TransactionReference
             $data['card'] = $this->card;
         }
         if (isset($this->cardReference)) {
-            $data['cardReference'] = (string)$this->cardReference;
+            $data['cardReference'] = (string) $this->cardReference;
         }
         return json_encode($data);
     }
 
     /**
+     *
      * @return string
      */
     public function getTransId()
@@ -65,7 +72,8 @@ class TransactionReference
     }
 
     /**
-     * @param string $transId
+     *
+     * @param string $transId            
      */
     public function setTransId($transId)
     {
@@ -73,6 +81,7 @@ class TransactionReference
     }
 
     /**
+     *
      * @return string
      */
     public function getApprovalCode()
@@ -81,7 +90,8 @@ class TransactionReference
     }
 
     /**
-     * @param string $approvalCode
+     *
+     * @param string $approvalCode            
      */
     public function setApprovalCode($approvalCode)
     {
@@ -89,6 +99,7 @@ class TransactionReference
     }
 
     /**
+     *
      * @return object
      */
     public function getCard()
@@ -97,7 +108,8 @@ class TransactionReference
     }
 
     /**
-     * @param array $card
+     *
+     * @param array $card            
      */
     public function setCard($card)
     {
@@ -105,6 +117,7 @@ class TransactionReference
     }
 
     /**
+     *
      * @return CardReference
      */
     public function getCardReference()
@@ -113,7 +126,8 @@ class TransactionReference
     }
 
     /**
-     * @param string|CardReference $cardReference
+     *
+     * @param string|CardReference $cardReference            
      */
     public function setCardReference($cardReference)
     {

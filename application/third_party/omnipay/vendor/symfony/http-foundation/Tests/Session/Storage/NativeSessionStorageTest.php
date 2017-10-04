@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage;
 
 use PHPUnit\Framework\TestCase;
@@ -23,21 +22,22 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
  * Test class for NativeSessionStorage.
  *
  * @author Drak <drak@zikula.org>
- *
- * These tests require separate processes.
- *
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
+ *        
+ *         These tests require separate processes.
+ *        
+ *         @runTestsInSeparateProcesses
+ *         @preserveGlobalState disabled
  */
 class NativeSessionStorageTest extends TestCase
 {
+
     private $savePath;
 
     protected function setUp()
     {
         $this->iniSet('session.save_handler', 'files');
-        $this->iniSet('session.save_path', $this->savePath = sys_get_temp_dir().'/sf2test');
-        if (!is_dir($this->savePath)) {
+        $this->iniSet('session.save_path', $this->savePath = sys_get_temp_dir() . '/sf2test');
+        if (! is_dir($this->savePath)) {
             mkdir($this->savePath);
         }
     }
@@ -45,16 +45,17 @@ class NativeSessionStorageTest extends TestCase
     protected function tearDown()
     {
         session_write_close();
-        array_map('unlink', glob($this->savePath.'/*'));
+        array_map('unlink', glob($this->savePath . '/*'));
         if (is_dir($this->savePath)) {
             rmdir($this->savePath);
         }
-
+        
         $this->savePath = null;
     }
 
     /**
-     * @param array $options
+     *
+     * @param array $options            
      *
      * @return NativeSessionStorage
      */
@@ -62,7 +63,7 @@ class NativeSessionStorageTest extends TestCase
     {
         $storage = new NativeSessionStorage($options);
         $storage->registerBag(new AttributeBag());
-
+        
         return $storage;
     }
 
@@ -97,12 +98,12 @@ class NativeSessionStorageTest extends TestCase
     {
         $storage = $this->getStorage();
         $this->assertSame('', $storage->getId(), 'Empty ID before starting session');
-
+        
         $storage->start();
         $id = $storage->getId();
         $this->assertInternalType('string', $id);
         $this->assertNotSame('', $id);
-
+        
         $storage->save();
         $this->assertSame($id, $storage->getId(), 'ID stays after saving session');
     }
@@ -115,7 +116,8 @@ class NativeSessionStorageTest extends TestCase
         $storage->getBag('attributes')->set('lucky', 7);
         $storage->regenerate();
         $this->assertNotEquals($id, $storage->getId());
-        $this->assertEquals(7, $storage->getBag('attributes')->get('lucky'));
+        $this->assertEquals(7, $storage->getBag('attributes')
+            ->get('lucky'));
     }
 
     public function testRegenerateDestroy()
@@ -126,7 +128,8 @@ class NativeSessionStorageTest extends TestCase
         $storage->getBag('attributes')->set('legs', 11);
         $storage->regenerate(true);
         $this->assertNotEquals($id, $storage->getId());
-        $this->assertEquals(11, $storage->getBag('attributes')->get('legs'));
+        $this->assertEquals(11, $storage->getBag('attributes')
+            ->get('legs'));
     }
 
     public function testSessionGlobalIsUpToDateAfterIdRegeneration()
@@ -136,7 +139,7 @@ class NativeSessionStorageTest extends TestCase
         $storage->getBag('attributes')->set('lucky', 7);
         $storage->regenerate();
         $storage->getBag('attributes')->set('lucky', 42);
-
+        
         $this->assertEquals(42, $_SESSION['_sf2_attributes']['lucky']);
     }
 
@@ -150,7 +153,7 @@ class NativeSessionStorageTest extends TestCase
     public function testDefaultSessionCacheLimiter()
     {
         $this->iniSet('session.cache_limiter', 'nocache');
-
+        
         $storage = new NativeSessionStorage();
         $this->assertEquals('', ini_get('session.cache_limiter'));
     }
@@ -158,8 +161,10 @@ class NativeSessionStorageTest extends TestCase
     public function testExplicitSessionCacheLimiter()
     {
         $this->iniSet('session.cache_limiter', 'nocache');
-
-        $storage = new NativeSessionStorage(array('cache_limiter' => 'public'));
+        
+        $storage = new NativeSessionStorage(array(
+            'cache_limiter' => 'public'
+        ));
         $this->assertEquals('public', ini_get('session.cache_limiter'));
     }
 
@@ -170,17 +175,17 @@ class NativeSessionStorageTest extends TestCase
             'cookie_path' => '/my/cookie/path',
             'cookie_domain' => 'symfony.example.com',
             'cookie_secure' => true,
-            'cookie_httponly' => false,
+            'cookie_httponly' => false
         );
-
+        
         $this->getStorage($options);
         $temp = session_get_cookie_params();
         $gco = array();
-
+        
         foreach ($temp as $key => $value) {
-            $gco['cookie_'.$key] = $value;
+            $gco['cookie_' . $key] = $value;
         }
-
+        
         $this->assertEquals($options, $gco);
     }
 
@@ -217,17 +222,19 @@ class NativeSessionStorageTest extends TestCase
     public function testStarted()
     {
         $storage = $this->getStorage();
-
-        $this->assertFalse($storage->getSaveHandler()->isActive());
+        
+        $this->assertFalse($storage->getSaveHandler()
+            ->isActive());
         $this->assertFalse($storage->isStarted());
-
+        
         session_start();
         $this->assertTrue(isset($_SESSION));
-        $this->assertTrue($storage->getSaveHandler()->isActive());
-
+        $this->assertTrue($storage->getSaveHandler()
+            ->isActive());
+        
         // PHP session might have started, but the storage driver has not, so false is correct here
         $this->assertFalse($storage->isStarted());
-
+        
         $key = $storage->getMetadataBag()->getStorageKey();
         $this->assertFalse(isset($_SESSION[$key]));
         $storage->start();
@@ -242,6 +249,7 @@ class NativeSessionStorageTest extends TestCase
         $storage->save();
         $storage->start();
         $this->assertSame($id, $storage->getId(), 'Same session ID after restarting');
-        $this->assertSame(7, $storage->getBag('attributes')->get('lucky'), 'Data still available');
+        $this->assertSame(7, $storage->getBag('attributes')
+            ->get('lucky'), 'Data still available');
     }
 }

@@ -1,11 +1,11 @@
 <?php
-
 namespace Omnipay\Stripe\Message;
 
 use Omnipay\Tests\TestCase;
 
 class CreatePlanRequestTest extends TestCase
 {
+
     public function setUp()
     {
         $this->request = new CreatePlanRequest($this->getHttpClient(), $this->getHttpRequest());
@@ -14,7 +14,7 @@ class CreatePlanRequestTest extends TestCase
         $this->request->setCurrency('usd');
         $this->request->setInterval('month');
         $this->request->setName('Basic Plan');
-
+        
         $this->request->setIntervalCount(1);
         $this->request->setStatementDescriptor('Omnipay Basic Plan');
         $this->request->setTrialPeriodDays(3);
@@ -35,7 +35,6 @@ class CreatePlanRequestTest extends TestCase
         $this->assertNotNull($response->getPlan());
         $this->assertNull($response->getMessage());
     }
-
 
     public function testSendError()
     {

@@ -2,7 +2,6 @@
 /**
  * Omnipay Gateway Factory class
  */
-
 namespace Omnipay\Common;
 
 use Guzzle\Http\ClientInterface;
@@ -21,15 +20,16 @@ use Symfony\Component\HttpFoundation\Request as HttpRequest;
  * Example:
  *
  * <code>
- *   // Create a gateway for the PayPal ExpressGateway
- *   // (routes to GatewayFactory::create)
- *   $gateway = Omnipay::create('ExpressGateway');
+ * // Create a gateway for the PayPal ExpressGateway
+ * // (routes to GatewayFactory::create)
+ * $gateway = Omnipay::create('ExpressGateway');
  * </code>
  *
  * @see Omnipay\Omnipay
  */
 class GatewayFactory
 {
+
     /**
      * Internal storage for all available gateways
      *
@@ -50,7 +50,8 @@ class GatewayFactory
     /**
      * Replace the list of available gateways
      *
-     * @param array $gateways An array of gateway names
+     * @param array $gateways
+     *            An array of gateway names
      */
     public function replace(array $gateways)
     {
@@ -60,11 +61,12 @@ class GatewayFactory
     /**
      * Register a new gateway
      *
-     * @param string $className Gateway name
+     * @param string $className
+     *            Gateway name
      */
     public function register($className)
     {
-        if (!in_array($className, $this->gateways)) {
+        if (! in_array($className, $this->gateways)) {
             $this->gateways[] = $className;
         }
     }
@@ -82,29 +84,32 @@ class GatewayFactory
                 $this->register($gateway);
             }
         }
-
+        
         ksort($this->gateways);
-
+        
         return $this->all();
     }
 
     /**
      * Create a new gateway instance
      *
-     * @param string               $class       Gateway name
-     * @param ClientInterface|null $httpClient  A Guzzle HTTP Client implementation
-     * @param HttpRequest|null     $httpRequest A Symfony HTTP Request implementation
-     * @throws RuntimeException                 If no such gateway is found
-     * @return GatewayInterface                 An object of class $class is created and returned
+     * @param string $class
+     *            Gateway name
+     * @param ClientInterface|null $httpClient
+     *            A Guzzle HTTP Client implementation
+     * @param HttpRequest|null $httpRequest
+     *            A Symfony HTTP Request implementation
+     * @throws RuntimeException If no such gateway is found
+     * @return GatewayInterface An object of class $class is created and returned
      */
     public function create($class, ClientInterface $httpClient = null, HttpRequest $httpRequest = null)
     {
         $class = Helper::getGatewayClassName($class);
-
-        if (!class_exists($class)) {
+        
+        if (! class_exists($class)) {
             throw new RuntimeException("Class '$class' not found");
         }
-
+        
         return new $class($httpClient, $httpRequest);
     }
 
@@ -115,8 +120,8 @@ class GatewayFactory
      */
     public function getSupportedGateways()
     {
-        $package = json_decode(file_get_contents(__DIR__.'/../../../composer.json'), true);
-
+        $package = json_decode(file_get_contents(__DIR__ . '/../../../composer.json'), true);
+        
         return $package['extra']['gateways'];
     }
 }

@@ -1,9 +1,9 @@
 <?php
-
 namespace Omnipay\AuthorizeNet\Model;
 
 /**
- * Authorize.Net CIM allows storing credit cards within customer profiles. However, the card is not represented by a
+ * Authorize.Net CIM allows storing credit cards within customer profiles.
+ * However, the card is not represented by a
  * single identifier, rather it requires a complex key to identify it. This class serves as a wrapper to help with
  * managing this complex key.
  *
@@ -11,12 +11,17 @@ namespace Omnipay\AuthorizeNet\Model;
  */
 class CardReference
 {
+
     private $customerProfileId = null;
+
     private $paymentProfileId = null;
+
     private $shippingProfileId = null;
 
     /**
-     * @param string $data JSON encoded string representing a card reference
+     *
+     * @param string $data
+     *            JSON encoded string representing a card reference
      */
     public function __construct($data = null)
     {

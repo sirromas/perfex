@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Service\Builder;
 
 use Guzzle\Service\Builder\ServiceBuilderLoader;
@@ -9,37 +8,38 @@ use Guzzle\Service\Builder\ServiceBuilderLoader;
  */
 class ServiceBuilderLoaderTest extends \Guzzle\Tests\GuzzleTestCase
 {
+
     public function testBuildsServiceBuilders()
     {
         $arrayFactory = new ServiceBuilderLoader();
-
+        
         $data = array(
             'services' => array(
                 'abstract' => array(
                     'params' => array(
                         'access_key' => 'xyz',
-                        'secret' => 'abc',
-                    ),
+                        'secret' => 'abc'
+                    )
                 ),
                 'foo' => array(
                     'extends' => 'abstract',
                     'params' => array(
-                        'baz' => 'bar',
-                    ),
+                        'baz' => 'bar'
+                    )
                 ),
                 'mock' => array(
                     'extends' => 'abstract',
                     'params' => array(
                         'username' => 'foo',
                         'password' => 'baz',
-                        'subdomain' => 'bar',
+                        'subdomain' => 'bar'
                     )
                 )
             )
         );
-
+        
         $builder = $arrayFactory->load($data);
-
+        
         // Ensure that services were parsed
         $this->assertTrue(isset($builder['mock']));
         $this->assertTrue(isset($builder['abstract']));
@@ -54,7 +54,7 @@ class ServiceBuilderLoaderTest extends \Guzzle\Tests\GuzzleTestCase
     public function testThrowsExceptionWhenExtendingNonExistentService()
     {
         $arrayFactory = new ServiceBuilderLoader();
-
+        
         $data = array(
             'services' => array(
                 'foo' => array(
@@ -62,14 +62,14 @@ class ServiceBuilderLoaderTest extends \Guzzle\Tests\GuzzleTestCase
                 )
             )
         );
-
+        
         $builder = $arrayFactory->load($data);
     }
 
     public function testAllowsGlobalParameterOverrides()
     {
         $arrayFactory = new ServiceBuilderLoader();
-
+        
         $data = array(
             'services' => array(
                 'foo' => array(
@@ -80,12 +80,12 @@ class ServiceBuilderLoaderTest extends \Guzzle\Tests\GuzzleTestCase
                 )
             )
         );
-
+        
         $builder = $arrayFactory->load($data, array(
             'bar' => 'jar',
             'far' => 'car'
         ));
-
+        
         $compiled = json_decode($builder->serialize(), true);
         $this->assertEquals(array(
             'foo' => 'baz',
@@ -99,8 +99,12 @@ class ServiceBuilderLoaderTest extends \Guzzle\Tests\GuzzleTestCase
         $arrayFactory = new ServiceBuilderLoader();
         $arrayFactory->load(array(
             'services' => array(
-                'too' => array('extends' => 'ball'),
-                'ball' => array('extends' => 'too'),
+                'too' => array(
+                    'extends' => 'ball'
+                ),
+                'ball' => array(
+                    'extends' => 'too'
+                )
             )
         ));
     }
@@ -109,44 +113,68 @@ class ServiceBuilderLoaderTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $foo = array(
             'extends' => 'bar',
-            'class'   => 'stdClass',
-            'params'  => array('a' => 'test', 'b' => '456')
+            'class' => 'stdClass',
+            'params' => array(
+                'a' => 'test',
+                'b' => '456'
+            )
         );
-
+        
         return array(
             array(
+                
                 // Does not extend the existing `foo` service but overwrites it
                 array(
                     'services' => array(
                         'foo' => $foo,
-                        'bar' => array('params' => array('baz' => '123'))
+                        'bar' => array(
+                            'params' => array(
+                                'baz' => '123'
+                            )
+                        )
                     )
                 ),
                 array(
                     'services' => array(
-                        'foo' => array('class' => 'Baz')
+                        'foo' => array(
+                            'class' => 'Baz'
+                        )
                     )
                 ),
                 array(
                     'services' => array(
-                        'foo' => array('class' => 'Baz'),
-                        'bar' => array('params' => array('baz' => '123'))
+                        'foo' => array(
+                            'class' => 'Baz'
+                        ),
+                        'bar' => array(
+                            'params' => array(
+                                'baz' => '123'
+                            )
+                        )
                     )
                 )
             ),
             array(
+                
                 // Extends the existing `foo` service
                 array(
                     'services' => array(
                         'foo' => $foo,
-                        'bar' => array('params' => array('baz' => '123'))
+                        'bar' => array(
+                            'params' => array(
+                                'baz' => '123'
+                            )
+                        )
                     )
                 ),
                 array(
                     'services' => array(
                         'foo' => array(
                             'extends' => 'foo',
-                            'params' => array('b' => '123', 'c' => 'def')
+                            'params' => array(
+                                'b' => '123',
+                                'c' => 'def'
+                            )
                         )
                     )
                 ),
@@ -155,9 +183,17 @@ class ServiceBuilderLoaderTest extends \Guzzle\Tests\GuzzleTestCase
                         'foo' => array(
                             'extends' => 'bar',
                             'class' => 'stdClass',
-                            'params' => array('a' => 'test', 'b' => '123', 'c' => 'def')
+                            'params' => array(
+                                'a' => 'test',
+                                'b' => '123',
+                                'c' => 'def'
+                            )
                         ),
-                        'bar' => array('params' => array('baz' => '123'))
+                        'bar' => array(
+                            'params' => array(
+                                'baz' => '123'
+                            )
+                        )
                     )
                 )
             )

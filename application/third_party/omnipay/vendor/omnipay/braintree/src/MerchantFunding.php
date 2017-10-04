@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\Braintree;
 
 use DateTime;
@@ -21,6 +20,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
  */
 class MerchantFunding
 {
+
     /**
      * Internal storage of all of the individual parameters.
      *
@@ -31,7 +31,8 @@ class MerchantFunding
     /**
      * Create a new MerchantIndividual object using the specified parameters
      *
-     * @param array $parameters An array of parameters to set on the new object
+     * @param array $parameters
+     *            An array of parameters to set on the new object
      */
     public function __construct($parameters = null)
     {
@@ -39,6 +40,7 @@ class MerchantFunding
     }
 
     /**
+     *
      * @return mixed
      */
     public function getAccountNumber()
@@ -47,17 +49,19 @@ class MerchantFunding
     }
 
     /**
-     * @param string $accountNumber
+     *
+     * @param string $accountNumber            
      * @return $this
      */
     public function setAccountNumber($accountNumber)
     {
         $this->setParameter('accountNumber', $accountNumber);
-
+        
         return $this;
     }
 
     /**
+     *
      * @return mixed
      */
     public function getDescriptor()
@@ -66,17 +70,19 @@ class MerchantFunding
     }
 
     /**
-     * @param string $descriptor
+     *
+     * @param string $descriptor            
      * @return $this
      */
     public function setDescriptor($descriptor)
     {
         $this->setParameter('descriptor', $descriptor);
-
+        
         return $this;
     }
 
     /**
+     *
      * @return mixed
      */
     public function getDestination()
@@ -85,17 +91,19 @@ class MerchantFunding
     }
 
     /**
-     * @param string $destination
+     *
+     * @param string $destination            
      * @return $this
      */
     public function setDestination($destination)
     {
         $this->setParameter('destination', $destination);
-
+        
         return $this;
     }
 
     /**
+     *
      * @return mixed
      */
     public function getEmail()
@@ -104,13 +112,14 @@ class MerchantFunding
     }
 
     /**
-     * @param mixed $email
+     *
+     * @param mixed $email            
      * @return $this
      */
     public function setEmail($email)
     {
         $this->setParameter('email', $email);
-
+        
         return $this;
     }
 
@@ -119,15 +128,16 @@ class MerchantFunding
      *
      * If any unknown parameters passed, they will be ignored.
      *
-     * @param array $parameters An associative array of parameters
+     * @param array $parameters
+     *            An associative array of parameters
      * @return CreditCard provides a fluent interface.
      */
     public function initialize($parameters = null)
     {
         $this->parameters = new ParameterBag();
-
+        
         Helper::initialize($this, $parameters);
-
+        
         return $this;
     }
 
@@ -142,6 +152,7 @@ class MerchantFunding
     }
 
     /**
+     *
      * @return mixed
      */
     public function getMobilePhone()
@@ -150,17 +161,19 @@ class MerchantFunding
     }
 
     /**
-     * @param string $mobilePhone
+     *
+     * @param string $mobilePhone            
      * @return $this
      */
     public function setMobilePhone($mobilePhone)
     {
         $this->setParameter('mobilePhone', $mobilePhone);
-
+        
         return $this;
     }
 
     /**
+     *
      * @return mixed
      */
     public function getRoutingNumber()
@@ -169,13 +182,14 @@ class MerchantFunding
     }
 
     /**
-     * @param string $routingNumber
+     *
+     * @param string $routingNumber            
      * @return $this
      */
     public function setRoutingNumber($routingNumber)
     {
         $this->setParameter('routingNumber', $routingNumber);
-
+        
         return $this;
     }
 
@@ -192,14 +206,16 @@ class MerchantFunding
     /**
      * Set one parameter.
      *
-     * @param string $key Parameter key
-     * @param mixed $value Parameter value
+     * @param string $key
+     *            Parameter key
+     * @param mixed $value
+     *            Parameter value
      * @return CreditCard provides a fluent interface.
      */
     protected function setParameter($key, $value)
     {
         $this->parameters->set($key, $value);
-
+        
         return $this;
     }
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\AuthorizeNet\Message;
 
 use Omnipay\Common\CreditCard;
@@ -9,6 +8,7 @@ use Omnipay\Common\CreditCard;
  */
 class AIMAuthorizeRequest extends AIMAbstractRequest
 {
+
     protected $action = 'authOnlyTransaction';
 
     public function getData()
@@ -20,13 +20,14 @@ class AIMAuthorizeRequest extends AIMAbstractRequest
         $this->addBillingData($data);
         $this->addCustomerIP($data);
         $this->addTransactionSettings($data);
-
+        
         return $data;
     }
 
     protected function addPayment(\SimpleXMLElement $data)
     {
         /**
+         *
          * @link http://developer.authorize.net/api/reference/features/acceptjs.html Documentation on opaque data
          */
         if ($this->getOpaqueDataDescriptor() && $this->getOpaqueDataValue()) {
@@ -34,9 +35,11 @@ class AIMAuthorizeRequest extends AIMAbstractRequest
             $data->transactionRequest->payment->opaqueData->dataValue = $this->getOpaqueDataValue();
             return;
         }
-
+        
         $this->validate('card');
-        /** @var CreditCard $card */
+        /**
+         * @var CreditCard $card
+         */
         $card = $this->getCard();
         $card->validate();
         $data->transactionRequest->payment->creditCard->cardNumber = $card->getNumber();
@@ -47,7 +50,7 @@ class AIMAuthorizeRequest extends AIMAbstractRequest
     protected function addCustomerIP(\SimpleXMLElement $data)
     {
         $ip = $this->getClientIp();
-        if (!empty($ip)) {
+        if (! empty($ip)) {
             $data->transactionRequest->customerIP = $ip;
         }
     }

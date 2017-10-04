@@ -1,11 +1,12 @@
 <?php
-
 namespace Omnipay\TwoCheckoutPlus\Message;
 
 class NotificationRequest extends AbstractRequest
 {
+
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
      *
      * @return array
      */
@@ -14,14 +15,15 @@ class NotificationRequest extends AbstractRequest
         $data = $this->httpRequest->request->all();
         $data['secretWord'] = $this->getSecretWord();
         $data['accountNumber'] = $this->getAccountNumber();
-
+        
         return $data;
     }
 
     /**
-     * {@inheritdoc}
      *
-     * @param mixed $data
+     * @ERROR!!!
+     *
+     * @param mixed $data            
      *
      * @return NotificationResponse
      */

@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\Common\Message;
 
 use Mockery as m;
@@ -9,6 +8,7 @@ use Omnipay\Tests\TestCase;
 
 class AbstractRequestTest extends TestCase
 {
+
     public function setUp()
     {
         $this->request = m::mock('\Omnipay\Common\Message\AbstractRequest')->makePartial();
@@ -18,13 +18,14 @@ class AbstractRequestTest extends TestCase
     /**
      * Allow changing a protected property using reflections.
      *
-     * @param $property
-     * @param bool|true $value
+     * @param
+     *            $property
+     * @param bool|true $value            
      */
     private function changeProtectedProperty($property, $value = true)
     {
         $reflection = new \ReflectionClass($this->request);
-
+        
         $reflection_property = $reflection->getProperty($property);
         $reflection_property->setAccessible(true);
         $reflection_property->setValue($this->request, $value);
@@ -39,7 +40,9 @@ class AbstractRequestTest extends TestCase
 
     public function testInitializeWithParams()
     {
-        $this->assertSame($this->request, $this->request->initialize(array('amount' => '1.23')));
+        $this->assertSame($this->request, $this->request->initialize(array(
+            'amount' => '1.23'
+        )));
         $this->assertSame('1.23', $this->request->getAmount());
     }
 
@@ -51,14 +54,14 @@ class AbstractRequestTest extends TestCase
     {
         $this->request = new AbstractRequestTest_MockAbstractRequest($this->getHttpClient(), $this->getHttpRequest());
         $this->request->send();
-
+        
         $this->request->initialize();
     }
 
     public function testCard()
     {
         // no type checking on card parameter
-        $card = new CreditCard;
+        $card = new CreditCard();
         $this->assertSame($this->request, $this->request->setCard($card));
         $this->assertSame($card, $this->request->getCard());
     }
@@ -66,8 +69,10 @@ class AbstractRequestTest extends TestCase
     public function testSetCardWithArray()
     {
         // passing array should create CreditCard object
-        $this->assertSame($this->request, $this->request->setCard(array('number' => '1234')));
-
+        $this->assertSame($this->request, $this->request->setCard(array(
+            'number' => '1234'
+        )));
+        
         $card = $this->request->getCard();
         $this->assertInstanceOf('\Omnipay\Common\CreditCard', $card);
         $this->assertSame('1234', $card->getNumber());
@@ -125,7 +130,7 @@ class AbstractRequestTest extends TestCase
         $this->request->setAmount('0.00');
         $this->request->getAmount();
     }
-
+    
     // See https://github.com/thephpleague/omnipay-common/issues/69
     public function testAmountPrecision()
     {
@@ -133,18 +138,18 @@ class AbstractRequestTest extends TestCase
         ini_set('precision', 6);
         $this->assertSame($this->request, $this->request->setAmount('67.10'));
         $this->assertSame('67.10', $this->request->getAmount());
-
+        
         // At 17 decimal places, 67.10 will echo as 67.09999...
         // This is *why* PHP sets the default precision at 6.
         ini_set('precision', 17);
         $this->assertSame('67.10', $this->request->getAmount());
-
+        
         $this->assertSame($this->request, $this->request->setAmount('67.01'));
         $this->assertSame('67.01', $this->request->getAmount());
-
+        
         $this->assertSame($this->request, $this->request->setAmount('0.10'));
         $this->assertSame('0.10', $this->request->getAmount());
-
+        
         $this->assertSame($this->request, $this->request->setAmount('0.01'));
         $this->assertSame('0.01', $this->request->getAmount());
     }
@@ -254,7 +259,7 @@ class AbstractRequestTest extends TestCase
      */
     public function testAmountNegativeFloatThrowsException()
     {
-        $this->assertSame($this->request, $this->request->setAmount(-123.00));
+        $this->assertSame($this->request, $this->request->setAmount(- 123.00));
         $this->request->getAmount();
     }
 
@@ -320,13 +325,17 @@ class AbstractRequestTest extends TestCase
     public function testItemsArray()
     {
         $this->assertSame($this->request, $this->request->setItems(array(
-            array('name' => 'Floppy Disk'),
-            array('name' => 'CD-ROM'),
+            array(
+                'name' => 'Floppy Disk'
+            ),
+            array(
+                'name' => 'CD-ROM'
+            )
         )));
-
+        
         $itemBag = $this->request->getItems();
         $this->assertInstanceOf('\Omnipay\Common\ItemBag', $itemBag);
-
+        
         $items = $itemBag->all();
         $this->assertSame('Floppy Disk', $items[0]->getName());
         $this->assertSame('CD-ROM', $items[1]->getName());
@@ -334,9 +343,11 @@ class AbstractRequestTest extends TestCase
 
     public function testItemsBag()
     {
-        $itemBag = new ItemBag;
-        $itemBag->add(array('name' => 'Floppy Disk'));
-
+        $itemBag = new ItemBag();
+        $itemBag->add(array(
+            'name' => 'Floppy Disk'
+        ));
+        
         $this->assertSame($this->request, $this->request->setItems($itemBag));
         $this->assertSame($itemBag, $this->request->getItems());
     }
@@ -379,10 +390,12 @@ class AbstractRequestTest extends TestCase
 
     public function testInitializedParametersAreSet()
     {
-        $params = array('testMode' => 'success');
-
+        $params = array(
+            'testMode' => 'success'
+        );
+        
         $this->request->initialize($params);
-
+        
         $this->assertSame($this->request->getTestMode(), 'success');
     }
 
@@ -390,10 +403,10 @@ class AbstractRequestTest extends TestCase
     {
         $this->request->setTestMode(true);
         $this->request->setToken('asdf');
-
+        
         $expected = array(
             'testMode' => true,
-            'token' => 'asdf',
+            'token' => 'asdf'
         );
         $this->assertEquals($expected, $this->request->getParameters());
     }
@@ -406,7 +419,7 @@ class AbstractRequestTest extends TestCase
     {
         $this->request = new AbstractRequestTest_MockAbstractRequest($this->getHttpClient(), $this->getHttpRequest());
         $this->request->send();
-
+        
         $this->request->setCurrency('PHP');
     }
 
@@ -414,7 +427,7 @@ class AbstractRequestTest extends TestCase
     {
         $this->request->setTestMode(true);
         $this->request->setToken('asdf');
-
+        
         $this->assertNull($this->request->validate('testMode', 'token'));
     }
 
@@ -424,7 +437,7 @@ class AbstractRequestTest extends TestCase
     public function testInvalidParametersThrowsException()
     {
         $this->request->setTestMode(true);
-
+        
         $this->request->validate('testMode', 'token');
     }
 
@@ -436,11 +449,18 @@ class AbstractRequestTest extends TestCase
     public function testSend()
     {
         $response = m::mock('\Omnipay\Common\Message\ResponseInterface');
-        $data = array('request data');
-
-        $this->request->shouldReceive('getData')->once()->andReturn($data);
-        $this->request->shouldReceive('sendData')->once()->with($data)->andReturn($response);
-
+        $data = array(
+            'request data'
+        );
+        
+        $this->request->shouldReceive('getData')
+            ->once()
+            ->andReturn($data);
+        $this->request->shouldReceive('sendData')
+            ->once()
+            ->with($data)
+            ->andReturn($response);
+        
         $this->assertSame($response, $this->request->send());
     }
 
@@ -458,7 +478,7 @@ class AbstractRequestTest extends TestCase
     {
         $this->request = new AbstractRequestTest_MockAbstractRequest($this->getHttpClient(), $this->getHttpRequest());
         $this->request->send();
-
+        
         $response = $this->request->getResponse();
         $this->assertInstanceOf('\Omnipay\Common\Message\ResponseInterface', $response);
     }
@@ -466,7 +486,9 @@ class AbstractRequestTest extends TestCase
 
 class AbstractRequestTest_MockAbstractRequest extends AbstractRequest
 {
-    public function getData() {}
+
+    public function getData()
+    {}
 
     public function sendData($data)
     {

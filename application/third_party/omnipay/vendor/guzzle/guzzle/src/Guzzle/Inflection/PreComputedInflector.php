@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Inflection;
 
 /**
@@ -7,20 +6,30 @@ namespace Guzzle\Inflection;
  */
 class PreComputedInflector implements InflectorInterface
 {
-    /** @var array Array of pre-computed inflections */
+
+    /**
+     * @var array Array of pre-computed inflections
+     */
     protected $mapping = array(
         'snake' => array(),
         'camel' => array()
     );
 
-    /** @var InflectorInterface Decorated inflector */
+    /**
+     * @var InflectorInterface Decorated inflector
+     */
     protected $decoratedInflector;
 
     /**
-     * @param InflectorInterface $inflector Inflector being decorated
-     * @param array              $snake     Hash of pre-computed camel to snake
-     * @param array              $camel     Hash of pre-computed snake to camel
-     * @param bool               $mirror    Mirror snake and camel reflections
+     *
+     * @param InflectorInterface $inflector
+     *            Inflector being decorated
+     * @param array $snake
+     *            Hash of pre-computed camel to snake
+     * @param array $camel
+     *            Hash of pre-computed snake to camel
+     * @param bool $mirror
+     *            Mirror snake and camel reflections
      */
     public function __construct(InflectorInterface $inflector, array $snake = array(), array $camel = array(), $mirror = false)
     {
@@ -28,7 +37,7 @@ class PreComputedInflector implements InflectorInterface
             $camel = array_merge(array_flip($snake), $camel);
             $snake = array_merge(array_flip($camel), $snake);
         }
-
+        
         $this->decoratedInflector = $inflector;
         $this->mapping = array(
             'snake' => $snake,
@@ -38,22 +47,19 @@ class PreComputedInflector implements InflectorInterface
 
     public function snake($word)
     {
-        return isset($this->mapping['snake'][$word])
-            ? $this->mapping['snake'][$word]
-            : $this->decoratedInflector->snake($word);
+        return isset($this->mapping['snake'][$word]) ? $this->mapping['snake'][$word] : $this->decoratedInflector->snake($word);
     }
 
     /**
      * Converts strings from snake_case to upper CamelCase
      *
-     * @param string $word Value to convert into upper CamelCase
-     *
+     * @param string $word
+     *            Value to convert into upper CamelCase
+     *            
      * @return string
      */
     public function camel($word)
     {
-        return isset($this->mapping['camel'][$word])
-            ? $this->mapping['camel'][$word]
-            : $this->decoratedInflector->camel($word);
+        return isset($this->mapping['camel'][$word]) ? $this->mapping['camel'][$word] : $this->decoratedInflector->camel($word);
     }
 }

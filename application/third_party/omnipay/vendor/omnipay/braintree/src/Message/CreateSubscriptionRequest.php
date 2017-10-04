@@ -8,6 +8,7 @@ namespace Omnipay\Braintree\Message;
  */
 class CreateSubscriptionRequest extends AbstractRequest
 {
+
     public function getData()
     {
         return $this->getSubscriptionData();
@@ -16,14 +17,15 @@ class CreateSubscriptionRequest extends AbstractRequest
     /**
      * Send the request with specified data
      *
-     * @param  mixed $data The data to send
-     *
+     * @param mixed $data
+     *            The data to send
+     *            
      * @return SubscriptionResponse
      */
     public function sendData($data)
     {
         $response = $this->braintree->subscription()->create($data);
-
+        
         return $this->response = new SubscriptionResponse($this, $response);
     }
 

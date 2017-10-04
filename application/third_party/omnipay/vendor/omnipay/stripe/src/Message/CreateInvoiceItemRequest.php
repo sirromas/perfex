@@ -10,12 +10,13 @@ namespace Omnipay\Stripe\Message;
  *
  * @see Omnipay\Stripe\Gateway
  * @link https://stripe.com/docs/api#create_invoiceitem
- *
- * Providing the invoice-item reference will update the invoice-item
+ *      
+ *       Providing the invoice-item reference will update the invoice-item
  * @link https://stripe.com/docs/api#update_invoiceitem
  */
 class CreateInvoiceItemRequest extends AbstractRequest
 {
+
     /**
      * Get the invoice-item reference
      *
@@ -159,45 +160,44 @@ class CreateInvoiceItemRequest extends AbstractRequest
     public function getData()
     {
         $data = array();
-
+        
         if ($this->getInvoiceItemReference() == null) {
             $this->validate('customerReference', 'amount', 'currency');
         }
-
+        
         if ($this->getCustomerReference()) {
             $data['customer'] = $this->getCustomerReference();
         }
-
+        
         if ($this->getAmount()) {
             $data['amount'] = $this->getAmount();
         }
-
+        
         if ($this->getCurrency()) {
             $data['currency'] = $this->getCurrency();
         }
-
+        
         if ($this->getDescription()) {
             $data['description'] = $this->getDescription();
         }
-
+        
         if ($this->getDiscountable() !== null) {
             $data['discountable'] = $this->getDiscountable();
         }
-
+        
         if ($this->getInvoiceReference()) {
             $data['invoice'] = $this->getInvoiceReference();
         }
-
+        
         if ($this->getSubscriptionReference()) {
             $data['subscription'] = $this->getSubscriptionReference();
         }
-
+        
         return $data;
     }
 
     public function getEndpoint()
     {
-        return $this->endpoint.'/invoiceitems'
-            .($this->getInvoiceItemReference() != null ? '/'.$this->getInvoiceItemReference() : '');
+        return $this->endpoint . '/invoiceitems' . ($this->getInvoiceItemReference() != null ? '/' . $this->getInvoiceItemReference() : '');
     }
 }

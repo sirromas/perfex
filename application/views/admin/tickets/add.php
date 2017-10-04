@@ -10,8 +10,10 @@
 							<div class="col-md-6">
 								<?php echo render_input('subject','ticket_settings_subject','','text',array('required'=>'true')); ?>
 								<div class="form-group">
-									<label for="contactid"><?php echo _l('contact'); ?></label>
-									<select name="contactid" required="true" id="contactid" class="ajax-search" data-width="100%" data-live-search="true" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
+									<label for="contactid"><?php echo _l('contact'); ?></label> <select
+										name="contactid" required="true" id="contactid"
+										class="ajax-search" data-width="100%" data-live-search="true"
+										data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
 										<?php if(isset($contact)) { ?>
 										<option value="<?php echo $contact['id']; ?>" selected><?php echo $contact['firstname'] . ' ' .$contact['lastname']; ?></option>
 										<?php } ?>
@@ -38,27 +40,41 @@
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
-									<label for="tags" class="control-label"><i class="fa fa-tag" aria-hidden="true"></i> <?php echo _l('tags'); ?></label>
-									<input type="text" class="tagsinput" id="tags" name="tags" data-role="tagsinput">
+									<label for="tags" class="control-label"><i class="fa fa-tag"
+										aria-hidden="true"></i> <?php echo _l('tags'); ?></label> <input
+										type="text" class="tagsinput" id="tags" name="tags"
+										data-role="tagsinput">
 								</div>
 
 								<div class="form-group">
 									<label for="assigned" class="control-label">
 										<?php echo _l('ticket_settings_assign_to'); ?>
-									</label>
-									<select name="assigned" id="assigned" class="form-control selectpicker" data-live-search="true" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>" data-width="100%">
+									</label> <select name="assigned" id="assigned"
+										class="form-control selectpicker" data-live-search="true"
+										data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>"
+										data-width="100%">
 										<option value=""><?php echo _l('ticket_settings_none_assigned'); ?></option>
 										<?php foreach($staff as $member){ ?>
-										<option value="<?php echo $member['staffid']; ?>" <?php if($member['staffid'] == get_staff_user_id()){echo 'selected';} ?>>
+										<option value="<?php echo $member['staffid']; ?>"
+											<?php if($member['staffid'] == get_staff_user_id()){echo 'selected';} ?>>
 											<?php echo $member['firstname'] . ' ' . $member['lastname'] ; ?>
 										</option>
 										<?php } ?>
 									</select>
 								</div>
 								<div class="row">
-									<div class="col-md-<?php if(get_option('services') == 1){ echo 6; }else{echo 12;} ?>">
-										<?php $priorities['callback_translate'] = 'ticket_priority_translate';
-										echo render_select('priority',$priorities,array('priorityid','name'),'ticket_settings_priority',do_action('new_ticket_priority_selected',2),array('required'=>'true')); ?>
+									<div
+										class="col-md-<?php if(get_option('services') == 1){ echo 6; }else{echo 12;} ?>">
+										<?php
+        
+$priorities['callback_translate'] = 'ticket_priority_translate';
+        echo render_select('priority', $priorities, array(
+            'priorityid',
+            'name'
+        ), 'ticket_settings_priority', do_action('new_ticket_priority_selected', 2), array(
+            'required' => 'true'
+        ));
+        ?>
 									</div>
 									<?php if(get_option('services') == 1){ ?>
 									<div class="col-md-6">
@@ -70,7 +86,12 @@
 								<div class="form-group projects-wrapper hide">
 									<label for="project_id"><?php echo _l('project'); ?></label>
 									<div id="project_ajax_search_wrapper">
-										<select name="project_id" id="project_id" class="projects ajax-search" data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>"<?php if(isset($project_id)){ ?> data-auto-project="true" data-project-userid="<?php echo $userid; ?>"<?php } ?>>
+										<select name="project_id" id="project_id"
+											class="projects ajax-search" data-live-search="true"
+											data-width="100%"
+											data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>"
+											<?php if(isset($project_id)){ ?> data-auto-project="true"
+											data-project-userid="<?php echo $userid; ?>" <?php } ?>>
 											<?php if(isset($project_id)){ ?>
 											<option value="<?php echo $project_id; ?>" selected><?php echo '#'.$project_id. ' - ' . get_project_name_by_id($project_id); ?></option>
 											<?php } ?>
@@ -92,11 +113,16 @@
 							</div>
 							<div class="panel-body">
 								<div class="btn-bottom-toolbar text-right">
-									<button type="submit" data-form="#new_ticket_form" autocomplete="off" data-loading-text="<?php echo _l('wait_text'); ?>" class="btn btn-info"><?php echo _l('open_ticket'); ?></button>
+									<button type="submit" data-form="#new_ticket_form"
+										autocomplete="off"
+										data-loading-text="<?php echo _l('wait_text'); ?>"
+										class="btn btn-info"><?php echo _l('open_ticket'); ?></button>
 								</div>
 								<div class="row">
 									<div class="col-md-12 mbot20">
-										<select id="insert_predefined_reply" data-live-search="true" class="selectpicker mleft10 pull-right" data-title="<?php echo _l('ticket_single_insert_predefined_reply'); ?>">
+										<select id="insert_predefined_reply" data-live-search="true"
+											class="selectpicker mleft10 pull-right"
+											data-title="<?php echo _l('ticket_single_insert_predefined_reply'); ?>">
 											<option value=""></option>
 											<?php foreach($predefined_replies as $predefined_reply){ ?>
 											<option value="<?php echo $predefined_reply['id']; ?>"><?php echo $predefined_reply['name']; ?></option>
@@ -104,7 +130,10 @@
 										</select>
 										<?php if(get_option('use_knowledge_base') == 1){ ?>
 										<?php $groups = get_all_knowledge_base_articles_grouped(); ?>
-										<select id="insert_knowledge_base_link" class="selectpicker pull-right" data-live-search="true" onchange="insert_ticket_knowledgebase_link(this);" data-title="<?php echo _l('ticket_single_insert_knowledge_base_link'); ?>">
+										<select id="insert_knowledge_base_link"
+											class="selectpicker pull-right" data-live-search="true"
+											onchange="insert_ticket_knowledgebase_link(this);"
+											data-title="<?php echo _l('ticket_single_insert_knowledge_base_link'); ?>">
 											<option value=""></option>
 											<?php foreach($groups as $group){ ?>
 											<?php if(count($group['articles']) > 0){ ?>
@@ -131,9 +160,17 @@
 											<div class="form-group">
 												<label for="attachment" class="control-label"><?php echo _l('ticket_add_attachments'); ?></label>
 												<div class="input-group">
-													<input type="file" extension="<?php echo str_replace('.','',get_option('ticket_attachments_file_extensions')); ?>" filesize="<?php echo file_upload_max_size(); ?>" class="form-control" name="attachments[0]" accept="<?php echo get_ticket_form_accepted_mimes(); ?>">
+													<input type="file"
+														extension="<?php echo str_replace('.','',get_option('ticket_attachments_file_extensions')); ?>"
+														filesize="<?php echo file_upload_max_size(); ?>"
+														class="form-control" name="attachments[0]"
+														accept="<?php echo get_ticket_form_accepted_mimes(); ?>">
 													<span class="input-group-btn">
-														<button class="btn btn-success add_more_attachments p8-half" data-ticket="true" type="button"><i class="fa fa-plus"></i></button>
+														<button
+															class="btn btn-success add_more_attachments p8-half"
+															data-ticket="true" type="button">
+															<i class="fa fa-plus"></i>
+														</button>
 													</span>
 												</div>
 											</div>
@@ -180,5 +217,5 @@
 					<?php } ?>
 				});
 			</script>
-		</body>
-		</html>
+	</body>
+	</html>

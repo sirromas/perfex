@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Http\Message;
 
 use Guzzle\Http\Message\Header;
@@ -11,10 +10,15 @@ use Guzzle\Common\Collection;
  */
 class AbstractMessageTest extends \Guzzle\Tests\GuzzleTestCase
 {
-    /** @var Request Request object */
+
+    /**
+     * @var Request Request object
+     */
     private $request;
 
-    /** @var AbstractMessage */
+    /**
+     * @var AbstractMessage
+     */
     private $mock;
 
     public function setUp()
@@ -37,11 +41,11 @@ class AbstractMessageTest extends \Guzzle\Tests\GuzzleTestCase
     public function testAddHeaders()
     {
         $this->mock->setHeader('A', 'B');
-
+        
         $this->assertEquals($this->mock, $this->mock->addHeaders(array(
             'X-Data' => '123'
         )));
-
+        
         $this->assertTrue($this->mock->hasHeader('X-Data') !== false);
         $this->assertTrue($this->mock->hasHeader('A') !== false);
     }
@@ -61,7 +65,10 @@ class AbstractMessageTest extends \Guzzle\Tests\GuzzleTestCase
 
     public function testGetHeaders()
     {
-        $this->assertSame($this->mock, $this->mock->setHeaders(array('a' => 'b', 'c' => 'd')));
+        $this->assertSame($this->mock, $this->mock->setHeaders(array(
+            'a' => 'b',
+            'c' => 'd'
+        )));
         $h = $this->mock->getHeaders();
         $this->assertArrayHasKey('a', $h->toArray());
         $this->assertArrayHasKey('c', $h->toArray());
@@ -71,7 +78,10 @@ class AbstractMessageTest extends \Guzzle\Tests\GuzzleTestCase
 
     public function testGetHeaderLinesUsesGlue()
     {
-        $this->mock->setHeaders(array('a' => 'b', 'c' => 'd'));
+        $this->mock->setHeaders(array(
+            'a' => 'b',
+            'c' => 'd'
+        ));
         $this->mock->addHeader('a', 'e');
         $this->mock->getHeader('a')->setGlue('!');
         $this->assertEquals(array(
@@ -112,7 +122,7 @@ class AbstractMessageTest extends \Guzzle\Tests\GuzzleTestCase
         ));
         $this->mock->addHeader('test', '456');
         $this->mock->addHeader('test', '789');
-
+        
         $header = $this->mock->getHeader('test');
         $this->assertContains('123', $header->toArray());
         $this->assertContains('456', $header->toArray());

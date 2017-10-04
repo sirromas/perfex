@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Message;
 
 use Guzzle\Common\Collection;
@@ -15,7 +14,10 @@ use Guzzle\Http\Message\Response;
  */
 class ResponseTest extends \Guzzle\Tests\GuzzleTestCase
 {
-    /** @var Response The response object to test */
+
+    /**
+     * @var Response The response object to test
+     */
     protected $response;
 
     public function setup()
@@ -66,11 +68,11 @@ class ResponseTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertEquals($body, $response->getBody());
         $this->assertEquals('OK', $response->getReasonPhrase());
         $this->assertEquals("HTTP/1.1 200 OK\r\n\r\n", $response->getRawHeaders());
-
+        
         // Make sure Content-Length is set automatically
         $response = new Response(200, $params);
         $this->assertEquals("HTTP/1.1 200 OK\r\n\r\n", $response->getRawHeaders());
-
+        
         // Pass bodies to the response
         $response = new Response(200, null, 'data');
         $this->assertInstanceOf('Guzzle\\Http\\EntityBody', $response->getBody());
@@ -79,38 +81,36 @@ class ResponseTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertEquals('data', $response->getBody(true));
         $response = new Response(200, null, '0');
         $this->assertSame('0', $response->getBody(true), 'getBody(true) should return "0" if response body is "0".');
-
+        
         // Make sure the proper exception is thrown
         try {
-            //$response = new Response(200, null, array('foo' => 'bar'));
-            //$this->fail('Response did not throw exception when passing invalid body');
-        } catch (HttpException $e) {
-        }
-
+            // $response = new Response(200, null, array('foo' => 'bar'));
+            // $this->fail('Response did not throw exception when passing invalid body');
+        } catch (HttpException $e) {}
+        
         // Ensure custom codes can be set
         $response = new Response(2);
         $this->assertEquals(2, $response->getStatusCode());
         $this->assertEquals('', $response->getReasonPhrase());
-
+        
         // Make sure the proper exception is thrown when sending invalid headers
         try {
             $response = new Response(200, 'adidas');
             $this->fail('Response did not throw exception when passing invalid $headers');
-        } catch (BadResponseException $e) {
-        }
+        } catch (BadResponseException $e) {}
     }
 
     public function test__toString()
     {
         $response = new Response(200);
         $this->assertEquals("HTTP/1.1 200 OK\r\n\r\n", (string) $response);
-
+        
         // Add another header
         $response = new Response(200, array(
             'X-Test' => 'Guzzle'
         ));
         $this->assertEquals("HTTP/1.1 200 OK\r\nX-Test: Guzzle\r\n\r\n", (string) $response);
-
+        
         $response = new Response(200, array(
             'Content-Length' => 4
         ), 'test');
@@ -124,7 +124,7 @@ class ResponseTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertEquals('OK', $response->getReasonPhrase());
         $this->assertEquals(4, (string) $response->getContentLength());
         $this->assertEquals('test', $response->getBody(true));
-
+        
         // Make sure that automatic Content-Length works
         $response = Response::fromMessage("HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\ntest");
         $this->assertEquals(4, (string) $response->getContentLength());
@@ -165,7 +165,7 @@ class ResponseTest extends \Guzzle\Tests\GuzzleTestCase
         $response = new Response(200, new Collection(array(
             'Content-Length' => 4
         )), 'body');
-
+        
         $this->assertEquals("HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\nbody", $response->getMessage());
     }
 
@@ -176,7 +176,7 @@ class ResponseTest extends \Guzzle\Tests\GuzzleTestCase
             'User-Agent' => 'Guzzle',
             'Content-Length' => 4
         )), 'body');
-
+        
         $this->assertEquals("HTTP/1.1 200 OK\r\nKeep-Alive: 155\r\nUser-Agent: Guzzle\r\nContent-Length: 4\r\n\r\n", $response->getRawHeaders());
     }
 
@@ -184,19 +184,19 @@ class ResponseTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $response = new Response(200, new Collection(), 'body');
         $this->assertEquals('OK', $response->getReasonPhrase());
-
+        
         $this->assertSame($response, $response->setStatus(204));
         $this->assertEquals('No Content', $response->getReasonPhrase());
         $this->assertEquals(204, $response->getStatusCode());
-
+        
         $this->assertSame($response, $response->setStatus(204, 'Testing!'));
         $this->assertEquals('Testing!', $response->getReasonPhrase());
         $this->assertEquals(204, $response->getStatusCode());
-
+        
         $response->setStatus(2000);
         $this->assertEquals(2000, $response->getStatusCode());
         $this->assertEquals('', $response->getReasonPhrase());
-
+        
         $response->setStatus(200, 'Foo');
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('Foo', $response->getReasonPhrase());
@@ -260,11 +260,11 @@ class ResponseTest extends \Guzzle\Tests\GuzzleTestCase
     public function testCalculatesAge()
     {
         $this->assertEquals(12, $this->response->calculateAge());
-
+        
         $this->response->removeHeader('Age');
         $this->response->removeHeader('Date');
         $this->assertNull($this->response->calculateAge());
-
+        
         $this->response->setHeader('Date', gmdate(ClientInterface::HTTP_DATE, strtotime('-1 minute')));
         // If the test runs slowly, still pass with a +5 second allowance
         $this->assertTrue($this->response->getAge() - 60 <= 5);
@@ -370,29 +370,33 @@ class ResponseTest extends \Guzzle\Tests\GuzzleTestCase
         $this->response->addHeader('Set-Cookie', 'UserID=Mike; Max-Age=200');
         $this->assertEquals(array(
             'UserID=JohnDoe; Max-Age=3600; Version=1',
-            'UserID=Mike; Max-Age=200',
-        ), $this->response->getHeader('Set-Cookie')->toArray());
+            'UserID=Mike; Max-Age=200'
+        ), $this->response->getHeader('Set-Cookie')
+            ->toArray());
     }
 
     public function testGetSetCookieNormalizesHeaders()
     {
         $this->response->addHeaders(array(
-            'Set-Cooke'  => 'boo',
+            'Set-Cooke' => 'boo',
             'set-cookie' => 'foo'
         ));
-
+        
         $this->assertEquals(array(
             'UserID=JohnDoe; Max-Age=3600; Version=1',
             'foo'
-        ), $this->response->getHeader('Set-Cookie')->toArray());
-
+        ), $this->response->getHeader('Set-Cookie')
+            ->toArray());
+        
         $this->response->addHeaders(array(
             'set-cookie' => 'fubu'
         ));
-        $this->assertEquals(
-            array('UserID=JohnDoe; Max-Age=3600; Version=1', 'foo', 'fubu'),
-            $this->response->getHeader('Set-Cookie')->toArray()
-        );
+        $this->assertEquals(array(
+            'UserID=JohnDoe; Max-Age=3600; Version=1',
+            'foo',
+            'fubu'
+        ), $this->response->getHeader('Set-Cookie')
+            ->toArray());
     }
 
     public function testGetTrailer()
@@ -414,6 +418,7 @@ class ResponseTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $this->assertEquals('1.0 fred, 1.1 nowhere.com (Apache/1.1)', $this->response->getVia());
     }
+
     public function testGetWarning()
     {
         $this->assertEquals('199 Miscellaneous warning', $this->response->getWarning());
@@ -439,13 +444,13 @@ class ResponseTest extends \Guzzle\Tests\GuzzleTestCase
 
     public function testHasTransferInfo()
     {
-        $stats = array (
+        $stats = array(
             'url' => 'http://www.google.com/',
             'content_type' => 'text/html; charset=ISO-8859-1',
             'http_code' => 200,
             'header_size' => 606,
             'request_size' => 53,
-            'filetime' => -1,
+            'filetime' => - 1,
             'ssl_verify_result' => 0,
             'redirect_count' => 0,
             'total_time' => 0.093284,
@@ -456,16 +461,16 @@ class ResponseTest extends \Guzzle\Tests\GuzzleTestCase
             'size_download' => 10330,
             'speed_download' => 110737,
             'speed_upload' => 0,
-            'download_content_length' => -1,
+            'download_content_length' => - 1,
             'upload_content_length' => 0,
             'starttransfer_time' => 0.07066,
-            'redirect_time' => 0,
+            'redirect_time' => 0
         );
-
+        
         // Uninitialized state
         $this->assertNull($this->response->getInfo('url'));
         $this->assertEquals(array(), $this->response->getInfo());
-
+        
         // Set the stats
         $this->response->setInfo($stats);
         $this->assertEquals($stats, $this->response->getInfo());
@@ -474,6 +479,7 @@ class ResponseTest extends \Guzzle\Tests\GuzzleTestCase
     }
 
     /**
+     *
      * @return Response
      */
     private function getResponse($code, array $headers = null, EntityBody $body = null)
@@ -483,64 +489,79 @@ class ResponseTest extends \Guzzle\Tests\GuzzleTestCase
 
     public function testDeterminesIfItCanBeCached()
     {
-        $this->assertTrue($this->getResponse(200)->canCache());
-        $this->assertTrue($this->getResponse(410)->canCache());
-        $this->assertFalse($this->getResponse(404)->canCache());
+        $this->assertTrue($this->getResponse(200)
+            ->canCache());
+        $this->assertTrue($this->getResponse(410)
+            ->canCache());
+        $this->assertFalse($this->getResponse(404)
+            ->canCache());
         $this->assertTrue($this->getResponse(200, array(
             'Cache-Control' => 'public'
-        ))->canCache());
-
+        ))
+            ->canCache());
+        
         // This has the no-store directive
         $this->assertFalse($this->getResponse(200, array(
             'Cache-Control' => 'private, no-store'
-        ))->canCache());
-
+        ))
+            ->canCache());
+        
         // The body cannot be read, so it cannot be cached
         $tmp = tempnam('/tmp', 'not-readable');
         $resource = fopen($tmp, 'w');
         $this->assertFalse($this->getResponse(200, array(
             'Transfer-Encoding' => 'chunked'
-        ), EntityBody::factory($resource, 10))->canCache());
+        ), EntityBody::factory($resource, 10))
+            ->canCache());
         unlink($tmp);
-
+        
         // The body is 0 length, cannot be read, so it can be cached
         $tmp = tempnam('/tmp', 'not-readable');
         $resource = fopen($tmp, 'w');
-        $this->assertTrue($this->getResponse(200, array(array(
-            'Content-Length' => 0
-        )), EntityBody::factory($resource, 0))->canCache());
+        $this->assertTrue($this->getResponse(200, array(
+            array(
+                'Content-Length' => 0
+            )
+        ), EntityBody::factory($resource, 0))
+            ->canCache());
         unlink($tmp);
     }
 
     public function testDeterminesResponseMaxAge()
     {
-        $this->assertEquals(null, $this->getResponse(200)->getMaxAge());
-
+        $this->assertEquals(null, $this->getResponse(200)
+            ->getMaxAge());
+        
         // Uses the response's s-maxage
         $this->assertEquals(140, $this->getResponse(200, array(
             'Cache-Control' => 's-maxage=140'
-        ))->getMaxAge());
-
+        ))
+            ->getMaxAge());
+        
         // Uses the response's max-age
         $this->assertEquals(120, $this->getResponse(200, array(
             'Cache-Control' => 'max-age=120'
-        ))->getMaxAge());
-
+        ))
+            ->getMaxAge());
+        
         // Uses the response's max-age
         $this->assertEquals(120, $this->getResponse(200, array(
             'Cache-Control' => 'max-age=120',
             'Expires' => gmdate(ClientInterface::HTTP_DATE, strtotime('+1 day'))
-        ))->getMaxAge());
-
+        ))
+            ->getMaxAge());
+        
         // Uses the Expires date
         $this->assertGreaterThanOrEqual(82400, $this->getResponse(200, array(
             'Expires' => gmdate(ClientInterface::HTTP_DATE, strtotime('+1 day'))
-        ))->getMaxAge());
-
+        ))
+            ->getMaxAge());
+        
         // Uses the Expires date
         $this->assertGreaterThanOrEqual(82400, $this->getResponse(200, array(
             'Expires' => gmdate(ClientInterface::HTTP_DATE, strtotime('+1 day'))
-        ))->getMaxAge());
+        ))
+            ->getMaxAge());
     }
 
     public function testDeterminesIfItCanValidate()
@@ -560,18 +581,18 @@ class ResponseTest extends \Guzzle\Tests\GuzzleTestCase
         $response = new Response(200);
         $this->assertNull($response->isFresh());
         $this->assertNull($response->getFreshness());
-
+        
         $response->setHeader('Cache-Control', 'max-age=120');
         $response->setHeader('Age', 100);
         $this->assertEquals(20, $response->getFreshness());
         $this->assertTrue($response->isFresh());
-
+        
         $response->setHeader('Age', 120);
         $this->assertEquals(0, $response->getFreshness());
         $this->assertTrue($response->isFresh());
-
+        
         $response->setHeader('Age', 150);
-        $this->assertEquals(-30, $response->getFreshness());
+        $this->assertEquals(- 30, $response->getFreshness());
         $this->assertFalse($response->isFresh());
     }
 
@@ -587,7 +608,7 @@ class ResponseTest extends \Guzzle\Tests\GuzzleTestCase
         $response = new Response(200, array(
             'Content-Type' => 'text/html; charset=ISO-8859-4'
         ));
-
+        
         $this->assertTrue($response->isContentType('text/html'));
         $this->assertTrue($response->isContentType('TExT/html'));
         $this->assertTrue($response->isContentType('charset=ISO-8859-4'));
@@ -599,7 +620,7 @@ class ResponseTest extends \Guzzle\Tests\GuzzleTestCase
         $response = new Response(200, array(
             'Allow' => 'OPTIONS, POST, deletE,GET'
         ));
-
+        
         $this->assertTrue($response->isMethodAllowed('get'));
         $this->assertTrue($response->isMethodAllowed('GET'));
         $this->assertTrue($response->isMethodAllowed('options'));
@@ -607,7 +628,7 @@ class ResponseTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertTrue($response->isMethodAllowed('Delete'));
         $this->assertFalse($response->isMethodAllowed('put'));
         $this->assertFalse($response->isMethodAllowed('PUT'));
-
+        
         $response = new Response(200);
         $this->assertFalse($response->isMethodAllowed('get'));
     }
@@ -615,7 +636,9 @@ class ResponseTest extends \Guzzle\Tests\GuzzleTestCase
     public function testParsesJsonResponses()
     {
         $response = new Response(200, array(), '{"foo": "bar"}');
-        $this->assertEquals(array('foo' => 'bar'), $response->json());
+        $this->assertEquals(array(
+            'foo' => 'bar'
+        ), $response->json());
         // Return array when null is a service response
         $response = new Response(200);
         $this->assertEquals(array(), $response->json());
@@ -652,7 +675,9 @@ class ResponseTest extends \Guzzle\Tests\GuzzleTestCase
 
     public function testResponseIsSerializable()
     {
-        $response = new Response(200, array('Foo' => 'bar'), 'test');
+        $response = new Response(200, array(
+            'Foo' => 'bar'
+        ), 'test');
         $r = unserialize(serialize($response));
         $this->assertEquals(200, $r->getStatusCode());
         $this->assertEquals('bar', (string) $r->getHeader('Foo'));
@@ -663,7 +688,7 @@ class ResponseTest extends \Guzzle\Tests\GuzzleTestCase
     {
         $xml = '<?xml version="1.0"?><!DOCTYPE scan[<!ENTITY test SYSTEM "php://filter/read=convert.base64-encode/resource=ResponseTest.php">]><scan>&test;</scan>';
         $response = new Response(200, array(), $xml);
-
+        
         $oldCwd = getcwd();
         chdir(__DIR__);
         try {

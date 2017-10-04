@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Symfony\Component\EventDispatcher;
 
 /**
@@ -20,6 +19,7 @@ namespace Symfony\Component\EventDispatcher;
  */
 class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
 {
+
     /**
      * Event subject.
      *
@@ -37,8 +37,10 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
     /**
      * Encapsulate an event with $subject and $args.
      *
-     * @param mixed $subject   The subject of the event, usually an object
-     * @param array $arguments Arguments to store in the event
+     * @param mixed $subject
+     *            The subject of the event, usually an object
+     * @param array $arguments
+     *            Arguments to store in the event
      */
     public function __construct($subject = null, array $arguments = array())
     {
@@ -59,10 +61,11 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
     /**
      * Get argument by key.
      *
-     * @param string $key Key
-     *
+     * @param string $key
+     *            Key
+     *            
      * @return mixed Contents of array key
-     *
+     *        
      * @throws \InvalidArgumentException If key is not found.
      */
     public function getArgument($key)
@@ -70,22 +73,24 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
         if ($this->hasArgument($key)) {
             return $this->arguments[$key];
         }
-
+        
         throw new \InvalidArgumentException(sprintf('Argument "%s" not found.', $key));
     }
 
     /**
      * Add argument to event.
      *
-     * @param string $key   Argument name
-     * @param mixed  $value Value
-     *
+     * @param string $key
+     *            Argument name
+     * @param mixed $value
+     *            Value
+     *            
      * @return $this
      */
     public function setArgument($key, $value)
     {
         $this->arguments[$key] = $value;
-
+        
         return $this;
     }
 
@@ -102,22 +107,24 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
     /**
      * Set args property.
      *
-     * @param array $args Arguments
-     *
+     * @param array $args
+     *            Arguments
+     *            
      * @return $this
      */
     public function setArguments(array $args = array())
     {
         $this->arguments = $args;
-
+        
         return $this;
     }
 
     /**
      * Has argument.
      *
-     * @param string $key Key of arguments array
-     *
+     * @param string $key
+     *            Key of arguments array
+     *            
      * @return bool
      */
     public function hasArgument($key)
@@ -128,8 +135,9 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
     /**
      * ArrayAccess for argument getter.
      *
-     * @param string $key Array key
-     *
+     * @param string $key
+     *            Array key
+     *            
      * @return mixed
      *
      * @throws \InvalidArgumentException If key does not exist in $this->args.
@@ -142,8 +150,10 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
     /**
      * ArrayAccess for argument setter.
      *
-     * @param string $key   Array key to set
-     * @param mixed  $value Value
+     * @param string $key
+     *            Array key to set
+     * @param mixed $value
+     *            Value
      */
     public function offsetSet($key, $value)
     {
@@ -153,7 +163,8 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
     /**
      * ArrayAccess for unset argument.
      *
-     * @param string $key Array key
+     * @param string $key
+     *            Array key
      */
     public function offsetUnset($key)
     {
@@ -165,8 +176,9 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
     /**
      * ArrayAccess has argument.
      *
-     * @param string $key Array key
-     *
+     * @param string $key
+     *            Array key
+     *            
      * @return bool
      */
     public function offsetExists($key)

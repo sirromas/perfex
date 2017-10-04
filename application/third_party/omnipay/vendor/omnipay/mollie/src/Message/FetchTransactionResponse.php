@@ -1,13 +1,15 @@
 <?php
-
 namespace Omnipay\Mollie\Message;
 
 use Omnipay\Common\Message\RedirectResponseInterface;
 
 class FetchTransactionResponse extends AbstractResponse implements RedirectResponseInterface
 {
+
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function isRedirect()
     {
@@ -15,7 +17,9 @@ class FetchTransactionResponse extends AbstractResponse implements RedirectRespo
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getRedirectUrl()
     {
@@ -25,7 +29,9 @@ class FetchTransactionResponse extends AbstractResponse implements RedirectRespo
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getRedirectMethod()
     {
@@ -33,7 +39,9 @@ class FetchTransactionResponse extends AbstractResponse implements RedirectRespo
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function getRedirectData()
     {
@@ -41,7 +49,9 @@ class FetchTransactionResponse extends AbstractResponse implements RedirectRespo
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * @ERROR!!!
+     *
      */
     public function isSuccessful()
     {
@@ -49,6 +59,7 @@ class FetchTransactionResponse extends AbstractResponse implements RedirectRespo
     }
 
     /**
+     *
      * @return boolean
      */
     public function isOpen()
@@ -57,6 +68,7 @@ class FetchTransactionResponse extends AbstractResponse implements RedirectRespo
     }
 
     /**
+     *
      * @return boolean
      */
     public function isCancelled()
@@ -65,6 +77,7 @@ class FetchTransactionResponse extends AbstractResponse implements RedirectRespo
     }
 
     /**
+     *
      * @return boolean
      */
     public function isPaid()
@@ -73,6 +86,7 @@ class FetchTransactionResponse extends AbstractResponse implements RedirectRespo
     }
 
     /**
+     *
      * @return boolean
      */
     public function isPaidOut()
@@ -81,6 +95,7 @@ class FetchTransactionResponse extends AbstractResponse implements RedirectRespo
     }
 
     /**
+     *
      * @return boolean
      */
     public function isExpired()
@@ -99,6 +114,7 @@ class FetchTransactionResponse extends AbstractResponse implements RedirectRespo
     }
 
     /**
+     *
      * @return mixed
      */
     public function getTransactionReference()
@@ -109,6 +125,7 @@ class FetchTransactionResponse extends AbstractResponse implements RedirectRespo
     }
 
     /**
+     *
      * @return mixed
      */
     public function getTransactionId()
@@ -119,6 +136,7 @@ class FetchTransactionResponse extends AbstractResponse implements RedirectRespo
     }
 
     /**
+     *
      * @return mixed
      */
     public function getStatus()
@@ -129,6 +147,7 @@ class FetchTransactionResponse extends AbstractResponse implements RedirectRespo
     }
 
     /**
+     *
      * @return mixed
      */
     public function getAmount()
@@ -139,6 +158,7 @@ class FetchTransactionResponse extends AbstractResponse implements RedirectRespo
     }
 
     /**
+     *
      * @return mixed
      */
     public function getMetadata()

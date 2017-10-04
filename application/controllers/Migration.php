@@ -1,7 +1,9 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
 class Migration extends CI_Controller
 {
+
     public function __construct()
     {
         parent::__construct();
@@ -11,18 +13,18 @@ class Migration extends CI_Controller
     {
         $this->load->config('migration');
         if ($this->config->item('migration_enabled') == true) {
-            if (!$this->input->get('old_base_url')) {
+            if (! $this->input->get('old_base_url')) {
                 echo '<h1>You need to pass old base url in the url like: ' . site_url('migration/make?old_base_url=http://myoldbaseurl.com/') . '</h1>';
-                die;
+                die();
             }
-
+            
             $old_url = $this->input->get('old_base_url');
             $new_url = $this->config->item('base_url');
-            if (!endsWith($old_url, '/')) {
+            if (! endsWith($old_url, '/')) {
                 $old_url = $old_url . '/';
             }
-
-            $tables       = array(
+            
+            $tables = array(
                 array(
                     'table' => 'tblnotifications',
                     'field' => 'description'
@@ -174,7 +176,7 @@ class Migration extends CI_Controller
             );
             $affectedRows = 0;
             foreach ($tables as $t) {
-                $this->db->query('UPDATE `'.$t['table'].'` SET `'.$t['field'].'` = replace('.$t['field'].', "' . $old_url . '", "' . $new_url . '")');
+                $this->db->query('UPDATE `' . $t['table'] . '` SET `' . $t['field'] . '` = replace(' . $t['field'] . ', "' . $old_url . '", "' . $new_url . '")');
                 $affectedRows += $this->db->affected_rows();
             }
             echo '<h1>Total links replaced: ' . $affectedRows . '</h1>';

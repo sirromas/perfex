@@ -1,10 +1,11 @@
 <?php
-
 namespace Omnipay\Mollie\Message;
 
 class CreateCustomerResponse extends AbstractResponse
 {
+
     /**
+     *
      * @return string
      */
     public function getCustomerReference()

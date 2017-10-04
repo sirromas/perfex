@@ -24,18 +24,19 @@ namespace Omnipay\Stripe\Message;
  */
 class FetchTokenRequest extends AbstractRequest
 {
+
     public function getData()
     {
         $this->validate('token');
-
+        
         $data = array();
-
+        
         return $data;
     }
 
     public function getEndpoint()
     {
-        return $this->endpoint.'/tokens/'.$this->getToken();
+        return $this->endpoint . '/tokens/' . $this->getToken();
     }
 
     public function getHttpMethod()

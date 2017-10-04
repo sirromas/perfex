@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Iterator;
 
 use Guzzle\Iterator\AppendIterator;
@@ -9,6 +8,7 @@ use Guzzle\Iterator\AppendIterator;
  */
 class AppendIteratorTest extends \PHPUnit_Framework_TestCase
 {
+
     public function testTraversesIteratorsInOrder()
     {
         $a = new \ArrayIterator(array(
@@ -24,6 +24,11 @@ class AppendIteratorTest extends \PHPUnit_Framework_TestCase
         $i->append($a);
         $i->append($b);
         $i->append($c);
-        $this->assertEquals(array(1, 2, 3, 4), iterator_to_array($i, false));
+        $this->assertEquals(array(
+            1,
+            2,
+            3,
+            4
+        ), iterator_to_array($i, false));
     }
 }

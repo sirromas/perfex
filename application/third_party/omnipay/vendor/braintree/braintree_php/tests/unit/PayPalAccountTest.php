@@ -8,6 +8,7 @@ use Braintree;
 
 class PayPalAccountTest extends Setup
 {
+
     public function testGet_givesErrorIfInvalidProperty()
     {
         $this->setExpectedException('PHPUnit_Framework_Error', 'Undefined property on Braintree\PayPalAccount: foo');
@@ -17,10 +18,14 @@ class PayPalAccountTest extends Setup
 
     public function testIsDefault()
     {
-        $paypalAccount = Braintree\PayPalAccount::factory(['default' => true]);
+        $paypalAccount = Braintree\PayPalAccount::factory([
+            'default' => true
+        ]);
         $this->assertTrue($paypalAccount->isDefault());
-
-        $paypalAccount = Braintree\PayPalAccount::factory(['default' => false]);
+        
+        $paypalAccount = Braintree\PayPalAccount::factory([
+            'default' => false
+        ]);
         $this->assertFalse($paypalAccount->isDefault());
     }
 

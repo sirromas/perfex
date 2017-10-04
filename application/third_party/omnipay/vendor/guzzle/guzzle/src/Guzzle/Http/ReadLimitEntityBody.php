@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Http;
 
 use Guzzle\Stream\StreamInterface;
@@ -9,16 +8,25 @@ use Guzzle\Stream\StreamInterface;
  */
 class ReadLimitEntityBody extends AbstractEntityBodyDecorator
 {
-    /** @var int Limit the number of bytes that can be read */
+
+    /**
+     * @var int Limit the number of bytes that can be read
+     */
     protected $limit;
 
-    /** @var int Offset to start reading from */
+    /**
+     * @var int Offset to start reading from
+     */
     protected $offset;
 
     /**
-     * @param EntityBodyInterface $body   Body to wrap
-     * @param int                 $limit  Total number of bytes to allow to be read from the stream
-     * @param int                 $offset Position to seek to before reading (only works on seekable streams)
+     *
+     * @param EntityBodyInterface $body
+     *            Body to wrap
+     * @param int $limit
+     *            Total number of bytes to allow to be read from the stream
+     * @param int $offset
+     *            Position to seek to before reading (only works on seekable streams)
      */
     public function __construct(EntityBodyInterface $body, $limit, $offset = 0)
     {
@@ -28,83 +36,84 @@ class ReadLimitEntityBody extends AbstractEntityBodyDecorator
 
     /**
      * Returns only a subset of the decorated entity body when cast as a string
-     * {@inheritdoc}
+     * 
+     * @ERROR!!!
+     *
      */
     public function __toString()
     {
-        if (!$this->body->isReadable() ||
-            (!$this->body->isSeekable() && $this->body->isConsumed())
-        ) {
+        if (! $this->body->isReadable() || (! $this->body->isSeekable() && $this->body->isConsumed())) {
             return '';
         }
-
+        
         $originalPos = $this->body->ftell();
         $this->body->seek($this->offset);
         $data = '';
-        while (!$this->feof()) {
+        while (! $this->feof()) {
             $data .= $this->read(1048576);
         }
         $this->body->seek($originalPos);
-
-        return (string) $data ?: '';
+        
+        return (string) $data ?  : '';
     }
 
     public function isConsumed()
     {
-        return $this->body->isConsumed() ||
-            ($this->body->ftell() >= $this->offset + $this->limit);
+        return $this->body->isConsumed() || ($this->body->ftell() >= $this->offset + $this->limit);
     }
 
     /**
      * Returns the Content-Length of the limited subset of data
-     * {@inheritdoc}
+     * 
+     * @ERROR!!!
+     *
      */
     public function getContentLength()
     {
         $length = $this->body->getContentLength();
-
-        return $length === false
-            ? $this->limit
-            : min($this->limit, min($length, $this->offset + $this->limit) - $this->offset);
+        
+        return $length === false ? $this->limit : min($this->limit, min($length, $this->offset + $this->limit) - $this->offset);
     }
 
     /**
      * Allow for a bounded seek on the read limited entity body
-     * {@inheritdoc}
+     * 
+     * @ERROR!!!
+     *
      */
     public function seek($offset, $whence = SEEK_SET)
     {
-        return $whence === SEEK_SET
-            ? $this->body->seek(max($this->offset, min($this->offset + $this->limit, $offset)))
-            : false;
+        return $whence === SEEK_SET ? $this->body->seek(max($this->offset, min($this->offset + $this->limit, $offset))) : false;
     }
 
     /**
      * Set the offset to start limiting from
      *
-     * @param int $offset Offset to seek to and begin byte limiting from
-     *
+     * @param int $offset
+     *            Offset to seek to and begin byte limiting from
+     *            
      * @return self
      */
     public function setOffset($offset)
     {
         $this->body->seek($offset);
         $this->offset = $offset;
-
+        
         return $this;
     }
 
     /**
      * Set the limit of bytes that the decorator allows to be read from the stream
      *
-     * @param int $limit Total number of bytes to allow to be read from the stream
-     *
+     * @param int $limit
+     *            Total number of bytes to allow to be read from the stream
+     *            
      * @return self
      */
     public function setLimit($limit)
     {
         $this->limit = $limit;
-
+        
         return $this;
     }
 

@@ -1,5 +1,4 @@
 <?php
-
 namespace Omnipay\AuthorizeNet\Message;
 
 use Omnipay\Common\CreditCard;
@@ -9,42 +8,45 @@ use Omnipay\Common\CreditCard;
  */
 class CIMCreateCardRequest extends CIMAbstractRequest
 {
+
     protected $requestType = 'createCustomerProfileRequest';
 
     public function getData()
     {
         $this->validate('card');
-
-        /** @var CreditCard $card */
+        
+        /**
+         * @var CreditCard $card
+         */
         $card = $this->getCard();
         $card->validate();
-
+        
         $data = $this->getBaseData();
         $this->addProfileData($data);
         $this->addTransactionSettings($data);
-
+        
         return $data;
     }
 
     /**
      * Add customer profile data to the specified xml element
      *
-     * @param \SimpleXMLElement $data
+     * @param \SimpleXMLElement $data            
      */
     protected function addProfileData(\SimpleXMLElement $data)
     {
         $req = $data->addChild('profile');
         // Merchant assigned customer ID
         $customer = $this->getCustomerId();
-        if (!empty($customer)) {
+        if (! empty($customer)) {
             $req->merchantCustomerId = $customer;
         }
         $description = $this->getDescription();
-        if (!empty($description)) {
+        if (! empty($description)) {
             $req->description = $description;
         }
         $email = $this->getEmail();
-        if (!empty($email)) {
+        if (! empty($email)) {
             $req->email = $email;
         }
         $this->addPaymentProfileData($req);
@@ -54,7 +56,7 @@ class CIMCreateCardRequest extends CIMAbstractRequest
     /**
      * Adds payment profile to the specified xml element
      *
-     * @param \SimpleXMLElement $data
+     * @param \SimpleXMLElement $data            
      */
     protected function addPaymentProfileData(\SimpleXMLElement $data)
     {
@@ -65,13 +67,15 @@ class CIMCreateCardRequest extends CIMAbstractRequest
     /**
      * Adds billing/payment data to the specified xml element
      *
-     * @param \SimpleXMLElement $data
+     * @param \SimpleXMLElement $data            
      *
      * @return \SimpleXMLElement|void
      */
     protected function addBillingData(\SimpleXMLElement $data)
     {
-        /** @var CreditCard $card */
+        /**
+         * @var CreditCard $card
+         */
         if ($card = $this->getCard()) {
             $req = $data->addChild('billTo');
             // A card is present, so include billing details
@@ -83,19 +87,19 @@ class CIMCreateCardRequest extends CIMAbstractRequest
             $req->state = $card->getBillingState();
             $req->zip = $card->getBillingPostcode();
             $req->country = $card->getBillingCountry();
-
+            
             $defaultBillTo = $this->getParameter('defaultBillTo');
             if (is_array($defaultBillTo)) {
                 // A configuration parameter to populate billTo has been specified
                 foreach ($defaultBillTo as $field => $value) {
-                    if (empty($req->{$field}) && !empty($value)) {
+                    if (empty($req->{$field}) && ! empty($value)) {
                         // This particular field is empty and default value in populateBillTo has been specified
                         // so use it
                         $req->{$field} = $value;
                     }
                 }
             }
-
+            
             $req = $data->addChild('payment');
             $req->creditCard->cardNumber = $card->getNumber();
             $req->creditCard->expirationDate = $card->getExpiryDate('Y-m');
@@ -110,11 +114,13 @@ class CIMCreateCardRequest extends CIMAbstractRequest
     /**
      * Adds shipping data to the specified xml element
      *
-     * @param \SimpleXMLElement $data
+     * @param \SimpleXMLElement $data            
      */
     protected function addShippingData(\SimpleXMLElement $data)
     {
-        /** @var CreditCard $card */
+        /**
+         * @var CreditCard $card
+         */
         if ($card = $this->getCard()) {
             if ($card->getShippingFirstName()) {
                 $data->shipToList->firstName = $card->getShippingFirstName();
@@ -150,13 +156,16 @@ class CIMCreateCardRequest extends CIMAbstractRequest
 
     public function sendData($data)
     {
-        $headers = array('Content-Type' => 'text/xml; charset=utf-8');
+        $headers = array(
+            'Content-Type' => 'text/xml; charset=utf-8'
+        );
         $data = $data->saveXml();
-        $httpResponse = $this->httpClient->post($this->getEndpoint(), $headers, $data)->send();
-
+        $httpResponse = $this->httpClient->post($this->getEndpoint(), $headers, $data)
+            ->send();
+        
         $response = new CIMCreateCardResponse($this, $httpResponse->getBody());
-
-        if (!$response->isSuccessful() && $response->getReasonCode() == 'E00039') {
+        
+        if (! $response->isSuccessful() && $response->getReasonCode() == 'E00039') {
             // Duplicate profile. Try adding a new payment profile for the same profile and get the response
             $response = $this->createPaymentProfile($response);
         } elseif ($response->isSuccessful()) {
@@ -167,7 +176,7 @@ class CIMCreateCardRequest extends CIMAbstractRequest
             // Get the payment profile for the specified card.
             $response = $this->makeGetPaymentProfileRequest($parameters);
         }
-
+        
         $response->augmentResponse();
         return $this->response = $response;
     }
@@ -175,8 +184,9 @@ class CIMCreateCardRequest extends CIMAbstractRequest
     /**
      * Attempts to add a payment profile to the existing customer profile and return the updated customer profile
      *
-     * @param CIMCreateCardResponse $createCardResponse Duplicate customer profile response
-     *
+     * @param CIMCreateCardResponse $createCardResponse
+     *            Duplicate customer profile response
+     *            
      * @return CIMCreateCardResponse
      */
     public function createPaymentProfile(CIMCreateCardResponse $createCardResponse)
@@ -188,9 +198,11 @@ class CIMCreateCardRequest extends CIMAbstractRequest
             // Duplicate profile id not found. Return current response
             return $createCardResponse;
         }
-
+        
         // Use the customerProfileId and create a payment profile for the customer
-        $parameters = array_replace($this->getParameters(), array('customerProfileId' => $matches[1]));
+        $parameters = array_replace($this->getParameters(), array(
+            'customerProfileId' => $matches[1]
+        ));
         $createPaymentProfileResponse = $this->makeCreatePaymentProfileRequest($parameters);
         if ($createPaymentProfileResponse->isSuccessful()) {
             $parameters['customerPaymentProfileId'] = $createPaymentProfileResponse->getCustomerPaymentProfileId();
@@ -198,53 +210,52 @@ class CIMCreateCardRequest extends CIMAbstractRequest
             // force card update flag turned off. No need to further process.
             return $createCardResponse;
         }
-
+        
         $getProfileResponse = $this->makeGetProfileRequest($parameters);
-
+        
         // Check if there is a pre-existing profile for the given card numbers.
         // For these codes we should check for duplicate payment profiles
         $otherErrorCodes = array(
             CIMGetProfileResponse::ERROR_DUPLICATE_PROFILE,
             CIMGetProfileResponse::ERROR_MAX_PAYMENT_PROFILE_LIMIT_REACHED
         );
-        if (!$createPaymentProfileResponse->isSuccessful() &&
-            in_array($createPaymentProfileResponse->getReasonCode(), $otherErrorCodes)
-        ) {
+        if (! $createPaymentProfileResponse->isSuccessful() && in_array($createPaymentProfileResponse->getReasonCode(), $otherErrorCodes)) {
             // There is a possibility of a duplicate payment profile, so find matching payment profile id
             // from the customer profile and update it.
             $card = $this->getCard();
-            $last4 = substr($card->getNumber(), -4);
-
+            $last4 = substr($card->getNumber(), - 4);
+            
             $customerPaymentProfileId = $getProfileResponse->getMatchingPaymentProfileId($last4);
-
-            if (!$customerPaymentProfileId) {
+            
+            if (! $customerPaymentProfileId) {
                 // Failed. Matching customer payment profile id not found. Return the original response
                 return $createCardResponse;
             }
-
+            
             $parameters['customerPaymentProfileId'] = $customerPaymentProfileId;
             $updatePaymentProfileResponse = $this->makeUpdatePaymentProfileRequest($parameters);
-            if (!$updatePaymentProfileResponse->isSuccessful()) {
+            if (! $updatePaymentProfileResponse->isSuccessful()) {
                 // Could not update payment profile. Return the original response
                 return $createCardResponse;
             }
         }
-
+        
         // return the updated customer profile
         $getPaymentProfileResponse = $this->makeGetPaymentProfileRequest($parameters);
-        if (!$getPaymentProfileResponse->isSuccessful()) {
+        if (! $getPaymentProfileResponse->isSuccessful()) {
             // Could not get the updated customer profile. Return the original response
             return $createCardResponse;
         }
-
+        
         return $getPaymentProfileResponse;
     }
 
     /**
      * Make a request to add a payment profile to the current customer profile
      *
-     * @param $parameters
-     *
+     * @param
+     *            $parameters
+     *            
      * @return CIMCreatePaymentProfileResponse
      */
     public function makeCreatePaymentProfileRequest($parameters)
@@ -257,7 +268,7 @@ class CIMCreateCardRequest extends CIMAbstractRequest
     /**
      * Get the customer profile
      *
-     * @param array $parameters
+     * @param array $parameters            
      *
      * @return CIMGetProfileResponse
      */
@@ -271,7 +282,7 @@ class CIMCreateCardRequest extends CIMAbstractRequest
     /**
      * Get the customer payment profile
      *
-     * @param array $parameters
+     * @param array $parameters            
      *
      * @return CIMGetPaymentProfileResponse
      */
@@ -285,8 +296,9 @@ class CIMCreateCardRequest extends CIMAbstractRequest
     /**
      * Makes an update profile request
      *
-     * @param $parameters
-     *
+     * @param
+     *            $parameters
+     *            
      * @return CIMCreateCardResponse
      */
     public function makeUpdatePaymentProfileRequest($parameters)

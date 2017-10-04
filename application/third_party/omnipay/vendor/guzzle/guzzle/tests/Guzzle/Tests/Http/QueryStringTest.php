@@ -1,5 +1,4 @@
 <?php
-
 namespace Guzzle\Tests\Http;
 
 use Guzzle\Http\QueryString;
@@ -8,7 +7,10 @@ use Guzzle\Http\QueryAggregator\CommaAggregator;
 
 class QueryStringTest extends \Guzzle\Tests\GuzzleTestCase
 {
-    /** @var \Guzzle\Http\QueryString The query string object to test */
+
+    /**
+     * @var \Guzzle\Http\QueryString The query string object to test
+     */
     protected $q;
 
     public function setup()
@@ -31,12 +33,12 @@ class QueryStringTest extends \Guzzle\Tests\GuzzleTestCase
         $this->assertEquals('RFC 3986', $this->q->getUrlEncoding());
         $this->assertTrue($this->q->isUrlEncoding());
         $this->assertEquals('foo%20bar', $this->q->encodeValue('foo bar'));
-
+        
         $this->q->useUrlEncoding(QueryString::FORM_URLENCODED);
         $this->assertTrue($this->q->isUrlEncoding());
         $this->assertEquals(QueryString::FORM_URLENCODED, $this->q->getUrlEncoding());
         $this->assertEquals('foo+bar', $this->q->encodeValue('foo bar'));
-
+        
         $this->assertSame($this->q, $this->q->useUrlEncoding(false));
         $this->assertFalse($this->q->isUrlEncoding());
         $this->assertFalse($this->q->isUrlEncoding());
@@ -57,24 +59,30 @@ class QueryStringTest extends \Guzzle\Tests\GuzzleTestCase
     public function testUrlEncode()
     {
         $params = array(
-            'test'   => 'value',
+            'test' => 'value',
             'test 2' => 'this is a test?',
-            'test3'  => array('v1', 'v2', 'v3'),
-            'ሴ'      => 'bar'
+            'test3' => array(
+                'v1',
+                'v2',
+                'v3'
+            ),
+            'ሴ' => 'bar'
         );
         $encoded = array(
-            'test'         => 'value',
-            'test%202'     => rawurlencode('this is a test?'),
+            'test' => 'value',
+            'test%202' => rawurlencode('this is a test?'),
             'test3%5B0%5D' => 'v1',
             'test3%5B1%5D' => 'v2',
             'test3%5B2%5D' => 'v3',
-            '%E1%88%B4'    => 'bar'
+            '%E1%88%B4' => 'bar'
         );
         $this->q->replace($params);
         $this->assertEquals($encoded, $this->q->urlEncode());
-
+        
         // Disable encoding
-        $testData = array('test 2' => 'this is a test');
+        $testData = array(
+            'test 2' => 'this is a test'
+        );
         $this->q->replace($testData);
         $this->q->useUrlEncoding(false);
         $this->assertEquals($testData, $this->q->urlEncode());
@@ -84,18 +92,22 @@ class QueryStringTest extends \Guzzle\Tests\GuzzleTestCase
     {
         // Check with no parameters
         $this->assertEquals('', $this->q->__toString());
-
+        
         $params = array(
-            'test'   => 'value',
+            'test' => 'value',
             'test 2' => 'this is a test?',
-            'test3'  => array('v1', 'v2', 'v3'),
-            'test4'  => null,
+            'test3' => array(
+                'v1',
+                'v2',
+                'v3'
+            ),
+            'test4' => null
         );
         $this->q->replace($params);
         $this->assertEquals('test=value&test%202=this%20is%20a%20test%3F&test3%5B0%5D=v1&test3%5B1%5D=v2&test3%5B2%5D=v3&test4', $this->q->__toString());
         $this->q->useUrlEncoding(false);
         $this->assertEquals('test=value&test 2=this is a test?&test3[0]=v1&test3[1]=v2&test3[2]=v3&test4', $this->q->__toString());
-
+        
         // Use an alternative aggregator
         $this->q->setAggregator(new CommaAggregator());
         $this->assertEquals('test=value&test 2=this is a test?&test3=v1,v2,v3&test4', $this->q->__toString());
@@ -121,11 +133,11 @@ class QueryStringTest extends \Guzzle\Tests\GuzzleTestCase
                 'v2' => 'b',
                 'v3' => array(
                     'v4' => 'c',
-                    'v5' => 'd',
+                    'v5' => 'd'
                 )
             )
         ));
-
+        
         $this->q->useUrlEncoding(false);
         $this->assertEquals('test=value&t[v1]=a&t[v2]=b&t[v3][v4]=c&t[v3][v5]=d', $this->q->__toString());
     }
@@ -133,21 +145,64 @@ class QueryStringTest extends \Guzzle\Tests\GuzzleTestCase
     public function parseQueryProvider()
     {
         return array(
+            
             // Ensure that multiple query string values are allowed per value
-            array('q=a&q=b', array('q' => array('a', 'b'))),
+            array(
+                'q=a&q=b',
+                array(
+                    'q' => array(
+                        'a',
+                        'b'
+                    )
+                )
+            ),
+            
             // Ensure that PHP array style query string values are parsed
-            array('q[]=a&q[]=b', array('q' => array('a', 'b'))),
+            array(
+                'q[]=a&q[]=b',
+                array(
+                    'q' => array(
+                        'a',
+                        'b'
+                    )
+                )
+            ),
+            
             // Ensure that a single PHP array style query string value is parsed into an array
-            array('q[]=a', array('q' => array('a'))),
+            array(
+                'q[]=a',
+                array(
+                    'q' => array(
+                        'a'
+                    )
+                )
+            ),
+            
             // Ensure that decimals are allowed in query strings
-            array('q.a=a&q.b=b', array(
-                'q.a' => 'a',
-                'q.b' => 'b'
-            )),
+            array(
+                'q.a=a&q.b=b',
+                array(
+                    'q.a' => 'a',
+                    'q.b' => 'b'
+                )
+            ),
+            
             // Ensure that query string values are percent decoded
-            array('q%20a=a%20b', array('q a' => 'a b')),
+            array(
+                'q%20a=a%20b',
+                array(
+                    'q a' => 'a b'
+                )
+            ),
+            
             // Ensure null values can be added
-            array('q&a', array('q' => false, 'a' => false)),
+            array(
+                'q&a',
+                array(
+                    'q' => false,
+                    'a' => false
+                )
+            )
         );
     }
 
@@ -163,7 +218,10 @@ class QueryStringTest extends \Guzzle\Tests\GuzzleTestCase
     public function testProperlyDealsWithDuplicateQueryStringValues()
     {
         $query = QueryString::fromString('foo=a&foo=b&?µ=c');
-        $this->assertEquals(array('a', 'b'), $query->get('foo'));
+        $this->assertEquals(array(
+            'a',
+            'b'
+        ), $query->get('foo'));
         $this->assertEquals('c', $query->get('?µ'));
     }
 
