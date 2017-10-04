@@ -864,8 +864,6 @@ else {
                 $row[] = $aRow['tblinvoices.date'];
                 $row[] = $aRow['value'];
                 $row[] = $employee;
-                
-               
                 $footer_data['total_qty'] += $aRow['total'];
                 $output['aaData'][] = $row;
             }
@@ -875,6 +873,7 @@ else {
             $output['sums'] = $footer_data;
             echo json_encode($output);
             die();
+            
         } // end if $this->input
     }
 
