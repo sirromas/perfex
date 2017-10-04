@@ -3,7 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
  * Check if client have transactions recorded
- * 
+ *
  * @param mixed $id
  *            clientid
  * @return boolean
@@ -36,7 +36,7 @@ function client_have_transactions($id)
 /**
  * Check if contact id passed is primary contact
  * If you dont pass $contact_id the current logged in contact will be checked
- * 
+ *
  * @param string $contact_id            
  * @return boolean
  */
@@ -59,7 +59,7 @@ function is_primary_contact($contact_id = '')
 /**
  * Function used to check if is really empty customer company
  * Can happen user to have selected that the company field is not required and the primary contact name is auto added in the company field
- * 
+ *
  * @param mixed $id            
  * @return boolean
  */
@@ -83,7 +83,7 @@ function is_empty_customer_company($id)
 
 /**
  * Return logged in user pinned projects
- * 
+ *
  * @return array
  */
 function get_user_pinned_projects()
@@ -105,7 +105,7 @@ function get_user_pinned_projects()
 
 /**
  * Get project name by passed id
- * 
+ *
  * @param mixed $id            
  * @return string
  */
@@ -122,6 +122,10 @@ function get_project_name_by_id($id)
     return '';
 }
 
+/**
+ * @param $id
+ * @return bool
+ */
 function get_client_id_by_project_id($id)
 {
     $CI = & get_instance();
@@ -137,7 +141,7 @@ function get_client_id_by_project_id($id)
 
 /**
  * Get ids to check what files with contacts are shared
- * 
+ *
  * @param array $where            
  * @return array
  */
@@ -151,7 +155,7 @@ function get_customer_profile_file_sharing($where = array())
 
 /**
  * Check if field is used in table
- * 
+ *
  * @param string $field
  *            column
  * @param string $table
@@ -177,7 +181,7 @@ function is_reference_in_table($field, $table, $id)
  * This function tracks activity only per hour
  * Eq customer viewed invoice at 15:00 and then 15:05 the activity will be tracked only once.
  * If customer view the invoice again in 16:01 there will be activity tracked.
- * 
+ *
  * @param string $rel_type            
  * @param mixed $rel_id            
  */
@@ -276,7 +280,7 @@ function add_views_tracking($rel_type, $rel_id)
 
 /**
  * Get views tracking based on rel type and rel id
- * 
+ *
  * @param string $rel_type            
  * @param mixed $rel_id            
  * @return array
@@ -293,7 +297,7 @@ function get_views_tracking($rel_type, $rel_id)
 
 /**
  * Get customer id by passed contact id
- * 
+ *
  * @param mixed $id            
  * @return mixed
  */
@@ -312,7 +316,7 @@ function get_user_id_by_contact_id($id)
 
 /**
  * Add option in table
- * 
+ *
  * @since Version 1.0.1
  * @param string $name
  *            option name
@@ -352,7 +356,7 @@ function add_option($name, $value = '', $autoload = 1)
 
 /**
  * Get primary contact user id for specific customer
- * 
+ *
  * @param mixed $userid            
  * @return mixed
  */
@@ -372,7 +376,7 @@ function get_primary_contact_user_id($userid)
 
 /**
  * Get option value
- * 
+ *
  * @param string $name
  *            Option name
  * @return mixed
@@ -389,7 +393,7 @@ function get_option($name)
 
 /**
  * Get option value from database
- * 
+ *
  * @param string $name
  *            Option name
  * @return mixed
@@ -414,7 +418,7 @@ function update_option($name, $value, $autoload = null)
 
 /**
  * Delete option
- * 
+ *
  * @since Version 1.0.4
  * @param mixed $id
  *            option id
@@ -435,7 +439,7 @@ function delete_option($id)
 
 /**
  * Get staff full name
- * 
+ *
  * @param string $userid
  *            Optional
  * @return string Firstname and Lastname
@@ -460,8 +464,20 @@ function get_staff_full_name($userid = '')
 }
 
 /**
+ * @param $item
+ * @return mixed
+ */
+function get_item_description($item)
+{
+    $CI = & get_instance();
+    $query = "select * from tblitems where id=$item";
+    $product = $CI->db->select($query);
+    return $product->description;
+}
+
+/**
  * Get client full name
- * 
+ *
  * @param string $userid
  *            Optional
  * @return string Firstname and Lastname
@@ -490,7 +506,7 @@ function get_contact_full_name($userid = '')
  * Search contact tickets
  * Project dropdown quick switch
  * Calendar tooltips
- * 
+ *
  * @param [type] $userid
  *            [description]
  * @return [type] [description]
@@ -519,7 +535,7 @@ function get_company_name($userid, $prevent_empty_company = false)
 
 /**
  * Get client default language
- * 
+ *
  * @param mixed $clientid            
  * @return mixed
  */
@@ -542,7 +558,7 @@ function get_client_default_language($clientid = '')
 
 /**
  * Get staff default language
- * 
+ *
  * @param mixed $staffid            
  * @return mixed
  */
@@ -570,7 +586,7 @@ function get_staff_default_language($staffid = '')
 
 /**
  * Log Activity for everything
- * 
+ *
  * @param string $description
  *            Activity Description
  * @param integer $staffid
@@ -788,7 +804,7 @@ function add_setup_menu_item($options = array(), $parent = '')
 
 /**
  * Add user notifications
- * 
+ *
  * @param array $values
  *            array of values [description,fromuserid,touserid,fromcompany,isread]
  */
@@ -834,7 +850,7 @@ function add_notification($values)
 
 /**
  * Count total rows on table based on params
- * 
+ *
  * @param string $table
  *            Table from where to count
  * @param array $where            
@@ -858,7 +874,7 @@ function total_rows($table, $where = array())
 
 /**
  * Sum total from table
- * 
+ *
  * @param string $table
  *            table name
  * @param array $attr
@@ -892,7 +908,7 @@ function sum_from_table($table, $attr = array())
 
 /**
  * General function for all datatables, performs search,additional select,join,where,orders
- * 
+ *
  * @param array $aColumns
  *            table columns
  * @param mixed $sIndexColumn
@@ -1114,7 +1130,7 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = array(), $w
 /**
  * Used in data_tables_init function to fix sorting problems when duedate is null
  * Null should be always last
- * 
+ *
  * @return array
  */
 function get_sorting_due_date_columns()
@@ -1130,7 +1146,7 @@ function get_sorting_due_date_columns()
 /**
  * Prefix field name with table ex.
  * table.column
- * 
+ *
  * @param string $table            
  * @param string $alias            
  * @param string $field
@@ -1158,7 +1174,7 @@ function prefixed_table_fields_wildcard($table, $alias, $field)
 /**
  * Prefix all columns from table with the table name
  * Used for select statements eq tblclients.company
- * 
+ *
  * @param string $table
  *            table name
  * @param array $exclude
@@ -1190,7 +1206,7 @@ function prefixed_table_fields_array($table, $string = false, $exclude = array()
 /**
  * Prefix all columns from table with the table name
  * Used for select statements eq tblclients.company
- * 
+ *
  * @param string $table
  *            table name
  * @param array $exclude
@@ -1205,7 +1221,7 @@ function prefixed_table_fields_string($table, $exclude = array())
 /**
  * Function used to get related data based on rel_id and rel_type
  * Eq in the tasks section there is field where this task is related eq invoice with number INV-0005
- * 
+ *
  * @param string $type            
  * @param string $rel_id            
  * @param string $connection_type            
@@ -1346,7 +1362,7 @@ function get_relation_data($type, $rel_id = '', $connection_type = '', $connecti
  * Ger relation values eq invoice number or project name etc based on passed relation parsed results
  * from function get_relation_data
  * $relation can be object or array
- * 
+ *
  * @param mixed $relation            
  * @param string $type            
  * @return mixed
@@ -1532,7 +1548,7 @@ function get_relation_values($relation, $type)
 
 /**
  * Helper function to get all knowledge base groups in the parents groups
- * 
+ *
  * @param boolean $only_customers
  *            prevent showing internal kb articles in customers area
  * @param array $where            
@@ -1569,7 +1585,7 @@ function get_all_knowledge_base_articles_grouped($only_customers = true, $where 
 
 /**
  * Helper function to get all announcements for user
- * 
+ *
  * @param boolean $staff
  *            Is this client or staff
  * @return array
@@ -1607,7 +1623,7 @@ function get_announcements_for_user($staff = true)
 
 /**
  * Helper function to get text question answers
- * 
+ *
  * @param integer $questionid            
  * @param itneger $surveyid            
  * @return array
@@ -1624,6 +1640,10 @@ function get_text_question_answers($questionid, $surveyid)
     return $CI->db->get()->result_array();
 }
 
+/**
+ * @param $customer_id
+ * @return bool
+ */
 function customer_has_projects($customer_id)
 {
     $totalCustomerProjects = total_rows('tblprojects', 'clientid=' . $customer_id);
@@ -1632,7 +1652,7 @@ function customer_has_projects($customer_id)
 
 /**
  * Get department email address
- * 
+ *
  * @param mixed $id
  *            department id
  * @return mixed
@@ -1647,7 +1667,7 @@ function get_department_email($id)
 
 /**
  * Helper function to get all knowledbase groups
- * 
+ *
  * @return array
  */
 function get_kb_groups()
@@ -1659,7 +1679,7 @@ function get_kb_groups()
 
 /**
  * Get all countries stored in database
- * 
+ *
  * @return array
  */
 function get_all_countries()
@@ -1671,7 +1691,7 @@ function get_all_countries()
 
 /**
  * Get country row from database based on passed country id
- * 
+ *
  * @param mixed $id            
  * @return object
  */
@@ -1685,7 +1705,7 @@ function get_country($id)
 
 /**
  * Get country short name by passed id
- * 
+ *
  * @param mixed $id
  *            county id
  * @return mixed
@@ -1704,7 +1724,7 @@ function get_country_short_name($id)
 
 /**
  * Function that add and edit tags based on passed arguments
- * 
+ *
  * @param string $tags            
  * @param mixed $rel_id            
  * @param string $rel_type            
@@ -1793,7 +1813,7 @@ function handle_tags_save($tags, $rel_id, $rel_type)
 
 /**
  * Get tag from db by name
- * 
+ *
  * @param string $name            
  * @return object
  */
@@ -1807,7 +1827,7 @@ function get_tag_by_name($name)
 
 /**
  * Function that will return all tags used in the app
- * 
+ *
  * @return array
  */
 function get_tags()
@@ -1820,7 +1840,7 @@ function get_tags()
 
 /**
  * Array of available tags without the keys
- * 
+ *
  * @return array
  */
 function get_tags_clean()
@@ -1837,7 +1857,7 @@ function get_tags_clean()
 
 /**
  * Get all tag ids
- * 
+ *
  * @return array
  */
 function get_tags_ids()
@@ -1854,7 +1874,7 @@ function get_tags_ids()
 
 /**
  * Function that will parse all the tags and return array with the names
- * 
+ *
  * @param string $rel_id            
  * @param string $rel_type            
  * @return array
@@ -1883,7 +1903,7 @@ function get_tags_in($rel_id, $rel_type)
  * This text is used in WHERE statements for tasks if the staff member don't have permission for tasks VIEW
  * This query will shown only tasks that are created from current user, public tasks or where this user is added is task follower.
  * Other statement will be included the tasks to be visible for this user only if Show All Tasks For Project Members is set to YES
- * 
+ *
  * @return [type] [description]
  */
 function get_tasks_where_string($table = true)
@@ -1899,6 +1919,12 @@ function get_tasks_where_string($table = true)
     return $_tasks_where;
 }
 
+/**
+ * @param $rel_name
+ * @param $rel_id
+ * @param $rel_type
+ * @return string
+ */
 function task_rel_name($rel_name, $rel_id, $rel_type)
 {
     if ($rel_type == 'invoice') {
@@ -1911,6 +1937,11 @@ function task_rel_name($rel_name, $rel_id, $rel_type)
     return $rel_name;
 }
 
+/**
+ * @param $rel_id
+ * @param $rel_type
+ * @return string
+ */
 function task_rel_link($rel_id, $rel_type)
 {
     $link = '#';
@@ -1944,6 +1975,9 @@ function task_rel_link($rel_id, $rel_type)
     return $link;
 }
 
+/**
+ * @return string
+ */
 function tasks_rel_name_select_query()
 {
     return '(CASE rel_type

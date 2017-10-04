@@ -30,11 +30,12 @@
         "c_employees": '[name="c_employees"]',
         "i_regions": '[name="i_regions"]',
         "i_employees": '[name="i_employees"]',
+        "item_products": '[name="item_products"]',
         "proposals_sale_agents": '[name="proposals_sale_agents"]',
         "proposal_status": '[name="proposal_status"]',
     }
     $(function () {
-        $('select[name="currency"], select[name="i_regions"], select[name="i_employees"], select[name="regions"], select[name="employees"], select[name="c_regions"], select[name="c_employees"], select[name="invoice_status"],select[name="estimate_status"],select[name="sale_agent_invoices"],select[name="sale_agent_items"],select[name="sale_agent_estimates"],select[name="payments_years"],select[name="proposals_sale_agents"],select[name="proposal_status"]').on('change', function () {
+        $('select[name="currency"], select[name="item_products"], select[name="i_regions"], select[name="i_employees"], select[name="regions"], select[name="employees"], select[name="c_regions"], select[name="c_employees"], select[name="invoice_status"],select[name="estimate_status"],select[name="sale_agent_invoices"],select[name="sale_agent_items"],select[name="sale_agent_estimates"],select[name="payments_years"],select[name="proposals_sale_agents"],select[name="proposal_status"]').on('change', function () {
             gen_reports();
         });
 

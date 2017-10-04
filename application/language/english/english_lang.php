@@ -1423,6 +1423,7 @@ $lang['customers_summary'] = 'Customers Summary';
 $lang['customers_summary_active'] = 'Active Contacts';
 $lang['customers_summary_inactive'] = 'Inactive Contacts';
 $lang['customers_summary_logged_in_today'] = 'Contacts Logged In Today';
+$lang['items']='Items';
 
 // Authentication
 $lang['admin_auth_forgot_password_email'] = 'Email Address';
@@ -1466,6 +1467,7 @@ $lang['employee_string'] = 'Employee';
 $lang['employee_all'] = 'All';
 $lang['regions'] = 'Regions';
 $lang['regions_all'] = 'All';
+$lang['products_all'] = 'All';
 $lang['amount_display_in_base_currency'] = 'Amount is displayed in your base currency - Only use this report if you are using 1 currency for payments and expenses.';
 
 // Leads

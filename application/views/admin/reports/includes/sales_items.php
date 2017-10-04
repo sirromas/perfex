@@ -10,6 +10,21 @@
     <!--<p class="mbot20 text-info"><?php echo _l('item_report_paid_invoices_notice'); ?></p>-->
     
     <div class="row">
+        
+        <?php if(count($item_products) > 0 ) { ?>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="item_products"><?php echo _l('items'); ?></label>
+                <select name="item_products" class="selectpicker" data-width="100%">
+                    <option value="" selected><?php echo _l('products_all'); ?></option>
+                    <?php foreach($item_products as $item){ ?>
+                        <option value="<?php echo $item; ?>"><?php echo $item; ?></option>
+                    <?php } ?>
+                </select>
+            </div>
+        </div>
+        <?php } ?>
+        
 
         <?php if(count($regions) > 0 ) { ?>
         <div class="col-md-3">

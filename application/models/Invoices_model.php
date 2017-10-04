@@ -132,6 +132,20 @@ else {
         return $regionsArr;
     }
 
+    /*
+     * 
+     */
+    public function get_products_list()
+    {
+        $products = array();
+        $query = "select * from tblitems order by description";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $products[] = $row->description;
+        }
+        return $products;
+    }
+
     /**
      *
      * @param
@@ -166,7 +180,7 @@ else {
 
     /**
      * Get invoice by id
-     * 
+     *
      * @param mixed $id            
      * @return array
      */
@@ -217,7 +231,7 @@ else {
 
     /**
      * Get all invoice items
-     * 
+     *
      * @param mixed $id
      *            invoiceid
      * @return array
@@ -292,7 +306,7 @@ else {
 
     /**
      * Get this invoice generated recurring invoices
-     * 
+     *
      * @since Version 1.0.1
      * @param mixed $id
      *            main invoice id
@@ -312,7 +326,7 @@ else {
 
     /**
      * Get invoice total from all statuses
-     * 
+     *
      * @since Version 1.0.2
      * @param mixed $data
      *            $_POST data
@@ -400,7 +414,7 @@ else {
 
     /**
      * Insert new invoice to database
-     * 
+     *
      * @param array $data
      *            invoiec data
      * @return mixed - false if not insert, invoice ID if succes
@@ -871,7 +885,7 @@ else {
 
     /**
      * Copy invoice
-     * 
+     *
      * @param mixed $id
      *            invoice id to copy
      * @return mixed
@@ -977,7 +991,7 @@ else {
 
     /**
      * Update invoice data
-     * 
+     *
      * @param array $data
      *            invoice data
      * @param mixed $id
@@ -1516,7 +1530,7 @@ else {
 
     /**
      * Delete invoice attachment
-     * 
+     *
      * @since Version 1.0.4
      * @param mixed $id
      *            attachmentid
@@ -1552,7 +1566,7 @@ else {
 
     /**
      * Delete invoice items and all connections
-     * 
+     *
      * @param mixed $id
      *            invoiceid
      * @return boolean
@@ -1684,7 +1698,7 @@ else {
 
     /**
      * Set invoice to sent when email is successfuly sended to client
-     * 
+     *
      * @param mixed $id
      *            invoiceid
      * @param mixed $manually
@@ -1730,7 +1744,7 @@ else {
 
     /**
      * Sent overdue notice to client for this invoice
-     * 
+     *
      * @since Since Version 1.0.1
      * @param mxied $id
      *            invoiceid
@@ -1794,7 +1808,7 @@ else {
 
     /**
      * Send invoice to client
-     * 
+     *
      * @param mixed $id
      *            invoiceid
      * @param string $template
@@ -1906,7 +1920,7 @@ else {
 
     /**
      * All invoice activity
-     * 
+     *
      * @param mixed $id
      *            invoiceid
      * @return array
@@ -1922,7 +1936,7 @@ else {
 
     /**
      * Log invoice activity to database
-     * 
+     *
      * @param mixed $id
      *            invoiceid
      * @param string $description
