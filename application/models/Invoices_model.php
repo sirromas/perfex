@@ -45,17 +45,63 @@ class Invoices_model extends CRM_Model
         return $this->db->query("SELECT DISTINCT(sale_agent) as sale_agent " . "FROM tblinvoices WHERE sale_agent != 0")->result_array();
     }
 
+
+    /**
+     * @param $name
+     * @return mixed
+     */
+    public function get_employee_id_by_name($name)
+    {
+        $names = explode(' ', $name);
+        if (count($names) == 2) {
+            $query = "select * from tblstaff 
+                    where firstname='" . $names[0] . "' 
+                    and lastname='" . $names[1] . "'";
+        } // end if
+        else {
+            $query = "select * from tblstaff 
+                    where firstname='" . $names[0] . "'";
+        } // end else
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $id = $row->staffid;
+        }
+        return $id;
+    }
+
+    /**
+     * @param $staffid
+     * @return mixed
+     */
+    public function is_employee_has_clients($staffid)
+    {
+        $query = "select * from tblcustomeradmins where staff_id=$staffid";
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
+        return $num;
+    }
+
     /**
      *
      * @return array
      */
     public function get_employees()
     {
-        $result = $this->db->query("SELECT DISTINCT(staffid) as employee " . "FROM tblstaff");
+        $employees = array();
+        $query = "select * from tblstaff where active='1' order by firstname";
+        $result = $this->db->query($query);
         foreach ($result->result() as $row) {
-            $employee[] = $row->employee;
+            $names[] = $row->firstname . " " . $row->lastname;
         }
-        return $employee;
+        sort($names, SORT_NATURAL);
+        foreach ($names as $name) {
+            $staffid = $this->get_employee_id_by_name($name);
+            $status = $this->is_employee_has_clients($staffid);
+            if ($staffid > 0 && $status > 0) {
+                $employees[] = $staffid;
+            }
+        }
+        return $employees;
     }
 
     /**
@@ -90,7 +136,7 @@ class Invoices_model extends CRM_Model
                 $name = $row->firstname . ' ' . $row->lastname;
             }
         }  // end if
-else {
+        else {
             $name = 'N/A';
         }
         return $name;
@@ -134,6 +180,9 @@ else {
 
     /*
      * 
+     */
+    /**
+     * @return array
      */
     public function get_products_list()
     {
@@ -181,7 +230,7 @@ else {
     /**
      * Get invoice by id
      *
-     * @param mixed $id            
+     * @param mixed $id
      * @return array
      */
     public function get($id = '', $where = array())
@@ -196,12 +245,12 @@ else {
             if ($invoice) {
                 $invoice->items = $this->get_invoice_items($id);
                 $invoice->attachments = $this->get_attachments($id);
-                
+
                 if ($invoice->project_id != 0) {
                     $this->load->model('projects_model');
                     $invoice->project_data = $this->projects_model->get($invoice->project_id);
                 }
-                
+
                 $invoice->visible_attachments_to_customer_found = false;
                 foreach ($invoice->attachments as $attachment) {
                     if ($attachment['visible_to_customer'] == 1) {
@@ -209,7 +258,7 @@ else {
                         break;
                     }
                 }
-                
+
                 $i = 0;
                 $this->load->model('payments_model');
                 $invoice->client = $this->clients_model->get($invoice->clientid);
@@ -220,12 +269,12 @@ else {
                 }
                 $invoice->payments = $this->payments_model->get_invoice_payments($id);
             }
-            
+
             return $invoice;
         }
-        
+
         $this->db->order_by('number,YEAR(date)', 'desc');
-        
+
         return $this->db->get()->result_array();
     }
 
@@ -244,7 +293,7 @@ else {
         $this->db->where('rel_type', 'invoice');
         $this->db->order_by('item_order', 'asc');
         $items = $this->db->get()->result_array();
-        
+
         return $items;
     }
 
@@ -257,7 +306,7 @@ else {
     public function get_invoice_item($id)
     {
         $this->db->where('id', $id);
-        
+
         return $this->db->get('tblitems_in')->row();
     }
 
@@ -276,10 +325,10 @@ else {
         if ($this->db->affected_rows() > 0) {
             $this->log_invoice_activity($id, 'invoice_activity_marked_as_cancelled');
             do_action('invoice_marked_as_cancelled', $id);
-            
+
             return true;
         }
-        
+
         return false;
     }
 
@@ -297,10 +346,10 @@ else {
         ));
         if ($this->db->affected_rows() > 0) {
             $this->log_invoice_activity($id, 'invoice_activity_unmarked_as_cancelled');
-            
+
             return true;
         }
-        
+
         return false;
     }
 
@@ -320,7 +369,7 @@ else {
         foreach ($invoices as $invoice) {
             $recurring_invoices[] = $this->get($invoice['id']);
         }
-        
+
         return $recurring_invoices;
     }
 
@@ -335,7 +384,7 @@ else {
     public function get_invoices_total($data)
     {
         $this->load->model('currencies_model');
-        
+
         if (isset($data['currency'])) {
             $currencyid = $data['currency'];
         } elseif (isset($data['customer_id']) && $data['customer_id'] != '') {
@@ -349,15 +398,15 @@ else {
         } else {
             $currencyid = $this->currencies_model->get_base_currency()->id;
         }
-        
+
         $result = array();
         $result['due'] = array();
         $result['paid'] = array();
         $result['overdue'] = array();
-        
+
         $has_permission_view = has_permission('invoices', '', 'view');
-        
-        for ($i = 1; $i <= 3; $i ++) {
+
+        for ($i = 1; $i <= 3; $i++) {
             $this->db->select('id,total');
             $this->db->from('tblinvoices');
             $this->db->where('currency', $currencyid);
@@ -365,27 +414,27 @@ else {
             $this->db->where('status !=', 5);
             // Exclude draft
             $this->db->where('status !=', 6);
-            
+
             if (isset($data['project_id']) && $data['project_id'] != '') {
                 $this->db->where('project_id', $data['project_id']);
             } elseif (isset($data['customer_id']) && $data['customer_id'] != '') {
                 $this->db->where('clientid', $data['customer_id']);
             }
-            
+
             if ($i == 3) {
                 $this->db->where('status', 4);
             }
-            
+
             if (isset($data['years']) && count($data['years']) > 0) {
                 $this->db->where_in('YEAR(date)', $data['years']);
             } else {
                 $this->db->where('YEAR(date)', date('Y'));
             }
-            
-            if (! $has_permission_view) {
+
+            if (!$has_permission_view) {
                 $this->db->where('addedfrom', get_staff_user_id());
             }
-            
+
             $invoices = $this->db->get()->result_array();
             foreach ($invoices as $invoice) {
                 if ($i == 1) {
@@ -408,7 +457,7 @@ else {
         $result['overdue'] = array_sum($result['overdue']);
         $result['symbol'] = $this->currencies_model->get_currency_symbol($currencyid);
         $result['currencyid'] = $currencyid;
-        
+
         return $result;
     }
 
@@ -423,18 +472,18 @@ else {
     {
         $data['prefix'] = get_option('invoice_prefix');
         $data['number_format'] = get_option('invoice_number_format');
-        
+
         if (isset($data['save_as_draft'])) {
             $data['status'] = 6;
             unset($data['save_as_draft']);
         }
-        
+
         $saveAndSend = false;
         if (isset($data['save_and_send'])) {
             $saveAndSend = true;
             unset($data['save_and_send']);
         }
-        
+
         if (isset($data['billed_tasks'])) {
             $billed_tasks = array_map("unserialize", array_unique(array_map("serialize", $data['billed_tasks'])));
             unset($data['billed_tasks']);
@@ -444,11 +493,11 @@ else {
             $billed_expenses = $data['billed_expenses'];
             unset($data['billed_expenses']);
         }
-        
-        if (isset($data['project_id']) && $data['project_id'] == '' || ! isset($data['project_id'])) {
+
+        if (isset($data['project_id']) && $data['project_id'] == '' || !isset($data['project_id'])) {
             $data['project_id'] = 0;
         }
-        
+
         if (isset($data['invoices_to_merge'])) {
             $invoices_to_merge = $data['invoices_to_merge'];
             unset($data['invoices_to_merge']);
@@ -457,13 +506,13 @@ else {
             $cancel_merged_invoices = true;
             unset($data['cancel_merged_invoices']);
         }
-        
-        if ((isset($data['adjustment']) && ! is_numeric($data['adjustment'])) || ! isset($data['adjustment'])) {
+
+        if ((isset($data['adjustment']) && !is_numeric($data['adjustment'])) || !isset($data['adjustment'])) {
             $data['adjustment'] = 0;
         } elseif (isset($data['adjustment']) && is_numeric($data['adjustment'])) {
             $data['adjustment'] = number_format($data['adjustment'], get_decimal_places(), '.', '');
         }
-        
+
         $unsetters = array(
             'currency_symbol',
             'price',
@@ -483,7 +532,7 @@ else {
             'repeat_type_custom',
             'bill_expenses'
         );
-        
+
         if (isset($data['recurring'])) {
             if ($data['recurring'] == 'custom') {
                 $data['recurring_type'] = $data['repeat_type_custom'];
@@ -494,7 +543,7 @@ else {
             $data['custom_recurring'] = 0;
             $data['recurring'] = 0;
         }
-        
+
         foreach ($unsetters as $unseter) {
             if (isset($data[$unseter])) {
                 unset($data[$unseter]);
@@ -511,13 +560,13 @@ else {
         if ($exists) {
             $data['hash'] = md5(rand() . microtime());
         }
-        
+
         $data['adminnote'] = nl2br($data['adminnote']);
         $data['clientnote'] = nl2br_save_html($data['clientnote']);
         $data['terms'] = nl2br_save_html($data['terms']);
-        
+
         $data['date'] = to_sql_date($data['date']);
-        if (! empty($data['duedate'])) {
+        if (!empty($data['duedate'])) {
             $data['duedate'] = to_sql_date($data['duedate']);
         } else {
             unset($data['duedate']);
@@ -525,13 +574,13 @@ else {
         if ($data['sale_agent'] == '') {
             $data['sale_agent'] = 0;
         }
-        
+
         if (isset($data['cancel_overdue_reminders'])) {
             $data['cancel_overdue_reminders'] = 1;
         } else {
             $data['cancel_overdue_reminders'] = 0;
         }
-        
+
         if (isset($data['recurring_ends_on']) && $data['recurring_ends_on'] == '') {
             unset($data['recurring_ends_on']);
         } elseif (isset($data['recurring_ends_on']) && $data['recurring_ends_on'] != '') {
@@ -544,7 +593,7 @@ else {
             $data['allowed_payment_modes'] = serialize(array());
         }
         $data['datecreated'] = date('Y-m-d H:i:s');
-        if (! DEFINED('CRON')) {
+        if (!DEFINED('CRON')) {
             $data['addedfrom'] = get_staff_user_id();
         }
         $items = array();
@@ -552,7 +601,7 @@ else {
             $items = $data['newitems'];
             unset($data['newitems']);
         }
-        if (! isset($data['include_shipping'])) {
+        if (!isset($data['include_shipping'])) {
             foreach ($this->shipping_fields as $_s_field) {
                 if (isset($data[$_s_field])) {
                     $data[$_s_field] = null;
@@ -562,7 +611,7 @@ else {
             $data['include_shipping'] = 0;
         } else {
             // we dont need to overwrite to 1 unless its coming from the main function add
-            if (! DEFINED('CRON') && $expense == false) {
+            if (!DEFINED('CRON') && $expense == false) {
                 $data['include_shipping'] = 1;
                 // set by default for the next time to be checked
                 if (isset($data['show_shipping_on_invoice'])) {
@@ -582,25 +631,25 @@ else {
         ));
         $data = $_data['data'];
         $items = $_data['items'];
-        
+
         $this->db->insert('tblinvoices', $data);
         $insert_id = $this->db->insert_id();
         if ($insert_id) {
-            
+
             // Update next invoice number in settings
             $this->db->where('name', 'next_invoice_number');
             $this->db->set('value', 'value+1', false);
             $this->db->update('tbloptions');
-            
+
             if (isset($custom_fields)) {
                 handle_custom_fields_post($insert_id, $custom_fields);
             }
-            
+
             if (isset($invoices_to_merge)) {
                 $_merged = false;
                 foreach ($invoices_to_merge as $m) {
                     $or_merge = $this->get($m);
-                    if (! isset($cancel_merged_invoices)) {
+                    if (!isset($cancel_merged_invoices)) {
                         if ($this->delete($m, true)) {
                             $_merged = true;
                         }
@@ -635,8 +684,8 @@ else {
                             ));
                         }
                         if (total_rows('tblestimates', array(
-                            'invoiceid' => $or_merge->id
-                        )) > 0) {
+                                'invoiceid' => $or_merge->id
+                            )) > 0) {
                             $this->db->where('invoiceid', $or_merge->id);
                             $estimate = $this->db->get('tblestimates')->row();
                             $this->db->where('id', $estimate->id);
@@ -644,8 +693,8 @@ else {
                                 'invoiceid' => $insert_id
                             ));
                         } elseif (total_rows('tblproposals', array(
-                            'invoice_id' => $or_merge->id
-                        )) > 0) {
+                                'invoice_id' => $or_merge->id
+                            )) > 0) {
                             $this->db->where('invoice_id', $or_merge->id);
                             $proposal = $this->db->get('tblproposals')->row();
                             $this->db->where('id', $proposal->id);
@@ -683,9 +732,9 @@ else {
                     }
                 }
             }
-            
+
             update_invoice_status($insert_id);
-            
+
             if (count($items) > 0) {
                 foreach ($items as $key => $item) {
                     $this->db->insert('tblitems_in', array(
@@ -698,9 +747,9 @@ else {
                         'item_order' => $item['order'],
                         'unit' => $item['unit']
                     ));
-                    
+
                     $itemid = $this->db->insert_id();
-                    
+
                     if ($itemid) {
                         if (isset($billed_tasks[$key])) {
                             foreach ($billed_tasks[$key] as $_task_id) {
@@ -727,12 +776,12 @@ else {
                                         $tax_name = trim($tax_array[0]);
                                         $tax_rate = trim($tax_array[1]);
                                         if (total_rows('tblitemstax', array(
-                                            'itemid' => $itemid,
-                                            'taxrate' => $tax_rate,
-                                            'taxname' => $tax_name,
-                                            'rel_id' => $insert_id,
-                                            'rel_type' => 'invoice'
-                                        )) == 0) {
+                                                'itemid' => $itemid,
+                                                'taxrate' => $tax_rate,
+                                                'taxname' => $tax_name,
+                                                'rel_id' => $insert_id,
+                                                'rel_type' => 'invoice'
+                                            )) == 0) {
                                             $this->db->insert('tblitemstax', array(
                                                 'itemid' => $itemid,
                                                 'taxrate' => $tax_rate,
@@ -748,12 +797,12 @@ else {
                     }
                 }
             }
-            
+
             $this->update_total_tax($insert_id);
-            
-            if (! DEFINED('CRON') && $expense == false) {
+
+            if (!DEFINED('CRON') && $expense == false) {
                 $lang_key = 'invoice_activity_created';
-            } elseif (! DEFINED('CRON') && $expense == true) {
+            } elseif (!DEFINED('CRON') && $expense == true) {
                 $lang_key = 'invoice_activity_from_expense';
             } elseif (DEFINED('CRON') && $expense == false) {
                 $lang_key = 'invoice_activity_recurring_created';
@@ -761,15 +810,15 @@ else {
                 $lang_key = 'invoice_activity_recurring_from_expense_created';
             }
             $this->log_invoice_activity($insert_id, $lang_key);
-            
+
             if ($saveAndSend === true) {
                 $this->send_invoice_to_client($insert_id, '', true, '', true);
             }
             do_action('after_invoice_added', $insert_id);
-            
+
             return $insert_id;
         }
-        
+
         return false;
     }
 
@@ -790,7 +839,7 @@ else {
                 foreach ($item_taxes as $tax) {
                     $calc_tax = 0;
                     $tax_not_calc = false;
-                    if (! in_array($tax['taxname'], $_calculated_taxes)) {
+                    if (!in_array($tax['taxname'], $_calculated_taxes)) {
                         array_push($_calculated_taxes, $tax['taxname']);
                         $tax_not_calc = true;
                     }
@@ -830,10 +879,10 @@ else {
     {
         $this->load->model('expenses_model');
         $where = 'billable=1 AND clientid=' . $clientid . ' AND invoiceid IS NULL';
-        if (! has_permission('expenses', '', 'view')) {
+        if (!has_permission('expenses', '', 'view')) {
             $where .= ' AND addedfrom=' . get_staff_user_id();
         }
-        
+
         return $this->expenses_model->get('', $where);
     }
 
@@ -856,30 +905,30 @@ else {
                 return array();
             }
         }
-        
+
         $statuses = array(
             1,
             4,
             6
         );
-        
+
         $has_permission_view = has_permission('invoices', '', 'view');
         $this->db->select('id');
         $this->db->where('clientid', $client_id);
         $this->db->where('STATUS IN (' . implode(', ', $statuses) . ')');
-        if (! $has_permission_view) {
+        if (!$has_permission_view) {
             $this->db->where('addedfrom', get_staff_user_id());
         }
         if ($current_invoice != 'undefined') {
             $this->db->where('id !=', $current_invoice);
         }
-        
+
         $invoices = $this->db->get('tblinvoices')->result_array();
         $_invoices = array();
         foreach ($invoices as $invoice) {
             $_invoices[] = $this->get($invoice['id']);
         }
-        
+
         return $_invoices;
     }
 
@@ -897,11 +946,11 @@ else {
         $new_invoice_data['clientid'] = $_invoice->clientid;
         $new_invoice_data['number'] = get_option('next_invoice_number');
         $new_invoice_data['date'] = _d(date('Y-m-d'));
-        
+
         if ($_invoice->duedate && get_option('invoice_due_after') != 0) {
             $new_invoice_data['duedate'] = _d(date('Y-m-d', strtotime('+' . get_option('invoice_due_after') . ' DAY', strtotime(date('Y-m-d')))));
         }
-        
+
         $new_invoice_data['save_as_draft'] = true;
         $new_invoice_data['recurring_type'] = $_invoice->recurring_type;
         $new_invoice_data['custom_recurring'] = $_invoice->custom_recurring;
@@ -954,7 +1003,7 @@ else {
             }
             $new_invoice_data['newitems'][$key]['rate'] = $item['rate'];
             $new_invoice_data['newitems'][$key]['order'] = $item['item_order'];
-            $key ++;
+            $key++;
         }
         $id = $this->invoices_model->add($new_invoice_data);
         if ($id) {
@@ -962,7 +1011,7 @@ else {
             $this->db->update('tblinvoices', array(
                 'cancel_overdue_reminders' => $_invoice->cancel_overdue_reminders
             ));
-            
+
             $custom_fields = get_custom_fields('invoice');
             foreach ($custom_fields as $field) {
                 $value = get_custom_field_value($_invoice->id, $field['id'], 'invoice');
@@ -977,15 +1026,15 @@ else {
                 ));
             }
             logActivity('Copied Invoice ' . format_invoice_number($_invoice->id));
-            
+
             do_action('invoice_copied', array(
                 'copy_from' => $_invoice->id,
                 'copy_id' => $id
             ));
-            
+
             return $id;
         }
-        
+
         return false;
     }
 
@@ -1001,18 +1050,18 @@ else {
     public function update($data, $id)
     {
         $original_invoice = $this->get($id);
-        
+
         $saveAndSend = false;
         if (isset($data['save_and_send'])) {
             $saveAndSend = true;
             unset($data['save_and_send']);
         }
-        
+
         // From the top checkboxes bill expenses to merge in invoice, no need for this in the update function
         if (isset($data['bill_expenses'])) {
             unset($data['bill_expenses']);
         }
-        
+
         if (isset($data['invoices_to_merge'])) {
             $invoices_to_merge = $data['invoices_to_merge'];
             unset($data['invoices_to_merge']);
@@ -1021,37 +1070,37 @@ else {
             $cancel_merged_invoices = true;
             unset($data['cancel_merged_invoices']);
         }
-        if (isset($data['project_id']) && $data['project_id'] == '' || ! isset($data['project_id'])) {
+        if (isset($data['project_id']) && $data['project_id'] == '' || !isset($data['project_id'])) {
             $data['project_id'] = 0;
         }
-        
+
         if ($data['recurring_ends_on'] == '') {
             $data['recurring_ends_on'] = null;
         } else {
             $data['recurring_ends_on'] = to_sql_date($data['recurring_ends_on']);
         }
-        
+
         $affectedRows = 0;
         $data['number'] = trim($data['number']);
         $original_number_formatted = format_invoice_number($id);
         $original_number = $original_invoice->number;
-        
+
         if (isset($data['billed_tasks'])) {
             $billed_tasks = $data['billed_tasks'];
             unset($data['billed_tasks']);
         }
-        
+
         if (isset($data['billed_expenses'])) {
             $billed_expenses = array_map("unserialize", array_unique(array_map("serialize", $data['billed_expenses'])));
             unset($data['billed_expenses']);
         }
-        
+
         if (isset($data['cancel_overdue_reminders'])) {
             $data['cancel_overdue_reminders'] = 1;
         } else {
             $data['cancel_overdue_reminders'] = 0;
         }
-        
+
         if (isset($data['recurring'])) {
             if ($data['recurring'] == 'custom') {
                 $data['recurring_type'] = $data['repeat_type_custom'];
@@ -1091,7 +1140,7 @@ else {
                 unset($data[$u]);
             }
         }
-        
+
         $items = array();
         if (isset($data['items'])) {
             $items = $data['items'];
@@ -1102,14 +1151,14 @@ else {
             $newitems = $data['newitems'];
             unset($data['newitems']);
         }
-        
-        if ((isset($data['adjustment']) && ! is_numeric($data['adjustment'])) || ! isset($data['adjustment'])) {
+
+        if ((isset($data['adjustment']) && !is_numeric($data['adjustment'])) || !isset($data['adjustment'])) {
             $data['adjustment'] = 0;
         } elseif (isset($data['adjustment']) && is_numeric($data['adjustment'])) {
             $data['adjustment'] = number_format($data['adjustment'], get_decimal_places(), '.', '');
         }
-        
-        if (! isset($data['include_shipping'])) {
+
+        if (!isset($data['include_shipping'])) {
             foreach ($this->shipping_fields as $_s_field) {
                 if (isset($data[$_s_field])) {
                     $data[$_s_field] = null;
@@ -1135,13 +1184,13 @@ else {
         } else {
             $data['allowed_payment_modes'] = serialize(array());
         }
-        
+
         $data['terms'] = nl2br_save_html($data['terms']);
         $data['clientnote'] = nl2br_save_html($data['clientnote']);
         $data['adminnote'] = nl2br($data['adminnote']);
-        
+
         $data['date'] = to_sql_date($data['date']);
-        if (! empty($data['duedate'])) {
+        if (!empty($data['duedate'])) {
             $data['duedate'] = to_sql_date($data['duedate']);
         } else {
             $data['duedate'] = null;
@@ -1152,7 +1201,7 @@ else {
         if (isset($data['custom_fields'])) {
             $custom_fields = $data['custom_fields'];
             if (handle_custom_fields_post($id, $custom_fields)) {
-                $affectedRows ++;
+                $affectedRows++;
             }
             unset($data['custom_fields']);
         }
@@ -1208,12 +1257,12 @@ else {
                     $this->log_invoice_activity($id, 'invoice_estimate_activity_removed_item', false, serialize(array(
                         $original_item->description
                     )));
-                    $affectedRows ++;
-                    
+                    $affectedRows++;
+
                     $this->db->where('itemid', $remove_item_id);
                     $this->db->where('rel_type', 'invoice');
                     $this->db->delete('tblitemstax');
-                    
+
                     $this->db->where('item_id', $original_item->id);
                     $related_items = $this->db->get('tblitemsrelated')->result_array();
                     foreach ($related_items as $rel_item) {
@@ -1233,7 +1282,7 @@ else {
                         $this->db->delete('tblitemsrelated');
                     }
                 }
-                
+
                 $this->db->where('itemid', $remove_item_id);
                 $this->db->where('rel_type', 'invoice');
                 $this->db->delete('tblitemstax');
@@ -1243,7 +1292,7 @@ else {
         $this->db->where('id', $id);
         $this->db->update('tblinvoices', $data);
         if ($this->db->affected_rows() > 0) {
-            $affectedRows ++;
+            $affectedRows++;
             if ($original_number != $data['number']) {
                 $this->log_invoice_activity($original_invoice->id, 'invoice_activity_number_changed', false, serialize(array(
                     $original_number_formatted,
@@ -1262,9 +1311,9 @@ else {
                     'unit' => $item['unit']
                 ));
                 if ($this->db->affected_rows() > 0) {
-                    $affectedRows ++;
+                    $affectedRows++;
                 }
-                
+
                 // Check for invoice item short description change
                 $this->db->where('id', $invoice_item_id);
                 $this->db->update('tblitems_in', array(
@@ -1275,7 +1324,7 @@ else {
                         $original_item->description,
                         $item['description']
                     )));
-                    $affectedRows ++;
+                    $affectedRows++;
                 }
                 // Check for item long description change
                 $this->db->where('id', $invoice_item_id);
@@ -1287,9 +1336,9 @@ else {
                         $original_item->long_description,
                         $item['long_description']
                     )));
-                    $affectedRows ++;
+                    $affectedRows++;
                 }
-                if (! isset($item['taxname']) || (isset($item['taxname']) && count($item['taxname']) == 0)) {
+                if (!isset($item['taxname']) || (isset($item['taxname']) && count($item['taxname']) == 0)) {
                     $this->db->where('itemid', $invoice_item_id);
                     $this->db->where('rel_type', 'invoice');
                     $this->db->delete('tblitemstax');
@@ -1301,14 +1350,14 @@ else {
                     }
                     $i = 0;
                     foreach ($_item_taxes_names as $_item_tax) {
-                        if (! in_array($_item_tax, $item['taxname'])) {
+                        if (!in_array($_item_tax, $item['taxname'])) {
                             $this->db->where('id', $item_taxes[$i]['id']);
                             $this->db->delete('tblitemstax');
                             if ($this->db->affected_rows() > 0) {
-                                $affectedRows ++;
+                                $affectedRows++;
                             }
                         }
-                        $i ++;
+                        $i++;
                     }
                     if (isset($item['taxname']) && is_array($item['taxname'])) {
                         foreach ($item['taxname'] as $taxname) {
@@ -1317,12 +1366,12 @@ else {
                                 $tax_name = trim($tax_array[0]);
                                 $tax_rate = trim($tax_array[1]);
                                 if (total_rows('tblitemstax', array(
-                                    'taxname' => $tax_name,
-                                    'itemid' => $invoice_item_id,
-                                    'taxrate' => $tax_rate,
-                                    'rel_type' => 'invoice',
-                                    'rel_id' => $id
-                                )) == 0) {
+                                        'taxname' => $tax_name,
+                                        'itemid' => $invoice_item_id,
+                                        'taxrate' => $tax_rate,
+                                        'rel_type' => 'invoice',
+                                        'rel_id' => $id
+                                    )) == 0) {
                                     $this->db->insert('tblitemstax', array(
                                         'taxrate' => $tax_rate,
                                         'taxname' => $tax_name,
@@ -1331,7 +1380,7 @@ else {
                                         'rel_type' => 'invoice'
                                     ));
                                     if ($this->db->affected_rows() > 0) {
-                                        $affectedRows ++;
+                                        $affectedRows++;
                                     }
                                 }
                             }
@@ -1348,7 +1397,7 @@ else {
                         $original_item->rate,
                         $item['rate']
                     )));
-                    $affectedRows ++;
+                    $affectedRows++;
                 }
                 // CHeck for invoice quantity change
                 $this->db->where('id', $invoice_item_id);
@@ -1361,7 +1410,7 @@ else {
                         $original_item->qty,
                         $item['qty']
                     )));
-                    $affectedRows ++;
+                    $affectedRows++;
                 }
             }
         }
@@ -1404,12 +1453,12 @@ else {
                                     $tax_name = trim($tax_array[0]);
                                     $tax_rate = trim($tax_array[1]);
                                     if (total_rows('tblitemstax', array(
-                                        'taxrate' => $tax_rate,
-                                        'taxname' => $tax_name,
-                                        'itemid' => $new_item_added,
-                                        'rel_id' => $id,
-                                        'rel_type' => 'invoice'
-                                    )) == 0) {
+                                            'taxrate' => $tax_rate,
+                                            'taxname' => $tax_name,
+                                            'itemid' => $new_item_added,
+                                            'rel_id' => $id,
+                                            'rel_type' => 'invoice'
+                                        )) == 0) {
                                         $this->db->insert('tblitemstax', array(
                                             'taxrate' => $tax_rate,
                                             'taxname' => $tax_name,
@@ -1418,7 +1467,7 @@ else {
                                             'rel_type' => 'invoice'
                                         ));
                                         if ($this->db->affected_rows() > 0) {
-                                            $affectedRows ++;
+                                            $affectedRows++;
                                         }
                                     }
                                 }
@@ -1428,7 +1477,7 @@ else {
                     $this->log_invoice_activity($id, 'invoice_estimate_activity_added_item', false, serialize(array(
                         $item['description']
                     )));
-                    $affectedRows ++;
+                    $affectedRows++;
                 }
             }
         }
@@ -1436,7 +1485,7 @@ else {
             $_merged = false;
             foreach ($invoices_to_merge as $m) {
                 $or_merge = $this->get($m);
-                if (! isset($cancel_merged_invoices)) {
+                if (!isset($cancel_merged_invoices)) {
                     if ($this->delete($m, true)) {
                         $_merged = true;
                     }
@@ -1466,8 +1515,8 @@ else {
                         ));
                     }
                     if (total_rows('tblestimates', array(
-                        'invoiceid' => $or_merge->id
-                    )) > 0) {
+                            'invoiceid' => $or_merge->id
+                        )) > 0) {
                         $this->db->where('invoiceid', $or_merge->id);
                         $estimate = $this->db->get('tblestimates')->row();
                         $this->db->where('id', $estimate->id);
@@ -1475,8 +1524,8 @@ else {
                             'invoiceid' => $id
                         ));
                     } elseif (total_rows('tblproposals', array(
-                        'invoice_id' => $or_merge->id
-                    )) > 0) {
+                            'invoice_id' => $or_merge->id
+                        )) > 0) {
                         $this->db->where('invoice_id', $or_merge->id);
                         $proposal = $this->db->get('tblproposals')->row();
                         $this->db->where('id', $proposal->id);
@@ -1487,16 +1536,16 @@ else {
                 }
             }
         }
-        
+
         if ($affectedRows > 0) {
             $this->update_total_tax($id);
             update_invoice_status($id);
         }
-        
+
         if ($saveAndSend === true) {
             $this->send_invoice_to_client($id, '', true, '', true);
         }
-        
+
         if ($affectedRows > 0) {
             do_action('after_invoice_updated', $id);
             return true;
@@ -1508,7 +1557,7 @@ else {
      *
      * @param
      *            $invoiceid
-     * @param string $id            
+     * @param string $id
      * @return mixed
      */
     public function get_attachments($invoiceid, $id = '')
@@ -1550,7 +1599,7 @@ else {
                 $deleted = true;
                 logActivity('Invoice Attachment Deleted [InvoiceID: ' . $attachment->rel_id . ']');
             }
-            
+
             if (is_dir(get_upload_path_by_type('invoice') . $attachment->rel_id)) {
                 // Check if no attachments left, so we can delete the folder also
                 $other_attachments = list_files(get_upload_path_by_type('invoice') . $attachment->rel_id);
@@ -1560,7 +1609,7 @@ else {
                 }
             }
         }
-        
+
         return $deleted;
     }
 
@@ -1574,12 +1623,12 @@ else {
     public function delete($id, $merge = false)
     {
         if (get_option('delete_only_on_last_invoice') == 1 && $merge == false) {
-            if (! is_last_invoice($id)) {
+            if (!is_last_invoice($id)) {
                 return false;
             }
         }
         $number = format_invoice_number($id);
-        
+
         do_action('before_invoice_deleted', $id);
         $this->db->where('id', $id);
         $this->db->delete('tblinvoices');
@@ -1598,23 +1647,23 @@ else {
                 $this->db->update('tblexpenses', array(
                     'invoiceid' => null
                 ));
-                
+
                 $this->db->where('invoice_id', $id);
                 $this->db->update('tblproposals', array(
                     'invoice_id' => null,
                     'date_converted' => null
                 ));
-                
+
                 $this->db->where('invoice_id', $id);
                 $this->db->update('tblstafftasks', array(
                     'invoice_id' => null,
                     'billed' => 0
                 ));
-                
+
                 // if is converted from estimate set the estimate invoice to null
                 if (total_rows('tblestimates', array(
-                    'invoiceid' => $id
-                )) > 0) {
+                        'invoiceid' => $id
+                    )) > 0) {
                     $this->db->where('invoiceid', $id);
                     $estimate = $this->db->get('tblestimates')->row();
                     $this->db->where('id', $estimate->id);
@@ -1629,41 +1678,41 @@ else {
             $this->db->where('rel_type', 'invoice');
             $this->db->where('rel_id', $id);
             $this->db->delete('tblreminders');
-            
+
             $this->db->where('rel_type', 'invoice');
             $this->db->where('rel_id', $id);
             $this->db->delete('tblviewstracking');
-            
+
             $items = $this->get_invoice_items($id);
             $this->db->where('rel_id', $id);
             $this->db->where('rel_type', 'invoice');
             $this->db->delete('tblitems_in');
-            
+
             foreach ($items as $item) {
                 $this->db->where('item_id', $item['id']);
                 $this->db->delete('tblitemsrelated');
             }
             $this->db->where('invoiceid', $id);
             $this->db->delete('tblinvoicepaymentrecords');
-            
+
             $this->db->where('rel_id', $id);
             $this->db->where('rel_type', 'invoice');
             $this->db->delete('tblsalesactivity');
-            
+
             $this->db->where('is_recurring_from', $id);
             $this->db->update('tblinvoices', array(
                 'is_recurring_from' => null
             ));
-            
+
             // Delete the custom field values
             $this->db->where('relid', $id);
             $this->db->where('fieldto', 'invoice');
             $this->db->delete('tblcustomfieldsvalues');
-            
+
             $this->db->where('rel_id', $id);
             $this->db->where('rel_type', 'invoice');
             $this->db->delete('tblitemstax');
-            
+
             // Get billed tasks for this invoice and set to unbilled
             $this->db->where('invoice_id', $id);
             $tasks = $this->db->get('tblstafftasks')->result_array();
@@ -1674,7 +1723,7 @@ else {
                     'billed' => 0
                 ));
             }
-            
+
             $attachments = $this->get_attachments($id);
             foreach ($attachments as $attachment) {
                 $this->delete_attachment($attachment['id']);
@@ -1689,10 +1738,10 @@ else {
             if ($merge == false) {
                 logActivity('Invoice Deleted [' . $number . ']');
             }
-            
+
             return true;
         }
-        
+
         return false;
     }
 
@@ -1732,13 +1781,13 @@ else {
                 $description = 'invoice_activity_marked_as_sent';
             }
         }
-        
+
         if ($is_status_updated == false) {
             update_invoice_status($id, true);
         }
-        
+
         $this->log_invoice_activity($id, $description, false, $additional_activity_data);
-        
+
         return $marked;
     }
 
@@ -1755,7 +1804,7 @@ else {
         $this->load->model('emails_model');
         $this->emails_model->set_rel_id($id);
         $this->emails_model->set_rel_type('invoice');
-        
+
         $invoice = $this->get($id);
         $invoice_number = format_invoice_number($invoice->id);
         $pdf = invoice_pdf($invoice);
@@ -1785,7 +1834,7 @@ else {
             } else {
                 $_from = get_staff_full_name();
             }
-            
+
             $this->db->where('id', $id);
             $this->db->update('tblinvoices', array(
                 'last_overdue_reminder' => date('Y-m-d')
@@ -1794,15 +1843,15 @@ else {
                 '<custom_data>' . implode(', ', $emails_sent) . '</custom_data>',
                 $_from
             )));
-            
+
             do_action('invoice_overdue_reminder_sent', array(
                 'sent_to' => $emails_sent,
                 'invoice_id' => $id
             ));
-            
+
             return true;
         }
-        
+
         return false;
     }
 
@@ -1820,12 +1869,12 @@ else {
     public function send_invoice_to_client($id, $template = '', $attachpdf = true, $cc = '', $manually = false)
     {
         $this->load->model('emails_model');
-        
+
         $this->emails_model->set_rel_id($id);
         $this->emails_model->set_rel_type('invoice');
-        
+
         $invoice = $this->get($id);
-        
+
         if ($template == '') {
             if ($invoice->sent == 0) {
                 $template = 'invoice-send-to-client';
@@ -1835,11 +1884,11 @@ else {
             $template = do_action('after_invoice_sent_template_statement', $template);
         }
         $invoice_number = format_invoice_number($invoice->id);
-        
+
         $emails_sent = array();
         $send = false;
         // Manually is used when sending the invoice via add/edit area button Save & Send
-        if (! DEFINED('CRON') && $manually === false) {
+        if (!DEFINED('CRON') && $manually === false) {
             $sent_to = $this->input->post('sent_to');
         } else {
             $sent_to = array();
@@ -1850,16 +1899,16 @@ else {
                 }
             }
         }
-        
+
         if (is_array($sent_to) && count($sent_to) > 0) {
             $status_updated = update_invoice_status($invoice->id, true, true);
-            
+
             if ($attachpdf) {
                 $_pdf_invoice = $this->get($id);
                 $pdf = invoice_pdf($_pdf_invoice);
                 $attach = $pdf->Output($invoice_number . '.pdf', 'S');
             }
-            
+
             $i = 0;
             foreach ($sent_to as $contact_id) {
                 if ($contact_id != '') {
@@ -1885,10 +1934,10 @@ else {
                     $contact = $this->clients_model->get_contact($contact_id);
                     $merge_fields = array();
                     $merge_fields = array_merge($merge_fields, get_client_contact_merge_fields($invoice->clientid, $contact_id));
-                    
+
                     $merge_fields = array_merge($merge_fields, get_invoice_merge_fields($invoice->id));
                     // Send cc only for the first contact
-                    if (! empty($cc) && $i > 0) {
+                    if (!empty($cc) && $i > 0) {
                         $cc = '';
                     }
                     if ($this->emails_model->send_email_template($template, $contact->email, $merge_fields, '', $cc)) {
@@ -1896,14 +1945,14 @@ else {
                         array_push($emails_sent, $contact->email);
                     }
                 }
-                $i ++;
+                $i++;
             }
         } else {
             return false;
         }
         if ($send) {
             $this->set_invoice_sent($id, false, $emails_sent, true);
-            
+
             return true;
         } else {
             // In case the invoice not sended and the status was draft and the invoiec status is updated before send return back to draft status
@@ -1914,7 +1963,7 @@ else {
                 ));
             }
         }
-        
+
         return false;
     }
 
@@ -1930,7 +1979,7 @@ else {
         $this->db->where('rel_id', $id);
         $this->db->where('rel_type', 'invoice');
         $this->db->order_by('date', 'asc');
-        
+
         return $this->db->get('tblsalesactivity')->result_array();
     }
 
