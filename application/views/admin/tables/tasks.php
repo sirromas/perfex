@@ -3,6 +3,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 $hasPermissionEdit = has_permission('tasks', '', 'edit');
 $bulkActions = $this->_instance->input->get('bulk_actions');
+$CI = &get_instance();
+$CI->load->helper('perfex_misc_helper');
 
 $aColumns = array(
     'name',

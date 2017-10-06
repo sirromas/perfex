@@ -14,7 +14,7 @@
         <?php if(count($item_products) > 0 ) { ?>
         <div class="col-md-3">
             <div class="form-group">
-                <label for="item_products"><?php echo _l('items'); ?></label>
+                <label for="item_products"><?php echo _l('item_products'); ?></label>
                 <select name="item_products" class="selectpicker" data-width="100%">
                     <option value="" selected><?php echo _l('products_all'); ?></option>
                     <?php foreach($item_products as $item){ ?>

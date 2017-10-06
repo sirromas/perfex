@@ -1224,4 +1224,11 @@ class Clients extends Admin_controller
         
         echo json_encode($viewData);
     }
+
+    public function test () {
+        $this->load->helper('perfex_misc_helper');
+        $data=array('clientid'=>2);
+        $this->load->view('admin/test', $data);
+
+    }
 }

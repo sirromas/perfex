@@ -302,6 +302,49 @@ function get_contact_user_id()
     return $CI->session->userdata('contact_user_id');
 }
 
+function dateDifference($date_1, $date_2, $differenceFormat = '%a')
+{
+    $datetime1 = date_create($date_1);
+    $datetime2 = date_create($date_2);
+    $interval = date_diff($datetime1, $datetime2);
+    return $interval->format($differenceFormat);
+}
+
+
+/**
+ * @param $clientid
+ * @return int|string
+ */
+function get_client_link_color($clientid)
+{
+    $CI = &get_instance();
+    $query = "select * from tblcustomfieldsvalues 
+                where relid=$clientid and fieldid=2 
+                            and fieldto='customers'";
+    $result = $CI->db->query($query);
+    foreach ($result->result() as $row) {
+        $lastvisit = $row->value;
+    }
+
+    if ($lastvisit != '') {
+        $now = date('Y-m-d', time());
+        $days = dateDifference($lastvisit, $now);
+        if ($days > 0 && $days <= 7) {
+            $color = 'green';
+        }
+        if ($days > 7 && $days <= 15) {
+            $color = 'yellow';
+        }
+        if ($days > 15) {
+            $color = 'red';
+        }
+    } // end if
+    else {
+        $color = '';
+    }
+    return $color;
+}
+
 /**
  * Get admin url
  * 

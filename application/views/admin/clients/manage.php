@@ -339,6 +339,12 @@ if (count($contacts_logged_in_today) > 0) {
         }
     }
 
+    var links=document.links;
+    for(var i=0; i<links.length; i++) {
+        console.log('Current link: '+links[i].href);
+
+    }
+
 
 </script>
 </body>

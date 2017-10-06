@@ -3,6 +3,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 $this->_instance->load->model('currencies_model');
 $baseCurrencySymbol = $this->_instance->currencies_model->get_base_currency()->symbol;
+$CI = &get_instance();
+$CI->load->helper('perfex_misc_helper');
 
 $aColumns = array(
     'tblcontracts.id as id',
@@ -119,8 +121,9 @@ foreach ($rResult as $aRow) {
     }
     
     $row[] = $subjectOutput;
-    
-    $row[] = '<a href="' . admin_url('clients/client/' . $aRow['client']) . '">' . $aRow['company'] . '</a>';
+
+    $color=get_client_link_color($aRow['client']);
+    $row[] = '<a href="' . admin_url('clients/client/' . $aRow['client']) . '" style="color:'.$color.';">' . $aRow['company'] . '</a>';
     
     $row[] = $aRow['type_name'];
     

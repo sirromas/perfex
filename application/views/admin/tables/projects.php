@@ -3,6 +3,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 $hasPermissionEdit = has_permission('projects', '', 'edit');
 $hasPermissionDelete = has_permission('projects', '', 'delete');
+$CI = &get_instance();
+$CI->load->helper('perfex_misc_helper');
+
 
 $aColumns = array(
     'tblprojects.id as id',
@@ -86,8 +89,9 @@ foreach ($rResult as $aRow) {
     $row[] = '<a href="' . admin_url('projects/view/' . $aRow['id']) . '">' . $aRow['id'] . '</a>';
     
     $row[] = '<a href="' . admin_url('projects/view/' . $aRow['id']) . '">' . $aRow['name'] . '</a>';
-    
-    $row[] = '<a href="' . admin_url('clients/client/' . $aRow['clientid']) . '">' . $aRow['company'] . '</a>';
+
+    $color=get_client_link_color($aRow['clientid']);
+    $row[] = '<a href="' . admin_url('clients/client/' . $aRow['clientid']) . '" style="color:'.$color.';">' . $aRow['company'] . '</a>';
     
     $row[] = render_tags($aRow['tags']);
     

@@ -2,6 +2,8 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 $project_id = $this->_instance->input->post('project_id');
+$CI = &get_instance();
+$CI->load->helper('perfex_misc_helper');
 
 $aColumns = array(
     'number',
@@ -138,8 +140,9 @@ foreach ($rResult as $aRow) {
     $row[] = $aRow['year'];
     
     $row[] = _d($aRow['date']);
-    
-    $row[] = '<a href="' . admin_url('clients/client/' . $aRow['clientid']) . '">' . $aRow['company'] . '</a>';
+
+    $color=get_client_link_color($aRow['clientid']);
+    $row[] = '<a href="' . admin_url('clients/client/' . $aRow['clientid']) . '" style="color:'.$color.';">' . $aRow['company'] . '</a>';
     
     $row[] = '<a href="' . admin_url('projects/view/' . $aRow['project_id']) . '">' . $aRow['project_name'] . '</a>';
     ;

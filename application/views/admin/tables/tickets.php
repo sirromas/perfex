@@ -1,5 +1,7 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+$CI = &get_instance();
+$CI->load->helper('perfex_misc_helper');
 
 $aColumns = array(
     'tbltickets.ticketid',
@@ -160,7 +162,8 @@ foreach ($rResult as $aRow) {
             $_data = render_tags($_data);
         } elseif ($i == $companyColumn) {
             if ($aRow['userid'] != 0) {
-                $_data = '<a href="' . admin_url('clients/client/' . $aRow['userid']) . '">' . $aRow['company'] . '</a>';
+                $color=get_client_link_color($aRow['userid']);
+                $_data = '<a href="' . admin_url('clients/client/' . $aRow['userid']) . '" style="color:'.$color.';">' . $aRow['company'] . '</a>';
             } else {
                 $_data = $aRow['ticket_opened_by_name'];
             }

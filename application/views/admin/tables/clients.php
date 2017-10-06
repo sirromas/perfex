@@ -5,6 +5,9 @@ $hasPermissionDelete = has_permission('customers', '', 'delete');
 
 $custom_fields = get_table_custom_fields('customers');
 
+$CI = &get_instance();
+$CI->load->helper('perfex_misc_helper');
+
 $aColumns = array(
     '1',
     'tblclients.userid as userid',
@@ -155,8 +158,9 @@ foreach ($rResult as $aRow) {
     if ($company == '') {
         $company = _l('no_company_view_profile');
     }
-    
-    $row[] = '<a href="' . admin_url('clients/client/' . $aRow['userid']) . '">' . $company . '</a>';
+
+     $color=get_client_link_color($aRow['userid']);
+     $row[] = '<a href="' . admin_url('clients/client/' . $aRow['userid']) . '" style="color:'.$color.';">' . $company . '</a>';
     
     // Primary contact
     $row[] = ($aRow['contact_id'] ? '<a href="' . admin_url('clients/client/' . $aRow['userid'] . '?contactid=' . $aRow['contact_id']) . '" target="_blank">' . $aRow['contact_fullname'] . '</a>' : '');

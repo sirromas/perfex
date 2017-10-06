@@ -2,6 +2,9 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 $hasPermissionDelete = has_permission('payments', '', 'delete');
+$CI = &get_instance();
+$CI->load->helper('perfex_misc_helper');
+
 
 $aColumns = array(
     'tblinvoicepaymentrecords.id as id',
@@ -69,8 +72,9 @@ foreach ($rResult as $aRow) {
     $row[] = $outputPaymentMode;
     
     $row[] = $aRow['transactionid'];
-    
-    $row[] = '<a href="' . admin_url('clients/client/' . $aRow['clientid']) . '">' . $aRow['company'] . '</a>';
+
+    $color=get_client_link_color($aRow['clientid']);
+    $row[] = '<a href="' . admin_url('clients/client/' . $aRow['clientid']) . '" style="color:'.$color.';">' . $aRow['company'] . '</a>';
     
     $row[] = format_money($aRow['amount'], $aRow['symbol']);
     

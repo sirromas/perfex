@@ -1927,7 +1927,7 @@ $lang['delete_invoice'] = 'Delete';
 // Calendar
 $lang['calendar_lead_reminder'] = 'Lead Reminder';
 
-$lang['items'] = 'Items';
+$lang['items'] = 'Products';
 $lang['support'] = 'Support';
 $lang['new_ticket'] = 'New Ticket';
 
@@ -2312,6 +2312,7 @@ $lang['report_invoice_status'] = 'Status';
 $lang['report_invoice_total_amount_with_tax'] = 'Total amount with tax';
 $lang['report_invoice_total_amount_without_tax'] = 'Total amount without tax';
 $lang['report_invoice_total_taxes'] = 'Taxes';
+$lang['item_products']='Products';
 
 // Version 1.0.9
 
@@ -3560,8 +3561,8 @@ $lang['project_setting_create_tasks'] = 'create tasks';
 $lang['project_setting_edit_tasks'] = 'edit tasks (only tasks created from contact)';
 
 // Version 1.9.2
-$lang['items_report'] = 'Items Report';
-$lang['reports_item'] = 'Item';
+$lang['items_report'] = 'Products Report';
+$lang['reports_item'] = 'Product';
 $lang['quantity_sold'] = 'Quantity Sold';
 $lang['total_amount'] = 'Total Amount';
 $lang['avg_price'] = 'Average Price';

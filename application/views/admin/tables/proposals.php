@@ -2,6 +2,9 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 $baseCurrencySymbol = $this->_instance->currencies_model->get_base_currency()->symbol;
+$CI = &get_instance();
+$CI->load->helper('perfex_misc_helper');
+
 
 $aColumns = array(
     'tblproposals.id',
@@ -107,7 +110,7 @@ $rResult = $result['rResult'];
 
 foreach ($rResult as $aRow) {
     $row = array();
-    
+
     $numberOutput = '<a href="' . admin_url('proposals/list_proposals/' . $aRow['tblproposals.id']) . '" onclick="init_proposal(' . $aRow['tblproposals.id'] . '); return false;">' . format_proposal_number($aRow['tblproposals.id']) . '</a>';
     
     if ($aRow['invoice_id']) {
@@ -117,11 +120,12 @@ foreach ($rResult as $aRow) {
     $row[] = $numberOutput;
     
     $row[] = '<a href="' . admin_url('proposals/list_proposals/' . $aRow['tblproposals.id']) . '" onclick="init_proposal(' . $aRow['tblproposals.id'] . '); return false;">' . $aRow['subject'] . '</a>';
-    
+
+    $color=get_client_link_color($aRow['rel_id']);
     if ($aRow['rel_type'] == 'lead') {
         $toOutput = '<a href="#" onclick="init_lead(' . $aRow['rel_id'] . ');return false;" target="_blank" data-toggle="tooltip" data-title="' . _l('lead') . '">' . $aRow['proposal_to'] . '</a>';
     } elseif ($aRow['rel_type'] == 'customer') {
-        $toOutput = '<a href="' . admin_url('clients/client/' . $aRow['rel_id']) . '" target="_blank" data-toggle="tooltip" data-title="' . _l('client') . '">' . $aRow['proposal_to'] . '</a>';
+        $toOutput = '<a href="' . admin_url('clients/client/' . $aRow['rel_id']) . '" target="_blank" data-toggle="tooltip" data-title="' . _l('client') . '" style="color:'.$color.';">' . $aRow['proposal_to'] . '</a>';
     }
     
     $row[] = $toOutput;

@@ -232,7 +232,8 @@ class Reports extends Admin_controller
                         $_data = $aRow[$aColumns[$i]];
                     }
                     if ($i == 0) {
-                        $_data = '<a href="' . admin_url('clients/client/' . $aRow['userid']) . '" target="_blank">' . $aRow['company'] . '</a>';
+                        $color=$this->invoices_model->get_client_link_color($aRow['userid']);
+                        $_data = '<a href="' . admin_url('clients/client/' . $aRow['userid']) . '" style="color:'.$color.';" target="_blank">' . $aRow['company'] . '</a>';
                     } // end if
 
                     if ($i == 2) {
@@ -261,6 +262,8 @@ class Reports extends Admin_controller
         if ($this->input->is_ajax_request()) {
             $this->load->model('currencies_model');
             $this->load->model('payment_modes_model');
+            $this->load->model('invoices_model');
+
             $online_modes = $this->payment_modes_model->get_online_payment_modes(true);
             $select = array(
                 'tblinvoicepaymentrecords.id',
@@ -339,7 +342,8 @@ class Reports extends Admin_controller
                     } elseif ($aColumns[$i] == 'invoiceid') {
                         $_data = '<a href="' . admin_url('invoices/list_invoices/' . $aRow[$aColumns[$i]]) . '" target="_blank">' . format_invoice_number($aRow['invoiceid']) . '</a>';
                     } elseif ($i == 3) {
-                        $_data = '<a href="' . admin_url('clients/client/' . $aRow['clientid']) . '" target="_blank">' . $aRow['company'] . '</a>';
+                        $color=$this->invoices_model->get_client_link_color($aRow['clientid']);
+                        $_data = '<a href="' . admin_url('clients/client/' . $aRow['clientid']) . '" style="color:'.$color.';" target="_blank">' . $aRow['company'] . '</a>';
                     } elseif ($aColumns[$i] == 'amount') {
                         $footer_data['total_amount'] += $_data;
                         $_data = format_money($_data, $currency_symbol);
@@ -364,6 +368,7 @@ class Reports extends Admin_controller
         if ($this->input->is_ajax_request()) {
             $this->load->model('currencies_model');
             $this->load->model('proposals_model');
+            $this->load->model('invoices_model');
 
             $proposalsTaxes = $this->distinct_taxes('proposal');
             $totalTaxesColumns = count($proposalsTaxes);
@@ -477,7 +482,8 @@ class Reports extends Admin_controller
                 if ($aRow['rel_type'] == 'lead') {
                     $row[] = '<a href="#" onclick="init_lead(' . $aRow['rel_id'] . ');return false;" target="_blank" data-toggle="tooltip" data-title="' . _l('lead') . '">' . $aRow['proposal_to'] . '</a>' . '<span class="hide">' . _l('lead') . '</span>';
                 } elseif ($aRow['rel_type'] == 'customer') {
-                    $row[] = '<a href="' . admin_url('clients/client/' . $aRow['rel_id']) . '" target="_blank" data-toggle="tooltip" data-title="' . _l('client') . '">' . $aRow['proposal_to'] . '</a>' . '<span class="hide">' . _l('client') . '</span>';
+                    $color=$this->invoices_model->get_client_link_color($aRow['rel_id']);
+                    $row[] = '<a href="' . admin_url('clients/client/' . $aRow['rel_id']) . '" style="color:'.$color.';" target="_blank" data-toggle="tooltip" data-title="' . _l('client') . '">' . $aRow['proposal_to'] . '</a>' . '<span class="hide">' . _l('client') . '</span>';
                 } else {
                     $row[] = '';
                 }
@@ -531,6 +537,7 @@ class Reports extends Admin_controller
         if ($this->input->is_ajax_request()) {
             $this->load->model('currencies_model');
             $this->load->model('estimates_model');
+            $this->load->model('invoices_model');
 
             $estimateTaxes = $this->distinct_taxes('estimate');
             $totalTaxesColumns = count($estimateTaxes);
@@ -643,7 +650,8 @@ class Reports extends Admin_controller
 
                 $row[] = '<a href="' . admin_url('estimates/list_estimates/' . $aRow['id']) . '" target="_blank">' . format_estimate_number($aRow['id']) . '</a>';
 
-                $row[] = '<a href="' . admin_url('clients/client/' . $aRow['userid']) . '" target="_blank">' . $aRow['company'] . '</a>';
+                $color=$this->invoices_model->get_client_link_color($aRow['userid']);
+                $row[] = '<a href="' . admin_url('clients/client/' . $aRow['userid']) . '" style="color:'.$color.';" target="_blank">' . $aRow['company'] . '</a>';
 
                 if ($aRow['invoiceid'] === null) {
                     $row[] = '';
@@ -1034,12 +1042,6 @@ class Reports extends Admin_controller
                 'discount_percent'
             ));
 
-            /*
-             * echo " < pre>";
-             * print_r($result);
-             * echo " </pre > ";
-             */
-
             $output = $result['output'];
             $rResult = $result['rResult'];
 
@@ -1061,7 +1063,8 @@ class Reports extends Admin_controller
 
                 $row[] = '<a href="' . admin_url('invoices / list_invoices / ' . $aRow['id']) . '" target="_blank">' . format_invoice_number($aRow['id']) . '</a>';
 
-                $row[] = '<a href="' . admin_url('clients / client / ' . $aRow['userid']) . '" target="_blank">' . $aRow['company'] . '</a>';
+                $color=$this->invoices_model->get_client_link_color($aRow['userid']);
+                $row[] = '<a href="' . admin_url('clients / client / ' . $aRow['userid']) . '" style="color:'.$color.';" target="_blank">' . $aRow['company'] . '</a>';
 
                 $row[] = $aRow['value'];
 
