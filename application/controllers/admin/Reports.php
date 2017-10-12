@@ -232,8 +232,8 @@ class Reports extends Admin_controller
                         $_data = $aRow[$aColumns[$i]];
                     }
                     if ($i == 0) {
-                        $color=$this->invoices_model->get_client_link_color($aRow['userid']);
-                        $_data = '<a href="' . admin_url('clients/client/' . $aRow['userid']) . '" style="color:'.$color.';" target="_blank">' . $aRow['company'] . '</a>';
+                        $color = $this->invoices_model->get_client_link_color($aRow['userid']);
+                        $_data = '<a href="' . admin_url('clients/client/' . $aRow['userid']) . '" style="color:' . $color . ';" target="_blank">' . $aRow['company'] . '</a>';
                     } // end if
 
                     if ($i == 2) {
@@ -248,6 +248,170 @@ class Reports extends Admin_controller
                 }
                 $output['aaData'][] = $row;
                 $x++;
+            } // end foreach
+        } // end if $this->input->is_ajax_request()
+
+        echo json_encode($output);
+        die();
+    }
+
+
+    /**
+     *
+     */
+    public function customers_report_new()
+    {
+        if ($this->input->is_ajax_request()) {
+
+            $this->load->model('currencies_model');
+            $this->load->model('invoices_model');
+
+            $select = array(
+                'CASE company WHEN "" THEN (SELECT CONCAT(firstname, " ", lastname) FROM tblcontacts WHERE userid = tblclients.userid and is_primary = 1) ELSE company END as company',
+                '(SELECT value as region FROM tblcustomfieldsvalues WHERE tblcustomfieldsvalues.fieldid=1 and tblcustomfieldsvalues.relid=tblclients.userid)',
+                '(SELECT staff_id FROM tblcustomeradmins WHERE tblcustomeradmins.customer_id=tblclients.userid)',
+                '(SELECT COUNT(clientid) FROM tblinvoices WHERE tblinvoices.clientid = tblclients.userid AND status != 5)',
+                '(SELECT SUM(subtotal) - SUM(discount_total) FROM tblinvoices WHERE tblinvoices.clientid = tblclients.userid AND status != 5)',
+                '(SELECT SUM(total) FROM tblinvoices WHERE tblinvoices.clientid = tblclients.userid AND status != 5)'
+            );
+            $where = array();
+
+            $custom_date_select = $this->get_where_report_period();
+            if ($custom_date_select != '') {
+                $i = 0;
+                foreach ($select as $_select) {
+                    if ($i > 3) {
+                        $_temp = substr($_select, 0, -1);
+                        $_temp .= ' ' . $custom_date_select . ')';
+                        $select[$i] = $_temp;
+                    }
+                    $i++;
+                }
+            }
+
+            $by_currency = $this->input->post('report_currency');
+            $currency = $this->currencies_model->get_base_currency();
+            $currency_symbol = $this->currencies_model->get_currency_symbol($currency->id);
+
+            if ($by_currency) {
+                $i = 0;
+                foreach ($select as $_select) {
+                    if ($i > 3) {
+                        $_temp = substr($_select, 0, -1);
+                        $_temp .= ' AND currency =' . $by_currency . ')';
+                        $select[$i] = $_temp;
+                    }
+                    $i++;
+                }
+                $currency = $this->currencies_model->get($by_currency);
+                $currency_symbol = $this->currencies_model->get_currency_symbol($currency->id);
+            }
+
+
+            if ($this->input->post('c_regions')) {
+                $regions = $this->input->post('c_regions');
+                $s_regions = array();
+                if (is_array($regions)) {
+                    foreach ($regions as $r) {
+                        if ($r != '') {
+                            $clients = $this->invoices_model->get_clientid_by_region(trim($r));
+                            if (count($clients) > 0) {
+                                foreach ($clients as $clientid) {
+                                    array_push($s_regions, $clientid);
+                                } // end if count($clients)>0
+                            } // end if $r != ''
+                        } // end if $r != ''
+                    } // end foreach
+                    if (count($s_regions) > 0) {
+                        array_push($where, 'AND userid IN (' . implode(', ', $s_regions) . ')');
+                    } // end if count($s_regions) > 0
+                } // end if is_array($regions)
+            }
+
+            if ($this->input->post('c_employees')) {
+                $employees = $this->input->post('c_employees');
+                $s_employees = array();
+                if (is_array($employees)) {
+                    foreach ($employees as $e) {
+                        if ($e > 0) {
+                            $clients = $this->invoices_model->get_clientid_by_admin($e);
+                            if (count($clients) > 0) {
+                                foreach ($clients as $clientid) {
+                                    array_push($s_employees, $clientid);
+                                } // end if count($clients)>0
+                            } // end if $r != ''
+                        } // end if $e > 0
+                    } // end foreach
+                } // end if is_array($employees)
+                if (count($s_employees) > 0) {
+                    array_push($where, 'AND userid IN (' . implode(', ', $s_employees) . ')');
+                }
+            }
+
+            $aColumns = $select;
+            $sIndexColumn = "userid";
+            $sTable = 'tblclients';
+            $months_report = $this->input->post('report_months');
+            $dates = $this->invoices_model->get_where_report_period($months_report);
+            $date1 = $dates['date1'];
+            $date2 = $dates['date2'];
+            $join = array(
+
+                'JOIN tblcustomfieldsvalues ON (tblcustomfieldsvalues.fieldid=7 
+                 and tblcustomfieldsvalues.relid=tblclients.userid 
+                 and tblcustomfieldsvalues.value between "'.$date1.'" and "'.$date2.'")'
+
+            );
+
+            $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, array(
+                'userid'
+            ));
+
+            /*
+            echo "<pre>";
+            print_r($result);
+            echo "</pre>";
+            die ('Stopped');
+            */
+
+            $output = $result['output'];
+            $rResult = $result['rResult'];
+            $x = 0;
+
+            foreach ($rResult as $aRow) {
+                $row = array();
+                for ($i = 0; $i < count($aColumns); $i++) {
+                    if (strpos($aColumns[$i], 'as') !== false && !isset($aRow[$aColumns[$i]])) {
+                        $_data = $aRow[strafter($aColumns[$i], 'as ')];
+                    }  // end if
+                    else {
+                        $_data = $aRow[$aColumns[$i]];
+                    }
+                    if ($i == 0) {
+                        $color = $this->invoices_model->get_client_link_color($aRow['userid']);
+                        $_data = '<a href="' . admin_url('clients/client/' . $aRow['userid']) . '" style="color:' . $color . ';" target="_blank">' . $aRow['company'] . '</a>';
+                    } // end if
+
+                    if ($i == 2) {
+                        $_data = $this->invoices_model->get_staff_name_by_client_id($aRow['userid']);
+                    } // end if
+
+                    elseif ($aColumns[$i] == $select[4] || $aColumns[$i] == $select[5]) {
+                        if ($_data == null) {
+                            $_data = 0;
+                        }
+                        $_data = format_money($_data, $currency_symbol);
+                    }
+                    $row[] = $_data;
+                } // end for
+
+                //$months_report = $this->input->post('report_months');
+                //$status = $this->invoices_model->is_new_customer($aRow['userid'], $months_report);
+                //if ($status > 0) {
+                    $output['aaData'][] = $row;
+                    $x++;
+                //}
+
             } // end foreach
         } // end if $this->input->is_ajax_request()
 
@@ -342,8 +506,8 @@ class Reports extends Admin_controller
                     } elseif ($aColumns[$i] == 'invoiceid') {
                         $_data = '<a href="' . admin_url('invoices/list_invoices/' . $aRow[$aColumns[$i]]) . '" target="_blank">' . format_invoice_number($aRow['invoiceid']) . '</a>';
                     } elseif ($i == 3) {
-                        $color=$this->invoices_model->get_client_link_color($aRow['clientid']);
-                        $_data = '<a href="' . admin_url('clients/client/' . $aRow['clientid']) . '" style="color:'.$color.';" target="_blank">' . $aRow['company'] . '</a>';
+                        $color = $this->invoices_model->get_client_link_color($aRow['clientid']);
+                        $_data = '<a href="' . admin_url('clients/client/' . $aRow['clientid']) . '" style="color:' . $color . ';" target="_blank">' . $aRow['company'] . '</a>';
                     } elseif ($aColumns[$i] == 'amount') {
                         $footer_data['total_amount'] += $_data;
                         $_data = format_money($_data, $currency_symbol);
@@ -482,8 +646,8 @@ class Reports extends Admin_controller
                 if ($aRow['rel_type'] == 'lead') {
                     $row[] = '<a href="#" onclick="init_lead(' . $aRow['rel_id'] . ');return false;" target="_blank" data-toggle="tooltip" data-title="' . _l('lead') . '">' . $aRow['proposal_to'] . '</a>' . '<span class="hide">' . _l('lead') . '</span>';
                 } elseif ($aRow['rel_type'] == 'customer') {
-                    $color=$this->invoices_model->get_client_link_color($aRow['rel_id']);
-                    $row[] = '<a href="' . admin_url('clients/client/' . $aRow['rel_id']) . '" style="color:'.$color.';" target="_blank" data-toggle="tooltip" data-title="' . _l('client') . '">' . $aRow['proposal_to'] . '</a>' . '<span class="hide">' . _l('client') . '</span>';
+                    $color = $this->invoices_model->get_client_link_color($aRow['rel_id']);
+                    $row[] = '<a href="' . admin_url('clients/client/' . $aRow['rel_id']) . '" style="color:' . $color . ';" target="_blank" data-toggle="tooltip" data-title="' . _l('client') . '">' . $aRow['proposal_to'] . '</a>' . '<span class="hide">' . _l('client') . '</span>';
                 } else {
                     $row[] = '';
                 }
@@ -650,8 +814,8 @@ class Reports extends Admin_controller
 
                 $row[] = '<a href="' . admin_url('estimates/list_estimates/' . $aRow['id']) . '" target="_blank">' . format_estimate_number($aRow['id']) . '</a>';
 
-                $color=$this->invoices_model->get_client_link_color($aRow['userid']);
-                $row[] = '<a href="' . admin_url('clients/client/' . $aRow['userid']) . '" style="color:'.$color.';" target="_blank">' . $aRow['company'] . '</a>';
+                $color = $this->invoices_model->get_client_link_color($aRow['userid']);
+                $row[] = '<a href="' . admin_url('clients/client/' . $aRow['userid']) . '" style="color:' . $color . ';" target="_blank">' . $aRow['company'] . '</a>';
 
                 if ($aRow['invoiceid'] === null) {
                     $row[] = '';
@@ -719,34 +883,46 @@ class Reports extends Admin_controller
                 if ($months_report == '1') {
                     $beginMonth = date('Y-m-01', strtotime("-$months_report MONTH"));
                     $endMonth = date('Y-m-t', strtotime('-1 MONTH'));
-                } else {
+                } // end if
+
+                else {
                     $months_report = (int)$months_report;
                     $months_report--;
                     $beginMonth = date('Y-m-01', strtotime("-$months_report MONTH"));
                     $endMonth = date('Y-m-t');
-                }
+                } // end else
                 $custom_date_select = 'AND (' . $field . ' BETWEEN "' . $beginMonth . '" AND "' . $endMonth . '")';
-            } elseif ($months_report == 'this_month') {
+            } // end if
+
+            elseif ($months_report == 'this_month') {
                 $custom_date_select = 'AND (' . $field . ' BETWEEN "' . date('Y-m-01') . '" AND "' . date('Y-m-t') . '")';
-            } elseif ($months_report == 'this_year') {
+            } // else if
+
+            elseif ($months_report == 'this_year') {
                 $custom_date_select = 'AND (' . $field . ' BETWEEN "' . date('Y-m-d', strtotime(date('Y-01-01'))) . '" AND "' . date('Y-m-d', strtotime(date('Y-12-' . date('d', strtotime('last day of this year'))))) . '")';
             } elseif ($months_report == 'last_year') {
                 $custom_date_select = 'AND (' . $field . ' BETWEEN "' . date('Y-m-d', strtotime(date(date('Y', strtotime('last year')) . '-01-01'))) . '" AND "' . date('Y-m-d', strtotime(date(date('Y', strtotime('last year')) . '-12-' . date('d', strtotime('last day of last year'))))) . '")';
-            } elseif ($months_report == 'custom') {
+            } // end elseif
+
+            elseif ($months_report == 'custom') {
                 $from_date = to_sql_date($this->input->post('report_from'));
                 $to_date = to_sql_date($this->input->post('report_to'));
                 if ($from_date == $to_date) {
                     $custom_date_select = 'AND ' . $field . ' = "' . $from_date . '"';
-                } else {
+                } // end if
+                else {
                     $custom_date_select = 'AND (' . $field . ' BETWEEN "' . $from_date . '" AND "' . $to_date . '")';
-                }
-            }
-        }
+                } // end else
+            } // end else if
+        } // end if
 
         return $custom_date_select;
     }
 
     /*
+     *
+     */
+    /**
      *
      */
     public function items()
@@ -1063,8 +1239,8 @@ class Reports extends Admin_controller
 
                 $row[] = '<a href="' . admin_url('invoices / list_invoices / ' . $aRow['id']) . '" target="_blank">' . format_invoice_number($aRow['id']) . '</a>';
 
-                $color=$this->invoices_model->get_client_link_color($aRow['userid']);
-                $row[] = '<a href="' . admin_url('clients / client / ' . $aRow['userid']) . '" style="color:'.$color.';" target="_blank">' . $aRow['company'] . '</a>';
+                $color = $this->invoices_model->get_client_link_color($aRow['userid']);
+                $row[] = '<a href="' . admin_url('clients / client / ' . $aRow['userid']) . '" style="color:' . $color . ';" target="_blank">' . $aRow['company'] . '</a>';
 
                 $row[] = $aRow['value'];
 

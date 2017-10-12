@@ -44,7 +44,9 @@ class Staff extends Admin_controller
                     set_alert('success', _l('added_successfully', _l('staff_member')));
                     redirect(admin_url('staff/member/' . $id));
                 }
-            } else {
+            } // end if $id == ''
+
+            else {
                 if (! has_permission('staff', '', 'edit')) {
                     access_denied('staff');
                 }
@@ -60,11 +62,13 @@ class Staff extends Admin_controller
                     set_alert('success', _l('updated_successfully', _l('staff_member')));
                 }
                 redirect(admin_url('staff/member/' . $id));
-            }
-        }
+            } // end else
+        } // end if $this->input->post()
+
         if ($id == '') {
             $title = _l('add_new', _l('staff_member_lowercase'));
-        } else {
+        } // end if $id == ''
+        else {
             $member = $this->staff_model->get($id);
             if (! $member) {
                 blank_page('Staff Member Not Found', 'danger');
@@ -88,7 +92,8 @@ class Staff extends Admin_controller
             
             $data['logged_time'] = $this->staff_model->get_logged_time_data($id, $ts_filter_data);
             $data['timesheets'] = $data['logged_time']['timesheets'];
-        }
+        } // end else
+
         $this->load->model('currencies_model');
         $data['base_currency'] = $this->currencies_model->get_base_currency();
         $data['roles'] = $this->roles_model->get();

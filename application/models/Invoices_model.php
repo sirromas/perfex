@@ -25,6 +25,8 @@ class Invoices_model extends CRM_Model
     public function __construct()
     {
         parent::__construct();
+        $ci =& get_instance();
+        $ci->load->helper('perfex_general_helper');
     }
 
     /**
@@ -130,6 +132,73 @@ class Invoices_model extends CRM_Model
         return $num;
     }
 
+
+    /**
+     * @param $months_report
+     * @return array
+     */
+    public function get_where_report_period($months_report)
+    {
+        if ($months_report != '') {
+            if (is_numeric($months_report)) {
+                // Last month
+                if ($months_report == '1') {
+                    $beginMonth = date('Y-m-01', strtotime("-$months_report MONTH"));
+                    $endMonth = date('Y-m-t', strtotime('-1 MONTH'));
+                } // end if $months_report == '1'
+                else {
+                    $months_report = (int)$months_report;
+                    $months_report--;
+                    $beginMonth = date('Y-m-01', strtotime("-$months_report MONTH"));
+                    $endMonth = date('Y-m-t');
+                } // end else
+            } // end if is_numeric($months_report)
+
+            elseif ($months_report == 'this_month') {
+                $beginMonth = date('Y-m-01');
+                $endMonth = date('Y-m-t');
+            } // else if
+
+            elseif ($months_report == 'this_year') {
+                $beginMonth = date('Y-m-d', strtotime(date('Y-01-01')));
+                $endMonth = date('Y-m-d', strtotime(date('Y-12-' . date('d', strtotime('last day of this year')))));
+
+            } // end else if
+
+            elseif ($months_report == 'last_year') {
+                $beginMonth = date('Y-m-d', strtotime(date(date('Y', strtotime('last year')) . '-01-01')));
+                $endMonth = date('Y-m-d', strtotime(date(date('Y', strtotime('last year')) . '-12-' . date('d', strtotime('last day of last year')))));
+            } // end elseif
+
+            elseif ($months_report == 'custom') {
+                $beginMonth = to_sql_date($this->input->post('report_from'));
+                $endMonth = to_sql_date($this->input->post('report_to'));
+            } // end else if
+        } // end if $months_report != ''
+        $dates = array('date1' => $beginMonth, 'date2' => $endMonth);
+        return $dates;
+    }
+
+    /**
+     * @param $userid
+     * @param $months_report
+     * @return mixed
+     */
+    public function is_new_customer($userid, $months_report)
+    {
+        $dates = $this->get_where_report_period($months_report);
+        $date1 = $dates['date1'];
+        $date2 = $dates['date2'];
+        $query = "select * from tblcustomfieldsvalues 
+                where fieldid=7 
+                and relid=$userid 
+                and value <>'' 
+                and value between '$date1' and '$date2'";
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
+        return $num;
+    }
+
     /**
      *
      * @return array
@@ -188,6 +257,22 @@ class Invoices_model extends CRM_Model
         else {
             $name = 'N/A';
         }
+        return $name;
+    }
+
+
+    /**
+     * @param $userid
+     * @return string
+     */
+    public function get_staff_name_by_client_id($userid)
+    {
+        $query = "SELECT * FROM tblcustomeradmins where customer_id=$userid";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $saff_id = $row->staff_id;
+        }
+        $name = $this->get_staff_name_by_id($saff_id);
         return $name;
     }
 

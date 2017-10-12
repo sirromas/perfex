@@ -7,8 +7,8 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-md-4 border-right">
-                                <h4 class="no-margin font-medium">
-                                    <i class="fa fa-balance-scale" aria-hidden="true"></i> <?php echo _l('sales_report_heading'); ?>
+                                <h4 class="no-margin font-medium"><i class="fa fa-balance-scale"
+                                                                     aria-hidden="true"></i> <?php echo _l('sales_report_heading'); ?>
                                 </h4>
                                 <hr/>
                                 <p>
@@ -18,7 +18,6 @@
                                                 aria-hidden="true"></i> <?php echo _l('invoice_report'); ?></a>
                                 </p>
                                 <hr class="hr-10"/>
-
                                 <p>
                                     <a href="#" class="font-medium"
                                        onclick="init_report(this,'items-report'); return false;"><i
@@ -26,7 +25,6 @@
                                                 aria-hidden="true"></i> <?php echo _l('items_report'); ?></a>
                                 </p>
                                 <hr class="hr-10"/>
-
                                 <p>
                                     <a href="#" class="font-medium"
                                        onclick="init_report(this,'payments-received'); return false;"><i
@@ -54,14 +52,6 @@
                                                 aria-hidden="true"></i> <?php echo _l('report_sales_type_customer'); ?>
                                     </a>
                                 </p>
-                                <hr class="hr-10"/>
-                                <p>
-                                    <a href="#" class="font-medium"
-                                       onclick="init_report(this,'new-customers'); return false;" ><i
-                                                class="fa fa-caret-down"
-                                                aria-hidden="true"></i> <?php echo _l('report_new_customers'); ?></a>
-                                </p>
-                                <hr class="hr-10"/>
 
                                 <?php if (total_rows('tblinvoices', array('status' => 5)) > 0) { ?>
                                     <hr class="hr-10"/>
@@ -181,7 +171,6 @@
                             <?php $this->load->view('admin/reports/includes/sales_payment_modes'); ?>
                             <?php $this->load->view('admin/reports/includes/sales_customers_groups'); ?>
                             <?php $this->load->view('admin/reports/includes/sales_customers'); ?>
-                            <?php $this->load->view('admin/reports/includes/sales_customers_new'); ?>
                             <?php $this->load->view('admin/reports/includes/sales_invoices'); ?>
                             <?php $this->load->view('admin/reports/includes/sales_items'); ?>
                             <?php $this->load->view('admin/reports/includes/sales_estimates'); ?>

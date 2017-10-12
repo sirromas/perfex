@@ -2313,6 +2313,7 @@ $lang['report_invoice_total_amount_with_tax'] = 'Total amount with tax';
 $lang['report_invoice_total_amount_without_tax'] = 'Total amount without tax';
 $lang['report_invoice_total_taxes'] = 'Taxes';
 $lang['item_products']='Products';
+$lang['report_new_customers']='New Customers Report';
 
 // Version 1.0.9
 

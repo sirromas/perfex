@@ -6,7 +6,6 @@
     var report_from = $('input[name="report-from"]');
     var report_to = $('input[name="report-to"]');
     var report_customers = $('#customers-report');
-    var report_customers_new=$('#new-customers');
     var report_customers_groups = $('#customers-group');
     var report_invoices = $('#invoices-report');
     var report_estimates = $('#estimates-report');
@@ -153,10 +152,6 @@
     });
 
     function init_report(e, type) {
-
-        //console.log('Event: '+JSON.stringify(e));
-        console.log('Type: '+type);
-
         var report_wrapper = $('#report');
 
         if (report_wrapper.hasClass('hide')) {
@@ -168,7 +163,6 @@
 
         report_customers_groups.addClass('hide');
         report_customers.addClass('hide');
-        report_customers_new.addClass('hide');
         report_invoices.addClass('hide');
         report_estimates.addClass('hide');
         report_payments_received.addClass('hide');
@@ -196,46 +190,24 @@
             $('.chart-income').removeClass('hide');
             $('#income-years').removeClass('hide');
             date_range.addClass('hide');
-        }
-
-        else if (type == 'customers-report') {
+        } else if (type == 'customers-report') {
             report_customers.removeClass('hide');
-        }
-
-        else if (type == 'new-customers') {
-            console.log('Inside new customers1 ...');
-            $('#new-customers').removeClass('hide');
-        }
-
-        else if (type == 'customers-group') {
+        } else if (type == 'customers-group') {
             $('.customers-group-gen').removeClass('hide');
-        }
-
-        else if (type == 'invoices-report') {
+        } else if (type == 'invoices-report') {
             report_invoices.removeClass('hide');
-        }
-
-        else if (type == 'payment-modes') {
+        } else if (type == 'payment-modes') {
             $('.chart-payment-modes').removeClass('hide');
             $('#income-years').removeClass('hide');
-        }
-
-        else if (type == 'payments-received') {
+        } else if (type == 'payments-received') {
             report_payments_received.removeClass('hide');
-        }
-
-        else if (type == 'estimates-report') {
+        } else if (type == 'estimates-report') {
             report_estimates.removeClass('hide');
-        }
-
-        else if (type == 'proposals-report') {
+        } else if (type == 'proposals-report') {
             report_proposals.removeClass('hide');
-        }
-
-        else if (type == 'items-report') {
+        } else if (type == 'items-report') {
             report_items.removeClass('hide');
         }
-
         gen_reports();
     }
 
@@ -313,16 +285,6 @@
         $('#customer_report_controls').show();
         initDataTable('.table-customers-report', admin_url + 'reports/customers_report', false, false, fnServerParams, [0, 'ASC']);
     }
-
-
-    function customers_report_new() {
-        if ($.fn.DataTable.isDataTable('.table-customers-report')) {
-            $('.table-customers-report').DataTable().destroy();
-        }
-        $('#customer_report_controls').show();
-        initDataTable('.table-customers-report', admin_url + 'reports/customers_report_new', false, false, fnServerParams, [0, 'ASC']);
-    }
-
 
     function report_by_customer_groups() {
         if (typeof (groupsChart) !== 'undefined') {
@@ -412,42 +374,21 @@
 
         if (!$('.chart-income').hasClass('hide')) {
             total_income_bar_report();
-        }
-
-        else if (!$('.chart-payment-modes').hasClass('hide')) {
+        } else if (!$('.chart-payment-modes').hasClass('hide')) {
             report_by_payment_modes();
-        }
-
-        else if (!report_customers.hasClass('hide')) {
+        } else if (!report_customers.hasClass('hide')) {
             customers_report();
-        }
-
-        else if (!$('#new-customers').hasClass('hide')) {
-            console.log('Report function called ...');
-            customers_report_new();
-        }
-
-        else if (!$('.customers-group-gen').hasClass('hide')) {
+        } else if (!$('.customers-group-gen').hasClass('hide')) {
             report_by_customer_groups();
-        }
-
-        else if (!report_invoices.hasClass('hide')) {
+        } else if (!report_invoices.hasClass('hide')) {
             invoices_report();
-        }
-
-        else if (!report_payments_received.hasClass('hide')) {
+        } else if (!report_payments_received.hasClass('hide')) {
             payments_received_reports();
-        }
-
-        else if (!report_estimates.hasClass('hide')) {
+        } else if (!report_estimates.hasClass('hide')) {
             estimates_report();
-        }
-
-        else if (!report_proposals.hasClass('hide')) {
+        } else if (!report_proposals.hasClass('hide')) {
             proposals_report();
-        }
-
-        else if (!report_items.hasClass('hide')) {
+        } else if (!report_items.hasClass('hide')) {
             items_report();
         }
     }
