@@ -47,7 +47,9 @@ class Authentication extends CI_Controller
                 if (is_array($data) && isset($data['memberinactive'])) {
                     set_alert('danger', _l('admin_auth_inactive_account'));
                     redirect(site_url('authentication/admin'));
-                } elseif (is_array($data) && isset($data['two_factor_auth'])) {
+                } // end if
+
+                elseif (is_array($data) && isset($data['two_factor_auth'])) {
                     
                     $this->Authentication_model->set_two_factor_auth_code($data['user']->staffid);
                     
@@ -58,24 +60,32 @@ class Authentication extends CI_Controller
                     if (! $sent) {
                         set_alert('danger', _l('two_factor_auth_failed_to_send_code'));
                         redirect(site_url('authentication/admin'));
-                    } else {
+                    } // end if
+
+                    else {
                         set_alert('success', _l('two_factor_auth_code_sent_successfully', $email));
                     }
                     redirect(site_url('authentication/two_factor'));
-                } elseif ($data == false) {
+                } // end elseif
+
+                elseif ($data == false) {
                     set_alert('danger', _l('admin_auth_invalid_email_or_password'));
                     redirect(site_url('authentication/admin'));
-                } else {
+                } // end elseif
+
+                else {
                     // is logged in
                     $this->_url_redirect_after_login();
                 }
                 do_action('after_staff_login');
                 redirect(admin_url());
-            }
-        }
-        
+            } // end if $this->form_validation->run() !== false
+        } // end if
+
+        $this->load->helper('url');
         $data['title'] = _l('admin_auth_login_heading');
         $this->load->view('authentication/login_admin', $data);
+        //redirect('admin/clients', 'refresh');
     }
 
     public function two_factor()

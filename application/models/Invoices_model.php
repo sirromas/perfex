@@ -104,7 +104,7 @@ class Invoices_model extends CRM_Model
         if ($lastvisit != '') {
             $now = date('Y-m-d', time());
             $days = $this->dateDifference($lastvisit, $now);
-            if ($days > 0 && $days <= 7) {
+            if ($days >= 0 && $days <= 7) {
                 $color = '#84c529';
             }
             if ($days > 7 && $days <= 15) {

@@ -932,7 +932,7 @@ function get_client_link_color($clientid)
     if ($lastvisit != '') {
         $now = date('Y-m-d', time());
         $days = dateDifference($lastvisit, $now);
-        if ($days > 0 && $days <= 7) {
+        if ($days >= 0 && $days <= 7) {
             $color = '#84c529';
         }
         if ($days > 7 && $days <= 15) {
