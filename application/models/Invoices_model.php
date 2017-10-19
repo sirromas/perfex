@@ -126,9 +126,14 @@ class Invoices_model extends CRM_Model
      */
     public function is_employee_has_clients($staffid)
     {
-        $query = "select * from tblcustomeradmins where staff_id=$staffid";
-        $result = $this->db->query($query);
-        $num = $result->num_rows();
+        if ($staffid > 0) {
+            $query = "select * from tblcustomeradmins where staff_id=$staffid";
+            $result = $this->db->query($query);
+            $num = $result->num_rows();
+        } // end if
+        else {
+            $num = 0;
+        } // end else
         return $num;
     }
 
