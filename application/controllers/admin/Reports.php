@@ -1237,10 +1237,10 @@ class Reports extends Admin_controller
             foreach ($rResult as $aRow) {
                 $row = array();
 
-                $row[] = '<a href="' . admin_url('invoices / list_invoices / ' . $aRow['id']) . '" target="_blank">' . format_invoice_number($aRow['id']) . '</a>';
+                $row[] = '<a href="' . admin_url('invoices/list_invoices/' . $aRow['id']) . '" target="_blank">' . format_invoice_number($aRow['id']) . '</a>';
 
                 $color = $this->invoices_model->get_client_link_color($aRow['userid']);
-                $row[] = '<a href="' . admin_url('clients / client / ' . $aRow['userid']) . '" style="color:' . $color . ';" target="_blank">' . $aRow['company'] . '</a>';
+                $row[] = '<a href="' . admin_url('clients/client/' . $aRow['userid']) . '" style="color:' . $color . ';" target="_blank">' . $aRow['company'] . '</a>';
 
                 $row[] = $aRow['value'];
 
