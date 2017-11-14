@@ -19,8 +19,8 @@ class Roles_model extends CRM_Model
 
     /**
      * Add new employee role
-     * 
-     * @param mixed $data            
+     *
+     * @param mixed $data
      */
     public function add($data)
     {
@@ -29,7 +29,7 @@ class Roles_model extends CRM_Model
             $permissions['view'] = $data['view'];
             unset($data['view']);
         }
-        
+
         if (isset($data['view_own'])) {
             $permissions['view_own'] = $data['view_own'];
             unset($data['view_own']);
@@ -46,7 +46,7 @@ class Roles_model extends CRM_Model
             $permissions['delete'] = $data['delete'];
             unset($data['delete']);
         }
-        
+
         $this->db->insert('tblroles', $data);
         $insert_id = $this->db->insert_id();
         if ($insert_id) {
@@ -62,7 +62,7 @@ class Roles_model extends CRM_Model
                     'can_delete' => 0
                 ));
             }
-            
+
             foreach ($this->perm_statements as $c) {
                 foreach ($permissions as $key => $p) {
                     if ($key == $c) {
@@ -76,18 +76,18 @@ class Roles_model extends CRM_Model
                     }
                 }
             }
-            
+
             logActivity('New Role Added [ID: ' . $insert_id . '.' . $data['name'] . ']');
-            
+
             return $insert_id;
         }
-        
+
         return false;
     }
 
     /**
      * Update employee role
-     * 
+     *
      * @param array $data
      *            role data
      * @param mixed $id
@@ -102,7 +102,7 @@ class Roles_model extends CRM_Model
             $permissions['view'] = $data['view'];
             unset($data['view']);
         }
-        
+
         if (isset($data['view_own'])) {
             $permissions['view_own'] = $data['view_own'];
             unset($data['view_own']);
@@ -127,13 +127,13 @@ class Roles_model extends CRM_Model
         $this->db->where('roleid', $id);
         $this->db->update('tblroles', $data);
         if ($this->db->affected_rows() > 0) {
-            $affectedRows ++;
+            $affectedRows++;
         }
-        
+
         $all_permissions = $this->roles_model->get_permissions();
         if (total_rows('tblrolepermissions', array(
-            'roleid' => $id
-        )) == 0) {
+                'roleid' => $id
+            )) == 0) {
             foreach ($all_permissions as $p) {
                 $_ins = array();
                 $_ins['roleid'] = $id;
@@ -141,13 +141,13 @@ class Roles_model extends CRM_Model
                 $this->db->insert('tblrolepermissions', $_ins);
             }
         } elseif (total_rows('tblrolepermissions', array(
-            'roleid' => $id
-        )) != count($all_permissions)) {
+                'roleid' => $id
+            )) != count($all_permissions)) {
             foreach ($all_permissions as $p) {
                 if (total_rows('tblrolepermissions', array(
-                    'roleid' => $id,
-                    'permissionid' => $p['permissionid']
-                )) == 0) {
+                        'roleid' => $id,
+                        'permissionid' => $p['permissionid']
+                    )) == 0) {
                     $_ins = array();
                     $_ins['roleid'] = $id;
                     $_ins['permissionid'] = $p['permissionid'];
@@ -155,7 +155,7 @@ class Roles_model extends CRM_Model
                 }
             }
         }
-        
+
         $_permission_restore_affected_rows = 0;
         foreach ($all_permissions as $permission) {
             foreach ($this->perm_statements as $c) {
@@ -165,11 +165,11 @@ class Roles_model extends CRM_Model
                     'can_' . $c => 0
                 ));
                 if ($this->db->affected_rows() > 0) {
-                    $_permission_restore_affected_rows ++;
+                    $_permission_restore_affected_rows++;
                 }
             }
         }
-        
+
         $_new_permissions_added_affected_rows = 0;
         foreach ($permissions as $key => $val) {
             foreach ($val as $p) {
@@ -179,14 +179,14 @@ class Roles_model extends CRM_Model
                     'can_' . $key => 1
                 ));
                 if ($this->db->affected_rows() > 0) {
-                    $_new_permissions_added_affected_rows ++;
+                    $_new_permissions_added_affected_rows++;
                 }
             }
         }
         if ($_new_permissions_added_affected_rows != $_permission_restore_affected_rows) {
-            $affectedRows ++;
+            $affectedRows++;
         }
-        
+
         if ($update_staff_permissions == true) {
             $this->load->model('staff_model');
             $staff = $this->staff_model->get('', '', array(
@@ -194,23 +194,23 @@ class Roles_model extends CRM_Model
             ));
             foreach ($staff as $m) {
                 if ($this->staff_model->update_permissions($permissions, $m['staffid'])) {
-                    $affectedRows ++;
+                    $affectedRows++;
                 }
             }
         }
-        
+
         if ($affectedRows > 0) {
             logActivity('Role Updated [ID: ' . $id . '.' . $data['name'] . ']');
-            
+
             return true;
         }
-        
+
         return false;
     }
 
     /**
      * Get employee role by id
-     * 
+     *
      * @param mixed $id
      *            Optional role id
      * @return mixed array if not id passed else object
@@ -219,16 +219,228 @@ class Roles_model extends CRM_Model
     {
         if (is_numeric($id)) {
             $this->db->where('roleid', $id);
-            
+
             return $this->db->get('tblroles')->row();
         }
-        
+
         return $this->db->get('tblroles')->result_array();
     }
 
     /**
+     * @param $id
+     * @return mixed
+     */
+    public function get_current_user_role($id)
+    {
+        $query = "select * from tblstaff WHERE  staffid=$id";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $role = $row->role;
+        }
+        return $role;
+    }
+
+    /**
+     * @return string
+     */
+    function get_teams_tab()
+    {
+        $list = "";
+        $query = "select * from tblcustomfields where id=9";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $options = $row->options;
+        }
+        $optArr = explode(',', $options);
+        foreach ($optArr as $item) {
+            $list .= "<div class='row'>";
+            $list .= "<span class='col-md-1'><input type='checkbox' class='teamItem'  value='" . trim($item) . "'></span>";
+            $list .= "<span class='col-md-11'><input type='text' style='width: 100%;' value='$item' id='" . trim($item) . "'></span>";
+            $list .= "</div><br>";
+        } // end foreach
+        $list .= "<br><div class='row'>";
+        $list .= "<span class='col-md-1'>&nbsp;</span>";
+        $list .= "<span class='col-md-4'>";
+        $list .= "<button class='btn-default' id='addTeam'>Add</button>&nbsp;&nbsp;";
+        $list .= "<button class='btn-default' id='updateTeams'>Update</button>&nbsp;&nbsp;";
+        $list .= "<button class='btn-default' id='deleteTeams'>Delete</button>";
+        $list .= "</span>";
+        $list .= "</div>";
+        return $list;
+    }
+
+
+    /**
+     * @param $id
+     * @param $newItem
+     */
+    public function update_custom_field_relations($id, $newItem)
+    {
+        $query = "update tblcustomfieldsvalues set value='$newItem' where id=$id";
+        $this->db->query($query);
+    }
+
+    /**
+     * @param $item
+     * @param $newitem
+     */
+    public function process_teams_custom_field($item, $newitem)
+    {
+        $query = "select * from tblcustomfields where id=9";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $oldStr = $row->options;
+        }
+
+        $newStr = str_replace($item, $newitem, $oldStr);
+        $query = "update tblcustomfields set options='$newStr' where id=9";
+        $this->db->query($query);
+
+        $query = "select * from tblcustomfieldsvalues where fieldid=9 and value='$item'";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $this->update_custom_field_relations($row->id, $newitem);
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function get_add_team_modal_dialog()
+    {
+        $list = "";
+
+        $list .= "<div class=\"container\">
+            
+              <!-- Modal -->
+              <div class=\"modal fade\" id=\"myModal\" role=\"dialog\">
+                <div class=\"modal-dialog\">
+                
+                  <!-- Modal content-->
+                  <div class=\"modal-content\">
+                    <div class=\"modal-header\">
+                      <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>
+                      <h4 class=\"modal-title\">Add New Team</h4>
+                    </div>
+                    <div class=\"modal-body\">
+                      <div class='row'>
+                      <span class='col-md-12'><input type='text' id='team_name' style='width: 100%;' placeholder='Team Name'></span>
+                      </div><br>
+                      <div class='row'>
+                      <span class='col-md-12' id='team_err' style='color: red;'></span>
+                      </div>
+                    </div>
+                    <div class=\"modal-footer\">
+                      <button type='button' class='btn btn-default' id='add_team_done'>OK</button>&nbsp;
+                      <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button>
+                    </div>
+                  </div>
+                  
+                </div>
+              </div>
+              
+            </div>";
+
+        return $list;
+    }
+
+
+    /**
+     * @param $name
+     */
+    public function add_new_team($name)
+    {
+        $query = "select * from tblcustomfields where id=9";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $oldStr = $row->options;
+        }
+        $tmpArr = explode(',', $oldStr);
+        $oldArr = array();
+        foreach ($tmpArr as $data) {
+            $item = trim($data);
+            array_push($oldArr, $item);
+        }
+        // Add new one team
+        array_push($oldArr, $name);
+        $newStr = implode(',', $oldArr);
+        $query = "update tblcustomfields set options='$newStr' where id=9";
+        $this->db->query($query);
+    }
+
+    /**
+     * @param $data
+     */
+    public function update_teams_data($data)
+    {
+        $items = json_decode($data); // array of objects
+        foreach ($items as $item) {
+            $this->process_teams_custom_field($item->oldVal, $item->newVal);
+        }
+    }
+
+    /**
+     * @param $item
+     * @return mixed
+     */
+    public function is_team_has_members($item)
+    {
+        $query = "select * from tblcustomfieldsvalues where fieldid=9 and value='$item'";
+        $result = $this->db->query($query);
+        return $result->num_rows();
+    }
+
+    /**
+     * @param $item
+     */
+    public function delete_selected_team($item)
+    {
+        $query = "select * from tblcustomfields where id=9";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $oldStr = $row->options;
+        }
+
+        $tmpArr = explode(',', $oldStr);
+        $oldArr = array();
+        foreach ($tmpArr as $data) {
+            $item = trim($data);
+            array_push($oldArr, $item);
+        }
+
+        $removeArr = array();
+        array_push($removeArr, trim($item));
+
+        $newArr = array_diff($oldArr, $removeArr);
+
+        $newStr = implode(',', $newArr);
+
+        $query = "update tblcustomfields set options='$newStr' where id=9";
+        $this->db->query($query);
+    }
+
+    /**
+     * @param $data
+     * @return mixed
+     */
+    public function delete_teams($data)
+    {
+        $items = json_decode($data);
+        foreach ($items as $item) {
+            $status = $this->is_team_has_members($item->value);
+            if ($status > 0) {
+                return $status;
+            } // end if
+            else {
+                $this->delete_selected_team($item->value);
+            } // end else
+        } // end foreach
+        return $status;
+    }
+
+    /**
      * Delete employee role
-     * 
+     *
      * @param mixed $id
      *            role id
      * @return mixed
@@ -246,25 +458,25 @@ class Roles_model extends CRM_Model
         $this->db->where('roleid', $id);
         $this->db->delete('tblroles');
         if ($this->db->affected_rows() > 0) {
-            $affectedRows ++;
+            $affectedRows++;
         }
         $this->db->where('roleid', $id);
         $this->db->delete('tblrolepermissions');
         if ($this->db->affected_rows() > 0) {
-            $affectedRows ++;
+            $affectedRows++;
         }
         if ($affectedRows > 0) {
             logActivity('Role Deleted [ID: ' . $id);
-            
+
             return true;
         }
-        
+
         return false;
     }
 
     /**
      * Get employee role permissions
-     * 
+     *
      * @param mixed $id
      *            permission id
      * @return mixed if id passed return object else array
@@ -273,17 +485,17 @@ class Roles_model extends CRM_Model
     {
         if (is_numeric($id)) {
             $this->db->where('permissionid', $id);
-            
+
             return $this->db->get('tblpermissions')->row();
         }
         $this->db->order_by('name', 'asc');
-        
+
         return $this->db->get('tblpermissions')->result_array();
     }
 
     /**
      * Get specific role permissions
-     * 
+     *
      * @param mixed $id
      *            role id
      * @return array
@@ -292,13 +504,13 @@ class Roles_model extends CRM_Model
     {
         $this->db->where('roleid', $id);
         $this->db->join('tblpermissions', 'tblpermissions.permissionid = tblrolepermissions.permissionid', 'left');
-        
+
         return $this->db->get('tblrolepermissions')->result_array();
     }
 
     /**
      * Get staff permission / Staff can have other permissions too different from the role which is assigned
-     * 
+     *
      * @param mixed $id
      *            Optional - staff id
      * @return array
@@ -310,14 +522,18 @@ class Roles_model extends CRM_Model
             $id = get_staff_user_id();
         }
         $this->db->where('staffid', $id);
-        
+
         return $this->db->get('tblstaffpermissions')->result_array();
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function get_contact_permissions($id)
     {
         $this->db->where('userid', $id);
-        
+
         return $this->db->get('tblcontactpermissions')->result_array();
     }
 }

@@ -408,7 +408,7 @@ $lang['report_leads_monthly_conversions'] = 'Monthly';
 $lang['sales_report_heading'] = 'Sales Report';
 $lang['report_sales_type_income'] = 'Total Income';
 
-$lang['report_sales_type_customer'] = 'Customers Report';
+$lang['report_sales_type_customer'] = 'Invoice Count Report';
 $lang['report_sales_base_currency_select_explanation'] = 'You need to select currency because you have invoices with different currency';
 $lang['report_sales_from_date'] = 'From Date';
 $lang['report_sales_to_date'] = 'To Date';
@@ -741,6 +741,7 @@ $lang['staff_add_edit_skype'] = 'Skype';
 $lang['staff_add_edit_departments'] = 'Member departments';
 $lang['staff_add_edit_role'] = 'Role';
 $lang['staff_add_edit_permissions'] = 'Permissions';
+$lang['staff_add_edit_teams'] = 'Teams';
 $lang['staff_add_edit_administrator'] = 'Administrator';
 $lang['staff_add_edit_password'] = 'Password';
 $lang['staff_add_edit_password_note'] = 'Note: if you populate this fields, password will be changed on this member.';
