@@ -103,7 +103,8 @@ class Staff extends Admin_controller
         } // end else
         $this->load->model('currencies_model');
         $data['base_currency'] = $this->currencies_model->get_base_currency();
-        $data['roles'] = $this->roles_model->get();
+        //$data['roles'] = $this->roles_model->get();
+        $data['roles'] = $this->roles_model->get2();
         $data['role'] = $this->roles_model->get_current_user_role($this->session->userdata('staff_user_id'));
         $data['id']=$id;
         $data['teams'] = $this->roles_model->get_teams_tab();

@@ -227,6 +227,46 @@ class Roles_model extends CRM_Model
     }
 
     /**
+     * @param string $id
+     * @return mixed
+     */
+    public function get2($id = '')
+    {
+        $current_user_role = $this->get_current_user_role($this->session->userdata('staff_user_id'));
+        if (is_numeric($id)) {
+            $this->db->where('roleid', $id);
+            return $this->db->get('tblroles')->row();
+        }  // end if
+        else {
+            switch ($current_user_role) {
+                case 3:
+                    // It is manager
+                    $query="select * from tblroles where roleid=1";
+                    $result = $this->db->query($query);
+                    foreach ($result->result() as $row) {
+                        $item=array('roleid'=>$row->roleid,'name'=>$row->name);
+                        $data[]=$item;
+                    }
+                    return $data;
+                    break;
+                case 4:
+                    // It is director
+                    $query="select * from tblroles where roleid<4";
+                    $result = $this->db->query($query);
+                    foreach ($result->result() as $row) {
+                        $item=array('roleid'=>$row->roleid,'name'=>$row->name);
+                        $data[]=$item;
+                    }
+                    return $data;
+                    break;
+                default:
+                    return $this->db->get('tblroles')->result_array();
+            } // end of switch
+        } // end else
+
+    }
+
+    /**
      * @param $id
      * @return mixed
      */
