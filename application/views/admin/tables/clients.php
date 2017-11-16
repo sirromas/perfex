@@ -59,6 +59,36 @@ if (count($invoiceStatusIds) > 0) {
     array_push($filter, 'AND tblclients.userid IN (SELECT clientid FROM tblinvoices WHERE status IN (' . implode(', ', $invoiceStatusIds) . '))');
 }
 
+// Custom filtering
+$item = $_SESSION['item'];
+$staffid = $_SESSION['staff_user_id'];
+$this->_instance->load->model('roles_model');
+$roleid = $this->_instance->roles_model->get_current_user_role($staffid);
+
+if ($roleid == 1 || $roleid == 3) {
+    if ($item == 'my_clients') {
+        $my_clients = $this->_instance->roles_model->get_user_clients($staffid);
+        if ($my_clients != '') {
+            array_push($filter, "AND tblclients.userid IN ($my_clients)");
+        } // end if
+        else {
+            array_push($filter, "AND tblclients.userid=0");
+        } // end else
+    } // end if$item == 'my_clients'
+
+    if ($item == 'team_clients') {
+        $teamname = $this->_instance->roles_model->get_user_team($staffid);
+        $team_clients = $this->_instance->roles_model->get_team_clients($teamname); // string
+        if ($team_clients != '') {
+            array_push($filter, "AND tblclients.userid IN ($team_clients)");
+        } // end if
+        else {
+            array_push($filter, "AND tblclients.userid=0");
+        } // end else
+    } // end if $item == 'team_clients'
+} // end if $roleid == 1 || $roleid == 3
+
+
 // Filter by estimates
 $estimateStatusIds = array();
 $this->_instance->load->model('estimates_model');
@@ -125,7 +155,7 @@ if (count($filter) > 0) {
     array_push($where, 'AND (' . prepare_dt_filter($filter) . ')');
 }
 
-if (! has_permission('customers', '', 'view')) {
+if (!has_permission('customers', '', 'view')) {
     array_push($where, 'AND tblclients.userid IN (SELECT customer_id FROM tblcustomeradmins WHERE staff_id=' . get_staff_user_id() . ')');
 }
 
@@ -144,44 +174,100 @@ $output = $result['output'];
 $rResult = $result['rResult'];
 
 foreach ($rResult as $aRow) {
-    
+
     $row = array();
-    
+
     // Bulk actions
     $row[] = '<div class="checkbox"><input type="checkbox" value="' . $aRow['userid'] . '"><label></label></div>';
     // User id
     $row[] = $aRow['userid'];
-    
+
     // Company
     $company = $aRow['company'];
-    
+
     if ($company == '') {
         $company = _l('no_company_view_profile');
     }
 
-     $color=get_client_link_color($aRow['userid']);
-     $row[] = '<a href="' . admin_url('clients/client/' . $aRow['userid']) . '" style="color:'.$color.';">' . $company . '</a>';
-    
-    // Primary contact
-    $row[] = ($aRow['contact_id'] ? '<a href="' . admin_url('clients/client/' . $aRow['userid'] . '?contactid=' . $aRow['contact_id']) . '" target="_blank">' . $aRow['contact_fullname'] . '</a>' : '');
-    
+    $color = get_client_link_color($aRow['userid']);
+    switch ($roleid) {
+        case 1:
+            $status = $this->_instance->roles_model->is_my_client($aRow['userid'], $staffid);
+            if ($status) {
+                $row[] = '<a href="' . admin_url('clients/client/' . $aRow['userid']) . '" style="color:' . $color . ';">' . $company . '</a>';
+                $row[] = ($aRow['contact_id'] ? '<a href="' . admin_url('clients/client/' . $aRow['userid'] . '?contactid=' . $aRow['contact_id']) . '" target="_blank">' . $aRow['contact_fullname'] . '</a>' : '');
+            } // end if
+            else {
+                $row[] = '<a href="#" onclick="return false" style="color:' . $color . ';">' . $company . '</a>';
+                $row[] = ($aRow['contact_id'] ? '<a href="#" onclick="return false" target="_blank">' . $aRow['contact_fullname'] . '</a>' : '');
+            }
+            break;
+        case 3:
+            $teamname = $this->_instance->roles_model->get_user_team($staffid);
+            $status = $this->_instance->roles_model->is_team_client($aRow['userid'], $teamname);
+            if ($status) {
+                $row[] = '<a href="' . admin_url('clients/client/' . $aRow['userid']) . '" style="color:' . $color . ';">' . $company . '</a>';
+                $row[] = ($aRow['contact_id'] ? '<a href="' . admin_url('clients/client/' . $aRow['userid'] . '?contactid=' . $aRow['contact_id']) . '" target="_blank">' . $aRow['contact_fullname'] . '</a>' : '');
+            } // end if
+            else {
+                $row[] = '<a href="#" onclick="return false" style="color:' . $color . ';">' . $company . '</a>';
+                $row[] = ($aRow['contact_id'] ? '<a href="#" onclick="return false" target="_blank">' . $aRow['contact_fullname'] . '</a>' : '');
+            }
+            break;
+        default:
+            $row[] = '<a href="' . admin_url('clients/client/' . $aRow['userid']) . '" style="color:' . $color . ';">' . $company . '</a>';
+            $row[] = ($aRow['contact_id'] ? '<a href="' . admin_url('clients/client/' . $aRow['userid'] . '?contactid=' . $aRow['contact_id']) . '" target="_blank">' . $aRow['contact_fullname'] . '</a>' : '');
+    }
+
+
     // Primary contact email
     $row[] = ($aRow['email'] ? '<a href="mailto:' . $aRow['email'] . '">' . $aRow['email'] . '</a>' : '');
-    
+
     // Primary contact phone
     $row[] = ($aRow['phonenumber'] ? '<a href="tel:' . $aRow['phonenumber'] . '">' . $aRow['phonenumber'] . '</a>' : '');
-    
+
     // Toggle active/inactive customer
-    $toggleActive = '<div class="onoffswitch" data-toggle="tooltip" data-title="' . _l('customer_active_inactive_help') . '">
+    switch ($roleid) {
+        case 1:
+            $status = $this->_instance->roles_model->is_my_client($aRow['userid'], $staffid);
+            if ($status) {
+                $toggleActive = '<div class="onoffswitch" data-toggle="tooltip" data-title="' . _l('customer_active_inactive_help') . '">
         <input type="checkbox" data-switch-url="' . admin_url() . 'clients/change_client_status" name="onoffswitch" class="onoffswitch-checkbox" id="' . $aRow['userid'] . '" data-id="' . $aRow['userid'] . '" ' . ($aRow['tblclients.active'] == 1 ? 'checked' : '') . '>
         <label class="onoffswitch-label" for="' . $aRow['userid'] . '"></label>
     </div>';
-    
+            } // end if
+            else {
+                $clientActive = ($aRow['tblclients.active'] == 1) ? 'Yes' : 'No';
+                $toggleActive = '<div class="onoffswitch">' . $clientActive . '</div>';
+            } // end else
+            break;
+        case 3:
+            $teamname = $this->_instance->roles_model->get_user_team($staffid);
+            $status = $this->_instance->roles_model->is_team_client($aRow['userid'], $teamname);
+            if ($status) {
+                $toggleActive = '<div class="onoffswitch" data-toggle="tooltip" data-title="' . _l('customer_active_inactive_help') . '">
+        <input type="checkbox" data-switch-url="' . admin_url() . 'clients/change_client_status" name="onoffswitch" class="onoffswitch-checkbox" id="' . $aRow['userid'] . '" data-id="' . $aRow['userid'] . '" ' . ($aRow['tblclients.active'] == 1 ? 'checked' : '') . '>
+        <label class="onoffswitch-label" for="' . $aRow['userid'] . '"></label>
+    </div>';
+            } // end if
+            else {
+                $clientActive = ($aRow['tblclients.active'] == 1) ? 'Yes' : 'No';
+                $toggleActive = '<div class="onoffswitch">' . $clientActive . '</div>';
+            } // end else
+            break;
+        default:
+            $toggleActive = '<div class="onoffswitch" data-toggle="tooltip" data-title="' . _l('customer_active_inactive_help') . '">
+        <input type="checkbox" data-switch-url="' . admin_url() . 'clients/change_client_status" name="onoffswitch" class="onoffswitch-checkbox" id="' . $aRow['userid'] . '" data-id="' . $aRow['userid'] . '" ' . ($aRow['tblclients.active'] == 1 ? 'checked' : '') . '>
+        <label class="onoffswitch-label" for="' . $aRow['userid'] . '"></label>
+    </div>';
+    }
+
+
     // For exporting
     $toggleActive .= '<span class="hide">' . ($aRow['tblclients.active'] == 1 ? _l('is_active_export') : _l('is_not_active_export')) . '</span>';
-    
+
     $row[] = $toggleActive;
-    
+
     // Customer groups parsing
     $groupsRow = '';
     if ($aRow['groups']) {
@@ -190,33 +276,86 @@ foreach ($rResult as $aRow) {
             $groupsRow .= '<span class="label label-default mleft5 inline-block customer-group-list pointer">' . $group . '</span>';
         }
     }
-    
+
     $row[] = $groupsRow;
-    
+
     // Custom fields add values
     foreach ($customFieldsColumns as $customFieldColumn) {
         $row[] = (strpos($customFieldColumn, 'date_picker_') !== false ? _d($aRow[$customFieldColumn]) : $aRow[$customFieldColumn]);
     }
-    
+
     $hook = do_action('customers_table_row_data', array(
         'output' => $row,
         'row' => $aRow
     ));
-    
+
     $row = $hook['output'];
-    
+
     // Table options
-    $options = icon_btn('clients/client/' . $aRow['userid'], 'pencil-square-o');
-    
+    switch ($roleid) {
+        case 1:
+            $status = $this->_instance->roles_model->is_my_client($aRow['userid'], $staffid);
+            if ($status) {
+                $options = icon_btn('clients/client/' . $aRow['userid'], 'pencil-square-o');
+            } // end if
+            else {
+                $options = "";
+            } // end else
+            break;
+        case 3:
+            $teamname = $this->_instance->roles_model->get_user_team($staffid);
+            $status = $this->_instance->roles_model->is_team_client($aRow['userid'], $teamname);
+            if ($status) {
+                $options = icon_btn('clients/client/' . $aRow['userid'], 'pencil-square-o');
+            } // end if
+            else {
+                $options = "";
+            } // end else
+            break;
+        default:
+            $options = icon_btn('clients/client/' . $aRow['userid'], 'pencil-square-o');
+    }
+
+
     // Show button delete if permission for delete exists
     if ($hasPermissionDelete) {
-        $options .= icon_btn('clients/delete/' . $aRow['userid'], 'remove', 'btn-danger _delete', array(
-            'data-toggle' => 'tooltip',
-            'data-placement' => 'left',
-            'title' => _l('client_delete_tooltip')
-        ));
+        switch ($roleid) {
+            case 1:
+                $status = $this->_instance->roles_model->is_my_client($aRow['userid'], $staffid);
+                if ($status) {
+                    $options .= icon_btn('clients/delete/' . $aRow['userid'], 'remove', 'btn-danger _delete', array(
+                        'data-toggle' => 'tooltip',
+                        'data-placement' => 'left',
+                        'title' => _l('client_delete_tooltip')
+                    ));
+                } // end if
+                else {
+                    $options = "";
+                } // end else
+                break;
+            case 3:
+                $teamname = $this->_instance->roles_model->get_user_team($staffid);
+                $status = $this->_instance->roles_model->is_team_client($aRow['userid'], $teamname);
+                if ($status) {
+                    $options .= icon_btn('clients/delete/' . $aRow['userid'], 'remove', 'btn-danger _delete', array(
+                        'data-toggle' => 'tooltip',
+                        'data-placement' => 'left',
+                        'title' => _l('client_delete_tooltip')
+                    ));
+                } // end if
+                else {
+                    $options = "";
+                } // end else
+                break;
+            default:
+                $options .= icon_btn('clients/delete/' . $aRow['userid'], 'remove', 'btn-danger _delete', array(
+                    'data-toggle' => 'tooltip',
+                    'data-placement' => 'left',
+                    'title' => _l('client_delete_tooltip')
+                ));
+        }
     }
-    
+
     $row[] = $options;
     $output['aaData'][] = $row;
 }

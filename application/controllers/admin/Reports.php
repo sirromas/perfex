@@ -19,6 +19,7 @@ class Reports extends Admin_controller
         }
         $this->_instance = &get_instance();
         $this->load->model('reports_model');
+        $this->load->model('roles_model');
     }
 
     /* No access on this url */
@@ -120,6 +121,8 @@ class Reports extends Admin_controller
 
             $this->load->model('currencies_model');
             $this->load->model('invoices_model');
+            $staffid = $this->session->userdata('staff_user_id');
+            $roleid = $this->roles_model->get_current_user_role($staffid);
 
             $select = array(
                 'CASE company WHEN "" THEN (SELECT CONCAT(firstname, " ", lastname) FROM tblcontacts WHERE userid = tblclients.userid and is_primary = 1) ELSE company END as company',
@@ -179,6 +182,12 @@ class Reports extends Admin_controller
                         array_push($where, 'AND userid IN (' . implode(', ', $s_regions) . ')');
                     } // end if count($s_regions) > 0
                 } // end if is_array($regions)
+            }
+
+            if ($roleid == 3) {
+                $teamname = $this->roles_model->get_user_team($staffid);
+                $team_clients = $this->roles_model->get_team_clients($teamname);
+                array_push($where, "AND userid IN ($team_clients)");
             }
 
             if ($this->input->post('c_employees')) {
@@ -359,7 +368,7 @@ class Reports extends Admin_controller
 
                 'JOIN tblcustomfieldsvalues ON (tblcustomfieldsvalues.fieldid=7 
                  and tblcustomfieldsvalues.relid=tblclients.userid 
-                 and tblcustomfieldsvalues.value between "'.$date1.'" and "'.$date2.'")'
+                 and tblcustomfieldsvalues.value between "' . $date1 . '" and "' . $date2 . '")'
 
             );
 
@@ -408,8 +417,8 @@ class Reports extends Admin_controller
                 //$months_report = $this->input->post('report_months');
                 //$status = $this->invoices_model->is_new_customer($aRow['userid'], $months_report);
                 //if ($status > 0) {
-                    $output['aaData'][] = $row;
-                    $x++;
+                $output['aaData'][] = $row;
+                $x++;
                 //}
 
             } // end foreach
@@ -1078,6 +1087,9 @@ class Reports extends Admin_controller
 
             $this->load->model('currencies_model');
             $this->load->model('invoices_model');
+            $staffid = $this->session->userdata('staff_user_id');
+            $roleid = $this->roles_model->get_current_user_role($staffid);
+
 
             $select = array(
                 'number',
@@ -1136,6 +1148,12 @@ class Reports extends Admin_controller
                         array_push($where, 'AND clientid IN (' . implode(', ', $s_regions) . ')');
                     } // end if count($s_regions) > 0
                 } // end if is_array($regions)
+            }
+
+            if ($roleid == 3) {
+                $teamname = $this->roles_model->get_user_team($staffid);
+                $team_clients = $this->roles_model->get_team_clients($teamname);
+                array_push($where, "AND clientid IN ($team_clients)");
             }
 
             if ($this->input->post('employees')) {

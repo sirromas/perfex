@@ -577,6 +577,10 @@ class Clients_model extends CRM_Model
         $this->db->insert('tblclients', $data);
         $userid = $this->db->insert_id();
         if ($userid) {
+            // Assign client to the user who created it
+            $staffid = $this->session->userdata('staff_user_id');
+            $this->assign_customer_admin($staffid, $userid);
+
             if (isset($custom_fields)) {
                 $_custom_fields = $custom_fields;
                 // Possible request from the register area with 2 types of custom fields for contact and for comapny/customer
@@ -620,6 +624,19 @@ class Clients_model extends CRM_Model
         }
 
         return $userid;
+    }
+
+    /**
+     * @param $staffid
+     * @param $userid
+     */
+    public function assign_customer_admin($staffid, $userid)
+    {
+        $date = date('Y-m-d h:i:s', time());
+        $query = "insert into tblcustomeradmins 
+              (staff_id,customer_id,date_assigned) 
+              values ($staffid,$userid,'$date')";
+        $this->db->query($query);
     }
 
     /**

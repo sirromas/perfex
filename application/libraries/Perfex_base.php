@@ -97,7 +97,7 @@ class Perfex_Base
     }
 
     /**
-     * Function that will parse table data from the tables folder for amin area
+     * Function that will parse table data from the tables folder for admin area
      * 
      * @param string $table
      *            table filename

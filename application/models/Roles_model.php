@@ -241,21 +241,21 @@ class Roles_model extends CRM_Model
             switch ($current_user_role) {
                 case 3:
                     // It is manager
-                    $query="select * from tblroles where roleid=1";
+                    $query = "select * from tblroles where roleid=1";
                     $result = $this->db->query($query);
                     foreach ($result->result() as $row) {
-                        $item=array('roleid'=>$row->roleid,'name'=>$row->name);
-                        $data[]=$item;
+                        $item = array('roleid' => $row->roleid, 'name' => $row->name);
+                        $data[] = $item;
                     }
                     return $data;
                     break;
                 case 4:
                     // It is director
-                    $query="select * from tblroles where roleid<4";
+                    $query = "select * from tblroles where roleid<4";
                     $result = $this->db->query($query);
                     foreach ($result->result() as $row) {
-                        $item=array('roleid'=>$row->roleid,'name'=>$row->name);
-                        $data[]=$item;
+                        $item = array('roleid' => $row->roleid, 'name' => $row->name);
+                        $data[] = $item;
                     }
                     return $data;
                     break;
@@ -265,6 +265,64 @@ class Roles_model extends CRM_Model
         } // end else
 
     }
+
+    /**
+     * @param $staffid
+     * @return string
+     */
+    public function get_user_team($staffid)
+    {
+        $query = "select * from tblcustomfieldsvalues where fieldid=9  and relid=$staffid";
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
+        if ($num > 0) {
+            foreach ($result->result() as $row) {
+                $teamname = $row->value;
+            }
+        } // end if
+        else {
+            $teamname = '';
+        }
+        return $teamname;
+    }
+
+    /**
+     * @param $teamname
+     * @return string
+     */
+    public function get_team_clients($teamname)
+    {
+        $query = "select * from tblcustomfieldsvalues where fieldid=9 and value='$teamname'";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $users[] = $row->relid;
+        } // end foreach
+        $users_list = implode(',', $users);
+
+        $query = "select * from tblcustomeradmins where staff_id in ($users_list)";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $clients[] = $row->customer_id;
+        }
+        $team_clients = implode(',', $clients);
+        return $team_clients;
+    }
+
+    /**
+     * @param $staffid
+     * @return string
+     */
+    public function get_user_clients($staffid)
+    {
+        $query = "select * from tblcustomeradmins where staff_id=$staffid";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $clients[] = $row->customer_id;
+        }
+        $team_users = implode(',', $clients);
+        return $team_users;
+    }
+
 
     /**
      * @param $id
@@ -278,6 +336,44 @@ class Roles_model extends CRM_Model
             $role = $row->role;
         }
         return $role;
+    }
+
+    /**
+     * @param $clientid
+     * @param $teamname
+     * @return bool
+     */
+    public function is_team_client($clientid, $teamname)
+    {
+        $query = "select * from tblcustomfieldsvalues where fieldid=9 and value='$teamname'";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $users[] = $row->relid;
+        } // end foreach
+        $users_list = implode(',', $users);
+
+        $query = "select * from tblcustomeradmins where staff_id in ($users_list)";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $clients[] = $row->customer_id;
+        }
+        return in_array($clientid, $clients);
+
+    }
+
+    /**
+     * @param $clientid
+     * @param $staffid
+     * @return bool
+     */
+    public function is_my_client($clientid, $staffid)
+    {
+        $query = "select * from tblcustomeradmins where staff_id=$staffid";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $clients[] = $row->customer_id;
+        }
+        return in_array($clientid, $clients);
     }
 
     /**

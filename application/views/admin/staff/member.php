@@ -234,7 +234,11 @@
                                     <?php } ?>
                                 </div>
                                 <?php $rel_id = (isset($member) ? $member->staffid : false); ?>
-                                <?php echo render_custom_fields('staff', $rel_id); ?>
+                                <?php
+                                if ($role==0 || $role==4) {
+                                    echo render_custom_fields('staff', $rel_id);
+                                }
+                                ?>
                                 <?php if (is_admin()) { ?>
                                     <div class="row">
                                         <div class="col-md-12">

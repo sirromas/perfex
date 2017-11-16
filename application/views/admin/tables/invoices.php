@@ -4,6 +4,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
 $project_id = $this->_instance->input->post('project_id');
 $CI = &get_instance();
 $CI->load->helper('perfex_misc_helper');
+$item = $_SESSION['item'];
+$staffid = $_SESSION['staff_user_id'];
+$this->_instance->load->model('roles_model');
+$roleid = $this->_instance->roles_model->get_current_user_role($staffid);
 
 $aColumns = array(
     'number',
@@ -30,7 +34,7 @@ $custom_fields = get_table_custom_fields('invoice');
 
 foreach ($custom_fields as $key => $field) {
     $selectAs = (is_cf_date($field) ? 'date_picker_cvalue_' . $key : 'cvalue_' . $key);
-    
+
     array_push($customFieldsColumns, $selectAs);
     array_push($aColumns, 'ctable_' . $key . '.value as ' . $selectAs);
     array_push($join, 'LEFT JOIN tblcustomfieldsvalues as ctable_' . $key . ' ON tblinvoices.id = ctable_' . $key . '.relid AND ctable_' . $key . '.fieldto="' . $field['fieldto'] . '" AND ctable_' . $key . '.fieldid=' . $field['id']);
@@ -104,7 +108,7 @@ if ($project_id) {
     array_push($where, 'AND project_id=' . $project_id);
 }
 
-if (! has_permission('invoices', '', 'view')) {
+if (!has_permission('invoices', '', 'view')) {
     array_push($where, 'AND tblinvoices.addedfrom=' . get_staff_user_id());
 }
 
@@ -119,49 +123,105 @@ $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, arr
 $output = $result['output'];
 $rResult = $result['rResult'];
 
+
 foreach ($rResult as $aRow) {
     $row = array();
-    
+
     $numberOutput = '';
-    
-    // If is from client area table
-    if (is_numeric($clientid) || $project_id) {
-        $numberOutput = '<a href="' . admin_url('invoices/list_invoices/' . $aRow['id']) . '" target="_blank">' . format_invoice_number($aRow['id']) . '</a>';
-    } else {
-        $numberOutput = '<a href="' . admin_url('invoices/list_invoices/' . $aRow['id']) . '" onclick="init_invoice(' . $aRow['id'] . '); return false;">' . format_invoice_number($aRow['id']) . '</a>';
+
+    switch ($roleid) {
+        case 1:
+            $status = $this->_instance->roles_model->is_my_client($aRow['clientid'], $staffid);
+            if ($status) {
+                if (is_numeric($clientid) || $project_id) {
+                    $numberOutput = '<a href="' . admin_url('invoices/list_invoices/' . $aRow['id']) . '" target="_blank">' . format_invoice_number($aRow['id']) . '</a>';
+                } // end if
+                else {
+                    $numberOutput = '<a href="' . admin_url('invoices/list_invoices/' . $aRow['id']) . '" onclick="init_invoice(' . $aRow['id'] . '); return false;">' . format_invoice_number($aRow['id']) . '</a>';
+                } // end else
+            } // end if
+            else {
+                $numberOutput = '<a href="#" onclick="return false;">' . format_invoice_number($aRow['id']) . '</a>';
+            } // end else
+            break;
+        case 3:
+            $teamname = $this->_instance->roles_model->get_user_team($staffid);
+            $status = $this->_instance->roles_model->is_team_client($aRow['clientid'], $teamname);
+            if ($status) {
+                if (is_numeric($clientid) || $project_id) {
+                    $numberOutput = '<a href="' . admin_url('invoices/list_invoices/' . $aRow['id']) . '" target="_blank">' . format_invoice_number($aRow['id']) . '</a>';
+                } // end if
+                else {
+                    $numberOutput = '<a href="' . admin_url('invoices/list_invoices/' . $aRow['id']) . '" onclick="init_invoice(' . $aRow['id'] . '); return false;">' . format_invoice_number($aRow['id']) . '</a>';
+                } // end else
+            } // end if
+            else {
+                $numberOutput = '<a href="#" onclick="return false;">' . format_invoice_number($aRow['id']) . '</a>';
+            } // end else
+            break;
+        default:
+            if (is_numeric($clientid) || $project_id) {
+                $numberOutput = '<a href="' . admin_url('invoices/list_invoices/' . $aRow['id']) . '" target="_blank">' . format_invoice_number($aRow['id']) . '</a>';
+            } // end if
+            else {
+                $numberOutput = '<a href="' . admin_url('invoices/list_invoices/' . $aRow['id']) . '" onclick="init_invoice(' . $aRow['id'] . '); return false;">' . format_invoice_number($aRow['id']) . '</a>';
+            } // end else
     }
-    
+
     $row[] = $numberOutput;
-    
+
     $row[] = format_money($aRow['total'], $aRow['symbol']);
-    
+
     $row[] = format_money($aRow['total_tax'], $aRow['symbol']);
-    
+
     $row[] = $aRow['year'];
-    
+
     $row[] = _d($aRow['date']);
 
-    $color=get_client_link_color($aRow['clientid']);
-    $row[] = '<a href="' . admin_url('clients/client/' . $aRow['clientid']) . '" style="color:'.$color.';">' . $aRow['company'] . '</a>';
-    
+    $color = get_client_link_color($aRow['clientid']);
+
+    switch ($roleid) {
+        case 1:
+            $status = $this->_instance->roles_model->is_my_client($aRow['clientid'], $staffid);
+            if ($status) {
+                $row[] = '<a href="' . admin_url('clients/client/' . $aRow['clientid']) . '" style="color:' . $color . ';">' . $aRow['company'] . '</a>';
+            } // end if
+            else {
+                $row[] = '<a href="#" onclick="return false" style="color:' . $color . ';">' . $aRow['company'] . '</a>';
+            } // end else
+            break;
+        case 3:
+            $teamname = $this->_instance->roles_model->get_user_team($staffid);
+            $status = $this->_instance->roles_model->is_team_client($aRow['clientid'], $teamname);
+            if ($status) {
+                $row[] = '<a href="' . admin_url('clients/client/' . $aRow['clientid']) . '" style="color:' . $color . ';">' . $aRow['company'] . '</a>';
+            } // end if
+            else {
+                $row[] = '<a href="#" onclick="return false" style="color:' . $color . ';">' . $aRow['company'] . '</a>';
+            } // end else
+            break;
+        default:
+            $row[] = '<a href="' . admin_url('clients/client/' . $aRow['clientid']) . '" style="color:' . $color . ';">' . $aRow['company'] . '</a>';
+    }
+
+
     $row[] = '<a href="' . admin_url('projects/view/' . $aRow['project_id']) . '">' . $aRow['project_name'] . '</a>';
-    ;
-    
+
     $row[] = _d($aRow['duedate']);
-    
+
     $row[] = format_invoice_status($aRow['tblinvoices.status']);
-    
+
     // Custom fields add values
     foreach ($customFieldsColumns as $customFieldColumn) {
         $row[] = (strpos($customFieldColumn, 'date_picker_') !== false ? _d($aRow[$customFieldColumn]) : $aRow[$customFieldColumn]);
     }
-    
+
     $hook = do_action('invoices_table_row_data', array(
         'output' => $row,
         'row' => $aRow
     ));
-    
+
     $row = $hook['output'];
-    
+
     $output['aaData'][] = $row;
 }

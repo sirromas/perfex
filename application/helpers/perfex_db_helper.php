@@ -1084,7 +1084,8 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = array(), $w
     $sOrder
     $sLimit
     ";
-    
+
+    //echo "Query: ".$sQuery."<br>";
     $rResult = $CI->db->query($sQuery)->result_array();
     
     $hookData = do_action('datatables_sql_query_results', array(
