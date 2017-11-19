@@ -410,6 +410,8 @@ $lang['report_leads_sources_conversions'] = 'Sources Conversion';
 $lang['report_leads_monthly_conversions'] = 'Monthly';
 $lang['sales_report_heading'] = 'Sales Report';
 $lang['report_sales_type_income'] = 'Total Income';
+$lang['teams'] = 'Team';
+$lang['teams_all'] = 'All';
 
 $lang['report_sales_type_customer'] = 'Invoice Count Report';
 $lang['report_sales_base_currency_select_explanation'] = 'You need to select currency because you have invoices with different currency';

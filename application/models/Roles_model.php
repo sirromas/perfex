@@ -286,25 +286,42 @@ class Roles_model extends CRM_Model
         return $teamname;
     }
 
+
     /**
      * @param $teamname
-     * @return string
+     * @param bool $array_output
+     * @return array|string
      */
-    public function get_team_clients($teamname)
+    public function get_team_clients($teamname, $array_output = false)
     {
-        $query = "select * from tblcustomfieldsvalues where fieldid=9 and value='$teamname'";
-        $result = $this->db->query($query);
-        foreach ($result->result() as $row) {
-            $users[] = $row->relid;
-        } // end foreach
-        $users_list = implode(',', $users);
-
-        $query = "select * from tblcustomeradmins where staff_id in ($users_list)";
-        $result = $this->db->query($query);
-        foreach ($result->result() as $row) {
-            $clients[] = $row->customer_id;
+        $users=array();
+        if ($teamname != '') {
+            $query = "select * from tblcustomfieldsvalues where fieldid=9 and value='$teamname'";
+            $result = $this->db->query($query);
+            foreach ($result->result() as $row) {
+                $users[] = $row->relid;
+            } // end foreach
+            if (count($users)>0) {
+                $users_list = implode(',', $users);
+                $query = "select * from tblcustomeradmins where staff_id in ($users_list)";
+                $result = $this->db->query($query);
+                foreach ($result->result() as $row) {
+                    $clients[] = $row->customer_id;
+                }
+            } // end if ount($users)>0
+            else {
+                $clients[]=0;
+            }
+        } // if $teamname!=''
+        else {
+            $clients[] = 0;
         }
-        $team_clients = implode(',', $clients);
+        if ($array_output == false) {
+            $team_clients = implode(',', $clients);
+        } // end if
+        else {
+            $team_clients = $clients;
+        } // end else
         return $team_clients;
     }
 

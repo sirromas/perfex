@@ -27,6 +27,7 @@ class Invoices_model extends CRM_Model
         parent::__construct();
         $ci =& get_instance();
         $ci->load->helper('perfex_general_helper');
+        $ci->load->model('roles_model');
     }
 
     /**
@@ -135,6 +136,28 @@ class Invoices_model extends CRM_Model
             $num = 0;
         } // end else
         return $num;
+    }
+
+    /**
+     * @return array
+     */
+    public function get_teams()
+    {
+        $teams = array();
+        $roleid = $this->roles_model->get_current_user_role($this->session->userdata('staff_user_id'));
+        if ($roleid == 0 || $roleid == 4) {
+            $query = "select * from tblcustomfields where id=9";
+            $result = $this->db->query($query);
+            foreach ($result->result() as $row) {
+                $data = $row->options;
+            }
+            $teams=explode(',',$data);
+        } // end if
+        else {
+            $teamname = $this->roles_model->get_user_team($this->session->userdata('staff_user_id'));
+            $teams[] = $teamname;
+        }
+        return $teams;
     }
 
 

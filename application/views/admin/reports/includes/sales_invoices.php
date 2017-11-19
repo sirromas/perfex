@@ -30,16 +30,16 @@
          <?php } ?>
           
          <?php
-        
-        if (count($regions) > 0) {
+        // We use regions dropdown to populate teams data
+        if (count($teams) >0)  {
             ?>
          <div class="col-md-3">
 			<div class="form-group">
-				<label for="regions"><?php echo _l('regions'); ?></label> <select
+				<label for="regions"><?php echo _l('teams'); ?></label> <select
 					name="regions" class="selectpicker" multiple data-width="100%">
-					<option value="" selected><?php echo _l('regions_all'); ?></option>
-                  <?php foreach($regions as $r){ ?>
-                  <option value="<?php echo $r; ?>"><?php echo $r; ?></option>
+					<option value="" selected><?php echo _l('teams_all'); ?></option>
+                  <?php foreach($teams as $t){ ?>
+                  <option value="<?php echo $t; ?>"><?php echo $t; ?></option>
                   <?php } ?>
                </select>
 			</div>

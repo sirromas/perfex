@@ -86,6 +86,7 @@ class Reports extends Admin_controller
 
         if (is_using_multiple_currencies()) {
             $this->load->model('currencies_model');
+            $this->load->model('roles_model');
             $data['currencies'] = $this->currencies_model->get();
         }
         $this->load->model('invoices_model');
@@ -95,8 +96,10 @@ class Reports extends Admin_controller
         $data['estimate_statuses'] = $this->estimates_model->get_statuses();
         $data['payments_years'] = $this->reports_model->get_distinct_payments_years();
         $data['estimates_sale_agents'] = $this->estimates_model->get_sale_agents();
+        $data['roleid'] = $this->roles_model->get_current_user_role($this->session->userdata('staff_user_id'));
         $data['employees'] = $this->invoices_model->get_employees();
         $data['regions'] = $this->invoices_model->get_regions();
+        $data['teams'] = $this->invoices_model->get_teams();
         $data['item_products'] = $this->invoices_model->get_products_list();
         $data['invoices_sale_agents'] = $this->invoices_model->get_sale_agents();
 
@@ -164,13 +167,14 @@ class Reports extends Admin_controller
                 $currency_symbol = $this->currencies_model->get_currency_symbol($currency->id);
             }
 
+            /******************* Filtering by team ********************/
             if ($this->input->post('c_regions')) {
                 $regions = $this->input->post('c_regions');
                 $s_regions = array();
                 if (is_array($regions)) {
                     foreach ($regions as $r) {
                         if ($r != '') {
-                            $clients = $this->invoices_model->get_clientid_by_region(trim($r));
+                            $clients = $this->roles_model->get_team_clients(trim($r), true);
                             if (count($clients) > 0) {
                                 foreach ($clients as $clientid) {
                                     array_push($s_regions, $clientid);
@@ -274,6 +278,8 @@ class Reports extends Admin_controller
 
             $this->load->model('currencies_model');
             $this->load->model('invoices_model');
+            $staffid = $this->session->userdata('staff_user_id');
+            $roleid = $this->roles_model->get_current_user_role($staffid);
 
             $select = array(
                 'CASE company WHEN "" THEN (SELECT CONCAT(firstname, " ", lastname) FROM tblcontacts WHERE userid = tblclients.userid and is_primary = 1) ELSE company END as company',
@@ -316,14 +322,14 @@ class Reports extends Admin_controller
                 $currency_symbol = $this->currencies_model->get_currency_symbol($currency->id);
             }
 
-
+            /******************* Filtering by team ********************/
             if ($this->input->post('c_regions')) {
                 $regions = $this->input->post('c_regions');
                 $s_regions = array();
                 if (is_array($regions)) {
                     foreach ($regions as $r) {
                         if ($r != '') {
-                            $clients = $this->invoices_model->get_clientid_by_region(trim($r));
+                            $clients = $this->roles_model->get_team_clients(trim($r), true);
                             if (count($clients) > 0) {
                                 foreach ($clients as $clientid) {
                                     array_push($s_regions, $clientid);
@@ -336,6 +342,15 @@ class Reports extends Admin_controller
                     } // end if count($s_regions) > 0
                 } // end if is_array($regions)
             }
+
+            /* We do not apply filtering for now */
+            if ($roleid == 3) {
+                $teamname = $this->roles_model->get_user_team($staffid);
+                $team_clients = $this->roles_model->get_team_clients($teamname);
+                array_push($where, "AND userid IN ($team_clients)");
+            }
+
+
 
             if ($this->input->post('c_employees')) {
                 $employees = $this->input->post('c_employees');
@@ -940,6 +955,8 @@ class Reports extends Admin_controller
 
             $this->load->model('currencies_model');
             $this->load->model('invoices_model');
+            $staffid = $this->session->userdata('staff_user_id');
+            $roleid = $this->roles_model->get_current_user_role($staffid);
 
             $aColumns = array(
                 'description as item',
@@ -1010,13 +1027,14 @@ class Reports extends Admin_controller
                 }
             }
 
+            /******************* Filtering by team ********************/
             if ($this->input->post('i_regions')) {
                 $regions = $this->input->post('i_regions');
                 $s_regions = array();
                 if (is_array($regions)) {
                     foreach ($regions as $r) {
-                        if ($r != '') {
-                            $clients = $this->invoices_model->get_clientid_by_region(trim($r));
+                        if (trim($r) != '') {
+                            $clients = $this->roles_model->get_team_clients(trim($r), true);
                             if (count($clients) > 0) {
                                 foreach ($clients as $clientid) {
                                     array_push($s_regions, $clientid);
@@ -1028,6 +1046,12 @@ class Reports extends Admin_controller
                         array_push($where, 'AND tblinvoices.clientid IN (' . implode(', ', $s_regions) . ')');
                     } // end if count($s_regions) > 0
                 } // end if is_array($regions)
+            }
+
+            if ($roleid == 3) {
+                $teamname = $this->roles_model->get_user_team($staffid);
+                $team_clients = $this->roles_model->get_team_clients($teamname);
+                array_push($where, "AND tblinvoices.clientid IN ($team_clients)");
             }
 
             if ($this->input->post('i_employees')) {
@@ -1090,7 +1114,6 @@ class Reports extends Admin_controller
             $staffid = $this->session->userdata('staff_user_id');
             $roleid = $this->roles_model->get_current_user_role($staffid);
 
-
             $select = array(
                 'number',
                 'CASE company WHEN "" THEN (SELECT CONCAT(firstname, " ", lastname) FROM tblcontacts WHERE userid = tblclients.userid and is_primary = 1) ELSE company END as company',
@@ -1130,13 +1153,14 @@ class Reports extends Admin_controller
                 array_push($where, $custom_date_select);
             }
 
+            /******************* Filtering by team ********************/
             if ($this->input->post('regions')) {
                 $regions = $this->input->post('regions');
                 $s_regions = array();
                 if (is_array($regions)) {
                     foreach ($regions as $r) {
-                        if ($r != '') {
-                            $clients = $this->invoices_model->get_clientid_by_region(trim($r));
+                        if (trim($r) != '') {
+                            $clients = $this->roles_model->get_team_clients(trim($r), true);
                             if (count($clients) > 0) {
                                 foreach ($clients as $clientid) {
                                     array_push($s_regions, $clientid);
