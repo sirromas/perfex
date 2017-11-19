@@ -1,3 +1,11 @@
+<?php
+
+$CI = &get_instance();
+$CI->load->helper('perfex_misc_helper');
+$roleid=get_user_role();
+
+?>
+
 
 <div id="items-report" class="hide">
     <?php if($mysqlVersion && strpos($mysqlVersion->version,'5.6') !== FALSE && $sqlMode && strpos($sqlMode->mode,'ONLY_FULL_GROUP_BY') !== FALSE){ ?>
@@ -31,9 +39,16 @@
             <div class="form-group">
                 <label for="i_regions"><?php echo _l('teams'); ?></label>
                 <select name="i_regions" class="selectpicker" multiple data-width="100%">
+                    <?php if ($roleid!=3) { ?>
                     <option value="" selected><?php echo _l('teams_all'); ?></option>
                     <?php foreach($teams as $t){ ?>
                         <option value="<?php echo $t; ?>"><?php echo $t; ?></option>
+                    <?php } ?>
+                    <?php }
+                    else {?>
+                        <?php foreach($teams as $t){ ?>
+                            <option value="<?php echo $t; ?>" selected><?php echo $t; ?></option>
+                        <?php } ?>
                     <?php } ?>
                 </select>
             </div>

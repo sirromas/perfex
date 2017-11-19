@@ -1,3 +1,10 @@
+<?php
+
+$CI = &get_instance();
+$CI->load->helper('perfex_misc_helper');
+$roleid=get_user_role();
+
+?>
 
 <div id="invoices-report" class="hide">
 	<div class="row">
@@ -30,17 +37,24 @@
          <?php } ?>
           
          <?php
+
         // We use regions dropdown to populate teams data
-        if (count($teams) >0)  {
-            ?>
+        if (count($teams) >0)  { ?>
          <div class="col-md-3">
 			<div class="form-group">
 				<label for="regions"><?php echo _l('teams'); ?></label> <select
 					name="regions" class="selectpicker" multiple data-width="100%">
+                    <?php if ($roleid!=3) { ?>
 					<option value="" selected><?php echo _l('teams_all'); ?></option>
-                  <?php foreach($teams as $t){ ?>
-                  <option value="<?php echo $t; ?>"><?php echo $t; ?></option>
-                  <?php } ?>
+                      <?php foreach($teams as $t){ ?>
+                      <option value="<?php echo $t; ?>"><?php echo $t; ?></option>
+                      <?php } ?>
+                      <?php } // end if
+                      else { ?>
+                        <?php foreach($teams as $t){ ?>
+                            <option value="<?php echo $t; ?>" selected><?php echo $t; ?></option>
+                        <?php } ?>
+                     <?php } ?>
                </select>
 			</div>
 		</div>
@@ -49,14 +63,15 @@
           
          <?php
         if (count($employees) > 0) {
+
             ?>
          <div class="col-md-3">
 			<div class="form-group">
 				<label for="employees"><?php echo _l('employee_string'); ?></label>
 				<select name="employees" class="selectpicker" multiple
 					data-width="100%">
-					<option value="" selected><?php echo _l('employee_all'); ?></option>
-                  <?php foreach($employees as $e){ ?>
+                 	<option value="" selected><?php echo _l('employee_all'); ?></option>
+                    <?php foreach($employees as $e){ ?>
                   <option value="<?php echo $e; ?>"><?php echo get_staff_full_name($e); ?></option>
                   <?php } ?>
                </select>

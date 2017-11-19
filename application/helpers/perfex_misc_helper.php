@@ -948,6 +948,21 @@ function get_client_link_color($clientid)
     return $color;
 }
 
+/**
+ * @return mixed
+ */
+function get_user_role()
+{
+    $staffid = $_SESSION['staff_user_id'];
+    $CI = &get_instance();
+    $query = "select * from tblstaff WHERE  staffid=$staffid";
+    $result = $CI->db->query($query);
+    foreach ($result->result() as $row) {
+        $roleid = $row->role;
+    }
+    return $roleid;
+}
+
 
 /**
  * When ticket will be opened automatically set to open
